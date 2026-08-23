@@ -38,7 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         variant: [full, services, legacy]
-        profile: [low, mid, modern]
+        profile: [low, mid, modern]   # stage 2 (UI) matters most on low and mid
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -51,6 +51,9 @@ jobs:
           else echo "BLOCKED — ENVIRONMENT LIMITATION: no /dev/kvm on this runner, falling back to TCG (slow)"; fi
       - name: Boot test (${{ matrix.variant }} / ${{ matrix.profile }})
         run: ./build/iso/boot-test.sh zaldros-${{ matrix.variant }}.iso ${{ matrix.profile }} results
+      - name: UI drive log
+        if: always()
+        run: cat results/*.ui-drive.log 2>/dev/null || echo "no UI drive log"
       - name: Result matrix
         if: always()
         run: python3 ./build/iso/report.py results | tee -a "$GITHUB_STEP_SUMMARY"
