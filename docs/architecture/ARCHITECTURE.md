@@ -1,4 +1,4 @@
-# Bedrock OS — Architecture (Phase 0 baseline)
+# Zaldros OS — Architecture (Phase 0 baseline)
 
 Derived from spec PART 1 §5 and PART 2. Layer names use the official project naming.
 
@@ -6,9 +6,9 @@ Derived from spec PART 1 §5 and PART 2. Layer names use the official project na
 
 ```
 ┌─ User Applications ─────────── Flatpak apps, Wine/Proton apps, distrobox
-├─ Bedrock System Applications ─ Files, Settings, Terminal, Task Manager, Store, Update,
+├─ Zaldros System Applications ─ Files, Settings, Terminal, Task Manager, Store, Update,
 │                                Screenshot, Text Editor, Archive Manager
-├─ Bedrock Desktop Shell ─────── Taskbar, Start, Search, Quick Settings, Notification Centre,
+├─ Zaldros Desktop Shell ─────── Taskbar, Start, Search, Quick Settings, Notification Centre,
 │                                Desktop/Icons, Run, Clipboard History, Recycle Bin
 ├─ Display / Compositor ──────── KWin (Wayland) + xwayland, layer-shell, xdg-desktop-portal
 ├─ Hardware / System Services ── systemd, NetworkManager, PipeWire/WirePlumber, BlueZ,
@@ -18,7 +18,7 @@ Derived from spec PART 1 §5 and PART 2. Layer names use the official project na
 ```
 
 Rule (§5): the core system must boot, update, network and log with the entire shell layer removed.
-CI enforces this: the `core` image target is built and booted headless without any Bedrock shell package.
+CI enforces this: the `core` image target is built and booted headless without any Zaldros shell package.
 
 ## 2. Technology stack (decisions)
 
@@ -34,7 +34,7 @@ CI enforces this: the `core` image target is built and booted headless without a
 | System package layer | rpm layered into the OS image at build time (not at runtime) | research/01 |
 | User app format | Flatpak (primary), Wine/Proton (Windows apps), distrobox (dev/`.deb`) | research/01 |
 | Update system | atomic A/B image update + rollback, Windows-like "update and restart" UX | research/01 |
-| Installer | Anaconda/`bootc install` for v0.x; custom Bedrock Setup UI once the shell exists | roadmap |
+| Installer | Anaconda/`bootc install` for v0.x; custom Zaldros Setup UI once the shell exists | roadmap |
 | Security | SELinux enforcing, read-only `/usr`, Flatpak portals, signed images, LUKS opt-in, TPM-backed unlock | SECURITY.md |
 | Windows compat | Wine/Proton as an optional managed component | research/02 |
 
@@ -42,12 +42,12 @@ CI enforces this: the `core` image target is built and booted headless without a
 
 | Profile | Target | Mechanism |
 |---|---|---|
-| Bedrock Desktop | everyday use | default service set, animations on, balanced CPU governor |
-| Bedrock Performance | maximum responsiveness | animations reduced, background indexing off, `performance`/EPP tuning, minimal service set |
-| Bedrock Legacy | ≤4 GB RAM / HDD / old GPU | software-friendly effects off, no compositing extras, zram aggressive, reduced-motion default |
+| Zaldros Desktop | everyday use | default service set, animations on, balanced CPU governor |
+| Zaldros Performance | maximum responsiveness | animations reduced, background indexing off, `performance`/EPP tuning, minimal service set |
+| Zaldros Legacy | ≤4 GB RAM / HDD / old GPU | software-friendly effects off, no compositing extras, zram aggressive, reduced-motion default |
 
 Profiles are systemd presets + shell settings, generated from the service map produced by
-`tools/bedrock-sysprobe`. No profile may disable a service without an entry in the service map
+`tools/zaldros-sysprobe`. No profile may disable a service without an entry in the service map
 justifying it (§6, §7).
 
 ## 4. Measurement contract

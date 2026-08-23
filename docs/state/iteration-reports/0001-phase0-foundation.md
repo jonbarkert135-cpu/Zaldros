@@ -21,7 +21,7 @@ own shell and system apps, Rust for new daemons (ADR-0003); btrfs+zstd+zram (ADR
 **IMPLEMENTATION** — Repository scaffolded: `spec/` (parts 1–2 verbatim), `docs/research`,
 `docs/architecture` (architecture, roadmap, risks, performance, security, testing),
 `docs/state` (project state, 4 ADRs, this report), `THIRD_PARTY_LICENSES.md`, CI workflow.
-First component: `tools/bedrock-sysprobe` v0.1.0 — a standard-library Python tool that produces the
+First component: `tools/zaldros-sysprobe` v0.1.0 — a standard-library Python tool that produces the
 service/dependency/resource map required by PART 1 §7 (description, state, enablement, PSS RAM,
 CPU seconds, `systemd-analyze blame` boot cost, dependants, "is anything requiring it").
 
@@ -45,6 +45,6 @@ all documents are additive so later parts extend rather than restart the project
 only, so the tool runs inside a minimal image). System metrics: none yet — no baseline can honestly be
 claimed without a VM run.
 
-**NEXT** — `Containerfile` for `bedrock-base` (core system, no shell) and `bedrock-desktop`, built in
+**NEXT** — `Containerfile` for `zaldros-base` (core system, no shell) and `zaldros-desktop`, built in
 CI, then a QEMU boot smoke test that attaches the service map and the first real baseline
 (boot time, idle RAM, idle CPU) to the build.

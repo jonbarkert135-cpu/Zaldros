@@ -1,11 +1,11 @@
-# Contributing to Bedrock OS
+# Contributing to Zaldros OS
 
 ## Non-negotiable rules (spec PART 1 §15, PART 5 §22)
 1. A compile, a boot or a screenshot is **not** proof that a feature works. Attach a test.
-2. Never claim compatibility without an evidence record — `tools/bedrock-compat` enforces this in CI.
+2. Never claim compatibility without an evidence record — `tools/zaldros-compat` enforces this in CI.
 3. Never hide a failure or silently delete failing functionality. Reproduce → logs → root cause →
    hypothesis → fix → rerun → regression test.
-4. Performance changes require a baseline and a comparison from `tools/bedrock-bench`; a change with
+4. Performance changes require a baseline and a comparison from `tools/zaldros-bench`; a change with
    an unmeasured metric is INCONCLUSIVE, not ACCEPT.
 5. Never overwrite known-good code without a commit or backup.
 
@@ -31,7 +31,7 @@ translation (ADR-0005 §3). Russian and English are both first-class.
 
 ## Code style: ponytail
 
-Bedrock code follows the **ponytail** rule set (lazy senior developer, MIT-licensed skill supplied by
+Zaldros code follows the **ponytail** rule set (lazy senior developer, MIT-licensed skill supplied by
 the project owner): question whether the code needs to exist, reuse what is already here, reach for
 the standard library before writing a parser, native platform features before dependencies, one line
 before fifty. Deliberate corner-cuts carry a `ponytail:` comment naming the ceiling and the upgrade

@@ -1,0 +1,96 @@
+"""Visual regression tests: the shell must actually render, and the rendered pixels must match the
+geometry we claim (spec PART 5 §8, VISUAL FOUNDATION §14).
+
+Skipped when PySide6 is unavailable so the rest of the suite still runs; CI installs PySide6.
+"""
+import os
+import sys
+
+import pytest
+
+pytest.importorskip("PySide6")
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+from PySide6.QtGui import QImage  # noqa: E402
+
+from zaldros_shell.app import render  # noqa: E402
+
+W, H = 1600, 1000
+TASKBAR_HEIGHT = 48
+
+
+def shot(tmp_path, name, **kwargs):
+    return render(str(tmp_path / f"{name}.png"), width=W, height=H, **kwargs)
+
+
+@pytest.fixture(scope="module")
+def desktop(tmp_path_factory):
+    return shot(tmp_path_factory.mktemp("shots"), "desktop")
+
+
+def test_desktop_renders_at_the_requested_size(desktop):
+    image = QImage(desktop)
+    assert (image.width(), image.height()) == (W, H)
+
+
+def test_taskbar_band_is_drawn_at_the_documented_height(desktop):
+    """A 48 px bar must exist: the pixel just above the bar edge is taskbar, 2 px higher is not."""
+    image = QImage(desktop)
+    inside = image.pixelColor(20, H - TASKBAR_HEIGHT // 2)
+    above = image.pixelColor(20, H - TASKBAR_HEIGHT - 30)
+    assert inside.lightness() < 110, "taskbar band is not dark"
+    assert abs(inside.lightness() - above.lightness()) > 8, "taskbar is indistinguishable from desktop"
+
+
+def test_start_button_and_tray_occupy_the_expected_zones(desktop):
+    """Windows 11 places the Start group centred and the clock at the right edge."""
+    image = QImage(desktop)
+    row = H - TASKBAR_HEIGHT // 2
+    centre = [image.pixelColor(x, row).lightness() for x in range(W // 2 - 200, W // 2 + 200)]
+    right = [image.pixelColor(x, row).lightness() for x in range(W - 200, W - 10)]
+    assert max(centre) - min(centre) > 40, "nothing is drawn in the centre group"
+    assert max(right) - min(right) > 30, "tray area looks empty"
+
+
+def test_opening_start_changes_the_screen(tmp_path):
+    closed, opened = QImage(shot(tmp_path, "c")), QImage(shot(tmp_path, "o", start_open=True))
+    y = H - TASKBAR_HEIGHT - 200
+    assert closed.pixelColor(W // 2, y) != opened.pixelColor(W // 2, y)
+
+
+def test_start_panel_is_opaque_enough_to_read(tmp_path):
+    """The panel must not ghost the windows behind it: its interior is a flat surface."""
+    image = QImage(shot(tmp_path, "start", start_open=True))
+    y = H - TASKBAR_HEIGHT - 120          # inside the Start panel, below the pinned grid
+    samples = [image.pixelColor(x, y).lightness() for x in range(W // 2 - 250, W // 2 + 250, 25)]
+    assert max(samples) - min(samples) < 30, "Start background is not uniform (content bleeding through)"
+
+
+def test_quick_settings_opens_on_the_right_above_the_taskbar(tmp_path):
+    plain, quick = QImage(shot(tmp_path, "p")), QImage(shot(tmp_path, "q", quick_open=True))
+    probe = (W - 180, H - TASKBAR_HEIGHT - 120)
+    assert plain.pixelColor(*probe) != quick.pixelColor(*probe)
+    # and the desktop far from the flyout is untouched
+    assert plain.pixelColor(200, 600) == quick.pixelColor(200, 600)
+
+
+def test_context_menu_renders_where_it_was_opened(tmp_path):
+    plain, menu = QImage(shot(tmp_path, "p2")), QImage(shot(tmp_path, "m", context_open=True))
+    assert plain.pixelColor(60, 60) != menu.pixelColor(60, 60)
+
+
+def test_light_theme_is_actually_light(tmp_path):
+    dark = QImage(shot(tmp_path, "d"))
+    light = QImage(shot(tmp_path, "l", light=True))
+    row = H - TASKBAR_HEIGHT // 2
+    assert light.pixelColor(20, row).lightness() > dark.pixelColor(20, row).lightness() + 60
+
+
+def test_english_locale_renders(tmp_path):
+    assert QImage(shot(tmp_path, "en", locale="en")).width() == W
+
+
+def test_a_bad_output_path_fails_loudly(tmp_path):
+    with pytest.raises(Exception):
+        render("/definitely/not/a/directory/out.png")

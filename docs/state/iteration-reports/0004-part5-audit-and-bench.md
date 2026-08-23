@@ -24,7 +24,7 @@ seven questions escalated to the owner.
 (PART 5 §18, everything honestly NOT IMPLEMENTED or PARTIALLY IMPLEMENTED); roadmap renumbered to
 phases 0–14; the full §14 document set (BUILD, INSTALL, RECOVERY, COMPATIBILITY, CONTRIBUTING,
 CHANGELOG + root pointers for ARCHITECTURE/SECURITY/PERFORMANCE). New component
-`tools/bedrock-bench` v0.1.0: collects used RAM, load, process count, running services and all six
+`tools/zaldros-bench` v0.1.0: collects used RAM, load, process count, running services and all six
 systemd boot stages, and implements BASELINE → CHANGE → BENCHMARK → COMPARE → ACCEPT/REVERT as a
 `decide()` function with a 3 % noise threshold.
 
@@ -47,7 +47,7 @@ counted as an improvement. The CI baseline job runs the same harness on a real s
 **METRICS** — 44/44 tests, 0.19 s. Four shipping tools, zero external dependencies. Evidence records:
 still 0 — no image has booted.
 
-**NEXT** — Phase 1 the moment a build host exists: build `bedrock-base`, boot in QEMU, capture the
+**NEXT** — Phase 1 the moment a build host exists: build `zaldros-base`, boot in QEMU, capture the
 first service map, hardware inventory and performance baseline. Meanwhile the seven questions in
 `SPEC_AUDIT.md` §E block decisions that are cheap now and expensive later (project license, name,
 Secure Boot).
@@ -57,8 +57,8 @@ Secure Boot).
 ## Addendum — owner decisions closed (2026-08-23)
 
 **DECISION** — ADR-0005 records four owner decisions, each benchmarked against what Ubuntu, Debian,
-Arch and Mint actually do: name **Bedrock OS** (short-name convention kept; suffix changed from "Linux"
-to "OS" only to avoid the live bedrocklinux.org project); license **GPL-3.0-or-later** for our own code
+Arch and Mint actually do: name **Zaldros OS** (short-name convention kept; suffix changed from "Linux"
+to "OS" only to avoid the live zaldroslinux.org project); license **GPL-3.0-or-later** for our own code
 with forks keeping upstream licenses; **Russian default with first-class English** plus a tier-2
 language set, and a hard no-hardcoded-strings rule from the first line of shell code; disk encryption
 **off by default**, offered as an installer checkbox — which is exactly what Ubuntu, Mint and Debian do
@@ -77,6 +77,6 @@ SPDX identifier and the standard notice with an explicit marker that the full te
 before release.
 
 **FIX / NEXT** — The base decision is settled by a defined test, not by preference: build both minimal
-images, boot each on the weakest available machine, and record `bedrock-hwinfo`, `bedrock-bench collect`
+images, boot each on the weakest available machine, and record `zaldros-hwinfo`, `zaldros-bench collect`
 and a deliberate broken-update rollback. All four tools are base-agnostic, so no work is lost either
 way. The test needs CI or a real machine — still the project's only blocker.

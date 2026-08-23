@@ -1,6 +1,6 @@
-# Bedrock OS — MASTER SPECIFICATION — PART 1/5 — VISION, RULES & ARCHITECTURE
-Repo: https://github.com/jonbarkert135-cpu/bedrock_os
-Received from Linussi Fril (Slack DM), 2026-08-23. Project name in spec: RAVEN OS.
+# Zaldros OS — MASTER SPECIFICATION — PART 1/5 — VISION, RULES & ARCHITECTURE
+Repo: https://github.com/jonbarkert135-cpu/zaldros_os
+Received from Linussi Fril (Slack DM), 2026-08-23. Project name in spec: ZALDROS OS.
 
 Role: autonomous senior Linux systems architect / OS, DE, UI/UX, performance, security, QA engineer and researcher.
 Goal: Windows 11-like desktop UX on a genuine, lightweight, highly optimised Linux OS.
@@ -9,10 +9,10 @@ Goal: Windows 11-like desktop UX on a genuine, lightweight, highly optimised Lin
 2. LEGAL BOUNDARIES — no proprietary Windows source/components/binaries, no pirated ISOs, no license bypass, no protected MS assets without license check. Allowed: study public behaviour/docs, screenshots/videos as UX reference, independent reimplementation, open-source projects, forks per license, original implementations.
 3. AUTONOMY — independently decide: distro base, kernel strategy, init, desktop architecture, compositor, display protocol, GUI toolkit, languages, filesystem, package manager, app format, updates, installer, HAL, security, Windows compat layer, performance architecture. Justify deviations with evidence.
 4. LINUX BASE SELECTION — no default choice. Compare at minimum Debian, Arch, Fedora, Ubuntu + other modern bases on: stability, packages, hardware/driver support, kernel freshness, performance, boot time, maintenance, security, docs, community, customization, buildability, sustainability, suitability.
-5. ARCHITECTURE — Kernel → Core System → Hardware/System Services → Display/Compositor → Raven Desktop Shell → Raven System Apps → User Apps. Core independent of visual layer; every daemon documented.
+5. ARCHITECTURE — Kernel → Core System → Hardware/System Services → Display/Compositor → Zaldros Desktop Shell → Zaldros System Apps → User Apps. Core independent of visual layer; every daemon documented.
 6. PERFORMANCE-FIRST — minimal resource use while stable/secure/functional. Loop: BASELINE → CHANGE → MEASURE → COMPARE → ACCEPT OR REVERT. Never remove components without understanding purpose/deps/consequences.
 7. SYSTEM MINIMALISM — for each background service answer 9 questions (what, required?, dependents, RAM, CPU, boot impact, disableable?, security impact, hardware impact). Produce a service/dependency map.
-8. PERFORMANCE PROFILES — Raven Desktop (everyday), Raven Performance (max responsiveness), Raven Legacy (low-end hardware). Each documented.
+8. PERFORMANCE PROFILES — Zaldros Desktop (everyday), Zaldros Performance (max responsiveness), Zaldros Legacy (low-end hardware). Each documented.
 9. RESEARCH-FIRST — RESEARCH → ARCHITECTURE → SPECIFICATION → PROTOTYPE → TEST → IMPLEMENTATION. Preference order: mature solution > compatible OSS > fork/modify > custom.
 10. EXISTING SOFTWARE — research options for shell, compositor, file manager, settings, terminal, notifications, launcher, package UI, task manager, system monitor, screenshot, archiver, text editor, display manager, network, Bluetooth, audio, updates.
 11. LICENSING — record project, version, source, license, modifications, redistribution requirements; create THIRD_PARTY_LICENSES.md.
@@ -23,4 +23,4 @@ Goal: Windows 11-like desktop UX on a genuine, lightweight, highly optimised Lin
 16. COMMUNICATION — per iteration report: CURRENT OBJECTIVE, RESEARCH, DECISION, IMPLEMENTATION, TEST, RESULT, PROBLEMS, FIX, METRICS, NEXT. No claims without evidence.
 17. PHASE 0 — FIRST MISSION: research & architecture only. Compare bases, desktop architectures, compositors, GUI toolkits, app technologies, packaging, update architectures, installers, Windows compat tech, performance strategies. Deliver: (1) recommended Linux base, (2) complete architecture, (3) tech stack, (4) component dependency graph, (5) roadmap, (6) risk assessment, (7) performance strategy, (8) security strategy, (9) testing strategy, (10) initial prototype plan.
 
-IMPORTANT: Part 1 of 5. No massive implementation yet. Wait for parts 2–5, then merge all five into one complete Raven OS specification.
+IMPORTANT: Part 1 of 5. No massive implementation yet. Wait for parts 2–5, then merge all five into one complete Zaldros OS specification.

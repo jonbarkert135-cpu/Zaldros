@@ -1,6 +1,6 @@
 # CI pipeline
 
-`ci.yml` is the GitHub Actions workflow for this repository. It runs the `bedrock-sysprobe` unit
+`ci.yml` is the GitHub Actions workflow for this repository. It runs the `zaldros-sysprobe` unit
 tests and then executes a live probe on the runner (a real systemd host), publishing the generated
 service map as a build artefact.
 

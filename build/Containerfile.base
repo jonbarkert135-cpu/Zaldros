@@ -1,0 +1,43 @@
+# Zaldros OS — core system image (no desktop shell).
+# Spec PART 1 §5: the core system must boot, network, log and update with the shell layer absent.
+#
+# STATUS: WRITTEN, NOT YET BUILT. No build host with podman/KVM is available to this project yet,
+# so this file is an untested build definition — see docs/state/PROJECT_STATE.md. Do not treat a
+# green CI checkout as proof that it boots (spec PART 1 §15).
+FROM quay.io/fedora/fedora-bootc:42
+
+ARG ZALDROS_VERSION=0.1.0-dev
+
+# --- core system -----------------------------------------------------------------
+RUN dnf -y install --setopt=install_weak_deps=False \
+        systemd \
+        NetworkManager \
+        firewalld \
+        fwupd \
+        podman \
+        flatpak \
+        btrfs-progs \
+        zram-generator \
+        ntfs-3g \
+        exfatprogs \
+        python3 \
+    && dnf clean all
+
+# Minimal network exposure (PART 4 §13): no inbound services by default.
+RUN systemctl enable NetworkManager firewalld \
+    && systemctl disable sshd.service || true
+
+# zram swap per ADR-0004
+RUN printf '[zram0]\nzram-size = min(ram / 2, 8192)\ncompression-algorithm = zstd\n' \
+        > /etc/systemd/zram-generator.conf
+
+# Zaldros identity
+RUN sed -i 's/^NAME=.*/NAME="Zaldros OS"/; s/^PRETTY_NAME=.*/PRETTY_NAME="Zaldros OS"/' \
+        /etc/os-release \
+    && echo "ZALDROS_VERSION=${ZALDROS_VERSION}" >> /etc/os-release
+
+# Zaldros tooling used by Settings, Services and Device Manager
+COPY tools/zaldros-sysprobe/zaldros_sysprobe /usr/lib/zaldros/zaldros_sysprobe
+COPY tools/zaldros-hwinfo/zaldros_hwinfo     /usr/lib/zaldros/zaldros_hwinfo
+
+RUN bootc container lint

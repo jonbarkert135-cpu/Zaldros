@@ -1,0 +1,18 @@
+{
+  "_comment": "Spec PART 4 §25. A positive state requires an evidence record. No Zaldros image has been booted on hardware yet, so everything is honestly 'untested'.",
+  "entries": [
+    {"id": "cpu-intel-x86_64", "name": "Intel x86_64 CPUs", "status": "untested", "notes": "Expected to work via the Fedora kernel; no Zaldros build has booted yet."},
+    {"id": "cpu-amd-x86_64", "name": "AMD x86_64 CPUs", "status": "untested", "notes": "Same as above."},
+    {"id": "gpu-intel-mesa", "name": "Intel GPU (Mesa ANV/iris)", "status": "untested", "notes": "Planned default stack."},
+    {"id": "gpu-amd-mesa", "name": "AMD GPU (Mesa RADV/radeonsi)", "status": "untested", "notes": "Planned default stack."},
+    {"id": "gpu-nvidia-proprietary", "name": "NVIDIA GPU (proprietary driver)", "status": "untested", "notes": "Separate image variant; Wayland support depends on recent driver branches."},
+    {"id": "wifi-generic", "name": "Wi-Fi (NetworkManager + kernel drivers)", "status": "untested"},
+    {"id": "bluetooth-bluez", "name": "Bluetooth (BlueZ)", "status": "untested"},
+    {"id": "audio-pipewire", "name": "Audio (PipeWire/WirePlumber)", "status": "untested"},
+    {"id": "storage-nvme", "name": "NVMe storage", "status": "untested"},
+    {"id": "storage-ntfs3", "name": "External NTFS drives (kernel ntfs3)", "status": "untested", "notes": "Required by PART 4 §19."},
+    {"id": "suspend-s2idle", "name": "Suspend-to-idle", "status": "untested"},
+    {"id": "printers-cups-ipp", "name": "Driverless printing (CUPS/IPP Everywhere)", "status": "untested"},
+    {"id": "multi-monitor-mixed-dpi", "name": "Multi-monitor with mixed DPI", "status": "untested", "notes": "PART 2 §16 acceptance item."}
+  ]
+}

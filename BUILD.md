@@ -1,8 +1,8 @@
-# Building Bedrock OS
+# Building Zaldros OS
 
 **Status: the build has never been executed.** These are the intended, reviewed commands; no image has
 been produced yet because no build host with `podman` and `/dev/kvm` is available to the project
-(`docs/state/PROJECT_STATE.md`). Nothing in this file may be quoted as evidence that Bedrock builds.
+(`docs/state/PROJECT_STATE.md`). Nothing in this file may be quoted as evidence that Zaldros builds.
 
 ## Requirements
 - Linux host, `podman` 4+, ~20 GB free disk
@@ -10,14 +10,14 @@ been produced yet because no build host with `podman` and `/dev/kvm` is availabl
 
 ## Build
 ```bash
-podman build -t bedrock-base    -f build/Containerfile.base    .
-podman build -t bedrock-desktop -f build/Containerfile.desktop .
+podman build -t zaldros-base    -f build/Containerfile.base    .
+podman build -t zaldros-desktop -f build/Containerfile.desktop .
 ```
 
 ## Bootable image
 ```bash
 podman run --rm -it --privileged -v .:/output \
-  quay.io/centos-bootc/bootc-image-builder --type qcow2 localhost/bedrock-desktop
+  quay.io/centos-bootc/bootc-image-builder --type qcow2 localhost/zaldros-desktop
 ```
 
 ## VM test (the gate for Phase 1)
@@ -27,13 +27,13 @@ qemu-system-x86_64 -enable-kvm -m 4096 -smp 4 -bios /usr/share/OVMF/OVMF_CODE.fd
 ```
 Inside the VM, record the first real evidence:
 ```bash
-python3 -m bedrock_sysprobe -o service-map.md
-python3 -m bedrock_hwinfo   -o inventory.md
-python3 -m bedrock_bench collect --label phase1-baseline -o baseline.json
+python3 -m zaldros_sysprobe -o service-map.md
+python3 -m zaldros_hwinfo   -o inventory.md
+python3 -m zaldros_bench collect --label phase1-baseline -o baseline.json
 ```
 
 ## Tests
 ```bash
 python -m pytest tools -q
-python -m bedrock_compat --check   # from tools/bedrock-compat
+python -m zaldros_compat --check   # from tools/zaldros-compat
 ```

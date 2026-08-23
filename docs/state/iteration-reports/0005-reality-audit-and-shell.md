@@ -13,12 +13,12 @@ owner's suspicion — that the project had drifted into backend and documentatio
 **DECISION** — Stop adding utilities. Build the first vertical slice of the actual desktop, and make
 it produce *visual evidence* that can be tested, since PART 5 §8 asks for visual regression testing.
 
-**IMPLEMENTATION** — `shell/bedrock-shell`: Qt 6/QML Bedrock Taskbar and Start menu with the Windows 11
+**IMPLEMENTATION** — `shell/zaldros-shell`: Qt 6/QML Zaldros Taskbar and Start menu with the Windows 11
 layout (centred group, search pill, tray with time above date, pinned grid, animated Start).
 Backend in Python: locale-aware clock, running-application detection from the real `/proc` table, real
 memory pressure. Notable engineering detail: QML context properties are invisible to types loaded
 through a `qmldir` module, which silently produced `null` backends; the theme singleton was moved into
-its own `BedrockTheme` module and the backend objects are now injected explicitly from `Shell.qml`.
+its own `ZaldrosTheme` module and the backend objects are now injected explicitly from `Shell.qml`.
 
 **TEST** — 9 new tests: pinned-data integrity, real-process reading, locale clock formats (ru/en_US/de),
 memory percent is real-or-None, plus render tests that assert the frame is 1280×800, that a dark

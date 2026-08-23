@@ -5,7 +5,7 @@ test is forbidden. Every statement below is either a decision or a hypothesis ma
 
 ## 1. Application delivery (§1, §2)
 
-| Format | Role in Bedrock | Reason |
+| Format | Role in Zaldros | Reason |
 |---|---|---|
 | **Flatpak** | primary format for user applications | vendor-neutral, sandboxed via portals, works on an image-based OS without touching `/usr` |
 | rpm layered in the image | system components only, at build time | keeps `/usr` reproducible (ADR-0001) |
@@ -13,9 +13,9 @@ test is forbidden. Every statement below is either a decision or a hypothesis ma
 | distrobox/toolbox container | `.deb`-only and developer tooling | isolates foreign packages from the base image |
 | Wine/Proton bottle | Windows applications | see §3 below |
 
-**Bedrock Store** is a thin front-end: search, categories, app pages with screenshots from AppStream
+**Zaldros Store** is a thin front-end: search, categories, app pages with screenshots from AppStream
 metadata, install/uninstall/update, permission editing (portal permissions per app), storage usage and
-— mandatory — the **source** of every app (Flathub / Bedrock repo / AppImage vendor / Wine bottle).
+— mandatory — the **source** of every app (Flathub / Zaldros repo / AppImage vendor / Wine bottle).
 Package-manager vocabulary never appears in the default UI; it is available in an "advanced" view.
 
 ## 2. Windows application compatibility (§3, §4)
@@ -29,7 +29,7 @@ the Store exactly as recorded:
 | Class | Meaning | Evidence required |
 |---|---|---|
 | Native Linux | a real Linux build exists | package exists |
-| Compatible | installs and runs, no blocking defects | a recorded test run on a Bedrock build |
+| Compatible | installs and runs, no blocking defects | a recorded test run on a Zaldros build |
 | Partially Compatible | runs with documented limitations | recorded test + description of the limitation |
 | Unsupported | does not run, or anti-cheat/DRM blocks it | recorded test or upstream statement |
 
@@ -43,7 +43,7 @@ components never modify the base image; they live in Flatpak/containers.
   profiles may only change *runtime* behaviour (services, polling, animations), never driver presence.
 - Graphics: **Mesa** (Intel/AMD, RADV/ANV) by default; **NVIDIA proprietary driver** offered as an
   image variant plus firmware, because Wayland/NVIDIA works acceptably only on recent driver branches —
-  status **UNTESTED** in Bedrock until we run the matrix.
+  status **UNTESTED** in Zaldros until we run the matrix.
 - Audio: **PipeWire + WirePlumber** (per-application volume, Bluetooth profiles, low latency,
   PulseAudio/JACK compatibility).
 - Networking: **NetworkManager** (Wi-Fi, Ethernet, VPN plugins, DNS, proxy, hotspot); taskbar state
@@ -53,12 +53,12 @@ components never modify the base image; they live in Flatpak/containers.
 - Printers: CUPS + IPP Everywhere driverless; scanners via SANE (optional feature).
 
 Hardware claims are tracked in `hardware/matrix.json` with the four states from §25 and validated in CI
-by `tools/bedrock-compat`.
+by `tools/zaldros-compat`.
 
 ## 4. Power (§11, §12)
 
 Baseline first, tuning second. Defaults: `power-profiles-daemon` (performance / balanced /
-power-saver) mapped to the three Bedrock profiles; suspend-to-idle or S3 per firmware capability;
+power-saver) mapped to the three Zaldros profiles; suspend-to-idle or S3 per firmware capability;
 hibernate offered only when a suitable swap target exists and the firmware supports resume.
 Measurements required before any tuning ships: idle (screen off), screen-on idle, sleep drain per hour,
 CPU package power, GPU power. `tlp`-style aggressive tuning is **not** applied blindly (§12).
@@ -85,7 +85,7 @@ via kernel drivers, auto-mounted through udisks2 so external Windows drives "jus
 ## 7. Installer and first run (§20, §21, §22)
 
 - v0.x: `bootc install` / Anaconda kickstart to get bootable media quickly.
-- v1: **Bedrock Setup** — language, keyboard, timezone, disk selection with a clear "this erases X"
+- v1: **Zaldros Setup** — language, keyboard, timezone, disk selection with a clear "this erases X"
   confirmation typed by the user, optional LUKS2 encryption, user creation, bootloader, network,
   optional software, installation profile (Desktop / Performance / Legacy).
 - First boot must reach the desktop with no startup applications beyond the shell; the optional
@@ -93,7 +93,7 @@ via kernel drivers, auto-mounted through udisks2 so external Windows drives "jus
 
 ## 8. Windows migration (§23)
 
-Bedrock Migration Assistant (Phase 4): mounts the Windows partition read-only and imports browser
+Zaldros Migration Assistant (Phase 4): mounts the Windows partition read-only and imports browser
 bookmarks/history (Firefox/Chrome profile formats), user files, wallpapers, and basic preferences
 (timezone, locale, accent colour). It never copies application binaries, fonts or system files.
 

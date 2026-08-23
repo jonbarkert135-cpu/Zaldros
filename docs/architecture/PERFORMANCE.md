@@ -14,7 +14,7 @@ Loop (spec §6): BASELINE → CHANGE → MEASURE → COMPARE → ACCEPT OR REVER
 
 ## Rules
 1. No optimisation without a recorded baseline in `docs/state/measurements/`.
-2. No service is removed until `bedrock-sysprobe` documents purpose, dependants and consequences.
+2. No service is removed until `zaldros-sysprobe` documents purpose, dependants and consequences.
 3. Animations are capped by profile; PERFORMANCE > ANIMATION (PART 2 §19).
 4. Search indexing is opt-in and scoped; no permanent full-disk indexer (PART 2 §4, §5).
 5. Regressions >5 % on any metric block a merge.

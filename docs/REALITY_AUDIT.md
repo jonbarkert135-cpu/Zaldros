@@ -16,15 +16,15 @@ Legend: REAL / PROTOTYPE / BACKEND ONLY / DOCUMENTATION ONLY / MOCK / NOT IMPLEM
 
 | Component | Before audit | After this iteration | Evidence |
 | --- | --- | --- | --- |
-| Bedrock Shell | NOT IMPLEMENTED | **PROTOTYPE** | renders offscreen, 9 tests, `docs/evidence/*.png` |
+| Zaldros Shell | NOT IMPLEMENTED | **PROTOTYPE** | renders offscreen, 9 tests, `docs/evidence/*.png` |
 | Taskbar | NOT IMPLEMENTED | **PROTOTYPE** | real clock, real running-process underline |
 | Start menu | NOT IMPLEMENTED | **PROTOTYPE** | pinned grid, animated open/close, click-outside dismiss |
 | Search | DOCUMENTATION ONLY | DOCUMENTATION ONLY (UI shell only, no index) | — |
 | Explorer | DOCUMENTATION ONLY | DOCUMENTATION ONLY | — |
 | Settings | DOCUMENTATION ONLY | DOCUMENTATION ONLY | — |
 | Terminal / PowerShell | DOCUMENTATION ONLY | DOCUMENTATION ONLY | decision only (reuse Konsole) |
-| Task Manager | BACKEND ONLY | BACKEND ONLY | `bedrock-sysprobe` service/resource map |
-| Device Manager | BACKEND ONLY | BACKEND ONLY | `bedrock-hwinfo` real `/proc`+`/sys` inventory |
+| Task Manager | BACKEND ONLY | BACKEND ONLY | `zaldros-sysprobe` service/resource map |
+| Device Manager | BACKEND ONLY | BACKEND ONLY | `zaldros-hwinfo` real `/proc`+`/sys` inventory |
 | Update Center | DOCUMENTATION ONLY | DOCUMENTATION ONLY | — |
 | Installer | DOCUMENTATION ONLY | DOCUMENTATION ONLY | contract in `INSTALL.md` |
 | Recovery | DOCUMENTATION ONLY | DOCUMENTATION ONLY | contract in `RECOVERY.md` |
@@ -33,7 +33,7 @@ Legend: REAL / PROTOTYPE / BACKEND ONLY / DOCUMENTATION ONLY / MOCK / NOT IMPLEM
 | Graphics / multi-monitor | NOT IMPLEMENTED | NOT IMPLEMENTED | never run on a GPU |
 | Application installation | NOT IMPLEMENTED | NOT IMPLEMENTED | — |
 | Bootable image | NOT IMPLEMENTED | NOT IMPLEMENTED | Containerfiles written, never built |
-| Performance harness | REAL | REAL | `bedrock-bench`, 13 tests |
+| Performance harness | REAL | REAL | `zaldros-bench`, 13 tests |
 | Compatibility registry | REAL (backend) | REAL (backend) | evidence gate fails unproven claims |
 
 ## 3. Real run — what was actually executed
@@ -43,8 +43,8 @@ Legend: REAL / PROTOTYPE / BACKEND ONLY / DOCUMENTATION ONLY / MOCK / NOT IMPLEM
 | Unit tests (4 tools) | **44 passed** |
 | Shell backend + render tests | **9 passed** (PySide6 6.11.2, offscreen) |
 | Shell rendered to PNG, RU and EN | **succeeded** — `docs/evidence/shell-desktop-ru.png`, `shell-start-ru.png`, `shell-desktop-en.png` |
-| `bedrock-bench collect` live | succeeded, but boot metrics `null` — no systemd here |
-| `bedrock-sysprobe` / `bedrock-hwinfo` live | run, output is honest but nearly empty in a container |
+| `zaldros-bench collect` live | succeeded, but boot metrics `null` — no systemd here |
+| `zaldros-sysprobe` / `zaldros-hwinfo` live | run, output is honest but nearly empty in a container |
 | Container image build | **impossible** — no `podman`/`docker` |
 | VM boot, GPU/multi-monitor/hardware profiles | **impossible** — no `qemu`, no `/dev/kvm` |
 | Comparison vs Ubuntu/Mint/Fedora/Debian VMs | **impossible** — same blocker |
@@ -58,7 +58,7 @@ Actions runner (the `image` job the owner added) or a real Linux machine.
 ### 10 strengths
 1. Architecture decisions are written down with evidence and revisable (ADR-0001…0005).
 2. The evidence gate makes an unproven compatibility claim fail the build — rare discipline.
-3. `bedrock-bench` cannot report a false optimisation win (missing metric ⇒ INCONCLUSIVE).
+3. `zaldros-bench` cannot report a false optimisation win (missing metric ⇒ INCONCLUSIVE).
 4. Real system data everywhere: `/proc`, `/sys`, no fixtures pretending to be hardware.
 5. 53 tests total, all green, no external dependencies in the tools.
 6. Full spec preserved verbatim, with contradictions resolved explicitly rather than silently.
@@ -113,7 +113,7 @@ binding (Win+Shift+S). 10. No file associations or "Open with".
 
 - Built the first **vertical slice** of the desktop: taskbar + Start, running from real system data.
 - Added render-based visual tests so UI claims are backed by an actual frame.
-- Wrote `docs/WINDOWS_BEDROCK_PARITY.md` (per-feature parity, all statuses evidence-based) and
+- Wrote `docs/WINDOWS_ZALDROS_PARITY.md` (per-feature parity, all statuses evidence-based) and
   `docs/FEATURE_RESEARCH.md` (what to take from Ubuntu, Mint, Debian, Arch, Fedora, KDE, GNOME).
 - Recorded the audit itself, including the parts that are unflattering.
 
@@ -124,4 +124,4 @@ binding (Win+Shift+S). 10. No file associations or "Open with".
 3. Make the taskbar a real layer-shell panel on KWin instead of a window.
 4. Parse `.desktop` files and actually launch applications from Start.
 5. Track real windows from the compositor and show them in the taskbar.
-6. Boot an image in a VM and capture the first screenshot of Bedrock running for real.
+6. Boot an image in a VM and capture the first screenshot of Zaldros running for real.

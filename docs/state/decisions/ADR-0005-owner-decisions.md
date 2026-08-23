@@ -1,24 +1,15 @@
-# ADR-0005 — Owner decisions: name, license, localization, disk encryption
+# ADR-0005 — Owner decisions (2026-08-23)
 
-Status: accepted (owner decision, 2026-08-23). Closes gaps B2, B4, B5, B7 of `docs/SPEC_AUDIT.md`.
-Guiding instruction from the owner: *align with what the popular distributions (Ubuntu, Debian, Arch,
-Mint) do — do not invent our own convention where a proven one exists.*
+Status: partially superseded by ADR-0006 (name).
 
-## 1. Name — **Bedrock OS**
+## 1. Name — superseded
 
-What the references do: all four use a single short word plus, when needed, an edition suffix
-(*Ubuntu*, *Debian*, *Arch Linux*, *Linux Mint*). None uses a slogan or a long compound.
+The name decided here ("Bedrock OS") was withdrawn after the full name-availability audit
+(`docs/NAME_RESEARCH.md`, 129 names checked). It collided with Bedrock Linux (an active
+meta-distribution since 2009), Minecraft Bedrock Edition and BedRock Systems.
+**The official name is now Zaldros OS — see ADR-0006.**
 
-Kept as "Bedrock" per owner decision. The one change is the suffix: **Bedrock OS**, not "Bedrock
-Linux", because *Bedrock OS* is a real, unrelated, actively maintained project (bedrocklinux.org)
-and a direct clash would cause user confusion, search collisions and a possible trademark problem
-later. "Bedrock OS" follows the same short-name convention while being distinguishable.
-
-- Product name: **Bedrock OS**
-- Short/technical id: `bedrock` (packages, `/etc/os-release` `ID=bedrock`, repo, CLI prefix)
-- Editions later: "Bedrock OS Desktop / Performance / Legacy" (the profile names, already defined)
-
-## 2. License — **GPL-3.0-or-later for Bedrock's own code**
+## 2. License — **GPL-3.0-or-later for Zaldros's own code**
 
 What the references do: none of them uses a single license for everything; each ships a mixed archive
 and licenses their *own* new code under a copyleft or permissive OSI license. Ubuntu's own tooling is
@@ -26,7 +17,7 @@ mostly GPL, Debian requires DFSG-free licenses, Mint's own applications (Cinnamo
 GPL-2.0/GPL-3.0, Arch's own tools are GPL.
 
 Decision:
-- New Bedrock code (shell, system applications, tools): **GPL-3.0-or-later**.
+- New Zaldros code (shell, system applications, tools): **GPL-3.0-or-later**.
 - Forked components keep their upstream license (e.g. a Dolphin fork stays GPL-2.0-or-later);
   our modifications are released under the same license as the upstream component.
 - No proprietary components in the base system. Everything third-party is recorded in
@@ -77,7 +68,7 @@ Decision:
 
 ## 5. Consequences
 
-- `docs/NAMING.md`, `README.md` and all documents updated from "Bedrock OS" to "Bedrock OS".
+- `docs/NAMING.md`, `README.md` and all documents carry the final name **Zaldros OS** (ADR-0006).
 - `LICENSE` (GPL-3.0-or-later) added; `CONTRIBUTING.md` license section resolved.
 - Localization becomes a Phase 3 requirement, not a Phase 12 afterthought.
 - `INSTALL.md` records the encryption contract above.

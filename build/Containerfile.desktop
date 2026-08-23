@@ -1,0 +1,20 @@
+# Zaldros OS — desktop image: core system + KWin/Plasma session + Zaldros shell components.
+# STATUS: WRITTEN, NOT YET BUILT (no build host available). Untested by definition.
+FROM localhost/zaldros-base:latest
+
+RUN dnf -y install --setopt=install_weak_deps=False \
+        plasma-workspace-wayland \
+        kwin-wayland \
+        sddm \
+        plasma-nm plasma-pa bluedevil powerdevil \
+        pipewire wireplumber pipewire-pulseaudio \
+        xdg-desktop-portal-kde \
+        dolphin konsole ark spectacle \
+        firefox \
+        qt6-qtdeclarative \
+    && dnf clean all
+
+RUN systemctl enable sddm
+
+# Zaldros shell components are added here as they are implemented (Phase 2).
+RUN bootc container lint

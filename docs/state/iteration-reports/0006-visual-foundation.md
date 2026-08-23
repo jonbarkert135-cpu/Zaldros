@@ -19,7 +19,7 @@ not behaviour, and their artwork provenance is unverified. Adopting them would i
 legal risk PART 1 §2 forbids. Reasoning recorded in `docs/VISUAL_THIRD_PARTY.md` §3.
 
 **IMPLEMENTATION**
-- Full design-token system (`qml/BedrockTheme/Theme.qml`): background / surface / surface-elevated /
+- Full design-token system (`qml/ZaldrosTheme/Theme.qml`): background / surface / surface-elevated /
   border / accent / text-primary / secondary / disabled / hover / pressed / selected, plus a
   typography scale and motion durations, in **dark and light**.
 - Taskbar rebuilt to Windows 11 metrics: 48 px bar, 40 px buttons, 24 px icons, centred group,

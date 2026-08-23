@@ -1,11 +1,11 @@
 # Third-party components
 
-Required by spec PART 1 §11. Every third-party component that ships in a Bedrock OS image must be
+Required by spec PART 1 §11. Every third-party component that ships in a Zaldros OS image must be
 listed here with project, version, source, license, our modifications and redistribution requirements.
 
 **No proprietary Microsoft binaries, fonts, icons, cursors or wallpapers may ever be added to this
-repository or to a Bedrock image.** Segoe UI, the Windows icon set and Windows wallpapers are
-proprietary; Bedrock ships open substitutes (see below) and may optionally import assets from a
+repository or to a Zaldros image.** Segoe UI, the Windows icon set and Windows wallpapers are
+proprietary; Zaldros ships open substitutes (see below) and may optionally import assets from a
 Windows installation the user themselves licenses, at their explicit request, at runtime.
 
 | Project | Version | Source | License | Modifications | Redistribution requirements |
@@ -28,5 +28,5 @@ Windows installation the user themselves licenses, at their explicit request, at
 | Wine / Proton | Windows compatibility (optional component) | LGPL-2.1+ |
 | Inter / Selawik | open substitutes for Segoe UI | OFL-1.1 / MIT |
 
-Bedrock OS is an independent Linux project. It is not affiliated with, endorsed by, or distributed
+Zaldros OS is an independent Linux project. It is not affiliated with, endorsed by, or distributed
 by Microsoft. Windows and Windows 11 are trademarks of Microsoft Corporation.

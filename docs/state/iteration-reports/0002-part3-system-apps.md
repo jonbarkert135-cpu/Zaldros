@@ -20,7 +20,7 @@ Information, Startup Apps, Firewall (over firewalld), Recovery (over bootc/ostre
 Per-application quality gates set (cold start, idle RSS, zero background processes when closed).
 
 **IMPLEMENTATION** — `spec/PART_3.md` preserved; `docs/architecture/SYSTEM_APPS.md` added;
-project state and CI updated. New component `tools/bedrock-hwinfo` v0.1.0: the read-only backend for
+project state and CI updated. New component `tools/zaldros-hwinfo` v0.1.0: the read-only backend for
 Device Manager and System Information — CPU, memory, storage, network, displays, batteries,
 board/firmware identity, kernel and OS, read from `/proc` and `/sys` only, with `--sysfs`/`--proc`
 overrides so it is testable without root or special hardware.
@@ -44,5 +44,5 @@ VM/hardware matrix.
 
 **METRICS** — 20/20 tests, 0.10 s. External dependencies: still zero. Two shipping tools.
 
-**NEXT** — `Containerfile` for `bedrock-base` and `bedrock-desktop` plus a QEMU boot smoke test —
+**NEXT** — `Containerfile` for `zaldros-base` and `zaldros-desktop` plus a QEMU boot smoke test —
 this is the first step that genuinely needs a Linux build host with KVM.

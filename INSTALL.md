@@ -1,10 +1,10 @@
-# Installing Bedrock OS
+# Installing Zaldros OS
 
 **There is no installable image yet.** This file describes the intended installation contract so the
 installer (Phase 10) can be built against it; it will be replaced with real instructions once an image
 boots.
 
-Planned: UEFI boot from a written USB image → live environment → **Bedrock Setup** → language,
+Planned: UEFI boot from a written USB image → live environment → **Zaldros Setup** → language,
 keyboard, timezone, disk selection, optional LUKS2 encryption (**off by default**, as in Ubuntu, Mint and Debian), user account, installation profile
 (Desktop / Performance / Legacy) → install → reboot → optional first-run wizard.
 

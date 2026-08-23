@@ -2,13 +2,13 @@
 
 Purpose: before any external code, artwork or font enters the visual layer, its licence must be
 checked and recorded here (spec PART 1 §11, VISUAL FOUNDATION RECOVERY §2).
-Researched 2026-08-23 via public repositories and vendor documentation. **"Used in Bedrock" = "no"
+Researched 2026-08-23 via public repositories and vendor documentation. **"Used in Zaldros" = "no"
 everywhere below means nothing has been vendored yet** — this table is the decision record, not a
 claim that the code is already in the tree.
 
 ## 1. Candidate components
 
-| Component | Source | Licence | Can modify? | Can redistribute? | Attribution required? | Used in Bedrock? |
+| Component | Source | Licence | Can modify? | Can redistribute? | Attribution required? | Used in Zaldros? |
 | --- | --- | --- | --- | --- | --- | --- |
 | **Fluent UI System Icons** | github.com/microsoft/fluentui-system-icons | **MIT** (Microsoft) | yes | yes | yes — keep MIT notice | **Chosen** for system/tray iconography; not yet vendored (no network in build sandbox) |
 | **Selawik** | github.com/microsoft/Selawik | **SIL OFL 1.1** (Microsoft) | yes (rename if modified) | yes | OFL notice | **Chosen** as the UI font — Microsoft's own open replacement for Segoe UI, metric-compatible |
@@ -32,7 +32,7 @@ claim that the code is already in the tree.
 Microsoft itself publishes an open icon set (**Fluent UI System Icons, MIT**) and an open Segoe UI
 replacement (**Selawik, OFL**). Together these give a legally clean Windows-native *look* for
 typography and system iconography without touching a single proprietary asset. This is a better
-answer than any third-party "Win11 theme" pack, and it is the route Bedrock takes.
+answer than any third-party "Win11 theme" pack, and it is the route Zaldros takes.
 
 ## 3. Why we do not build on an existing Windows-11 KDE theme
 

@@ -6,7 +6,7 @@ on:
 
 jobs:
   sysprobe:
-    name: bedrock-sysprobe (unit tests + live run)
+    name: zaldros-sysprobe (unit tests + live run)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,19 +18,19 @@ jobs:
       - name: Unit tests
         run: python -m pytest tools -q
       - name: Live probe on the runner (real systemd system)
-        working-directory: tools/bedrock-sysprobe
-        run: python -m bedrock_sysprobe -o service-map.md && head -30 service-map.md
+        working-directory: tools/zaldros-sysprobe
+        run: python -m zaldros_sysprobe -o service-map.md && head -30 service-map.md
       - uses: actions/upload-artifact@v4
         with:
           name: service-map
-          path: tools/bedrock-sysprobe/service-map.md
+          path: tools/zaldros-sysprobe/service-map.md
       - name: Live hardware inventory on the runner
-        working-directory: tools/bedrock-hwinfo
-        run: python -m bedrock_hwinfo -o inventory.md && head -25 inventory.md
+        working-directory: tools/zaldros-hwinfo
+        run: python -m zaldros_hwinfo -o inventory.md && head -25 inventory.md
       - uses: actions/upload-artifact@v4
         with:
           name: hardware-inventory
-          path: tools/bedrock-hwinfo/inventory.md
+          path: tools/zaldros-hwinfo/inventory.md
 
   compat:
     name: compatibility registries (evidence gate)
@@ -41,18 +41,18 @@ jobs:
         with:
           python-version: "3.12"
       - name: No compatibility claim without evidence (spec PART 4 §25)
-        working-directory: tools/bedrock-compat
-        run: python -m bedrock_compat --check
+        working-directory: tools/zaldros-compat
+        run: python -m zaldros_compat --check
 
   image:
     name: build OS images (requires podman)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build bedrock-base
-        run: podman build -t bedrock-base -f build/Containerfile.base .
-      - name: Build bedrock-desktop
-        run: podman build -t bedrock-desktop -f build/Containerfile.desktop .
+      - name: Build zaldros-base
+        run: podman build -t zaldros-base -f build/Containerfile.base .
+      - name: Build zaldros-desktop
+        run: podman build -t zaldros-desktop -f build/Containerfile.desktop .
 
   bench:
     name: benchmark harness (baseline on the runner)
@@ -63,15 +63,15 @@ jobs:
         with:
           python-version: "3.12"
       - name: Collect a baseline sample (real systemd host)
-        working-directory: tools/bedrock-bench
+        working-directory: tools/zaldros-bench
         run: |
-          python -m bedrock_bench collect \
+          python -m zaldros_bench collect \
             --label ci-runner --commit "${GITHUB_SHA::7}" -o baseline.json
           cat baseline.json
       - uses: actions/upload-artifact@v4
         with:
           name: benchmark-baseline
-          path: tools/bedrock-bench/baseline.json
+          path: tools/zaldros-bench/baseline.json
 
   shell:
     name: shell prototype (backend + visual render tests)
@@ -87,22 +87,22 @@ jobs:
           sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libdbus-1-3 fonts-noto-color-emoji
           python -m pip install PySide6-Essentials pytest
       - name: Run shell tests and render evidence screenshots
-        working-directory: shell/bedrock-shell
+        working-directory: shell/zaldros-shell
         env:
           QT_QPA_PLATFORM: offscreen
         run: |
           python -m pytest tests -q
-          python -m bedrock_shell render --out desktop.png
-          python -m bedrock_shell render --start --out start.png
-          python -m bedrock_shell render --quick --out quick.png
-          python -m bedrock_shell render --context --out context.png
-          python -m bedrock_shell render --light --out light.png
+          python -m zaldros_shell render --out desktop.png
+          python -m zaldros_shell render --start --out start.png
+          python -m zaldros_shell render --quick --out quick.png
+          python -m zaldros_shell render --context --out context.png
+          python -m zaldros_shell render --light --out light.png
       - uses: actions/upload-artifact@v4
         with:
           name: shell-screenshots
           path: |
-            shell/bedrock-shell/desktop.png
-            shell/bedrock-shell/start.png
-            shell/bedrock-shell/quick.png
-            shell/bedrock-shell/context.png
-            shell/bedrock-shell/light.png
+            shell/zaldros-shell/desktop.png
+            shell/zaldros-shell/start.png
+            shell/zaldros-shell/quick.png
+            shell/zaldros-shell/context.png
+            shell/zaldros-shell/light.png

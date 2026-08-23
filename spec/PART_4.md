@@ -1,8 +1,8 @@
-# RAVEN OS (→ Bedrock Linux) — MASTER SPECIFICATION — PART 4/5 — APPLICATIONS, COMPATIBILITY, HARDWARE & SECURITY
+# ZALDROS OS (→ Zaldros Linux) — MASTER SPECIFICATION — PART 4/5 — APPLICATIONS, COMPATIBILITY, HARDWARE & SECURITY
 Received 2026-08-23 (Slack DM). Combine with PARTS 1–3. Naming: see docs/NAMING.md.
 
 1. APPLICATION INSTALLATION — make installing apps easy for non-Linux users; research/integrate native packages, Flatpak, AppImage, distro repos, Wine-based apps, other formats. Do not expose package-management complexity unnecessarily.
-2. BEDROCK SOFTWARE CENTER — unified app management: search, categories, app pages, screenshots, install, uninstall, update, permissions, storage usage, source information. Architecture must respect the real package formats underneath.
+2. ZALDROS SOFTWARE CENTER — unified app management: search, categories, app pages, screenshots, install, uninstall, update, permissions, storage usage, source information. Architecture must respect the real package formats underneath.
 3. WINDOWS APPLICATION COMPATIBILITY — research Wine, Proton, Bottles, other legitimate tech. Optional compatibility layer. Never promise 100 % compatibility. Classify apps: Native Linux / Compatible / Partially Compatible / Unsupported, based on testing where possible.
 4. WINDOWS GAMES — research Proton, Vulkan, GPU drivers, controller support, launchers, shader caching, compatibility tools. Never compromise system stability for gaming.
 5. BROWSER — modern default browser (tabs, bookmarks, history, downloads, profiles, extensions, privacy controls, password management, hardware acceleration). No proprietary browser source copying. Other browsers installable.

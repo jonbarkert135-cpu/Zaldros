@@ -44,8 +44,8 @@ in Phase 10/11.
 
 Build both minimal images and boot each on the reference machine, then record with our own tools:
 
-1. `bedrock-hwinfo` — does every device resolve (Wi-Fi, GPU, audio, touchpad, suspend)?
-2. `bedrock-bench collect` — boot stages and used RAM on the weakest available machine.
+1. `zaldros-hwinfo` — does every device resolve (Wi-Fi, GPU, audio, touchpad, suspend)?
+2. `zaldros-bench collect` — boot stages and used RAM on the weakest available machine.
 3. Time and disk cost of one full update, and a deliberate rollback after a broken update.
 
 Whichever base passes on the weakest machine *and* survives a broken-update rollback becomes final.

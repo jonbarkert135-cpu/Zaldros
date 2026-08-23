@@ -4,7 +4,7 @@
 - **SELinux enforcing** by default; any policy exception is documented and reviewed.
 - **Signed OS images**; update client verifies signatures; rollback to the previous known-good image.
 - **Flatpak + portals** for user applications: filesystem, camera, microphone, screenshot and
-  screen-share access mediated by portals, surfaced in Bedrock Settings as Windows-like permissions.
+  screen-share access mediated by portals, surfaced in Zaldros Settings as Windows-like permissions.
 - **Disk encryption**: LUKS2 opt-in at install, TPM2-backed unlock where available (Windows-like
   "device encryption" workflow).
 - **Secure Boot**: shim-based signed boot chain as a Phase 4 requirement.

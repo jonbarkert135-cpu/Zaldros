@@ -1,4 +1,4 @@
-# Bedrock OS
+# Zaldros OS
 
 A Linux desktop operating system built around **Windows-11-familiar workflows**, with a clean,
 lightweight and aggressively optimised Linux system underneath.
@@ -6,8 +6,8 @@ lightweight and aggressively optimised Linux system underneath.
 > Not "Linux with a Windows theme" — a complete Linux desktop environment designed around
 > Windows-familiar workflows.
 
-**Name:** the official project name is **Bedrock OS**. The master-specification text uses
-"Raven OS"; that name was invented by the AI that drafted the spec and is superseded — see
+**Name:** the official project name is **Zaldros OS**. The master-specification text uses
+"Zaldros OS"; that name was invented by the AI that drafted the spec and is superseded — see
 [`docs/NAMING.md`](docs/NAMING.md).
 
 ## Status
@@ -27,7 +27,7 @@ spec/                  Master specification parts as received (source of truth f
 docs/research/         Evidence-based comparisons (base distro, compositor, toolkit, ...)
 docs/architecture/     Architecture, tech stack, dependency graph, roadmap, risks, strategies
 docs/state/            Living project state, decision log (ADRs), iteration reports
-tools/bedrock-sysprobe/ Service & resource probe — produces the service/dependency map (spec §7)
+tools/zaldros-sysprobe/ Service & resource probe — produces the service/dependency map (spec §7)
 assets/refs/           UX reference material
 ```
 

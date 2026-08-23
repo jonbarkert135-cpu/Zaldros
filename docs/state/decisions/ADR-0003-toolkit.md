@@ -7,4 +7,4 @@ Decision: Qt 6 + QML for shell and system applications; Rust for new non-GUI dae
 C++ where Qt/KWin APIs require it.
 Alternatives: GTK4 (fights Plasma integration), Electron/web (memory cost incompatible with goals),
 Rust GUI toolkits (immature Wayland-shell and a11y support today).
-Consequences: contributors need Qt/QML skills; theming is unified through a single Bedrock design system.
+Consequences: contributors need Qt/QML skills; theming is unified through a single Zaldros design system.

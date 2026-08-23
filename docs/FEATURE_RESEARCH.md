@@ -1,6 +1,6 @@
 # Feature research — what to take from other systems
 
-Rule: adopt only what measurably improves Bedrock, and never copy blindly (spec PART 1 §9–10).
+Rule: adopt only what measurably improves Zaldros, and never copy blindly (spec PART 1 §9–10).
 Each row says what to take **and** what it costs us.
 
 ## Distributions
@@ -66,7 +66,7 @@ Windows Central 2025-09-07; TechRadar 2021-01-24; Wikipedia "Winux". [web, 2026-
 
 1. **zram + zstd** swap for low-RAM machines (Fedora default, measurable win on weak PCs).
 2. **`systemd-analyze blame` in CI** so boot regressions are caught automatically — already wired into
-   `bedrock-bench`.
+   `zaldros-bench`.
 3. **AppStream metadata** for the Store instead of a hand-maintained app list.
 4. **grub-btrfs + snapper** as the rollback path if the base becomes Debian-family.
 5. **Weblate** for translations, as most upstream desktop projects use.

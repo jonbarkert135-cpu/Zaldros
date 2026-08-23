@@ -53,8 +53,8 @@ the feature matrix rather than implied.
 | B1 | **Secure Boot.** PART 5 §12 says "appropriate secure-boot strategy *if implemented*" — undecided. Without a signed shim, users must disable Secure Boot in firmware, which is a serious adoption blocker. | Decide in Phase 1: ship unsigned + documented firmware step for v0.x; pursue a shim review or a user-enrolled MOK key before v1. Needs a real decision, not a default. |
 | B2 | **Localization / RU-first.** The screenshot reference is a Russian Windows 11, but no part specifies the default language, keyboard layouts or translation workflow. | Ship RU + EN as first-class from Phase 4; all shell strings translatable from the first commit (no hardcoded UI text). Awaiting your confirmation on the default locale. |
 | B3 | **Accessibility.** Not mentioned anywhere: screen reader, magnifier, high contrast, keyboard-only navigation. Windows users depend on these and retrofitting is expensive. | Adopt Orca + Qt accessibility from Phase 3; every shell component must expose accessible names. |
-| B4 | **Legal identity of the project**: license of Bedrock's own code, trademark, contribution terms. | Choose GPL-3.0-or-later or MIT for new code (recommend **GPL-3.0-or-later** for a distro shell) and add `CONTRIBUTING.md` + DCO. Needs your decision. |
-| B5 | **Name collision** — "Bedrock OS" is an existing unrelated project (bedrocklinux.org). | Decide before any public release: keep, or differentiate (BedrockOS / Bedrock Desktop). Asked twice; still open. |
+| B4 | **Legal identity of the project**: license of Zaldros's own code, trademark, contribution terms. | Choose GPL-3.0-or-later or MIT for new code (recommend **GPL-3.0-or-later** for a distro shell) and add `CONTRIBUTING.md` + DCO. Needs your decision. |
+| B5 | **Name collision** — "Zaldros OS" is an existing unrelated project (zaldroslinux.org). | Decide before any public release: keep, or differentiate (ZaldrosOS / Zaldros Desktop). Asked twice; still open. |
 | B6 | **Update bandwidth/offline users.** Atomic image updates are large; no part addresses metered connections or offline updates. | Delta updates via bootc/ostree static deltas + a documented offline update path; measure real update size in Phase 11. |
 | B7 | **Data at rest by default.** Encryption is offered by the installer (§20) but no part states whether it is default-on. | Recommend LUKS2 default-on with a clear recovery-key screen; needs confirmation because it affects recovery UX. |
 | B8 | **Crash reporting without telemetry.** §14 forbids unnecessary telemetry, §22 demands log collection for failures. | Local-only crash capture with an explicit, user-initiated "attach to report" action. Nothing leaves the machine automatically. |
@@ -87,7 +87,7 @@ the feature matrix rather than implied.
 ## E. Open questions for the project owner
 
 1. B5 — project name before public release?
-2. B4 — license for Bedrock's own code (recommendation: GPL-3.0-or-later)?
+2. B4 — license for Zaldros's own code (recommendation: GPL-3.0-or-later)?
 3. B2 — default locale RU or EN?
 4. B7 — disk encryption default-on?
 5. B1 — is Secure Boot support a v1 requirement?

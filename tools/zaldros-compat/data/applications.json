@@ -1,0 +1,13 @@
+{
+  "_comment": "Spec PART 4 §3. 'native' needs no test record; every other positive claim does.",
+  "entries": [
+    {"id": "firefox", "name": "Firefox", "status": "native", "notes": "Planned default browser."},
+    {"id": "mpv", "name": "mpv", "status": "native"},
+    {"id": "libreoffice", "name": "LibreOffice", "status": "native"},
+    {"id": "onlyoffice", "name": "ONLYOFFICE", "status": "native", "notes": "Closest to Microsoft Office file fidelity."},
+    {"id": "powershell-7", "name": "PowerShell 7 (cross-platform, MIT)", "status": "native", "notes": "Optional Terminal profile, PART 3 §6."},
+    {"id": "ms-office-desktop", "name": "Microsoft Office (desktop)", "status": "untested", "notes": "Do not claim anything until tested under Wine on a Zaldros build."},
+    {"id": "adobe-photoshop", "name": "Adobe Photoshop", "status": "untested"},
+    {"id": "steam", "name": "Steam + Proton", "status": "untested", "notes": "Flatpak; gaming stack never modifies the base image."}
+  ]
+}

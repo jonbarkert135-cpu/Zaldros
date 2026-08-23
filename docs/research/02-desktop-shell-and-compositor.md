@@ -13,7 +13,7 @@ recycle bin, accessibility, theming.
 
 | Option | Cost to reach PART 2 parity | Performance | Risk |
 |---|---|---|---|
-| **A. KDE Plasma 6 (KWin) + Bedrock shell layer** | Low — snapping, tray (SNI), quick settings, notifications, multi-monitor, a11y, Wayland session all exist and are mature | Good; Plasma 6 idles well below GNOME on comparable hardware and is far more configurable | Low; risk is "looks like a theme" — mitigated by owning our own applets/shell components |
+| **A. KDE Plasma 6 (KWin) + Zaldros shell layer** | Low — snapping, tray (SNI), quick settings, notifications, multi-monitor, a11y, Wayland session all exist and are mature | Good; Plasma 6 idles well below GNOME on comparable hardware and is far more configurable | Low; risk is "looks like a theme" — mitigated by owning our own applets/shell components |
 | B. GNOME + extensions | Medium-high | Medium | High: extension API breaks every release; Windows workflows fight GNOME's design |
 | C. Custom shell on **smithay** (Rust) | Very high — years; must implement layer-shell, xwayland, session, input, a11y | Potentially best | Very high; COSMIC (smithay) took a full team years |
 | D. Custom shell on **wlroots** (C) | High | Very good | High; wlroots is mature and C-based, but everything above the compositor is still ours |
@@ -26,13 +26,13 @@ roadmap is measured in years.
 
 ## Decision (two-stage, deliberate)
 
-**Stage 1 (Phase 1–3): Option A.** Bedrock Desktop = KWin (Wayland) + our own shell components:
-Bedrock Taskbar, Bedrock Start, Bedrock Quick Settings, Bedrock Search, Bedrock Settings — implemented
+**Stage 1 (Phase 1–3): Option A.** Zaldros Desktop = KWin (Wayland) + our own shell components:
+Zaldros Taskbar, Zaldros Start, Zaldros Quick Settings, Zaldros Search, Zaldros Settings — implemented
 as first-class Plasma/Qt 6 + QML components in our repo, not as downloaded themes. Plasma supplies the
 compositor, session, tray protocol, notifications daemon and a11y stack; we supply the shell UX.
 
 **Stage 2 (evaluated at end of Phase 3, only if measurements justify it):** replace `plasma-shell`
-with a standalone Bedrock shell process talking directly to KWin via layer-shell, keeping KWin.
+with a standalone Zaldros shell process talking directly to KWin via layer-shell, keeping KWin.
 A full compositor rewrite (C/D) is explicitly **out of scope** unless Stage 2 measurements prove KWin
 itself is the bottleneck.
 
@@ -46,6 +46,6 @@ non-GUI system components (daemons, tooling) where it competes with C.
 ## Windows compatibility layer
 
 Wine + Proton (via a managed prefix manager) as an installable component, not a core dependency;
-never bundle Microsoft binaries or fonts. Segoe UI is proprietary — the Bedrock design system ships
+never bundle Microsoft binaries or fonts. Segoe UI is proprietary — the Zaldros design system ships
 an open substitute (Inter / Selawik) and, optionally, imports fonts from a Windows installation the
 user already licenses.
