@@ -73,6 +73,20 @@ Newest first. Each entry states what was *run*, not only what was written.
   installed packages, sources, chroot DNS/arch/os-release, `df`/`free`/`mount`/`uname`, and 200-line
   tails — uploaded as `build-debug-{variant}` and echoed into the run summary. No more guessing.
 
+## 2026-08-23 — run #14: pipeline works, boot still FAIL 9/9 (empty serial log)
+- Evidence: run 32665317028. Builds 3/3 PASS, all 9 boot jobs ran QEMU for the full 900 s
+  timeout, artifacts + screenshots + serial logs published to `ci-logs-boot-*` branches.
+- `zaldros-full-low.serial.log` is **0 bytes**; screenshot at 120 s is a black screen with a
+  firmware cursor. So the kernel never started — the failure is at firmware/GRUB stage.
+- Build log shows `grub-mkrescue` writing only the i386-pc `boot_hybrid.img` system area; no
+  proof an EFI El Torito image was produced. Not yet a root cause — evidence is missing.
+- Diagnostics added instead of guessing: GRUB now speaks to ttyS0 (`serial`/`terminal_output`)
+  and echoes each stage, `quiet` removed, `console=tty0 console=ttyS0`; build prints
+  `xorriso -report_el_torito` and the `/EFI` listing; boot-test takes an early 25 s screenshot.
+- `report.py`: stopped parsing `-host.json`/`.ui-guest.json` as results, and now exits 1 when
+  any boot is not PASS, so a green CI job can no longer mean "did not boot".
+- Boot: NOT TESTED. Architecture: PROPOSED.
+
 ## 2026-08-23 — run #12: builds PASS 3/3, boot FAIL 9/9 (root cause found)
 - Evidence: run 32664345534. All three ISOs built (full ~3.19 GB artifact). Every boot job died
   19 ms into `boot-test.sh` with exit 2 and **no output**.

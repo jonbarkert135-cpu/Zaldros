@@ -167,12 +167,25 @@ install -d "$WORK/iso/casper" "$WORK/iso/boot/grub"
 mksquashfs "$ROOT" "$WORK/iso/casper/filesystem.squashfs" -comp zstd -Xcompression-level 15 -noappend
 cp "$ROOT"/boot/vmlinuz-* "$WORK/iso/casper/vmlinuz"
 cp "$ROOT"/boot/initrd.img-* "$WORK/iso/casper/initrd"
+# ponytail: GRUB itself talks to the serial port, so a GRUB-level failure is visible
+# in the boot log instead of a black screen (run #14: empty serial log, no evidence).
 cat > "$WORK/iso/boot/grub/grub.cfg" <<EOS
-set timeout=1
+serial --unit=0 --speed=115200
+terminal_input console serial
+terminal_output console serial
+set timeout=5
+echo "GRUB: Zaldros $VARIANT menu loaded"
 menuentry "Zaldros OS ($VARIANT)" {
-  linux /casper/vmlinuz boot=casper quiet console=ttyS0,115200 zaldros.selftest
+  echo "GRUB: loading kernel"
+  linux /casper/vmlinuz boot=casper console=tty0 console=ttyS0,115200 zaldros.selftest
+  echo "GRUB: loading initrd"
   initrd /casper/initrd
+  echo "GRUB: booting"
 }
 EOS
-grub-mkrescue -o "$OUT" "$WORK/iso" -- -volid ZALDROS
+step grub-mkrescue grub-mkrescue -o "$OUT" "$WORK/iso" -- -volid ZALDROS
+# Evidence, not assumption: does this ISO actually carry an EFI El Torito image?
+echo "== El Torito catalogue"
+xorriso -indev "$OUT" -report_el_torito plain 2>&1 | tail -20 || true
+xorriso -indev "$OUT" -find /EFI -type f 2>&1 | head -20 || true
 echo "ISO: $OUT ($(du -h "$OUT" | cut -f1))"

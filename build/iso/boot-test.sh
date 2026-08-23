@@ -40,6 +40,13 @@ timeout "${BOOT_TIMEOUT:-900}" qemu-system-x86_64 \
   -no-reboot &
 QEMU=$!
 
+# Early screenshot: if the firmware/GRUB stage dies we need a picture of *that*, not of a
+# black screen two minutes later.
+( sleep "${EARLY_SHOT_DELAY:-25}"
+  printf '{"execute":"qmp_capabilities"}\n{"execute":"screendump","arguments":{"filename":"%s"}}\n' \
+    "$(readlink -f "$OUT")/$NAME.early.ppm" | timeout 30 socat - "UNIX-CONNECT:$OUT/$NAME.qmp" >/dev/null 2>&1
+  [ -f "$OUT/$NAME.early.ppm" ] && command -v convert >/dev/null && convert "$OUT/$NAME.early.ppm" "$OUT/$NAME.early.png" || true ) &
+
 # Screenshot once the desktop has had time to come up; QMP screendump works headless.
 ( sleep "${SHOT_DELAY:-120}"
   printf '{"execute":"qmp_capabilities"}\n{"execute":"screendump","arguments":{"filename":"%s"}}\n' \

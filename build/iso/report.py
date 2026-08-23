@@ -46,7 +46,9 @@ def ui_table(rows):
 
 
 def main(directory="results"):
-    rows = [json.loads(p.read_text()) for p in sorted(Path(directory).glob("*.json"))]
+    # ponytail: only the per-boot result files; the -host/.ui-guest halves are read through them.
+    rows = [json.loads(p.read_text()) for p in sorted(Path(directory).glob("*.json"))
+            if not p.name.endswith(("-host.json", ".ui-guest.json"))]
     if not rows:
         print("no results — BLOCKED, nothing ran")
         return 1
@@ -57,7 +59,8 @@ def main(directory="results"):
         cells = [d.get("variant", "?"), d.get("profile", "?")] + [str(fn(d)) for _, fn in COLUMNS]
         print("| " + " | ".join(cells) + " |")
     print(ui_table(rows))
-    return 0
+    # A green CI job must never mean "did not boot".
+    return 0 if all(d.get("boot") == "PASS" for d in rows) else 1
 
 
 if __name__ == "__main__":
