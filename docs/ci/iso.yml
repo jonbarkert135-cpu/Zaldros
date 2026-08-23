@@ -79,6 +79,8 @@ jobs:
 
   boot:
     needs: build
+    # ponytail: a failed sibling variant must never block booting the ISOs that did build.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
