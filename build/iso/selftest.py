@@ -68,6 +68,26 @@ def launch_test(app="konsole"):
         return {"app": app, "started": False, "error": str(exc)}
 
 
+def boot_seconds():
+    """Real boot time, measured two ways instead of the harness ceiling (which is wall clock of the
+    whole QEMU run). uptime_at_selftest = kernel start -> this test; systemd-analyze is often
+    unavailable in a live session, so it is reported as null rather than guessed."""
+    out = {"uptime_at_selftest_s": None, "systemd_analyze": None,
+           "userspace_s": None, "kernel_s": None}
+    try:
+        out["uptime_at_selftest_s"] = round(float(Path("/proc/uptime").read_text().split()[0]), 2)
+    except Exception as exc:
+        out["uptime_error"] = str(exc)
+    analyze = sh("systemd-analyze", "time")
+    if analyze:
+        out["systemd_analyze"] = analyze
+        import re
+        m = re.search(r"([\d.]+)s \(kernel\).*?([\d.]+)s \(userspace\)", analyze, re.S)
+        if m:
+            out["kernel_s"], out["userspace_s"] = float(m.group(1)), float(m.group(2))
+    return out
+
+
 def settled_systemd_state(timeout=120):
     deadline = time.monotonic() + timeout
     state = sh("systemctl", "is-system-running")
@@ -99,6 +119,7 @@ def main():
         "kernel": sh("uname", "-r"),
         # is-system-running is "starting" until every job settles; wait for a verdict instead of
         # sampling one too early (run #17 failed the systemd check for exactly that reason).
+        "boot_time": boot_seconds(),
         "systemd_state": settled_systemd_state(),
         # Evidence for that state: run #18 sat at "starting" with zero failed units because this
         # very self-test is a job inside the graphical.target transaction.

@@ -20,7 +20,20 @@ from .icons import IconProvider
 from .model import AppModel, InstalledAppModel, ShellState, SystemState
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
-ASSETS = Path(__file__).resolve().parents[3] / "assets"
+def _assets_dir() -> Path:
+    """Find the asset tree. In the repo it sits three levels up; inside the ISO the shell is
+    installed flat at /opt/zaldros, where that walk lands on "/assets" and every font, icon and
+    wallpaper silently disappears — which is half of the services/legacy black screen."""
+    candidates = [Path(os.environ["ZALDROS_ASSETS"])] if os.environ.get("ZALDROS_ASSETS") else []
+    here = Path(__file__).resolve()
+    candidates += [here.parents[3] / "assets", here.parents[1] / "assets", Path("/opt/zaldros/assets")]
+    for path in candidates:
+        if (path / "wallpaper").is_dir():
+            return path
+    return candidates[-1]  # nothing found: keep a stable path, missing files stay visible as errors
+
+
+ASSETS = _assets_dir()
 FONT_DIR = ASSETS / "fonts" / "selawik"
 
 
@@ -100,6 +113,14 @@ def run() -> int:
     app = QGuiApplication(sys.argv)
     view, backends = build_view()
     _KEEPALIVE.extend([view, *backends])
-    view.resize(1600, 1000)
-    view.show()
+    # The shell is the desktop: fill the output instead of opening a 1600x1000 window on a
+    # smaller screen (KWin then shows bare compositor background around/behind it).
+    screen = app.primaryScreen()
+    if screen is not None:
+        size = screen.geometry().size()
+        view.resize(size)
+        view.rootObject().setProperty("width", size.width())
+        view.rootObject().setProperty("height", size.height())
+    view.setResizeMode(QQuickView.SizeRootObjectToView)
+    view.showFullScreen()
     return app.exec()

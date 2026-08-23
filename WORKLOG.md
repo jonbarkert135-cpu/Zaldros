@@ -221,3 +221,20 @@ Root cause read off the code, not guessed:
 
 Architecture verdict stays open: `full` ACCEPT (provisional, only visible desktop),
 `services`/`legacy` MODIFY — half the RAM (452 vs 883 MiB, 22 vs 39 processes) but no visuals yet.
+
+## Run #19 candidate (2026-08-24) — black screen: second root cause, and real boot time
+
+Written and unit-tested locally (44 shell tests + shell render green); CI evidence pending.
+
+1. **Assets vanished inside the ISO.** `app.py` resolved the asset tree as `parents[3]/assets`,
+   which is correct in the repo checkout but lands on `/assets` when the shell is installed flat
+   at `/opt/zaldros`. So in every ISO the shell ran with no wallpaper, no Selawik font and no
+   Fluent icons — the other half of the services/legacy black frame, next to the argparse exit.
+   Fix: `_assets_dir()` tries `$ZALDROS_ASSETS`, the repo layout, the flat layout and
+   `/opt/zaldros/assets`, and only accepts a directory that actually contains `wallpaper/`.
+2. **The shell opened a 1600x1000 window on a 1280x800 screen.** `run()` now sizes the view to the
+   primary screen, sets `SizeRootObjectToView` and calls `showFullScreen()`.
+3. **Boot time is measured, not estimated.** The self-test reports `boot_time`:
+   `uptime_at_selftest_s` from `/proc/uptime` plus `systemd-analyze time` (kernel/userspace split)
+   when available — `null` when it is not, never a guessed number. `wall_seconds` stays the
+   harness ceiling and is not a boot time.
