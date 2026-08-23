@@ -54,3 +54,15 @@ def test_unknown_glyph_returns_a_null_image_rather_than_a_wrong_icon():
 
 def test_unknown_application_icon_falls_back_instead_of_guessing():
     assert provider.requestImage("app/definitely-not-installed-app", QSize(), QSize(32, 32)).isNull()
+
+
+def test_system_icon_theme_is_read_from_the_installed_config(tmp_path):
+    from zaldros_shell.icons import system_icon_theme
+    conf = tmp_path / "visual.conf"
+    conf.write_text("icon_theme=Win11-dark\ncursor_theme=Win11-cursors\n")
+    assert system_icon_theme(conf) == "Win11-dark"
+
+
+def test_missing_visual_config_means_vendored_fallback(tmp_path):
+    from zaldros_shell.icons import system_icon_theme
+    assert system_icon_theme(tmp_path / "nope.conf") == ""

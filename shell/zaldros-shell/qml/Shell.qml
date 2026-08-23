@@ -61,17 +61,20 @@ Item {
         y: 24
         spacing: 8
         Repeater {
-            model: [{ n: "Этот компьютер", c: "#3a7ebf", g: "computer" },
-                    { n: "Корзина", c: "#4d5b6b", g: "recycle-bin" },
-                    { n: "Проводник", c: "#c9a227", g: "folder" }]
+            model: [{ n: "Этот компьютер", i: "computer" },
+                    { n: "Корзина", i: "user-trash" },
+                    { n: "Проводник", i: "system-file-manager" }]
             delegate: Column {
                 width: 92
                 spacing: 6
-                AppTile {
-                    width: 40; height: 40
-                    baseColor: modelData.c
-                    glyph: modelData.g
+                Image {
+                    width: 48; height: 48
                     anchors.horizontalCenter: parent.horizontalCenter
+                    source: "image://zaldrosicon/app/" + modelData.i
+                    sourceSize.width: 96; sourceSize.height: 96
+                    asynchronous: false
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
                 }
                 Text {
                     width: 92
@@ -125,8 +128,14 @@ Item {
                     anchors.margins: 8
                     spacing: 2
                     Repeater {
-                        model: ["Быстрый доступ", "Рабочий стол", "Загрузки", "Документы",
-                                "Изображения", "Этот компьютер"]
+                        // Sidebar entries carry the freedesktop icon name; the artwork comes from
+                        // the Win11 icon theme (GPL-3), never from hand-drawn strokes.
+                        model: [{ t: "Быстрый доступ", i: "user-home" },
+                                { t: "Рабочий стол", i: "user-desktop" },
+                                { t: "Загрузки", i: "folder-download" },
+                                { t: "Документы", i: "folder-documents" },
+                                { t: "Изображения", i: "folder-pictures" },
+                                { t: "Этот компьютер", i: "computer" }]
                         delegate: Item {
                             width: sidebar.width - 16
                             height: 30
@@ -140,13 +149,17 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 8
                                 spacing: 10
-                                SysIcon {
-                                    glyph: "folder"; width: 16; height: 16
-                                    color: Theme.textSecondary
+                                Image {
+                                    width: 18; height: 18
+                                    source: "image://zaldrosicon/app/" + modelData.i
+                                    sourceSize.width: 36; sourceSize.height: 36
+                                    asynchronous: false
+                                    fillMode: Image.PreserveAspectFit
+                                    smooth: true
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 Text {
-                                    text: modelData
+                                    text: modelData.t
                                     color: Theme.textPrimary
                                     font.family: Theme.fontFamily
                                     font.pixelSize: Theme.fontCaption + 1

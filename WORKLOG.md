@@ -2,6 +2,17 @@
 
 Newest first. Each entry states what was *run*, not only what was written.
 
+## 2026-08-23 — Themes installed, not coded
+- `system/theme/fetch-sources.sh` + `install-visual-theme.sh`: the ISO now installs Win11-gtk-theme,
+  Win11-icon-theme and Fluent cursors through **their own installers** and forces them as defaults
+  (kdeglobals, GTK settings, GNOME schema override, kwinrc, `/etc/zaldros/visual.conf`).
+- KWin config carries the Windows 11 geometry: blur + contrast effects, borderless maximised
+  windows, Aurorae decoration — configuration, not shell code.
+- The shell reads `/etc/zaldros/visual.conf` and uses the **installed** icon theme; the vendored
+  subset is only a fallback for build containers.
+- Desktop icons and the Explorer sidebar now use Win11-icon-theme SVGs instead of drawn glyphs.
+- Ran it: 44 shell + 44 tool tests green; evidence renders regenerated.
+
 ## 2026-08-23 — Open-source visual foundation integration
 - The sandbox got network access, so the research was done **on the real repositories**: cloned and
   read Win11-gtk-theme, Win11-icon-theme and AnduinOS, plus ~15 further projects.

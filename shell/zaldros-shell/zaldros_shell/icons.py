@@ -19,6 +19,21 @@ from PySide6.QtSvg import QSvgRenderer
 FLUENT_BLACK = "#212121"
 
 
+VISUAL_CONF = Path("/etc/zaldros/visual.conf")
+
+
+def system_icon_theme(conf: Path = VISUAL_CONF) -> str:
+    """Icon theme chosen by system/theme/install-visual-theme.sh. Empty when the file is absent
+    (build containers, this sandbox), and the vendored fallback icons are used instead."""
+    if not conf.is_file():
+        return ""
+    for line in conf.read_text().splitlines():
+        key, _, value = line.partition("=")
+        if key.strip() == "icon_theme":
+            return value.strip()
+    return ""
+
+
 class IconProvider(QQuickImageProvider):
     """Serves `image://zaldrosicon/<name>?<#rrggbb>`. Unknown names return a null image, which QML
     reports as Image.Error — a missing icon must be visible as missing, not silently blank."""
@@ -26,7 +41,11 @@ class IconProvider(QQuickImageProvider):
     def __init__(self, directory: Path) -> None:
         super().__init__(QQuickImageProvider.Image)
         self.directory = Path(directory)
-        self.app_directory = self.directory.parent / "apps"   # Fluent-icon-theme, GPL-3
+        self.app_directory = self.directory.parent / "apps"      # Fluent-icon-theme, GPL-3
+        self.place_directory = self.directory.parent / "places"  # Win11-icon-theme, GPL-3
+        theme = system_icon_theme()
+        if theme:
+            QIcon.setThemeName(theme)   # the installed Win11 theme wins over anything vendored
 
     def requestImage(self, request_id: str, size: QSize, requested: QSize) -> QImage:
         name, _, colour = unquote(request_id).partition("?")   # QML sends "%23rrggbb"
@@ -55,8 +74,9 @@ class IconProvider(QQuickImageProvider):
         icon = QIcon.fromTheme(name)
         if not icon.isNull():
             return icon.pixmap(side, side).toImage()
-        vendored = self.app_directory / f"{name}.svg"
-        if not vendored.is_file():
+        vendored = next((d / f"{name}.svg" for d in (self.app_directory, self.place_directory)
+                         if (d / f"{name}.svg").is_file()), None)
+        if vendored is None:
             return QImage()
         renderer = QSvgRenderer(str(vendored))
         image = QImage(side, side, QImage.Format_ARGB32_Premultiplied)

@@ -106,12 +106,13 @@ def test_taskbar_tray_really_draws_icons_not_empty_space(tmp_path):
     assert lit > 40, f"tray icons look blank ({lit} lit pixels)"
 
 
-def test_desktop_icons_use_the_vendored_glyphs(tmp_path):
-    """Each desktop tile must contain light glyph pixels on its coloured square."""
+def test_desktop_icons_come_from_the_icon_theme(tmp_path):
+    """Desktop icons must be the real Win11 theme artwork: coloured, not a flat glyph square."""
     image = QImage(shot(tmp_path, "deskicons"))
-    lit = sum(1 for x in range(48, 90) for y in range(24, 66)
-              if image.pixelColor(x, y).lightness() > 200)
-    assert lit > 30, f"the first desktop icon has no glyph ({lit} lit pixels)"
+    saturated = sum(1 for x in range(44, 92) for y in range(20, 68)
+                    if image.pixelColor(x, y).saturation() > 80
+                    and image.pixelColor(x, y).value() > 90)
+    assert saturated > 120, f"the first desktop icon is not themed artwork ({saturated} px)"
 
 
 def test_context_menu_is_opaque(tmp_path):
