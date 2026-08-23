@@ -7,6 +7,9 @@ on:
   push:
     paths: ["build/iso/**", "shell/**", "system/theme/**", ".github/workflows/iso.yml"]
 
+permissions:
+  contents: write        # the build publishes its diagnostics to a ci-logs-* branch (see below)
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,6 +41,22 @@ jobs:
             echo "### last 200 lines of the build log"; echo '```'
             tail -200 build-${{ matrix.variant }}.log 2>/dev/null; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      # Artifacts and job logs need repository admin rights to download, which blocks the
+      # read-the-error → fix loop. Publishing the same diagnostics to a branch makes them plainly
+      # readable by anyone working on the build, with no extra tooling.
+      - name: Publish diagnostics to the ci-logs branch
+        if: always()
+        run: |
+          BRANCH=ci-logs-${{ matrix.variant }}
+          rm -rf /tmp/pub && mkdir -p /tmp/pub
+          cp -a build-debug-${{ matrix.variant }}/. /tmp/pub/ 2>/dev/null || true
+          cp build-${{ matrix.variant }}.log /tmp/pub/ 2>/dev/null || true
+          cd /tmp/pub
+          git init -q . && git checkout -q -b "$BRANCH"
+          git config user.email "ci@zaldros.invalid" && git config user.name "zaldros ci"
+          echo "run ${{ github.run_id }} / ${{ matrix.variant }} / ${{ job.status }}" > RUN.txt
+          git add -A && git commit -qm "diagnostics: run ${{ github.run_id }} ${{ matrix.variant }} ${{ job.status }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" "$BRANCH"
       - name: Keep every diagnostic, pass or fail
         if: always()
         uses: actions/upload-artifact@v4
@@ -80,6 +99,16 @@ jobs:
       - name: Result matrix
         if: always()
         run: python3 ./build/iso/report.py results | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Publish boot results to the ci-logs branch
+        if: always()
+        run: |
+          BRANCH=ci-logs-boot-${{ matrix.variant }}-${{ matrix.profile }}
+          mogrify -format png results/*.ppm 2>/dev/null && rm -f results/*.ppm || true
+          cd results
+          git init -q . && git checkout -q -b "$BRANCH"
+          git config user.email "ci@zaldros.invalid" && git config user.name "zaldros ci"
+          git add -A && git commit -qm "boot ${{ matrix.variant }}/${{ matrix.profile }} — ${{ job.status }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" "$BRANCH"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
