@@ -5,11 +5,18 @@ Base:          Ubuntu 26.04 LTS
 Status:        PROPOSED
 ISO:           BUILT — run #15 (0a210fe), all 3 variants:
                full 3.19G / services 3.09G / legacy 2.84G
-Boot:          KERNEL + SYSTEMD PASS, DESKTOP FAIL (run #15, 9/9 profiles)
+Boot:          KERNEL + SYSTEMD PASS, DESKTOP FAIL (run #16, 9/9 profiles)
                kernel 7.0.0-30-generic boots under OVMF/UEFI, systemd reaches
                graphical.target, in-guest self-test ran and reported on ttyS0.
                No kwin_wayland, no Wayland socket, konsole did not start:
-               the graphical session never began (sddm alive, no session).
+               the graphical session never began. ROOT CAUSE (run #16 serial log):
+               sddm ignored /etc/sddm.conf.d autologin ("Unable to find autologin
+               session entry"), fell back to an X greeter, and the image has no
+               Xorg -> "Failed to start display server process".
+               FIX (pending run #17): sddm removed, session started by
+               zaldros-session.service (systemd autologin on tty1).
+               CI green != boot PASS: the PASS verdict now requires
+               kernel+systemd+wayland+kwin+shell+app_launch.
 Architecture:  NOT ACCEPTED (no variant produced a desktop yet — nothing to compare)
 ```
 

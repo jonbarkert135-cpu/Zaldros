@@ -34,11 +34,25 @@ def mem_used_mib():
     return (int(info["MemTotal"]) - int(info["MemAvailable"])) // 1024
 
 
+def wayland_sockets():
+    return sorted(Path("/run/user").glob("*/wayland-*"))
+
+
 def launch_test(app="konsole"):
-    """A real application must actually start and stay alive for two seconds."""
+    """A real application must actually start and stay alive for two seconds.
+
+    ponytail: the self-test runs as root from systemd, so it must borrow the session user's
+    runtime dir and wayland socket — run #16 launched konsole with no display at all."""
+    socks = [p for p in wayland_sockets() if not p.name.endswith(".lock")]
+    if not socks:
+        return {"app": app, "started": False, "error": "no wayland socket"}
+    sock = socks[0]
+    cmd = ["runuser", "-u", "ubuntu", "--", "env",
+           f"XDG_RUNTIME_DIR={sock.parent}", f"WAYLAND_DISPLAY={sock.name}",
+           "QT_QPA_PLATFORM=wayland", app]
     try:
         started = time.monotonic()
-        proc = subprocess.Popen([app], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(2)
         alive = proc.poll() is None
         proc.terminate()
@@ -69,10 +83,11 @@ def main():
         "kernel": sh("uname", "-r"),
         "systemd_state": sh("systemctl", "is-system-running"),
         "failed_units": sh("systemctl", "list-units", "--state=failed", "--no-legend", "--plain"),
-        "wayland_socket": sorted(str(p) for p in Path("/run/user").glob("*/wayland-*")),
+        "wayland_socket": [str(p) for p in wayland_sockets()],
         "kwin": "kwin_wayland" in procs,
         "plasmashell": "plasmashell" in procs,
-        "shell": any(c.startswith("zaldros") or c == "python3" for c in procs),
+        # ponytail: "python3 is running" was a false positive — this self-test *is* python3.
+        "shell": bool(sh("pgrep", "-f", "zaldros_shell")) or "plasmashell" in procs,
         "process_count": sum(n for n, _ in procs.values()),
         "mem_used_mib": mem_used_mib(),
         "rss_mib": {c: round(r / 1024, 1) for c, (_, r) in
@@ -85,8 +100,9 @@ def main():
                               if Path("/usr/share/wayland-sessions").is_dir() else [],
         "users": sh("getent", "passwd", "1000"),
         "runtime_dirs": sorted(p.name for p in Path("/run/user").glob("*")) if Path("/run/user").is_dir() else [],
-        "sddm_journal": sh("journalctl", "-u", "sddm", "--no-pager", "-n", "40")[-3000:],
-        "session_journal": sh("journalctl", "--no-pager", "-n", "40", "-t", "sddm-helper")[-2000:],
+        "session_unit": sh("systemctl", "show", "zaldros-session.service",
+                           "-p", "ActiveState", "-p", "SubState", "-p", "Result", "-p", "ExecMainStatus"),
+        "session_journal": sh("journalctl", "-u", "zaldros-session", "--no-pager", "-n", "60")[-4000:],
     }
     line = MARK + json.dumps(result, ensure_ascii=False)
     print(line, flush=True)

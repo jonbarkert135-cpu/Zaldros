@@ -72,7 +72,20 @@ if grep -q 'ZALDROS-SELFTEST {' "$SERIAL" 2>/dev/null; then
   python3 - "$JSON" "$ELAPSED" "$PROFILE" <<'PY'
 import json, sys
 data = json.load(open(sys.argv[1]))
-data["wall_seconds"] = int(sys.argv[2]); data["profile"] = sys.argv[3]; data["boot"] = "PASS"
+data["wall_seconds"] = int(sys.argv[2]); data["profile"] = sys.argv[3]
+# ponytail: the self-test marker only proves the guest talked to us. PASS needs the real chain:
+# kernel + systemd + Wayland + KWin + shell + a launched application (spec PART "NO FALSE SUCCESS").
+checks = {
+    "kernel": bool(data.get("kernel")),
+    "systemd": data.get("systemd_state") in ("running", "degraded"),
+    "wayland": bool(data.get("wayland_socket")),
+    "kwin": bool(data.get("kwin")),
+    "shell": bool(data.get("shell")),
+    "app_launch": bool((data.get("app_launch") or {}).get("started")),
+}
+data["checks"] = checks
+data["boot"] = "PASS" if all(checks.values()) else "FAIL"
+data["failed_checks"] = [k for k, v in checks.items() if not v]
 for extra, key in ((sys.argv[1].replace(".json", ".ui-guest.json"), "ui_guest"),
                    (sys.argv[1].replace(".json", "-host.json"), "ui_host")):
     try:

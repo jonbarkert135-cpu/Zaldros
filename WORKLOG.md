@@ -117,6 +117,20 @@ Newest first. Each entry states what was *run*, not only what was written.
   EXIT trap writes `<name>.error.txt`; publish step uses `git commit --allow-empty`.
 - Boot status: still NOT TESTED. QEMU never started in run #12.
 
+## 2026-08-23 — Run #16: first honest desktop failure, root cause found
+- All 12 CI jobs green, but the evidence says otherwise: `kwin=false`, no Wayland socket,
+  `konsole` did not start, every UI step FAIL, 12-15 processes, 355-444 MiB used.
+- Root cause (read from `sddm_journal`, not guessed): sddm never applied the autologin
+  config, fell back to its X greeter, and this image ships no Xorg ->
+  "Failed to start display server process. Attempt 1 ... failed". Nothing started a session.
+- Fixes: (1) sddm dropped entirely; `zaldros-session.service` autologins user `ubuntu` on
+  tty1 via PAM and execs the variant session directly — fewer processes, ~25 MiB less RSS.
+  (2) self-test no longer counts its own `python3` as "the shell" (pgrep zaldros_shell) and
+  launches the test app as the session user with XDG_RUNTIME_DIR/WAYLAND_DISPLAY.
+  (3) `boot=PASS` is now computed from kernel+systemd+wayland+kwin+shell+app_launch;
+  a self-test marker alone is no longer a PASS.
+- Architecture: still NOT ACCEPTED. No variant has produced a desktop yet.
+
 ## 2026-08-23 — Owner decisions
 - ADR-0005: name **Zaldros OS**, license GPL-3.0-or-later, Russian default + first-class English,
   disk encryption opt-in. Base-distribution decision reopened toward Ubuntu LTS + HWE, to be settled
