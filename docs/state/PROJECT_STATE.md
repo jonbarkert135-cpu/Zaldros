@@ -3,8 +3,10 @@
 ```
 Base:          Ubuntu 26.04 LTS
 Status:        PROPOSED
-ISO:           NOT BUILT YET
-Boot:          NOT TESTED
+ISO:           BUILT — run #11 (d9dff44), all 3 variants:
+               full 3.0G / services 2.9G / legacy 2.7G
+Boot:          NOT TESTED (boot job was skipped: the diagnostics step
+               failed the build job after the ISOs were already produced)
 Architecture:  NOT ACCEPTED
 ```
 
