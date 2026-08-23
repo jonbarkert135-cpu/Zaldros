@@ -17,6 +17,34 @@ COLUMNS = [
 ]
 
 
+UI_STEPS = ["desktop_ready", "start_open", "start_close", "app_launch_explorer", "window_move",
+            "minimize", "restore", "alt_tab", "taskbar_response"]
+
+
+def ui_cell(d, step):
+    """UI verdicts come from two halves: the guest measures window operations, the host measures
+    keyboard/mouse interaction by looking at the screen. Whichever half owns the step wins."""
+    entries = [source.get(step) for source in
+               ((d.get("ui_guest") or {}).get("steps") or {}, d.get("ui_host") or {})]
+    entries = [e for e in entries if isinstance(e, dict) and e.get("status")]
+    # A measured verdict always beats the other half's "BLOCKED — someone else measures this".
+    entries.sort(key=lambda e: e["status"] == "BLOCKED")
+    if not entries:
+        return "—"
+    seconds = entries[0].get("seconds")
+    return entries[0]["status"] + (f" {seconds}s" if seconds is not None else "")
+
+
+def ui_table(rows):
+    head = ["image", "profile"] + UI_STEPS
+    out = ["", "### UI interaction (stage 2)", "| " + " | ".join(head) + " |",
+           "| " + " | ".join("---" for _ in head) + " |"]
+    for d in rows:
+        out.append("| " + " | ".join([d.get("variant", "?"), d.get("profile", "?")]
+                                     + [ui_cell(d, s) for s in UI_STEPS]) + " |")
+    return "\n".join(out)
+
+
 def main(directory="results"):
     rows = [json.loads(p.read_text()) for p in sorted(Path(directory).glob("*.json"))]
     if not rows:
@@ -28,6 +56,7 @@ def main(directory="results"):
     for d in rows:
         cells = [d.get("variant", "?"), d.get("profile", "?")] + [str(fn(d)) for _, fn in COLUMNS]
         print("| " + " | ".join(cells) + " |")
+    print(ui_table(rows))
     return 0
 
 

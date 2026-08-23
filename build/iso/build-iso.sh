@@ -44,7 +44,9 @@ mkdir -p "$ROOT/opt/zaldros"
 cp -a "$REPO/shell/zaldros-shell/zaldros_shell" "$REPO/shell/zaldros-shell/qml" "$ROOT/opt/zaldros/"
 cp -a "$REPO/assets" "$ROOT/opt/zaldros/assets"
 cp -a "$REPO/system/theme" "$ROOT/opt/zaldros/theme"
-cp "$(dirname "$0")/selftest.py" "$ROOT/usr/local/bin/zaldros-selftest"; chmod +x "$ROOT/usr/local/bin/zaldros-selftest"
+cp "$(dirname "$0")/selftest.py" "$ROOT/usr/local/bin/zaldros-selftest"
+cp "$(dirname "$0")/uitest.py"   "$ROOT/usr/local/bin/zaldros-uitest"
+chmod +x "$ROOT/usr/local/bin/zaldros-selftest" "$ROOT/usr/local/bin/zaldros-uitest"
 echo "$VARIANT" > "$ROOT/etc/zaldros-variant"
 
 # The themes: run the real upstream installers inside the image (no network at boot time).
@@ -81,6 +83,10 @@ ConditionKernelCommandLine=zaldros.selftest
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/zaldros-selftest --serial /dev/ttyS0
+# Stage 2: pause so the host can inject input over QMP, then run the UI interaction test.
+ExecStart=/bin/sleep 45
+ExecStart=/bin/sh -c '/usr/local/bin/zaldros-uitest > /dev/ttyS0 2>/var/log/zaldros-uitest.err'
+TimeoutStartSec=600
 ExecStopPost=/usr/bin/systemctl poweroff
 [Install]
 WantedBy=graphical.target

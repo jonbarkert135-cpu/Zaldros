@@ -35,16 +35,30 @@ QEMU=$!
     "$(readlink -f "$OUT")/$NAME.ppm" | timeout 30 socat - "UNIX-CONNECT:$OUT/$NAME.qmp" >/dev/null 2>&1
   [ -f "$OUT/$NAME.ppm" ] && command -v convert >/dev/null && convert "$OUT/$NAME.ppm" "$SHOT" || true ) &
 
+# Stage 2: once the guest reports stage 1, drive the UI over QMP while the VM is still alive.
+( for _ in $(seq 1 "${UI_WAIT:-600}"); do
+    grep -q '^ZALDROS-SELFTEST ' "$SERIAL" 2>/dev/null && break; sleep 1
+  done
+  python3 "$(dirname "$0")/ui-drive.py" "$OUT/$NAME.qmp" --out "$OUT" --name "$NAME" \
+    >"$OUT/$NAME.ui-drive.log" 2>&1 || echo "UI drive failed, see $OUT/$NAME.ui-drive.log" ) &
+
 wait "$QEMU" && RC=0 || RC=$?
 ELAPSED=$(( $(date +%s) - START ))
 
 # The self-test line is the evidence; without it the boot failed, whatever QEMU's exit code says.
 if grep -q '^ZALDROS-SELFTEST ' "$SERIAL" 2>/dev/null; then
   grep '^ZALDROS-SELFTEST ' "$SERIAL" | tail -1 | cut -c18- > "$JSON"
+  grep '^ZALDROS-UITEST ' "$SERIAL" | tail -1 | cut -c16- > "$OUT/$NAME.ui-guest.json" 2>/dev/null || true
   python3 - "$JSON" "$ELAPSED" "$PROFILE" <<'PY'
 import json, sys
 data = json.load(open(sys.argv[1]))
 data["wall_seconds"] = int(sys.argv[2]); data["profile"] = sys.argv[3]; data["boot"] = "PASS"
+for extra, key in ((sys.argv[1].replace(".json", ".ui-guest.json"), "ui_guest"),
+                   (sys.argv[1].replace(".json", "-host.json"), "ui_host")):
+    try:
+        data[key] = json.load(open(extra))
+    except Exception as exc:
+        data[key] = {"status": "MISSING", "why": str(exc)}
 json.dump(data, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
 PY
   echo "PASS: $JSON"

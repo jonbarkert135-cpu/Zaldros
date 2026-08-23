@@ -80,6 +80,53 @@ Everything in ADR-0002/0003 assumes KWin 6, so the base must be 26.04 LTS, not 2
 - Visual regression against the Windows 11 reference still comes from the offscreen render tests, not
   from the VM screenshot, until the screenshot path is proven to capture a composited desktop.
 
+## Stage 2 — UI validation ("booted" is not "responsive")
+
+Booting proves nothing about feel, so every image is driven through the full interaction chain on at
+least the LOW and MID profiles: **BOOT → LOGIN → DESKTOP → START OPEN → START CLOSE → APP LAUNCH →
+WINDOW OPEN → WINDOW MOVE → MINIMIZE → RESTORE → ALT+TAB → TASKBAR RESPONSE → EXPLORER OPEN.**
+
+The test has two halves that never pretend to be one:
+
+| Half | Script | Measures | Method |
+| --- | --- | --- | --- |
+| guest | `build/iso/uitest.py` | desktop ready, Explorer open, window move, minimise, restore | KWin's own scripting D-Bus interface — works under full Plasma *and* bare `kwin_wayland`, so all three variants run the identical test |
+| host | `build/iso/ui-drive.py` | Start open/close, Alt+Tab, taskbar click | QEMU QMP `input-send-event` injects real keys and clicks; `screendump` captures the composited screen before and after |
+
+A host step is PASS **only if the screen actually changed** — a keypress that produces no visible
+change is a FAIL, not a pass. Every step also records the CPU% and RSS of `kwin_wayland`,
+`plasmashell` and the shell during that step, which is our CPU/RAM spike measure.
+
+Artifacts per run: serial log, stage-1 JSON, stage-2 guest JSON, stage-2 host JSON, and a
+before/after screenshot pair for every driven step.
+
+### Honest limits of stage 2
+
+- `BLOCKED — ENVIRONMENT LIMITATION`: **frame/render stability** is not measured. Under QEMU the
+  frames come from llvmpipe or virtio-gpu, so frame timings would grade the emulator, not KWin. Real
+  frame pacing needs hardware.
+- Screen-change detection is a coarse pixel signature, not a visual diff: it proves *something*
+  happened, not that the right thing happened. The screenshots are kept so a human (and the visual
+  scoring in `docs/VISUAL_SCORE.md`) can judge the "right thing" part.
+- Input latency is measured as key-injection → visible change, which includes QEMU's own latency and
+  is therefore comparable between variants but not an absolute figure.
+
+## Decision rubric — per architecture, after stage 2
+
+Each variant gets ACCEPT / MODIFY / REJECT judged on five axes together, never on RAM alone:
+
+| Axis | Source |
+| --- | --- |
+| Performance | stage-1 RAM, process count, boot time; stage-2 CPU/RAM spikes |
+| UI responsiveness | stage-2 step timings, LOW profile weighted heaviest |
+| Visual fidelity | `docs/VISUAL_SCORE.md` and the screenshot pairs |
+| Hardware compatibility | boot PASS/FAIL across profiles, `-vga std` (llvmpipe) included |
+| Complexity | package closure size and the amount of Zaldros-specific code the variant needs |
+
+**Design is never traded for a benchmark.** A variant that wins on RAM or CPU while degrading Start,
+taskbar, Explorer, Settings, animations, decorations, typography, icons, spacing, colours or
+Windows-like behaviour is REJECTED on that ground alone.
+
 ## Rule for this cycle
 
 No optimisation may degrade Start, taskbar, Explorer, Settings, animations, decorations, typography,
