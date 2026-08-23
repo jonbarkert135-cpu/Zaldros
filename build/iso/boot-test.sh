@@ -6,6 +6,8 @@ set -euo pipefail
 ISO="${1:?iso}"; PROFILE="${2:-mid}"; OUT="${3:-results}"
 NAME="$(basename "${ISO%.iso}")-$PROFILE"
 mkdir -p "$OUT"
+# ponytail: never leave results/ empty — an empty dir made the publish step fail too.
+trap 'rc=$?; [ "$rc" = 0 ] || echo "boot-test.sh exited $rc" > "$OUT/$NAME.error.txt"' EXIT
 SERIAL="$OUT/$NAME.serial.log"; SHOT="$OUT/$NAME.png"; JSON="$OUT/$NAME.json"
 
 case "$PROFILE" in
@@ -15,8 +17,17 @@ case "$PROFILE" in
   *) echo "unknown profile $PROFILE" >&2; exit 2 ;;
 esac
 
-OVMF="$(ls /usr/share/OVMF/OVMF_CODE_4M.fd /usr/share/OVMF/OVMF_CODE.fd 2>/dev/null | head -1)"
-[ -n "$OVMF" ] || { echo "BLOCKED — ENVIRONMENT LIMITATION: no OVMF firmware, UEFI boot untestable" >&2; exit 3; }
+# ponytail: plain globbing — `$(ls ... | head -1)` died under `set -e -o pipefail`
+# before the check below could report BLOCKED (run #12: exit 2, zero output).
+OVMF=""
+for c in /usr/share/OVMF/OVMF_CODE_4M.fd /usr/share/OVMF/OVMF_CODE.fd \
+         /usr/share/OVMF/OVMF_CODE.4m.fd /usr/share/ovmf/OVMF.fd \
+         /usr/share/qemu/OVMF.fd /usr/share/edk2/x64/OVMF_CODE.4m.fd; do
+  [ -f "$c" ] && { OVMF="$c"; break; }
+done
+# last resort: whatever OVMF code file the distro actually shipped
+[ -n "$OVMF" ] || OVMF="$(find /usr/share -maxdepth 3 -name 'OVMF_CODE*.fd' -o -maxdepth 3 -name 'OVMF.fd' 2>/dev/null | head -1 || true)"
+[ -n "$OVMF" ] || { { ls -l /usr/share/OVMF /usr/share/ovmf 2>&1 || true; } | head -40 >&2; echo "BLOCKED — ENVIRONMENT LIMITATION: no OVMF firmware, UEFI boot untestable" >&2; exit 3; }
 ACCEL=tcg; [ -w /dev/kvm ] && ACCEL=kvm
 echo "== $NAME: $CPUS vCPU, $RAM MiB, vga=$VGA, accel=$ACCEL"
 
