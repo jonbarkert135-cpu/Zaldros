@@ -1,7 +1,7 @@
 [project]
 name = "bedrock-sysprobe"
 version = "0.1.0"
-description = "Service, dependency and resource map generator for Bedrock Linux"
+description = "Service, dependency and resource map generator for Bedrock OS"
 requires-python = ">=3.10"
 dependencies = []
 

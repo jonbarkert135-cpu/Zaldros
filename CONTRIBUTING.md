@@ -1,4 +1,4 @@
-# Contributing to Bedrock Linux
+# Contributing to Bedrock OS
 
 ## Non-negotiable rules (spec PART 1 §15, PART 5 §22)
 1. A compile, a boot or a screenshot is **not** proof that a feature works. Attach a test.
@@ -21,5 +21,10 @@
   license, modifications and redistribution requirements.
 
 ## License of new code
-Undecided — see `docs/SPEC_AUDIT.md` B4 (recommendation: GPL-3.0-or-later). Do not add substantial
-new code until this is settled.
+**GPL-3.0-or-later** (owner decision, ADR-0005). Add `SPDX-License-Identifier: GPL-3.0-or-later` to new
+source files. Forked components keep their upstream license, and our modifications to them are released
+under that same upstream license. Every third-party component goes into `THIRD_PARTY_LICENSES.md`.
+
+## User-visible strings
+No hardcoded UI text, ever. Everything goes through `tr()`/gettext so it can be extracted for
+translation (ADR-0005 §3). Russian and English are both first-class.

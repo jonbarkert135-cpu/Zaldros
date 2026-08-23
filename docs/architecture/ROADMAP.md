@@ -1,4 +1,4 @@
-# Bedrock Linux — Development roadmap
+# Bedrock OS — Development roadmap
 
 Phases follow the numbering fixed by spec PART 5 §15. A phase ends only when its acceptance criteria
 are verified (spec PART 1 §15) — a build or a screenshot is never a gate.

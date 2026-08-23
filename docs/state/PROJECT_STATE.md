@@ -4,7 +4,7 @@ _Last updated: 2026-08-23_
 
 | Field | Value |
 | --- | --- |
-| Project | Bedrock Linux |
+| Project | Bedrock OS |
 | Phase | 0 — Research & Architecture |
 | Spec parts received | **all 5 of 5** (complete specification) |
 | Base decision | Fedora, bootc/bootable-container flavour (ADR-0001) |
@@ -14,7 +14,7 @@ _Last updated: 2026-08-23_
 
 ## Done
 - Specification parts 1–2 preserved verbatim in `spec/`
-- Naming authority recorded (`docs/NAMING.md`): official name **Bedrock Linux**, not "Raven OS"
+- Naming authority recorded (`docs/NAMING.md`): official name **Bedrock OS**, not "Raven OS"
 - Base distribution research and decision
 - Desktop/compositor/toolkit research and decision
 - Architecture, roadmap, risks, performance, security and testing strategies
@@ -36,7 +36,7 @@ _Last updated: 2026-08-23_
 4. Turn the map into the three performance profiles as systemd presets.
 
 ## Open questions for the owner
-- **Name collision:** an unrelated project bedrocklinux.org already uses "Bedrock Linux". Keep it or
+- **Name collision:** an unrelated project bedrocklinux.org already uses "Bedrock OS". Keep it or
   differentiate before release?
 - Target hardware for the first baseline (which machine defines "reference laptop")?
 - Is a Linux build host / self-hosted runner available for image builds and VM tests?

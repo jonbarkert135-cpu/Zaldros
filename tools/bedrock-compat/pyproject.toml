@@ -1,7 +1,7 @@
 [project]
 name = "bedrock-compat"
 version = "0.1.0"
-description = "Compatibility registries with evidence enforcement for Bedrock Linux"
+description = "Compatibility registries with evidence enforcement for Bedrock OS"
 requires-python = ">=3.10"
 dependencies = []
 

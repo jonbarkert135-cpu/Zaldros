@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Bedrock Linux. Nothing here is a claim that a component has been booted or
+All notable changes to Bedrock OS. Nothing here is a claim that a component has been booted or
 benchmarked unless it says so explicitly (spec PART 1 §15).
 
 ## [Unreleased]

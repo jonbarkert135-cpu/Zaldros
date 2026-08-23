@@ -1,6 +1,6 @@
 # bedrock-sysprobe
 
-Generates the service / dependency / resource map required by the Bedrock Linux specification
+Generates the service / dependency / resource map required by the Bedrock OS specification
 (PART 1 §7) and consumed by the performance profiles (§8).
 
 For every systemd service it records: description, active state, enablement, PSS memory of the

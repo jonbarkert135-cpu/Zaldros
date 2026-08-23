@@ -1,7 +1,7 @@
 [project]
 name = "bedrock-hwinfo"
 version = "0.1.0"
-description = "Real hardware and system inventory for Bedrock Linux"
+description = "Real hardware and system inventory for Bedrock OS"
 requires-python = ">=3.10"
 dependencies = []
 

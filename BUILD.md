@@ -1,4 +1,4 @@
-# Building Bedrock Linux
+# Building Bedrock OS
 
 **Status: the build has never been executed.** These are the intended, reviewed commands; no image has
 been produced yet because no build host with `podman` and `/dev/kvm` is available to the project

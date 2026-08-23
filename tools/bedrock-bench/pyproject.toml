@@ -1,7 +1,7 @@
 [project]
 name = "bedrock-bench"
 version = "0.1.0"
-description = "Baseline/compare performance harness for Bedrock Linux"
+description = "Baseline/compare performance harness for Bedrock OS"
 requires-python = ">=3.10"
 dependencies = []
 

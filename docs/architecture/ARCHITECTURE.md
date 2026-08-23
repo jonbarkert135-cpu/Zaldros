@@ -1,4 +1,4 @@
-# Bedrock Linux — Architecture (Phase 0 baseline)
+# Bedrock OS — Architecture (Phase 0 baseline)
 
 Derived from spec PART 1 §5 and PART 2. Layer names use the official project naming.
 

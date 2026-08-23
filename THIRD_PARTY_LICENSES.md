@@ -1,6 +1,6 @@
 # Third-party components
 
-Required by spec PART 1 §11. Every third-party component that ships in a Bedrock Linux image must be
+Required by spec PART 1 §11. Every third-party component that ships in a Bedrock OS image must be
 listed here with project, version, source, license, our modifications and redistribution requirements.
 
 **No proprietary Microsoft binaries, fonts, icons, cursors or wallpapers may ever be added to this
@@ -28,5 +28,5 @@ Windows installation the user themselves licenses, at their explicit request, at
 | Wine / Proton | Windows compatibility (optional component) | LGPL-2.1+ |
 | Inter / Selawik | open substitutes for Segoe UI | OFL-1.1 / MIT |
 
-Bedrock Linux is an independent Linux project. It is not affiliated with, endorsed by, or distributed
+Bedrock OS is an independent Linux project. It is not affiliated with, endorsed by, or distributed
 by Microsoft. Windows and Windows 11 are trademarks of Microsoft Corporation.

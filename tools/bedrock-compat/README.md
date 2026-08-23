@@ -1,6 +1,6 @@
 # bedrock-compat
 
-Keeps Bedrock Linux honest about what works. Two registries live in `data/`:
+Keeps Bedrock OS honest about what works. Two registries live in `data/`:
 
 - `applications.json` — Windows/Linux applications classified as `native`, `compatible`, `partial`,
   `unsupported` or `untested` (spec PART 4 §3).

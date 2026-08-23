@@ -1,4 +1,4 @@
-# Bedrock Linux
+# Bedrock OS
 
 A Linux desktop operating system built around **Windows-11-familiar workflows**, with a clean,
 lightweight and aggressively optimised Linux system underneath.
@@ -6,7 +6,7 @@ lightweight and aggressively optimised Linux system underneath.
 > Not "Linux with a Windows theme" — a complete Linux desktop environment designed around
 > Windows-familiar workflows.
 
-**Name:** the official project name is **Bedrock Linux**. The master-specification text uses
+**Name:** the official project name is **Bedrock OS**. The master-specification text uses
 "Raven OS"; that name was invented by the AI that drafted the spec and is superseded — see
 [`docs/NAMING.md`](docs/NAMING.md).
 

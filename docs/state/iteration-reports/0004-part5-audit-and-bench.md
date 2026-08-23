@@ -51,3 +51,32 @@ still 0 — no image has booted.
 first service map, hardware inventory and performance baseline. Meanwhile the seven questions in
 `SPEC_AUDIT.md` §E block decisions that are cheap now and expensive later (project license, name,
 Secure Boot).
+
+---
+
+## Addendum — owner decisions closed (2026-08-23)
+
+**DECISION** — ADR-0005 records four owner decisions, each benchmarked against what Ubuntu, Debian,
+Arch and Mint actually do: name **Bedrock OS** (short-name convention kept; suffix changed from "Linux"
+to "OS" only to avoid the live bedrocklinux.org project); license **GPL-3.0-or-later** for our own code
+with forks keeping upstream licenses; **Russian default with first-class English** plus a tier-2
+language set, and a hard no-hardcoded-strings rule from the first line of shell code; disk encryption
+**off by default**, offered as an installer checkbox — which is exactly what Ubuntu, Mint and Debian do
+(Fedora is the outlier here).
+
+**RESEARCH** — The owner also questioned the Fedora bootc base. `docs/research/03-base-distribution-reopened.md`
+reopens ADR-0001 honestly: Fedora bootc is not obscure (it is Fedora, packaged as an image), but for the
+stated goal of maximum device coverage plus familiarity, the Debian family wins on old hardware, NVIDIA
+packaging, `.deb` third-party software and documentation volume, while Ubuntu LTS + HWE closes most of
+the fresh-kernel gap. Recommendation: default to an **Ubuntu 24.04 LTS + HWE** base, at the cost of
+rebuilding atomic rollback ourselves with btrfs snapshots + grub-btrfs.
+
+**PROBLEMS** — This must not become an opinion flip-flop, and `LICENSE` could not be completed: the
+sandbox has no network access, so the verbatim GPL-3.0 text could not be fetched. The file carries the
+SPDX identifier and the standard notice with an explicit marker that the full text must be pasted
+before release.
+
+**FIX / NEXT** — The base decision is settled by a defined test, not by preference: build both minimal
+images, boot each on the weakest available machine, and record `bedrock-hwinfo`, `bedrock-bench collect`
+and a deliberate broken-update rollback. All four tools are base-agnostic, so no work is lost either
+way. The test needs CI or a real machine — still the project's only blocker.
