@@ -61,11 +61,11 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland fonts-dejavu-core python3 python3-pyside6.qtquick"
+BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland fonts-dejavu-core python3 python3-pyside6.qtquick qml6-module-qtquick-controls"
 case "$VARIANT" in
   full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland" ;;
   services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
-  legacy)   EXTRA="kwin-wayland layer-shell-qt qml6-module-qtquick-controls" ;;
+  legacy)   EXTRA="kwin-wayland layer-shell-qt" ;;
   *) echo "unknown variant $VARIANT" >&2; exit 2 ;;
 esac
 
@@ -129,7 +129,9 @@ cat > "$ROOT/usr/local/bin/zaldros-session" <<'EOS'
 #!/bin/sh
 # KWin as the compositor, the Zaldros shell as the only shell process. No plasmashell.
 export QT_QPA_PLATFORM=wayland PYTHONPATH=/opt/zaldros
-exec kwin_wayland --xwayland -- python3 -m zaldros_shell
+# ponytail: the "run" subcommand is required by the shell CLI. Without it argparse exited 2 at
+# startup, which is why services/legacy booted to a black screen in run #18.
+exec kwin_wayland --xwayland -- python3 -m zaldros_shell run
 EOS
 chmod +x "$ROOT/usr/local/bin/zaldros-session"
 # ponytail: no display manager. Run #16 proved sddm never honoured its autologin config and fell

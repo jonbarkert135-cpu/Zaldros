@@ -200,3 +200,24 @@ Alt+Tab FAIL. services/legacy host input all FAIL — expected fallout of (1): n
 
 Architecture decision stays **PROPOSED**. RAM/process deltas (full ~854 MiB / 39 procs vs
 ~453 MiB / 22 procs) are recorded but are not a verdict until a boot PASS with working UI.
+
+## Run #18 (b17846d) — first green boot, and the black screen behind it
+
+12/12 CI jobs green. All 9 variant x profile combinations passed the guest self-test:
+kernel 7.0.0-30-generic, systemd, Wayland, KWin, session unit, konsole launch 2.0 s, 0 failed units.
+Full table and verdicts: `docs/state/iteration-reports/0009-first-green-boot.md`.
+
+But the screenshots disagree with the JSON: `services` and `legacy` produce a *fully black* frame.
+Root cause read off the code, not guessed:
+
+1. `zaldros-session` ran `python3 -m zaldros_shell` with no subcommand. The CLI declares
+   `add_subparsers(..., required=True)`, so argparse exited 2 the instant the session started —
+   the shell never drew anything. Fix: `... zaldros_shell run`.
+2. The self-test still reported `shell: true` because `pgrep -f zaldros_shell` matched
+   *kwin_wayland's own command line*. Fix: match `^python3 -m zaldros_shell`, and capture the
+   session journal into the artifact so the next failure names itself.
+3. The shell QML imports `QtQuick.Controls`, which only the `legacy` package set installed.
+   Moved `qml6-module-qtquick-controls` into the base set.
+
+Architecture verdict stays open: `full` ACCEPT (provisional, only visible desktop),
+`services`/`legacy` MODIFY — half the RAM (452 vs 883 MiB, 22 vs 39 processes) but no visuals yet.

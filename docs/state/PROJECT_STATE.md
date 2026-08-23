@@ -3,17 +3,15 @@
 ```
 Base:          Ubuntu 26.04 LTS
 Status:        PROPOSED
-ISO:           BUILT — run #17 (0d364d1), all 3 variants
-Boot:          DESKTOP REACHED, VERDICT FAIL (run #17, 9/9 combinations)
-               kernel 7.0.0-30-generic + systemd + Wayland + KWin + shell all
-               observed; the session autologin unit works. Two open failures:
-               (1) systemd_state=starting (casper-md5check fails, state sampled
-               too early); (2) no session D-Bus in the test units + qdbus6 absent
-               -> konsole failed on services/legacy and all KWin window steps
-               returned nothing. Fixes pending run #18.
-Architecture:  NOT ACCEPTED (no green boot verdict yet)
-Idle RAM (QEMU, low profile): full 875 MiB / 39 proc, services 461 MiB / 22 proc,
-               legacy 467 MiB / 22 proc — comparison data only, not hardware evidence.
+ISO:           BUILT — run #18 (b17846d), all 3 variants
+Boot:          PASS — 9/9 variant x profile combinations, guest self-test green
+               (kernel 7.0.0-30-generic, systemd, Wayland, KWin, Zaldros session,
+               real app launch 2.0 s, 0 failed units). run 32671131899, 2026-08-23.
+Architecture:  NOT ACCEPTED — full ACCEPT (provisional), services/legacy MODIFY:
+               they boot but render a black screen (shell paints nothing).
+Idle RAM (QEMU, low profile): full 883 MiB / 39 proc, services 452 MiB / 22 proc,
+               legacy 468 MiB / 22 proc — comparison data only, not hardware evidence.
+Boot time:     NOT MEASURED (harness ceiling only) — BLOCKED, needs a timestamp probe.
 ```
 
 _Last updated: 2026-08-23_

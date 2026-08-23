@@ -108,7 +108,11 @@ def main():
         "kwin": "kwin_wayland" in procs,
         "plasmashell": "plasmashell" in procs,
         # ponytail: "python3 is running" was a false positive — this self-test *is* python3.
-        "shell": bool(sh("pgrep", "-f", "zaldros_shell")) or "plasmashell" in procs,
+        # ponytail: pgrep -f zaldros_shell also matched *kwin_wayland's* command line
+        # ("kwin_wayland -- python3 -m zaldros_shell"), so run #18 reported shell=true while the
+        # shell had already exited. Match the python interpreter process itself.
+        "shell": bool(sh("pgrep", "-f", "^python3 -m zaldros_shell")) or "plasmashell" in procs,
+        "shell_journal": sh("journalctl", "-u", "zaldros-session.service", "-b", "--no-pager", "-n", "80"),
         "process_count": sum(n for n, _ in procs.values()),
         "mem_used_mib": mem_used_mib(),
         "rss_mib": {c: round(r / 1024, 1) for c, (_, r) in
