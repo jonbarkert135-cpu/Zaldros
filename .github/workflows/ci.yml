@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sysprobe:
+    name: bedrock-sysprobe (unit tests + live run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: pip install pytest
+      - name: Unit tests
+        run: python -m pytest tools -q
+      - name: Live probe on the runner (real systemd system)
+        working-directory: tools/bedrock-sysprobe
+        run: python -m bedrock_sysprobe -o service-map.md && head -30 service-map.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: service-map
+          path: tools/bedrock-sysprobe/service-map.md
+      - name: Live hardware inventory on the runner
+        working-directory: tools/bedrock-hwinfo
+        run: python -m bedrock_hwinfo -o inventory.md && head -25 inventory.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hardware-inventory
+          path: tools/bedrock-hwinfo/inventory.md
+
+  compat:
+    name: compatibility registries (evidence gate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: No compatibility claim without evidence (spec PART 4 §25)
+        working-directory: tools/bedrock-compat
+        run: python -m bedrock_compat --check
+
+  image:
+    name: build OS images (requires podman)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build bedrock-base
+        run: podman build -t bedrock-base -f build/Containerfile.base .
+      - name: Build bedrock-desktop
+        run: podman build -t bedrock-desktop -f build/Containerfile.desktop .
+
+  bench:
+    name: benchmark harness (baseline on the runner)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Collect a baseline sample (real systemd host)
+        working-directory: tools/bedrock-bench
+        run: |
+          python -m bedrock_bench collect \
+            --label ci-runner --commit "${GITHUB_SHA::7}" -o baseline.json
+          cat baseline.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-baseline
+          path: tools/bedrock-bench/baseline.json
