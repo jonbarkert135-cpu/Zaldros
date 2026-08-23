@@ -1,5 +1,13 @@
 # Project state
 
+```
+Base:          Ubuntu 26.04 LTS
+Status:        PROPOSED
+ISO:           NOT BUILT YET
+Boot:          NOT TESTED
+Architecture:  NOT ACCEPTED
+```
+
 _Last updated: 2026-08-23_
 
 | Field | Value |

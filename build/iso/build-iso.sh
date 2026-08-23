@@ -12,6 +12,54 @@ REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 WORK="${WORK:-$(mktemp -d)}"
 ROOT="$WORK/rootfs"
 
+# --- diagnostics -------------------------------------------------------------------------------
+# Every run leaves a debug directory behind, whether it succeeds or fails, so a failure is read from
+# evidence instead of guessed at. DEBUG_DIR is uploaded as its own artifact per variant.
+DEBUG_DIR="${DEBUG_DIR:-$PWD/build-debug-$VARIANT}"
+mkdir -p "$DEBUG_DIR"
+: > "$DEBUG_DIR/steps.tsv"
+
+step() {                              # step <name> <command...> — records the exit code of each step
+  local name="$1"; shift
+  echo "== $name"
+  local rc=0
+  "$@" > >(tee -a "$DEBUG_DIR/$name.log") 2> >(tee -a "$DEBUG_DIR/$name.log" >&2) || rc=$?
+  printf '%s\t%s\t%s\n' "$name" "$rc" "$*" >> "$DEBUG_DIR/steps.tsv"
+  [ "$rc" -eq 0 ] || echo "!! step '$name' failed with exit code $rc: $*"
+  return "$rc"
+}
+
+collect_debug() {                     # runs on every exit, including failures
+  local rc=$?
+  {
+    echo "=== exit code: $rc"; echo "=== date: $(date -Is)"
+    echo "=== uname -a"; uname -a
+    echo "=== host /etc/os-release"; cat /etc/os-release
+    echo "=== df -h"; df -h
+    echo "=== free -h"; free -h
+    echo "=== mount"; mount
+    echo "=== dpkg --print-architecture (host)"; dpkg --print-architecture
+    echo "=== rootfs: $ROOT"; ls -la "$ROOT" 2>/dev/null | head -40
+    echo "=== rootfs size"; du -sh "$ROOT" 2>/dev/null
+    echo "=== rootfs /etc/os-release"; cat "$ROOT/etc/os-release" 2>/dev/null
+    echo "=== rootfs dpkg --print-architecture"; chroot "$ROOT" dpkg --print-architecture 2>&1
+    echo "=== rootfs /etc/resolv.conf"; cat "$ROOT/etc/resolv.conf" 2>/dev/null
+    echo "=== rootfs DNS check"; chroot "$ROOT" getent hosts archive.ubuntu.com 2>&1
+    echo "=== step exit codes (name / rc / command)"; cat "$DEBUG_DIR/steps.tsv"
+  } > "$DEBUG_DIR/environment.txt" 2>&1
+  cat "$ROOT"/etc/apt/sources.list "$ROOT"/etc/apt/sources.list.d/* > "$DEBUG_DIR/sources.txt" 2>&1 || true
+  cp -a "$ROOT"/var/log/apt "$DEBUG_DIR/apt-log" 2>/dev/null || true
+  cp "$ROOT"/var/log/dpkg.log "$DEBUG_DIR/dpkg.log" 2>/dev/null || true
+  chroot "$ROOT" dpkg-query -W -f='${binary:Package}\t${Version}\n' > "$DEBUG_DIR/installed-packages.txt" 2>&1 || true
+  for f in "$DEBUG_DIR"/*.log; do
+    [ -e "$f" ] || continue
+    { echo "===== tail -200 $(basename "$f")"; tail -200 "$f"; } >> "$DEBUG_DIR/tails.txt"
+  done
+  umount -l "$ROOT/dev" "$ROOT/proc" "$ROOT/sys" 2>/dev/null || true
+  echo "== diagnostics written to $DEBUG_DIR"
+}
+trap collect_debug EXIT
+
 # Package set per variant — the three architectures we are comparing.
 BASE="ubuntu-minimal linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber sddm dolphin konsole fonts-dejavu-core python3 python3-pyside6.qtquick"
 case "$VARIANT" in
@@ -48,11 +96,12 @@ Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
 
 mount --bind /dev "$ROOT/dev"; mount -t proc proc "$ROOT/proc"; mount -t sysfs sys "$ROOT/sys"
-trap 'umount -l "$ROOT/dev" "$ROOT/proc" "$ROOT/sys" 2>/dev/null || true' EXIT
 
-echo "== install packages ($VARIANT)"
-chroot "$ROOT" env DEBIAN_FRONTEND=noninteractive sh -c \
-  "apt-get update -qq && apt-get install -y --no-install-recommends $BASE $EXTRA"
+# apt is split into update and install so a failure names which half broke, and both keep full output.
+step apt-update chroot "$ROOT" env DEBIAN_FRONTEND=noninteractive apt-get update
+echo "== install packages ($VARIANT): $BASE $EXTRA"
+step apt-install chroot "$ROOT" env DEBIAN_FRONTEND=noninteractive \
+  apt-get install -y --no-install-recommends $BASE $EXTRA
 
 echo "== install the Zaldros shell, theme scripts and self-test"
 mkdir -p "$ROOT/opt/zaldros"

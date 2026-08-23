@@ -51,6 +51,17 @@ Newest first. Each entry states what was *run*, not only what was written.
   21 MISSING) and `docs/FEATURE_RESEARCH.md`.
 - Still blocked: no container build, no VM boot, no hardware or performance evidence.
 
+## 2026-08-23 — ISO pipeline: diagnosability before more fixes
+- Base change recorded as ADR-0009 (Ubuntu 26.04, **PROPOSED**); ADR-0001 (Fedora bootc) superseded.
+  Every doc that promised atomic updates, rollback, read-only `/usr` or SELinux corrected.
+- `iso` runs #1–#6: all builds FAIL, boot job never ran. No ISO exists, so no metrics exist.
+- Root causes found and fixed so far: `plasma-workspace-wayland` is a Plasma 5 name that does not
+  exist in 26.04; the runner's debootstrap has no script for `resolute` (now bootstrapping from the
+  official Ubuntu base tarball instead).
+- Build script now emits a full diagnostic set per variant on every run — step exit codes, apt logs,
+  installed packages, sources, chroot DNS/arch/os-release, `df`/`free`/`mount`/`uname`, and 200-line
+  tails — uploaded as `build-debug-{variant}` and echoed into the run summary. No more guessing.
+
 ## 2026-08-23 — Owner decisions
 - ADR-0005: name **Zaldros OS**, license GPL-3.0-or-later, Russian default + first-class English,
   disk encryption opt-in. Base-distribution decision reopened toward Ubuntu LTS + HWE, to be settled

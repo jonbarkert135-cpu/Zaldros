@@ -27,6 +27,7 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [ ] Settings (display, network, sound, accounts)
+- [ ] **FIRST ISO BUILD PASS** — nothing else in this cycle; then first QEMU boot PASS
 - [ ] Installer, then recovery/rollback tested by deliberately breaking a VM
 - [ ] **Re-earn what the bootc base gave us** (ADR-0009): atomic updates, rollback, read-only `/usr`,
       on-disk recovery entry. Until these exist, do not claim any of them anywhere in the docs.
