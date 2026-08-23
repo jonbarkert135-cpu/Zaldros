@@ -15,14 +15,22 @@ ROOT="$WORK/rootfs"
 # Package set per variant — the three architectures we are comparing.
 BASE="ubuntu-minimal linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber sddm dolphin konsole fonts-dejavu-core python3 python3-pyside6.qtquick"
 case "$VARIANT" in
-  full)     EXTRA="plasma-desktop plasma-workspace-wayland" ;;
-  services) EXTRA="plasma-workspace-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
+  full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland" ;;
+  services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
   legacy)   EXTRA="kwin-wayland layer-shell-qt qml6-module-qtquick-controls" ;;
   *) echo "unknown variant $VARIANT" >&2; exit 2 ;;
 esac
 
+# GitHub runners ship an older debootstrap that has no script for a newer suite; Ubuntu suites all
+# use the same gutsy-derived script, so pointing the missing name at it is the standard workaround.
+if [ ! -e "/usr/share/debootstrap/scripts/$SUITE" ]; then
+  echo "== debootstrap has no script for $SUITE, linking it to the generic Ubuntu one"
+  ln -s gutsy "/usr/share/debootstrap/scripts/$SUITE"
+fi
+
 echo "== debootstrap $SUITE"
-debootstrap --arch=amd64 --variant=minbase "$SUITE" "$ROOT" "$MIRROR"
+debootstrap --arch=amd64 --variant=minbase --components=main,universe "$SUITE" "$ROOT" "$MIRROR" \
+  || { echo "== debootstrap failed, tail of its log:"; tail -50 "$ROOT/debootstrap/debootstrap.log" 2>/dev/null; exit 1; }
 
 cat > "$ROOT/etc/apt/sources.list.d/ubuntu.sources" <<EOF
 Types: deb

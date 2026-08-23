@@ -23,7 +23,22 @@ jobs:
           sudo apt-get install -y --no-install-recommends debootstrap squashfs-tools xorriso \
             grub-efi-amd64-bin grub-pc-bin mtools dosfstools zstd
       - name: Build ISO (${{ matrix.variant }})
-        run: sudo -E ./build/iso/build-iso.sh ${{ matrix.variant }} zaldros-${{ matrix.variant }}.iso
+        run: |
+          set -o pipefail
+          sudo -E ./build/iso/build-iso.sh ${{ matrix.variant }} zaldros-${{ matrix.variant }}.iso \
+            2>&1 | tee build-${{ matrix.variant }}.log
+      - name: Build failure summary
+        if: failure()
+        run: |
+          { echo "## build ${{ matrix.variant }} FAILED"; echo '```';
+            tail -60 build-${{ matrix.variant }}.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep the build log either way
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ matrix.variant }}
+          path: build-${{ matrix.variant }}.log
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: iso-${{ matrix.variant }}
