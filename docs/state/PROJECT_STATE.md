@@ -6,10 +6,10 @@ _Last updated: 2026-08-23_
 | --- | --- |
 | Project | Bedrock Linux |
 | Phase | 0 — Research & Architecture |
-| Spec parts received | 1, 2 of 5 (PART 3 was referenced by the owner but not received in chat) |
+| Spec parts received | 1, 2, 3 of 5 |
 | Base decision | Fedora, bootc/bootable-container flavour (ADR-0001) |
 | Desktop decision | KWin 6 (Wayland) + own Bedrock shell components in Qt6/QML (ADR-0002, ADR-0003) |
-| Shipping code | `tools/bedrock-sysprobe` v0.1.0 — 11 unit tests passing |
+| Shipping code | `tools/bedrock-sysprobe` v0.1.0, `tools/bedrock-hwinfo` v0.1.0 — 20 unit tests passing |
 | Blocked on | a Linux build host / VM runner for image builds and real measurements |
 
 ## Done
@@ -19,10 +19,12 @@ _Last updated: 2026-08-23_
 - Desktop/compositor/toolkit research and decision
 - Architecture, roadmap, risks, performance, security and testing strategies
 - First component built and tested: `bedrock-sysprobe`
-- CI: unit tests + a live service-map run on a real systemd host, artefact published
+- CI: unit tests + live service-map and hardware-inventory runs on a real systemd host, artefacts published
+- PART 3 integrated: `docs/architecture/SYSTEM_APPS.md` — build/reuse decision for every system app
+- Second component: `tools/bedrock-hwinfo` v0.1.0 (Device Manager / System Information backend)
 
 ## Next
-1. Integrate PART 3 (and 4–5 when they arrive) into the existing docs — additive, no restart.
+1. Integrate PARTS 4–5 when they arrive — additive, no restart.
 2. `Containerfile` for `bedrock-base` (core, no shell) + `bedrock-desktop`, built in CI.
 3. QEMU boot smoke test; attach the `bedrock-sysprobe` map and baseline metrics to the build.
 4. Turn the map into the three performance profiles as systemd presets.

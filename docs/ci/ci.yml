@@ -16,7 +16,7 @@ jobs:
       - name: Install pytest
         run: pip install pytest
       - name: Unit tests
-        run: python -m pytest tools/bedrock-sysprobe/tests -q
+        run: python -m pytest tools/bedrock-sysprobe/tests tools/bedrock-hwinfo/tests -q
       - name: Live probe on the runner (real systemd system)
         working-directory: tools/bedrock-sysprobe
         run: python -m bedrock_sysprobe -o service-map.md && head -30 service-map.md
@@ -24,3 +24,10 @@ jobs:
         with:
           name: service-map
           path: tools/bedrock-sysprobe/service-map.md
+      - name: Live hardware inventory on the runner
+        working-directory: tools/bedrock-hwinfo
+        run: python -m bedrock_hwinfo -o inventory.md && head -25 inventory.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hardware-inventory
+          path: tools/bedrock-hwinfo/inventory.md
