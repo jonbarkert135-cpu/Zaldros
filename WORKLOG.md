@@ -259,3 +259,13 @@ Written and unit-tested locally (44 shell tests + shell render green); CI eviden
 - Исправлено: лог сессии пишется в `/tmp/zaldros-session.log`, selftest читает оттуда же.
 - Открыто: `full` всё ещё стартует startplasma-wayland (отклонение от спеки), Alt+Tab host FAIL,
   boot_time: systemd-analyze пуст (systemd ещё "starting"), меряем uptime_at_selftest_s.
+
+## Run #22 (2026-08-24)
+- Root cause of the black screen in services/legacy found from /tmp/zaldros-session.log:
+  `ModuleNotFoundError: No module named 'PySide6.QtSvg'` — the ISO installed only
+  python3-pyside6.qtquick. kwin_wayland itself started fine.
+- Fix: add python3-pyside6.qtsvg to the ISO package list.
+- Guard: tests/test_iso_packages.py asserts every `from PySide6.X import` in the shell
+  has a matching python3-pyside6.x package in build-iso.sh.
+- full variant now runs /usr/local/bin/zaldros-session (own shell) instead of
+  startplasma-wayland, as the spec requires.
