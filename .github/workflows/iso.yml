@@ -30,9 +30,12 @@ jobs:
           set -o pipefail
           sudo -E ./build/iso/build-iso.sh ${{ matrix.variant }} zaldros-${{ matrix.variant }}.iso \
             2>&1 | tee build-${{ matrix.variant }}.log
+      # ponytail: diagnostics must never be able to fail the job — the ISO itself is the result.
       - name: Diagnostics summary (always)
         if: always()
+        continue-on-error: true
         run: |
+          sudo chown -R "$USER" build-debug-${{ matrix.variant }} build-${{ matrix.variant }}.log || true
           D=build-debug-${{ matrix.variant }}
           {
             echo "## build ${{ matrix.variant }} — ${{ job.status }}"
@@ -46,6 +49,7 @@ jobs:
       # readable by anyone working on the build, with no extra tooling.
       - name: Publish diagnostics to the ci-logs branch
         if: always()
+        continue-on-error: true
         run: |
           BRANCH=ci-logs-${{ matrix.variant }}
           rm -rf /tmp/pub && mkdir -p /tmp/pub
@@ -67,6 +71,7 @@ jobs:
             build-debug-${{ matrix.variant }}/**
           retention-days: 7
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: iso-${{ matrix.variant }}
           path: zaldros-${{ matrix.variant }}.iso
@@ -74,6 +79,8 @@ jobs:
 
   boot:
     needs: build
+    # ponytail: a failed sibling variant must never block booting the ISOs that did build.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
