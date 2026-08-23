@@ -100,6 +100,9 @@ def main():
         # is-system-running is "starting" until every job settles; wait for a verdict instead of
         # sampling one too early (run #17 failed the systemd check for exactly that reason).
         "systemd_state": settled_systemd_state(),
+        # Evidence for that state: run #18 sat at "starting" with zero failed units because this
+        # very self-test is a job inside the graphical.target transaction.
+        "pending_jobs": sh("systemctl", "list-jobs", "--no-legend", "--plain"),
         "failed_units": sh("systemctl", "list-units", "--state=failed", "--no-legend", "--plain"),
         "wayland_socket": [str(p) for p in wayland_sockets()],
         "kwin": "kwin_wayland" in procs,

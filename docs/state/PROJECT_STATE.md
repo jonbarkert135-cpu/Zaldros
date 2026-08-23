@@ -57,3 +57,5 @@ _Last updated: 2026-08-23_
   differentiate before release?
 - Target hardware for the first baseline (which machine defines "reference laptop")?
 - Is a Linux build host / self-hosted runner available for image builds and VM tests?
+
+- Run #18: all CI jobs green, boot=FAIL on all 9 (systemd/app_launch), root causes fixed in run #19 candidate. Architecture: NOT ACCEPTED. [ci run 32670157459, 2026-08-23]

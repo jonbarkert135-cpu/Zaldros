@@ -61,7 +61,7 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session fonts-dejavu-core python3 python3-pyside6.qtquick"
+BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland fonts-dejavu-core python3 python3-pyside6.qtquick"
 case "$VARIANT" in
   full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland" ;;
   services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
@@ -174,7 +174,7 @@ Type=oneshot
 ExecStart=/usr/local/bin/zaldros-selftest --serial /dev/ttyS0
 # Stage 2: pause so the host can inject input over QMP, then run the UI interaction test.
 ExecStart=/bin/sleep 45
-ExecStart=/bin/sh -c 'XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland /usr/local/bin/zaldros-uitest > /dev/ttyS0 2>/var/log/zaldros-uitest.err'
+ExecStart=/bin/sh -c 'runuser -u ubuntu -- env XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland /usr/local/bin/zaldros-uitest > /dev/ttyS0 2>/var/log/zaldros-uitest.err'
 TimeoutStartSec=600
 ExecStopPost=/usr/bin/systemctl poweroff
 [Install]

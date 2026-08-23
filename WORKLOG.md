@@ -170,3 +170,33 @@ Newest first. Each entry states what was *run*, not only what was written.
 ## 2026-08-23 — PARTS 1–4
 - Phase 0 architecture, ADR-0001…0004, `zaldros-sysprobe`, `zaldros-hwinfo`, `zaldros-compat`,
   Containerfiles (never built).
+
+## Run #18 — first full green pipeline, first real boot evidence (2026-08-23)
+
+All 12 jobs succeeded (build full/services/legacy + 9 boot jobs). Evidence, not conclusions:
+
+| variant | profile | boot | RAM used | procs | kwin | shell | app launch |
+|---|---|---|---|---|---|---|---|
+| full | low/mid/modern | FAIL (systemd) | 854/897/966 MiB | 39 | PASS | plasmashell PASS | konsole PASS |
+| services | low/mid/modern | FAIL (systemd, app_launch) | 454/484/537 MiB | 22 | PASS | zaldros_shell PASS | FAIL |
+| legacy | low/mid/modern | FAIL (systemd, app_launch) | 452/482/547 MiB | 22 | PASS | zaldros_shell PASS | FAIL |
+
+Three root causes read off the actual logs (no guessing):
+
+1. `app_launch` FAIL on services/legacy — konsole aborts with
+   `qt.qpa.wayland: No shell integration named "xdg-shell" found` (exit 134). The Qt Wayland
+   shell-integration plugins come with `qt6-wayland`, which only full pulled in via plasma-desktop.
+   Fix: `qt6-wayland` added to the base package set.
+2. Every window UI step FAIL — `dbus-send --session` timed out: the UI test ran as root against
+   the ubuntu user's bus socket, and the bus refuses a uid mismatch. Fix: the unit now runs the
+   UI test through `runuser -u ubuntu`.
+3. `systemd` check FAIL with **zero failed units** — `is-system-running` stays `starting` while a
+   job of the initial transaction is running, and that job is the self-test itself. Fix: the
+   self-test now records `systemctl list-jobs`, and `starting` passes only when the outstanding
+   jobs are its own units and nothing failed.
+
+Host-side QMP input (full variant): Start open PASS 1.5 s, Start close PASS, taskbar PASS,
+Alt+Tab FAIL. services/legacy host input all FAIL — expected fallout of (1): no client windows.
+
+Architecture decision stays **PROPOSED**. RAM/process deltas (full ~854 MiB / 39 procs vs
+~453 MiB / 22 procs) are recorded but are not a verdict until a boot PASS with working UI.

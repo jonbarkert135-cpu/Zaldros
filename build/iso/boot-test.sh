@@ -77,7 +77,12 @@ data["wall_seconds"] = int(sys.argv[2]); data["profile"] = sys.argv[3]
 # kernel + systemd + Wayland + KWin + shell + a launched application (spec PART "NO FALSE SUCCESS").
 checks = {
     "kernel": bool(data.get("kernel")),
-    "systemd": data.get("systemd_state") in ("running", "degraded"),
+    # "starting" is only accepted when the sole outstanding jobs are this test's own units;
+    # any other pending job, and any failed unit, still fails the check.
+    "systemd": data.get("systemd_state") in ("running", "degraded") or (
+        data.get("systemd_state") == "starting" and not data.get("failed_units")
+        and all(any(u in line for u in ("zaldros-selftest.service", "graphical.target"))
+                for line in data.get("pending_jobs", "x").splitlines() if line.strip())),
     "wayland": bool(data.get("wayland_socket")),
     "kwin": bool(data.get("kwin")),
     "shell": bool(data.get("shell")),
