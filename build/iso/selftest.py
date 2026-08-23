@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+"""In-guest boot self-test. Prints one JSON line, marked so the host can find it on the serial log.
+
+Every check reports what it actually observed; nothing is assumed from a successful build."""
+import argparse, json, os, re, subprocess, time
+from pathlib import Path
+
+MARK = "ZALDROS-SELFTEST "
+
+
+def sh(*cmd, timeout=20):
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout).stdout.strip()
+    except Exception as exc:                                  # a failing probe is data, not a crash
+        return f"ERROR: {exc}"
+
+
+def processes():
+    out = {}
+    for pid in filter(str.isdigit, os.listdir("/proc")):
+        try:
+            comm = Path(f"/proc/{pid}/comm").read_text().strip()
+            rss = int(re.search(r"VmRSS:\s+(\d+)", Path(f"/proc/{pid}/status").read_text())[1])
+        except Exception:
+            continue
+        out.setdefault(comm, [0, 0])
+        out[comm][0] += 1
+        out[comm][1] += rss
+    return out
+
+
+def mem_used_mib():
+    info = dict(re.findall(r"(\w+):\s+(\d+) kB", Path("/proc/meminfo").read_text()))
+    return (int(info["MemTotal"]) - int(info["MemAvailable"])) // 1024
+
+
+def launch_test(app="konsole"):
+    """A real application must actually start and stay alive for two seconds."""
+    try:
+        started = time.monotonic()
+        proc = subprocess.Popen([app], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(2)
+        alive = proc.poll() is None
+        proc.terminate()
+        return {"app": app, "started": alive, "seconds": round(time.monotonic() - started, 2)}
+    except Exception as exc:
+        return {"app": app, "started": False, "error": str(exc)}
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--serial", default="")
+    ap.add_argument("--settle", type=float, default=15.0, help="seconds to let the desktop settle")
+    args = ap.parse_args()
+    time.sleep(args.settle)
+
+    procs = processes()
+    runtime = os.environ.get("XDG_RUNTIME_DIR", "/run/user/1000")
+    result = {
+        "variant": Path("/etc/zaldros-variant").read_text().strip()
+                   if Path("/etc/zaldros-variant").is_file() else "unknown",
+        "kernel": sh("uname", "-r"),
+        "systemd_state": sh("systemctl", "is-system-running"),
+        "failed_units": sh("systemctl", "list-units", "--state=failed", "--no-legend", "--plain"),
+        "wayland_socket": sorted(p.name for p in Path(runtime).glob("wayland-*")
+                                 if Path(runtime).is_dir()),
+        "kwin": "kwin_wayland" in procs,
+        "plasmashell": "plasmashell" in procs,
+        "shell": any(c.startswith("zaldros") or c == "python3" for c in procs),
+        "process_count": sum(n for n, _ in procs.values()),
+        "mem_used_mib": mem_used_mib(),
+        "rss_mib": {c: round(r / 1024, 1) for c, (_, r) in
+                    sorted(procs.items(), key=lambda kv: -kv[1][1])[:12]},
+        "loadavg": Path("/proc/loadavg").read_text().split()[:3],
+        "boot_time": sh("systemd-analyze", "time"),
+        "app_launch": launch_test(),
+    }
+    line = MARK + json.dumps(result, ensure_ascii=False)
+    print(line, flush=True)
+    if args.serial:
+        with open(args.serial, "w") as fh:
+            fh.write(line + "\n")
+
+
+if __name__ == "__main__":
+    main()

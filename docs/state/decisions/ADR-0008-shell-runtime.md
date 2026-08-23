@@ -1,6 +1,9 @@
 # ADR-0008 — Shell runtime: Plasma shell package on KWin
 
-**Status:** proposed (2026-08-23), pending the two measurements listed below.
+**Status:** proposed (2026-08-23). Remains PROPOSED until the boot matrix in
+`docs/architecture/VALIDATION_PLAN.md` produces real numbers. A third candidate was added after the
+owner's question: **KWin + selected Plasma services without plasmashell** (variant `services`), which
+the package data shows is possible — `kwin-wayland` does not depend on `plasma-workspace`.
 
 ## Context
 The owner asked whether the Qt 6/QML architecture should survive at all, given that the Windows-11
