@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-08-23 — first ISOs actually built (run #11, d9dff44)
+
+- `apt-update`, `apt-install`, `theme` all exit 0 in all three variants; xorriso wrote
+  `zaldros-full.iso` (3.0G), `zaldros-services.iso` (2.9G), `zaldros-legacy.iso` (2.7G).
+- The job still reported `failure`: the *Diagnostics summary* step failed (root-owned
+  `build-debug-*` written under sudo), which skipped the ISO artifact upload and the boot job.
+- Fix (minimal): `continue-on-error: true` on both diagnostics steps + `chown` of the debug dir,
+  and `if: always()` on the ISO artifact upload. Diagnostics must never fail the build job.
+- Boot evidence: still NONE. Architecture stays PROPOSED / NOT ACCEPTED.
+
+
 Newest first. Each entry states what was *run*, not only what was written.
 
 ## 2026-08-23 — Themes installed, not coded
