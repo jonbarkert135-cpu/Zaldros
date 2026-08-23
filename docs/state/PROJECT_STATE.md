@@ -3,11 +3,14 @@
 ```
 Base:          Ubuntu 26.04 LTS
 Status:        PROPOSED
-ISO:           BUILT — run #11 (d9dff44), all 3 variants:
-               full 3.0G / services 2.9G / legacy 2.7G
-Boot:          NOT TESTED (boot job was skipped: the diagnostics step
-               failed the build job after the ISOs were already produced)
-Architecture:  NOT ACCEPTED
+ISO:           BUILT — run #15 (0a210fe), all 3 variants:
+               full 3.19G / services 3.09G / legacy 2.84G
+Boot:          KERNEL + SYSTEMD PASS, DESKTOP FAIL (run #15, 9/9 profiles)
+               kernel 7.0.0-30-generic boots under OVMF/UEFI, systemd reaches
+               graphical.target, in-guest self-test ran and reported on ttyS0.
+               No kwin_wayland, no Wayland socket, konsole did not start:
+               the graphical session never began (sddm alive, no session).
+Architecture:  NOT ACCEPTED (no variant produced a desktop yet — nothing to compare)
 ```
 
 _Last updated: 2026-08-23_

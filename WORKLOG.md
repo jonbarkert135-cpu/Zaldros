@@ -1,5 +1,24 @@
 # Worklog
 
+## 2026-08-23 — run #15: first real boot — kernel + systemd PASS, desktop FAIL
+- Evidence: run 32666821061 (0a210fe). Builds 3/3 PASS. Serial logs on the `ci-logs-boot-*` branches.
+- **The system boots.** `ZALDROS-SELFTEST {...}` reached ttyS0 from inside the guest:
+  kernel `7.0.0-30-generic`, systemd `starting`, graphical.target reached, 16 processes, 354 MiB used.
+- Three real failures, each read from the log rather than guessed:
+  1. `boot-test.sh` reported FAIL although the marker was present — getty printed
+     `ubuntu login: ` on the same line and the grep was anchored with `^`. Fixed: `grep -o`.
+  2. Every job burned the full 15 min timeout: casper's shutdown asks
+     "Please remove the installation medium, then press ENTER" and loops on `cdrom.mount`.
+     Fixed: `noprompt` on the kernel command line.
+  3. No compositor: `kwin: false`, `wayland_socket: []`, `konsole` did not start, only sddm alive.
+     Likely cause: autologin pointed at a `zaldros` user, but casper creates its own live user
+     `ubuntu` (uid 1000). Fixed: autologin as `ubuntu` into `zaldros.desktop`, extra user dropped.
+     Not yet proven — the next run adds the evidence for it (sddm journal, `/run/user/*`,
+     available sessions) instead of asserting it.
+- `selftest.py` now waits up to 90 s for `kwin_wayland` and attaches the session diagnostics.
+- `casper-md5check.service` fails on every boot (cosmetic for CI, will be disabled later).
+- Boot: PARTIAL. Architecture: still PROPOSED — no variant produced a desktop, nothing to compare.
+
 ## 2026-08-23 — first ISOs actually built (run #11, d9dff44)
 
 - `apt-update`, `apt-install`, `theme` all exit 0 in all three variants; xorriso wrote

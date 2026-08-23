@@ -51,8 +51,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--serial", default="")
     ap.add_argument("--settle", type=float, default=15.0, help="seconds to let the desktop settle")
+    ap.add_argument("--wait-kwin", type=float, default=90.0,
+                    help="seconds to wait for the compositor before reporting what is there")
     args = ap.parse_args()
     time.sleep(args.settle)
+    # The desktop is not up the moment graphical.target is reached; wait for evidence of it,
+    # and if it never appears, say so with the session logs attached rather than guessing.
+    deadline = time.monotonic() + args.wait_kwin
+    while time.monotonic() < deadline and "kwin_wayland" not in processes():
+        time.sleep(2)
 
     procs = processes()
     runtime = os.environ.get("XDG_RUNTIME_DIR", "/run/user/1000")
@@ -62,8 +69,7 @@ def main():
         "kernel": sh("uname", "-r"),
         "systemd_state": sh("systemctl", "is-system-running"),
         "failed_units": sh("systemctl", "list-units", "--state=failed", "--no-legend", "--plain"),
-        "wayland_socket": sorted(p.name for p in Path(runtime).glob("wayland-*")
-                                 if Path(runtime).is_dir()),
+        "wayland_socket": sorted(str(p) for p in Path("/run/user").glob("*/wayland-*")),
         "kwin": "kwin_wayland" in procs,
         "plasmashell": "plasmashell" in procs,
         "shell": any(c.startswith("zaldros") or c == "python3" for c in procs),
@@ -74,6 +80,13 @@ def main():
         "loadavg": Path("/proc/loadavg").read_text().split()[:3],
         "boot_time": sh("systemd-analyze", "time"),
         "app_launch": launch_test(),
+        # Session diagnostics: run #15 booted fine but no compositor ever started.
+        "sessions_available": sorted(p.name for p in Path("/usr/share/wayland-sessions").glob("*.desktop"))
+                              if Path("/usr/share/wayland-sessions").is_dir() else [],
+        "users": sh("getent", "passwd", "1000"),
+        "runtime_dirs": sorted(p.name for p in Path("/run/user").glob("*")) if Path("/run/user").is_dir() else [],
+        "sddm_journal": sh("journalctl", "-u", "sddm", "--no-pager", "-n", "40")[-3000:],
+        "session_journal": sh("journalctl", "--no-pager", "-n", "40", "-t", "sddm-helper")[-2000:],
     }
     line = MARK + json.dumps(result, ensure_ascii=False)
     print(line, flush=True)

@@ -122,9 +122,7 @@ step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git 
 
 # Autologin straight into the variant's session, so a boot test needs no keyboard.
 install -d "$ROOT/etc/sddm.conf.d"
-printf '[Autologin]\nUser=zaldros\nSession=zaldros.desktop\n' > "$ROOT/etc/sddm.conf.d/10-autologin.conf"
-chroot "$ROOT" useradd -m -s /bin/bash zaldros
-chroot "$ROOT" sh -c 'passwd -d zaldros'
+printf '[Autologin]\nUser=ubuntu\nSession=zaldros.desktop\nRelogin=true\n' > "$ROOT/etc/sddm.conf.d/10-autologin.conf"
 
 case "$VARIANT" in
   full)     SESSION_EXEC="startplasma-wayland" ;;
@@ -177,7 +175,7 @@ set timeout=5
 echo "GRUB: Zaldros $VARIANT menu loaded"
 menuentry "Zaldros OS ($VARIANT)" {
   echo "GRUB: loading kernel"
-  linux /casper/vmlinuz boot=casper console=tty0 console=ttyS0,115200 zaldros.selftest
+  linux /casper/vmlinuz boot=casper console=tty0 console=ttyS0,115200 zaldros.selftest noprompt
   echo "GRUB: loading initrd"
   initrd /casper/initrd
   echo "GRUB: booting"
