@@ -106,6 +106,7 @@ Item {
                 appName: model.name
                 initial: model.name.substring(0, 1).toUpperCase()
                 tileColor: model.color
+                iconName: model.icon
                 running: model.running
                 installed: model.installed
                 active: model.running && model.name === taskbar.activeApp

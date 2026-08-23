@@ -50,7 +50,8 @@ class AppModel(QAbstractListModel):
         entry = self._entries[index.row()]
         match = self._match(entry)
         return {
-            NAME: entry.name, EXEC: entry.exec_name, ICON: entry.icon, COLOR: entry.color,
+            NAME: entry.name, EXEC: entry.exec_name, COLOR: entry.color,
+            ICON: match.icon if match else "",   # freedesktop icon name of the real .desktop entry
             RUNNING: entry.exec_name in self._running,
             INSTALLED: match is not None,
             SUBTITLE: "" if match else "не установлено",
@@ -92,7 +93,7 @@ class InstalledAppModel(QAbstractListModel):
             return None
         app = self._apps[index.row()]
         palette = ["#3a7ebf", "#c95d2b", "#3f8f5f", "#8a5cc4", "#c1483f", "#2f8f96"]
-        return {NAME: app.name, EXEC: app.exec_name, ICON: app.initial,
+        return {NAME: app.name, EXEC: app.exec_name, ICON: app.icon,
                 SUBTITLE: app.comment[:60], COLOR: palette[index.row() % len(palette)]}.get(role)
 
     @Slot(int, result=bool)

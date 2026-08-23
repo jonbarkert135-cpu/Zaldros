@@ -94,3 +94,28 @@ def test_english_locale_renders(tmp_path):
 def test_a_bad_output_path_fails_loudly(tmp_path):
     with pytest.raises(Exception):
         render("/definitely/not/a/directory/out.png")
+
+
+def test_taskbar_tray_really_draws_icons_not_empty_space(tmp_path):
+    """The tray strip must contain drawn glyph pixels — the icon pipeline silently produced blank
+    images once, and only a pixel check caught it."""
+    image = QImage(shot(tmp_path, "tray"))
+    row_top, row_bottom = H - TASKBAR_HEIGHT + 12, H - 12
+    lit = sum(1 for x in range(W - 260, W - 130) for y in range(row_top, row_bottom)
+              if image.pixelColor(x, y).lightness() > 120)
+    assert lit > 40, f"tray icons look blank ({lit} lit pixels)"
+
+
+def test_desktop_icons_use_the_vendored_glyphs(tmp_path):
+    """Each desktop tile must contain light glyph pixels on its coloured square."""
+    image = QImage(shot(tmp_path, "deskicons"))
+    lit = sum(1 for x in range(48, 90) for y in range(24, 66)
+              if image.pixelColor(x, y).lightness() > 200)
+    assert lit > 30, f"the first desktop icon has no glyph ({lit} lit pixels)"
+
+
+def test_context_menu_is_opaque(tmp_path):
+    """Text behind the menu must not read through it."""
+    image = QImage(shot(tmp_path, "menuopaque", context_open=True))
+    samples = [image.pixelColor(x, 240).lightness() for x in range(30, 230, 10)]
+    assert max(samples) - min(samples) < 25, "content bleeding through the context menu"

@@ -30,3 +30,12 @@ Windows installation the user themselves licenses, at their explicit request, at
 
 Zaldros OS is an independent Linux project. It is not affiliated with, endorsed by, or distributed
 by Microsoft. Windows and Windows 11 are trademarks of Microsoft Corporation.
+
+## Vendored assets (shipped in this repository)
+
+| Component | Version | Source | License | Modifications | Redistribution duty |
+| --- | --- | --- | --- | --- | --- |
+| Fluent UI System Icons (26 SVGs) | fetched 2026-08-23 | github.com/microsoft/fluentui-system-icons | MIT | none on disk; recoloured at runtime | keep MIT notice (`assets/icons/fluent/LICENSE`) |
+| Selawik | 1.01 | github.com/microsoft/Selawik | SIL OFL 1.1 | none | ship `LICENSE.txt`; reserved font name |
+
+Full analysis: `docs/VISUAL_LICENSE_AUDIT.md` and `docs/VISUAL_FOUNDATION_RESEARCH.md`.

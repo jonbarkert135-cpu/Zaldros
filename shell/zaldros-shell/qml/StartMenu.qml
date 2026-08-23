@@ -156,6 +156,7 @@ Item {
                     width: Theme.startPinIcon
                     height: Theme.startPinIcon
                     baseColor: model.color
+                    iconName: model.icon
                     label: model.name.substring(0, 1).toUpperCase()
                     dim: !model.installed
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -268,6 +269,7 @@ Item {
                     AppTile {
                         width: 24; height: 24
                         baseColor: model.color
+                        iconName: model.icon
                         label: model.name.substring(0, 1).toUpperCase()
                         anchors.verticalCenter: parent.verticalCenter
                     }

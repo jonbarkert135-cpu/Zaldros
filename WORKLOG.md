@@ -2,6 +2,20 @@
 
 Newest first. Each entry states what was *run*, not only what was written.
 
+## 2026-08-23 — Open-source visual foundation integration
+- The sandbox got network access, so the research was done **on the real repositories**: cloned and
+  read Win11-gtk-theme, Win11-icon-theme and AnduinOS, plus ~15 further projects.
+- **Vendored and wired in**: Selawik (Microsoft, OFL 1.1) and 26 Fluent UI System Icons (Microsoft,
+  MIT). The shell now renders Microsoft's own font and icons — legally.
+- Application icons now come from the host icon theme by freedesktop name, with a lettered fallback.
+- `LICENSE` finally contains the full GPL-3.0 text (fetched from gnu.org).
+- Adopted the 75 ms hover timing measured in Win11-gtk-theme; kept our own colours and radii after
+  comparing them (that theme is Material underneath).
+- Fixed: context menu was translucent enough to read the window behind it.
+- Ran it: 40 shell tests + 44 tool tests green; six evidence renders regenerated, plus before/after.
+- New docs: `VISUAL_FOUNDATION_RESEARCH.md`, `VISUAL_LICENSE_AUDIT.md`, `ZALDROS_DESIGN_SYSTEM.md`,
+  `VISUAL_COMPONENT_MATRIX.md`.
+
 ## 2026-08-23 — Visual foundation
 - Licence-audited the open-source Windows-like field into `docs/VISUAL_THIRD_PARTY.md`; found the
   legally clean route: Fluent UI System Icons (MIT) + Selawik (OFL), both from Microsoft.

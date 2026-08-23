@@ -33,7 +33,11 @@ QtObject {
     readonly property int menuItemHeight:  32
 
     // --- typography -------------------------------------------------------------------------
-    readonly property string fontFamily: "Selawik, Inter, Noto Sans, DejaVu Sans, sans-serif"
+    // Set at startup from the vendored Selawik faces (Microsoft, SIL OFL 1.1); falls back to the
+    // host default when the font failed to load, so text never silently renders in a fake family.
+    property string fontFamily: "Selawik"
+    // Directory URL of the vendored Fluent UI System Icons (Microsoft, MIT). Set at startup.
+    property string iconDir: ""
     readonly property int fontCaption:   12   // tray, labels
     readonly property int fontBody:      14   // standard UI text
     readonly property int fontSubtitle:  16
@@ -41,7 +45,7 @@ QtObject {
     readonly property real lineHeight:   1.35
 
     // --- motion -----------------------------------------------------------------------------
-    readonly property int animFast:   120
+    readonly property int animFast:   75    // hover/press feedback; value measured in Win11-gtk-theme
     readonly property int animNormal: 180
     readonly property int animSlow:   250
 

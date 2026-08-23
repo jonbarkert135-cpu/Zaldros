@@ -60,7 +60,6 @@ Item {
                             anchors.centerIn: parent
                             glyph: modelData.g
                             width: 12; height: 12
-                            weight: 1.2
                             color: btnArea.containsMouse && modelData.g === "close"
                                    ? "#ffffff" : Theme.textPrimary
                         }

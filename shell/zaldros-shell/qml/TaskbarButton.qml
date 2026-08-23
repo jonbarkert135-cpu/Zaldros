@@ -11,6 +11,7 @@ Item {
     property bool running: false
     property bool active: false
     property bool installed: true
+    property string iconName: ""
     property bool showTile: true
     signal activated()
     signal contextRequested(int mouseX, int mouseY)
@@ -32,6 +33,7 @@ Item {
         width: Theme.taskbarIcon
         height: Theme.taskbarIcon
         baseColor: button.tileColor
+        iconName: button.iconName
         label: button.initial
         dim: !button.installed
     }

@@ -20,6 +20,14 @@ Item {
     Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
     Behavior on scale { NumberAnimation { duration: Theme.animFast; easing.type: Easing.OutCubic } }
 
+    // Opaque base under the acrylic tint: without it whatever sits behind the menu reads straight
+    // through the text (a defect this shell shipped once already).
+    Rectangle {
+        anchors.fill: parent
+        radius: Theme.radiusMedium
+        color: Theme.background
+    }
+
     Rectangle {
         anchors.fill: parent
         radius: Theme.radiusMedium

@@ -5,6 +5,11 @@ import ZaldrosTheme
 // menus and the taskbar. Backends are injected as properties by zaldros_shell/app.py.
 Item {
     id: shell
+
+    Component.onCompleted: {
+        Theme.fontFamily = uiFontFamily;   // real family, resolved by the Python side
+    }
+
     width: 1600
     height: 1000
 
@@ -50,15 +55,16 @@ Item {
         y: 24
         spacing: 8
         Repeater {
-            model: [{ n: "Этот компьютер", c: "#3a7ebf" }, { n: "Корзина", c: "#4d5b6b" },
-                    { n: "Проводник", c: "#c9a227" }]
+            model: [{ n: "Этот компьютер", c: "#3a7ebf", g: "computer" },
+                    { n: "Корзина", c: "#4d5b6b", g: "recycle-bin" },
+                    { n: "Проводник", c: "#c9a227", g: "folder" }]
             delegate: Column {
                 width: 92
                 spacing: 6
                 AppTile {
                     width: 40; height: 40
                     baseColor: modelData.c
-                    label: modelData.n.substring(0, 1)
+                    glyph: modelData.g
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text {

@@ -14,7 +14,10 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Launch applications from Start and from the taskbar
 - [ ] Track real windows from the compositor; group them in the taskbar
 - [ ] Wire quick-settings toggles to NetworkManager / BlueZ / PipeWire / UPower
-- [ ] Vendor Fluent UI System Icons (MIT) and Selawik (OFL) once the build host has network
+- [x] Vendor Fluent UI System Icons (MIT) and Selawik (OFL) — done, in use
+- [ ] Vendor Fluent-icon-theme (GPL-3) for app/mime icons and its cursor theme
+- [ ] Ship Win11-gtk-theme (GPL-3) so GTK applications match the shell
+- [ ] Build the ISO the AnduinOS way (debootstrap + squashfs + xorriso) — no container runtime needed
 - [ ] Window management: Alt+Tab, snap layouts, minimise/maximise/close on real windows
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files
