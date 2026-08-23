@@ -147,7 +147,7 @@ def main():
         "rss_mib": {c: round(r / 1024, 1) for c, (_, r) in
                     sorted(procs.items(), key=lambda kv: -kv[1][1])[:12]},
         "loadavg": Path("/proc/loadavg").read_text().split()[:3],
-        "session_log": tail_file("/var/log/zaldros-session.log"),
+        "session_log": tail_file("/tmp/zaldros-session.log"),
         "app_launch": launch_test(),
         # Session diagnostics: run #15 booted fine but no compositor ever started.
         "sessions_available": sorted(p.name for p in Path("/usr/share/wayland-sessions").glob("*.desktop"))

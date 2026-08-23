@@ -250,3 +250,12 @@ Written and unit-tested locally (44 shell tests + shell render green); CI eviden
 - Fixed a real data bug: `selftest.py` had two `"boot_time"` keys; the second
   (`systemd-analyze time`, empty while systemd is still "starting") silently overwrote the measured
   value from `boot_seconds()`. That is why every run #19 report showed boot_time "". Removed.
+
+## Run #21 candidate (2026-08-24)
+- CI b93c4a7 green; boot logs показали причину падения сессии: `zaldros-session.service` exit
+  status=2 в ту же секунду. Виновник — сам диагностический редирект: `/var/log` не доступен на
+  запись пользователю ubuntu, поэтому `exec >>/var/log/zaldros-session.log` завершал скрипт до
+  запуска kwin. Поле `session_log` пришло `null` (tail_file честно вернул None, не догадку).
+- Исправлено: лог сессии пишется в `/tmp/zaldros-session.log`, selftest читает оттуда же.
+- Открыто: `full` всё ещё стартует startplasma-wayland (отклонение от спеки), Alt+Tab host FAIL,
+  boot_time: systemd-analyze пуст (systemd ещё "starting"), меряем uptime_at_selftest_s.

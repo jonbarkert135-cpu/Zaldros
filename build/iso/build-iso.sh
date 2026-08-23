@@ -133,7 +133,9 @@ export QT_QPA_PLATFORM=wayland PYTHONPATH=/opt/zaldros
 # startup, which is why services/legacy booted to a black screen in run #18.
 # Run #19: the shell process was gone by self-test time and the unit journal held nothing about
 # it, so capture the session's own output in a file the self-test can read back.
-exec >>/var/log/zaldros-session.log 2>&1
+# Run #20: /var/log is not writable by user ubuntu, so the redirect itself made the unit exit 2
+# before anything started. /tmp is writable by the session user, so log there.
+exec >>/tmp/zaldros-session.log 2>&1
 set -x
 exec kwin_wayland --xwayland -- sh -c 'python3 -m zaldros_shell run; echo "zaldros-shell exited $?"'
 EOS
