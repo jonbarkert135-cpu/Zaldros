@@ -116,7 +116,7 @@ echo "$VARIANT" > "$ROOT/etc/zaldros-variant"
 # The themes: run the real upstream installers inside the image (no network at boot time).
 # ca-certificates is only a *recommend* of git, and we install with --no-install-recommends, so
 # without naming it the chroot has no CA store and every HTTPS clone dies on "Problem with the SSL CA cert".
-step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git sassc ca-certificates \
+step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git sassc ca-certificates gtk-update-icon-cache \
   && /opt/zaldros/theme/fetch-sources.sh /usr/src \
   && /opt/zaldros/theme/install-visual-theme.sh --dest / --variant dark"
 
