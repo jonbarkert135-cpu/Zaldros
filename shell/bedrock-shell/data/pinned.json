@@ -1,0 +1,17 @@
+{
+  "_comment": "Placeholder pinned set for the shell prototype. Icons are drawn as glyph+colour, not proprietary Microsoft artwork (spec PART 1 §2). Replaced by real .desktop parsing in Phase 4.",
+  "pinned": [
+    {"name": "Проводник",    "exec_name": "bedrock-files",   "icon": "🗂", "color": "#ffd04b"},
+    {"name": "Firefox",      "exec_name": "firefox",         "icon": "🌐", "color": "#ff7139"},
+    {"name": "Терминал",     "exec_name": "konsole",         "icon": "▶_", "color": "#2d2d2d"},
+    {"name": "Параметры",    "exec_name": "bedrock-settings","icon": "⚙",  "color": "#5a6b7d"},
+    {"name": "Блокнот",      "exec_name": "bedrock-notepad", "icon": "📝", "color": "#4f8cc9"},
+    {"name": "Диспетчер задач","exec_name": "bedrock-taskmgr","icon": "📊","color": "#3f9c5a"},
+    {"name": "Магазин",      "exec_name": "bedrock-store",   "icon": "🛍", "color": "#7a5cff"},
+    {"name": "Медиа",        "exec_name": "mpv",             "icon": "▶",  "color": "#8e44ad"},
+    {"name": "Почта",        "exec_name": "thunderbird",     "icon": "✉",  "color": "#1e88e5"},
+    {"name": "Калькулятор",  "exec_name": "bedrock-calc",    "icon": "🧮", "color": "#4d5b6b"},
+    {"name": "Фото",         "exec_name": "bedrock-photos",  "icon": "🖼", "color": "#e0629c"},
+    {"name": "Python",       "exec_name": "python3",         "icon": "🐍", "color": "#3776ab"}
+  ]
+}

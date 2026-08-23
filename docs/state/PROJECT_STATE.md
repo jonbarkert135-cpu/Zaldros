@@ -9,7 +9,8 @@ _Last updated: 2026-08-23_
 | Spec parts received | **all 5 of 5** (complete specification) |
 | Base decision | Fedora, bootc/bootable-container flavour (ADR-0001) |
 | Desktop decision | KWin 6 (Wayland) + own Bedrock shell components in Qt6/QML (ADR-0002, ADR-0003) |
-| Shipping code | `bedrock-sysprobe`, `bedrock-hwinfo`, `bedrock-compat`, `bedrock-bench` (all v0.1.0) — 44 unit tests passing |
+| Reality audit | `docs/REALITY_AUDIT.md` — project was documentation+backend only until 2026-08-23 |
+| Shipping code | `bedrock-sysprobe`, `bedrock-hwinfo`, `bedrock-compat`, `bedrock-bench` (all v0.1.0) + `shell/bedrock-shell` prototype — 44 tool tests + 9 shell tests passing |
 | Blocked on | a Linux build host with podman + /dev/kvm (or enabled GitHub Actions) — needed to build and boot the images and to record any hardware evidence |
 
 ## Done

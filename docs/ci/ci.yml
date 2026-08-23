@@ -72,3 +72,31 @@ jobs:
         with:
           name: benchmark-baseline
           path: tools/bedrock-bench/baseline.json
+
+  shell:
+    name: shell prototype (backend + visual render tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Qt runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libdbus-1-3 fonts-noto-color-emoji
+          python -m pip install PySide6-Essentials pytest
+      - name: Run shell tests and render evidence screenshots
+        working-directory: shell/bedrock-shell
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python -m pytest tests -q
+          python -m bedrock_shell render --out desktop.png
+          python -m bedrock_shell render --start --out start.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shell-screenshots
+          path: |
+            shell/bedrock-shell/desktop.png
+            shell/bedrock-shell/start.png
