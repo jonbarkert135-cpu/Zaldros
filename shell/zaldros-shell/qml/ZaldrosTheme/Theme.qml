@@ -36,8 +36,8 @@ QtObject {
     // Set at startup from the vendored Selawik faces (Microsoft, SIL OFL 1.1); falls back to the
     // host default when the font failed to load, so text never silently renders in a fake family.
     property string fontFamily: "Selawik"
-    // Directory URL of the vendored Fluent UI System Icons (Microsoft, MIT). Set at startup.
-    property string iconDir: ""
+    // Wallpaper file URL, set at startup from assets/wallpaper.
+    property string wallpaper: ""
     readonly property int fontCaption:   12   // tray, labels
     readonly property int fontBody:      14   // standard UI text
     readonly property int fontSubtitle:  16

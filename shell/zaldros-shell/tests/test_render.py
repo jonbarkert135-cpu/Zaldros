@@ -119,3 +119,22 @@ def test_context_menu_is_opaque(tmp_path):
     image = QImage(shot(tmp_path, "menuopaque", context_open=True))
     samples = [image.pixelColor(x, 240).lightness() for x in range(30, 230, 10)]
     assert max(samples) - min(samples) < 25, "content bleeding through the context menu"
+
+
+def test_pinned_apps_show_real_coloured_icons(tmp_path):
+    """Start pins must render the vendored colour icons, not only grey lettered squares."""
+    image = QImage(shot(tmp_path, "pins", start_open=True))
+    saturated = 0
+    for x in range(520, 1060, 3):
+        for y in range(348, 384, 3):
+            c = image.pixelColor(x, y)
+            if c.saturation() > 90 and c.value() > 90:
+                saturated += 1
+    assert saturated > 60, f"pinned icons look colourless ({saturated} saturated pixels)"
+
+
+def test_wallpaper_is_drawn(tmp_path):
+    """The desktop must show the wallpaper, not a flat fill: brightness varies across the surface."""
+    image = QImage(shot(tmp_path, "wall"))
+    samples = [image.pixelColor(x, 700).lightness() for x in range(20, 1580, 40)]
+    assert max(samples) - min(samples) > 25, "desktop looks like a flat colour"

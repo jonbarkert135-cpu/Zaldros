@@ -11,6 +11,8 @@ Anything not on this list is not shipped. Reference-only projects are in
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Fluent UI System Icons (26 SVGs) | `assets/icons/fluent/` | github.com/microsoft/fluentui-system-icons | fetched 2026-08-23 | **MIT** | © 2020 Microsoft Corporation | yes | yes | keep the MIT text (`assets/icons/fluent/LICENSE`) | none — permissive |
 | Selawik (5 faces) | `assets/fonts/selawik/` | github.com/microsoft/Selawik | 1.01 | **SIL OFL 1.1** | © 2015 Microsoft, Reserved Font Name **Selawik** | yes | yes, incl. bundling | ship `LICENSE.txt` | **must rename** any modified face; may not be sold on its own |
+| Application icons (18 SVGs) | `assets/icons/apps/` | github.com/vinceliuice/Fluent-icon-theme | fetched 2026-08-23 | **GPL-3.0** | © vinceliuice and contributors | yes | yes | ship `COPYING` + `AUTHORS` (both vendored) | publish modifications; offer source |
+| Wallpaper | `assets/wallpaper/` | **ours** (`generate.py`) | 2026-08-23 | GPL-3.0 (Zaldros) | Zaldros project | — | — | — | — |
 | GPL-3.0 licence text | `LICENSE` | gnu.org | 3, 29 June 2007 | — | FSF | verbatim only | yes | — | — |
 
 Recolouring the icons at runtime (`shell/zaldros-shell/zaldros_shell/icons.py`) is a permitted
@@ -20,7 +22,7 @@ modification under MIT; no icon file is altered on disk.
 
 | Asset | Upstream | Licence | Conditions we must meet |
 | --- | --- | --- | --- |
-| App / mime / device icons | vinceliuice/Fluent-icon-theme | GPL-3.0 | ship COPYING, state modifications, offer source; credit the author |
+| Full mime/device icon theme | vinceliuice/Fluent-icon-theme | GPL-3.0 | app icons already vendored; the complete theme follows with the ISO |
 | Cursor theme | vinceliuice/Fluent-icon-theme (`cursors/`) | GPL-3.0 | same |
 | App / mime icons (alternative) | yeyushengfan258/Win11-icon-theme | GPL-3.0, derived from Ubuntu **Yaru** | ship COPYING + `AUTHORS` credit to Yaru |
 | GTK application theme | yeyushengfan258/Win11-gtk-theme | GPL-3.0 | ship COPYING; if we patch the SCSS, publish the patch |

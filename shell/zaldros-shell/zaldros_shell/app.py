@@ -49,6 +49,8 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("systemState", system_state)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
+    context.setContextProperty(
+        "wallpaperUrl", QUrl.fromLocalFile(str(ASSETS / "wallpaper" / "zaldros-default.png")).toString())
     view.setSource(QUrl.fromLocalFile(str(QML_DIR / "Shell.qml")))
     if view.status() != QQuickView.Ready:
         errors = "\n".join(str(error.toString()) for error in view.errors())

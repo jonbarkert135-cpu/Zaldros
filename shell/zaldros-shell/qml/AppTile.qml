@@ -11,7 +11,7 @@ Item {
     property string glyph: ""     // Fluent glyph used when there is no themed app icon
     property color baseColor: Theme.accent
     property bool dim: false
-    opacity: dim ? 0.45 : 1.0
+    opacity: dim ? 0.75 : 1.0     // legible but visibly not installed; the label says why
 
     Image {
         id: themed

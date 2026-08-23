@@ -26,6 +26,7 @@ class IconProvider(QQuickImageProvider):
     def __init__(self, directory: Path) -> None:
         super().__init__(QQuickImageProvider.Image)
         self.directory = Path(directory)
+        self.app_directory = self.directory.parent / "apps"   # Fluent-icon-theme, GPL-3
 
     def requestImage(self, request_id: str, size: QSize, requested: QSize) -> QImage:
         name, _, colour = unquote(request_id).partition("?")   # QML sends "%23rrggbb"
@@ -47,8 +48,20 @@ class IconProvider(QQuickImageProvider):
         return image   # the engine reads the real size off the returned image
 
     def _app_icon(self, name: str, side: int) -> QImage:
-        """Real application icon from the host's icon theme. Returns a null image when the theme has
-        no such icon, and QML then falls back to the lettered tile — an app never gets a wrong icon.
+        """Application icon: the host icon theme first (a user's own theme must win), then the
+        icons vendored in assets/icons/apps (Fluent-icon-theme, GPL-3) so the shell looks right even
+        on a bare system. Null image when neither has it — QML then draws the lettered tile.
         """
         icon = QIcon.fromTheme(name)
-        return QImage() if icon.isNull() else icon.pixmap(side, side).toImage()
+        if not icon.isNull():
+            return icon.pixmap(side, side).toImage()
+        vendored = self.app_directory / f"{name}.svg"
+        if not vendored.is_file():
+            return QImage()
+        renderer = QSvgRenderer(str(vendored))
+        image = QImage(side, side, QImage.Format_ARGB32_Premultiplied)
+        image.fill(Qt.transparent)
+        painter = QPainter(image)
+        renderer.render(painter)
+        painter.end()
+        return image

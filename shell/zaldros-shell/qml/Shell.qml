@@ -8,6 +8,7 @@ Item {
 
     Component.onCompleted: {
         Theme.fontFamily = uiFontFamily;   // real family, resolved by the Python side
+        Theme.wallpaper = wallpaperUrl;
     }
 
     width: 1600
@@ -27,10 +28,15 @@ Item {
     // --- desktop ---------------------------------------------------------------------------
     Rectangle {
         anchors.fill: parent
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Theme.dark ? "#123b63" : "#7fb2e5" }
-            GradientStop { position: 0.55; color: Theme.dark ? "#0d2745" : "#4b81bd" }
-            GradientStop { position: 1.0; color: Theme.dark ? "#08192c" : "#2d5b8f" }
+        color: Theme.dark ? "#08192c" : "#2d5b8f"
+
+        // Zaldros wallpaper — our own artwork (assets/wallpaper/generate.py), never a Microsoft file.
+        Image {
+            anchors.fill: parent
+            source: Theme.wallpaper
+            asynchronous: false
+            fillMode: Image.PreserveAspectCrop
+            opacity: Theme.dark ? 1.0 : 0.85
         }
         MouseArea {
             anchors.fill: parent

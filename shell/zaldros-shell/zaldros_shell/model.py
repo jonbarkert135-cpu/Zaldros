@@ -51,7 +51,7 @@ class AppModel(QAbstractListModel):
         match = self._match(entry)
         return {
             NAME: entry.name, EXEC: entry.exec_name, COLOR: entry.color,
-            ICON: match.icon if match else "",   # freedesktop icon name of the real .desktop entry
+            ICON: match.icon if (match and match.icon) else entry.exec_name,
             RUNNING: entry.exec_name in self._running,
             INSTALLED: match is not None,
             SUBTITLE: "" if match else "не установлено",

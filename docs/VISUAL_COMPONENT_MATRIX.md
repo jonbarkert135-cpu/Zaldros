@@ -16,8 +16,9 @@ Status: **COMPLETE / PARTIAL / PROTOTYPE / MISSING**. A high visual score never 
 | Context menus | ours | `ContextMenu.qml` | QML | PROTOTYPE | 4.0 | opaque, correct metrics; items do nothing yet |
 | Window decorations | ours; KWin will draw the real ones | `AppWindow.qml` | QML | PROTOTYPE | 4.0 | 32 px title bar, 46 px caption buttons, Fluent glyphs |
 | Desktop icons | ours + Fluent glyphs | `Shell.qml` | QML | PROTOTYPE | 3.8 | not interactive |
-| Application icons | host icon theme by freedesktop name | `icons.py` `_app_icon` | Qt icon theme | PARTIAL | 3.0 | real icon when the theme has one, lettered tile otherwise |
-| App / mime icon theme | Fluent-icon-theme (GPL-3) — **approved, not vendored** | — | SVG theme | MISSING | — | pending: needs the build host, not the sandbox |
+| Wallpaper | **ours** — generated artwork | `assets/wallpaper/generate.py` | Qt painter | **COMPLETE** | 4.5 | 3840×2160 render, reproducible from source |
+| Application icons | host icon theme, then vendored Fluent-icon-theme (GPL-3) | `icons.py` `_app_icon` + `assets/icons/apps/` | SVG | **PARTIAL** | 4.5 | colour icons always render; lettered tile only for unknown apps |
+| Mime / device icon theme | Fluent-icon-theme (GPL-3) | — | SVG theme | MISSING | — | app icons vendored; full theme ships with the ISO |
 | Cursor theme | Fluent-icon-theme cursors (GPL-3) — approved | — | Xcursor | MISSING | — | pending |
 | GTK app styling | Win11-gtk-theme (GPL-3) — approved | — | GTK3/4 | MISSING | — | pending; makes GTK apps match the shell |
 | Search | ours | field only | QML | MISSING | 3.0 | no index |
