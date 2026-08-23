@@ -73,6 +73,17 @@ Newest first. Each entry states what was *run*, not only what was written.
   installed packages, sources, chroot DNS/arch/os-release, `df`/`free`/`mount`/`uname`, and 200-line
   tails — uploaded as `build-debug-{variant}` and echoed into the run summary. No more guessing.
 
+## 2026-08-23 — run #12: builds PASS 3/3, boot FAIL 9/9 (root cause found)
+- Evidence: run 32664345534. All three ISOs built (full ~3.19 GB artifact). Every boot job died
+  19 ms into `boot-test.sh` with exit 2 and **no output**.
+- Root cause (read from the actual log, not guessed): `OVMF="$(ls A B 2>/dev/null | head -1)"`.
+  With `set -euo pipefail` the failing `ls` aborted the script *before* the `[ -n "$OVMF" ]` check,
+  so the intended `BLOCKED — ENVIRONMENT LIMITATION` message never printed.
+- Secondary failure: with `results/` empty the publish step failed on "nothing to commit".
+- Fixes: glob-based OVMF discovery + `find` fallback + directory listing on failure;
+  EXIT trap writes `<name>.error.txt`; publish step uses `git commit --allow-empty`.
+- Boot status: still NOT TESTED. QEMU never started in run #12.
+
 ## 2026-08-23 — Owner decisions
 - ADR-0005: name **Zaldros OS**, license GPL-3.0-or-later, Russian default + first-class English,
   disk encryption opt-in. Base-distribution decision reopened toward Ubuntu LTS + HWE, to be settled
