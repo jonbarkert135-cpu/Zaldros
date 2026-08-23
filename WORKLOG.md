@@ -238,3 +238,15 @@ Written and unit-tested locally (44 shell tests + shell render green); CI eviden
    `uptime_at_selftest_s` from `/proc/uptime` plus `systemd-analyze time` (kernel/userspace split)
    when available — `null` when it is not, never a guessed number. `wall_seconds` stays the
    harness ceiling and is not a boot time.
+
+## Run #20 candidate (2026-08-24)
+- CI for c4c7f3d: iso 32672535930 + CI 32672536000 both green. Guest verdicts are now honest:
+  full/low|mid|modern boot=PASS (but that session is startplasma-wayland, i.e. stock Plasma, not our
+  shell); services/* and legacy/* boot=FAIL with failed_checks=["shell"] — screenshots 282 B (black).
+- Root cause work: `zaldros-session.service` journal holds only the two PAM lines, so the shell's own
+  stderr was never captured. Session script now tees everything to /var/log/zaldros-session.log
+  (with `set -x`) and reports the child's exit status; the self-test reads that file back as
+  `session_log` (None when absent — never a guess).
+- Fixed a real data bug: `selftest.py` had two `"boot_time"` keys; the second
+  (`systemd-analyze time`, empty while systemd is still "starting") silently overwrote the measured
+  value from `boot_seconds()`. That is why every run #19 report showed boot_time "". Removed.

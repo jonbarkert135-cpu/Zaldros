@@ -97,6 +97,14 @@ def settled_systemd_state(timeout=120):
     return state
 
 
+
+def tail_file(path, n=4000):
+    """Last n chars of a log file, or None when it does not exist (never a guess)."""
+    try:
+        return Path(path).read_text(errors="replace")[-n:]
+    except OSError:
+        return None
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--serial", default="")
@@ -139,7 +147,7 @@ def main():
         "rss_mib": {c: round(r / 1024, 1) for c, (_, r) in
                     sorted(procs.items(), key=lambda kv: -kv[1][1])[:12]},
         "loadavg": Path("/proc/loadavg").read_text().split()[:3],
-        "boot_time": sh("systemd-analyze", "time"),
+        "session_log": tail_file("/var/log/zaldros-session.log"),
         "app_launch": launch_test(),
         # Session diagnostics: run #15 booted fine but no compositor ever started.
         "sessions_available": sorted(p.name for p in Path("/usr/share/wayland-sessions").glob("*.desktop"))

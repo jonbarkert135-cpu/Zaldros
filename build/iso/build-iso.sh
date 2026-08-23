@@ -131,7 +131,11 @@ cat > "$ROOT/usr/local/bin/zaldros-session" <<'EOS'
 export QT_QPA_PLATFORM=wayland PYTHONPATH=/opt/zaldros
 # ponytail: the "run" subcommand is required by the shell CLI. Without it argparse exited 2 at
 # startup, which is why services/legacy booted to a black screen in run #18.
-exec kwin_wayland --xwayland -- python3 -m zaldros_shell run
+# Run #19: the shell process was gone by self-test time and the unit journal held nothing about
+# it, so capture the session's own output in a file the self-test can read back.
+exec >>/var/log/zaldros-session.log 2>&1
+set -x
+exec kwin_wayland --xwayland -- sh -c 'python3 -m zaldros_shell run; echo "zaldros-shell exited $?"'
 EOS
 chmod +x "$ROOT/usr/local/bin/zaldros-session"
 # ponytail: no display manager. Run #16 proved sddm never honoured its autologin config and fell
