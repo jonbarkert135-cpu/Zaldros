@@ -6,11 +6,11 @@ _Last updated: 2026-08-23_
 | --- | --- |
 | Project | Bedrock Linux |
 | Phase | 0 — Research & Architecture |
-| Spec parts received | 1, 2, 3 of 5 |
+| Spec parts received | 1, 2, 3, 4 of 5 |
 | Base decision | Fedora, bootc/bootable-container flavour (ADR-0001) |
 | Desktop decision | KWin 6 (Wayland) + own Bedrock shell components in Qt6/QML (ADR-0002, ADR-0003) |
-| Shipping code | `tools/bedrock-sysprobe` v0.1.0, `tools/bedrock-hwinfo` v0.1.0 — 20 unit tests passing |
-| Blocked on | a Linux build host / VM runner for image builds and real measurements |
+| Shipping code | `bedrock-sysprobe`, `bedrock-hwinfo`, `bedrock-compat` (all v0.1.0) — 31 unit tests passing |
+| Blocked on | a Linux build host with podman + /dev/kvm (or enabled GitHub Actions) — needed to build and boot the images and to record any hardware evidence |
 
 ## Done
 - Specification parts 1–2 preserved verbatim in `spec/`
@@ -22,9 +22,12 @@ _Last updated: 2026-08-23_
 - CI: unit tests + live service-map and hardware-inventory runs on a real systemd host, artefacts published
 - PART 3 integrated: `docs/architecture/SYSTEM_APPS.md` — build/reuse decision for every system app
 - Second component: `tools/bedrock-hwinfo` v0.1.0 (Device Manager / System Information backend)
+- PART 4 integrated: `docs/architecture/COMPATIBILITY_AND_HARDWARE.md`
+- Third component: `tools/bedrock-compat` v0.1.0 — compatibility registries with a CI evidence gate
+- `build/Containerfile.base` + `build/Containerfile.desktop` written (**never built — no build host**)
 
 ## Next
-1. Integrate PARTS 4–5 when they arrive — additive, no restart.
+1. Integrate PART 5 when it arrives — additive, no restart.
 2. `Containerfile` for `bedrock-base` (core, no shell) + `bedrock-desktop`, built in CI.
 3. QEMU boot smoke test; attach the `bedrock-sysprobe` map and baseline metrics to the build.
 4. Turn the map into the three performance profiles as systemd presets.

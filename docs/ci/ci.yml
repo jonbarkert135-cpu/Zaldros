@@ -16,7 +16,7 @@ jobs:
       - name: Install pytest
         run: pip install pytest
       - name: Unit tests
-        run: python -m pytest tools/bedrock-sysprobe/tests tools/bedrock-hwinfo/tests -q
+        run: python -m pytest tools -q
       - name: Live probe on the runner (real systemd system)
         working-directory: tools/bedrock-sysprobe
         run: python -m bedrock_sysprobe -o service-map.md && head -30 service-map.md
@@ -31,3 +31,25 @@ jobs:
         with:
           name: hardware-inventory
           path: tools/bedrock-hwinfo/inventory.md
+
+  compat:
+    name: compatibility registries (evidence gate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: No compatibility claim without evidence (spec PART 4 §25)
+        working-directory: tools/bedrock-compat
+        run: python -m bedrock_compat --check
+
+  image:
+    name: build OS images (requires podman)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build bedrock-base
+        run: podman build -t bedrock-base -f build/Containerfile.base .
+      - name: Build bedrock-desktop
+        run: podman build -t bedrock-desktop -f build/Containerfile.desktop .
