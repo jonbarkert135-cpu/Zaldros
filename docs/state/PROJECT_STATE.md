@@ -6,10 +6,10 @@ _Last updated: 2026-08-23_
 | --- | --- |
 | Project | Bedrock Linux |
 | Phase | 0 — Research & Architecture |
-| Spec parts received | 1, 2, 3, 4 of 5 |
+| Spec parts received | **all 5 of 5** (complete specification) |
 | Base decision | Fedora, bootc/bootable-container flavour (ADR-0001) |
 | Desktop decision | KWin 6 (Wayland) + own Bedrock shell components in Qt6/QML (ADR-0002, ADR-0003) |
-| Shipping code | `bedrock-sysprobe`, `bedrock-hwinfo`, `bedrock-compat` (all v0.1.0) — 31 unit tests passing |
+| Shipping code | `bedrock-sysprobe`, `bedrock-hwinfo`, `bedrock-compat`, `bedrock-bench` (all v0.1.0) — 44 unit tests passing |
 | Blocked on | a Linux build host with podman + /dev/kvm (or enabled GitHub Actions) — needed to build and boot the images and to record any hardware evidence |
 
 ## Done
@@ -25,9 +25,12 @@ _Last updated: 2026-08-23_
 - PART 4 integrated: `docs/architecture/COMPATIBILITY_AND_HARDWARE.md`
 - Third component: `tools/bedrock-compat` v0.1.0 — compatibility registries with a CI evidence gate
 - `build/Containerfile.base` + `build/Containerfile.desktop` written (**never built — no build host**)
+- PART 5 integrated: combined-spec audit (`docs/SPEC_AUDIT.md`), feature matrix, roadmap renumbered to phases 0–14
+- Fourth component: `tools/bedrock-bench` v0.1.0 — baseline/compare harness (PART 5 §1)
+- Spec §14 document set complete: README, ARCHITECTURE, BUILD, INSTALL, RECOVERY, SECURITY, PERFORMANCE, COMPATIBILITY, CONTRIBUTING, THIRD_PARTY_LICENSES, CHANGELOG
 
 ## Next
-1. Integrate PART 5 when it arrives — additive, no restart.
+1. Answers to the 7 open questions in `docs/SPEC_AUDIT.md` §E (name, license, locale, encryption default, Secure Boot, build host, reference hardware).
 2. `Containerfile` for `bedrock-base` (core, no shell) + `bedrock-desktop`, built in CI.
 3. QEMU boot smoke test; attach the `bedrock-sysprobe` map and baseline metrics to the build.
 4. Turn the map into the three performance profiles as systemd presets.

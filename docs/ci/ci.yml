@@ -53,3 +53,22 @@ jobs:
         run: podman build -t bedrock-base -f build/Containerfile.base .
       - name: Build bedrock-desktop
         run: podman build -t bedrock-desktop -f build/Containerfile.desktop .
+
+  bench:
+    name: benchmark harness (baseline on the runner)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Collect a baseline sample (real systemd host)
+        working-directory: tools/bedrock-bench
+        run: |
+          python -m bedrock_bench collect \
+            --label ci-runner --commit "${GITHUB_SHA::7}" -o baseline.json
+          cat baseline.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-baseline
+          path: tools/bedrock-bench/baseline.json

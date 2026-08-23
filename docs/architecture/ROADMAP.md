@@ -1,6 +1,28 @@
 # Bedrock Linux — Development roadmap
 
-Phases are gated: a phase ends only when its acceptance criteria are verified (spec PART 1 §15).
+Phases follow the numbering fixed by spec PART 5 §15. A phase ends only when its acceptance criteria
+are verified (spec PART 1 §15) — a build or a screenshot is never a gate.
+
+| # | Phase | State |
+|---|---|---|
+| 0 | Research & architecture | in progress (see below) |
+| 1 | Minimal bootable Linux base | blocked on a build host |
+| 2 | Graphics + compositor + basic desktop | not started |
+| 3 | Bedrock Shell | not started |
+| 4 | Taskbar + Start + Search | not started |
+| 5 | Explorer | not started |
+| 6 | Settings | not started |
+| 7 | System utilities | backends started (`bedrock-sysprobe`, `bedrock-hwinfo`) |
+| 8 | Application management | not started |
+| 9 | Windows compatibility | registry started (`bedrock-compat`) |
+| 10 | Installer + recovery | not started |
+| 11 | Performance optimization | harness started (`bedrock-bench`) |
+| 12 | Hardware compatibility | matrix started, 0 evidence records |
+| 13 | Security audit | not started |
+| 14 | Release candidate | not started |
+
+Priority order when phases conflict (PART 5 §16): correctness → stability → security → hardware
+compatibility → usability → performance → visual similarity → advanced features.
 
 ## Phase 0 — Research & Architecture (current)
 - [x] Base distribution comparison and decision (`docs/research/01`)
@@ -9,7 +31,10 @@ Phases are gated: a phase ends only when its acceptance criteria are verified (s
 - [x] Roadmap, risk register, performance/security/testing strategies
 - [x] First tool: `bedrock-sysprobe` (service & resource map generator, spec §7)
 - [ ] Baseline measurement run inside a VM (boot time, idle RAM, service map) — needs a build host
-- [ ] Integrate spec PART 3, 4, 5 when received
+- [x] Integrate spec PARTS 3, 4, 5 (all received)
+- [x] Combined-spec audit: contradictions, gaps, risks (`docs/SPEC_AUDIT.md`)
+- [x] Windows → Bedrock feature matrix (`docs/architecture/FEATURE_MATRIX.md`)
+- [x] Benchmark harness `bedrock-bench` (PART 5 §1)
 Gate: architecture documents reviewed + a reproducible baseline image builds in CI.
 
 ## Phase 1 — Bootable base image
