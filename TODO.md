@@ -28,6 +28,10 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Explorer (Dolphin fork) — first real system application
 - [ ] Settings (display, network, sound, accounts)
 - [ ] Installer, then recovery/rollback tested by deliberately breaking a VM
+- [ ] **Re-earn what the bootc base gave us** (ADR-0009): atomic updates, rollback, read-only `/usr`,
+      on-disk recovery entry. Until these exist, do not claim any of them anywhere in the docs.
+- [ ] Pin package versions in `build/iso/build-iso.sh` — builds are repeatable, not reproducible
+- [ ] Mark `build/Containerfile.*` dead or delete them; they belong to the superseded bootc base
 - [ ] First hardware evidence records; first performance baselines vs Ubuntu/Mint/Fedora/Debian
 - [ ] Accessibility pass (Orca, keyboard-only, high contrast)
 - [ ] Paste the verbatim GPL-3.0 text into `LICENSE` (no network in the build sandbox)

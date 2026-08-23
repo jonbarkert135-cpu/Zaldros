@@ -15,8 +15,8 @@ and the Status column moves only when a test exists.
 | Task Manager | Zaldros Task Manager | NOT IMPLEMENTED | — | Phase 7 |
 | Device Manager | Zaldros Device Manager (`zaldros-hwinfo` backend) | PARTIALLY IMPLEMENTED | `tools/zaldros-hwinfo` unit tests | Backend exists, no GUI |
 | Services / Event Viewer / Resource Monitor | systemd + journald front-ends (`zaldros-sysprobe`) | PARTIALLY IMPLEMENTED | `tools/zaldros-sysprobe` unit tests | Backend exists, no GUI |
-| Windows Update | Zaldros Update Center (bootc atomic + rollback) | NOT IMPLEMENTED | — | Never contacts Windows Update |
-| Windows Defender | SELinux + firewalld + Flatpak sandboxing | ALTERNATIVE IMPLEMENTATION | — | No AV product; posture differs by design |
+| Windows Update | Zaldros Update Center (apt; atomic updates and rollback LOST with ADR-0009, replacement unbuilt) | NOT IMPLEMENTED | — | Never contacts Windows Update |
+| Windows Defender | AppArmor + firewalld + Flatpak sandboxing | ALTERNATIVE IMPLEMENTATION | — | No AV product; posture differs by design |
 | BitLocker | LUKS2 | ALTERNATIVE IMPLEMENTATION | — | Default-on pending decision |
 | Registry | Config files + KConfig/dconf | NOT APPLICABLE | — | No registry equivalent; Settings is the UI |
 | .exe installers | Wine/Proton bottles (optional layer) | NOT IMPLEMENTED | — | Phase 9; never promise 100 % |

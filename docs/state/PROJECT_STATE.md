@@ -7,7 +7,7 @@ _Last updated: 2026-08-23_
 | Project | Zaldros OS |
 | Phase | 0 — Research & Architecture |
 | Spec parts received | **all 5 of 5** (complete specification) |
-| Base decision | Fedora, bootc/bootable-container flavour (ADR-0001) |
+| Base decision | Ubuntu 26.04 LTS `resolute`, live ISO (ADR-0009, **PROPOSED** — accepted only after a real build + boot). Supersedes ADR-0001 Fedora bootc. |
 | Desktop decision | KWin 6 (Wayland) + own Zaldros shell components in Qt6/QML (ADR-0002, ADR-0003) |
 | Reality audit | `docs/REALITY_AUDIT.md` — project was documentation+backend only until 2026-08-23 |
 | Shipping code | `zaldros-sysprobe`, `zaldros-hwinfo`, `zaldros-compat`, `zaldros-bench` (all v0.1.0) + `shell/zaldros-shell` prototype — 44 tool tests + 9 shell tests passing |

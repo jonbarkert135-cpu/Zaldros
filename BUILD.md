@@ -1,5 +1,9 @@
 # Building Zaldros OS
 
+> **ADR-0009:** the container/bootc build below belongs to the superseded Fedora base and is not
+> used. The live ISO is built with `build/iso/build-iso.sh` (Ubuntu 26.04 base rootfs + apt +
+> squashfs + xorriso) and boot-tested with `build/iso/boot-test.sh`.
+
 **Status: the build has never been executed.** These are the intended, reviewed commands; no image has
 been produced yet because no build host with `podman` and `/dev/kvm` is available to the project
 (`docs/state/PROJECT_STATE.md`). Nothing in this file may be quoted as evidence that Zaldros builds.

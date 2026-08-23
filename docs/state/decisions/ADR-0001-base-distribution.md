@@ -1,6 +1,8 @@
 # ADR-0001 — Base distribution: Fedora (bootc)
 
-Status: accepted (Phase 0), re-verified before Phase 2.
+Status: **SUPERSEDED by ADR-0009 (proposed)** — the base moved to Ubuntu 26.04 LTS on 2026-08-23.
+Kept as the record of the bootc option and of the properties (atomic updates, rollback, immutability,
+SELinux) that the move gives up; ADR-0009 lists what replaces each of them.
 Context: spec PART 1 §4 requires an evidence-based base choice; the product needs a Windows-like
 update-and-rollback experience, reproducible builds and fresh hardware support.
 Decision: Fedora bootable-container base; `/usr` read-only; atomic A/B updates; SELinux enforcing.

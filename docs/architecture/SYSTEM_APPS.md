@@ -10,7 +10,7 @@ no fake toggles, no fabricated hardware data, no invented log events (PART 3 §2
 |---|---|---|---|
 | **Zaldros Explorer** | **Fork + reskin Dolphin** (KIO, Qt6) | KIO (smb/sftp/mtp), udisks2, `gio trash` | Dolphin already has tabs, breadcrumbs, split view, previews, network locations, trash. Writing a file manager from scratch is a multi-year trap. Our work: Explorer-like layout, ribbonless Win11 command bar, navigation pane presets, default columns/behaviour. |
 | **Zaldros Settings** | **Custom (Qt6/QML)** — the flagship differentiator | KDE config APIs, NetworkManager D-Bus, PipeWire, BlueZ, UPower, logind, accountsservice, firewalld, portals | Windows-11 category structure (System / Bluetooth & devices / Network / Personalization / Apps / Accounts / Privacy & security / Update) cannot be reached by re-arranging KDE System Settings. Each page is a thin, honest front-end over a real D-Bus service. |
-| **Zaldros Update Center** | Custom UI, thin | `bootc`/ostree (system), Flatpak (apps), fwupd (firmware) | Windows-like "check → download → restart to apply → roll back". Rollback is real because the base is image-based (ADR-0001). Never contacts Windows Update. |
+| **Zaldros Update Center** | Custom UI, thin | apt (system), Flatpak (apps), fwupd (firmware) | Windows-like "check → download → restart to apply". **Rollback is NOT available**: ADR-0009 moved the base off the image model, and the btrfs-snapshot replacement is unbuilt. Never contacts Windows Update. |
 | **Zaldros Notepad** | Custom (Qt6, minimal) | plain files, `uchardet` for encodings | §4 demands *extremely fast startup* and low memory; Kate/KWrite carry a plugin framework we do not need. Target: <120 ms cold start, <40 MB RSS. |
 | **Zaldros Terminal** | **Reuse Konsole** (Qt6, KDE) + Zaldros profile set | login shells; profiles for bash/zsh/fish and `pwsh` when installed | Konsole has tabs, split panes, profiles, working-directory integration. Custom terminals are a solved problem. |
 | PowerShell | Optional Flatpak/rpm of **PowerShell 7 (MIT, cross-platform)** exposed as a Terminal profile | `pwsh` | Legitimate open-source implementation; no proprietary Windows components. Not installed by default — offered in Settings → Apps → Optional features. |
@@ -23,7 +23,7 @@ no fake toggles, no fabricated hardware data, no invented log events (PART 3 §2
 | **System Information** | Custom, read-only | `sysfs`, DMI/SMBIOS, DRM, PipeWire, `uname`, ostree image version | |
 | **Startup Apps** | Custom | XDG autostart, systemd user units | "Impact" is measured (activation time + RSS), never guessed. |
 | **Firewall** | Custom UI over **firewalld** | firewalld D-Bus (nftables backend) | Profiles map to Windows-like Private/Public networks. |
-| **Zaldros Recovery** | Custom UI + boot-menu entry | bootc/ostree rollback, btrfs snapshots, `bootctl`, a minimal recovery image | Honest naming: "roll back to previous version" is an ostree deployment switch, documented as such. |
+| **Zaldros Recovery** | Custom UI + boot-menu entry | btrfs snapshots, `bootctl`, the live ISO as a recovery image | The on-disk recovery entry must be rebuilt on the Ubuntu base (ADR-0009); today only the live ISO can recover a system. |
 | Screenshot | **Reuse Spectacle** + Zaldros shortcuts (Win+Shift+S) | xdg-desktop-portal screenshot API | |
 | Archive manager | **Reuse Ark** | libarchive, 7zip, zstd | |
 | Image viewer / media player / calculator | Reuse gwenview (or a lighter Qt viewer), **mpv**, a Qt calculator | | |

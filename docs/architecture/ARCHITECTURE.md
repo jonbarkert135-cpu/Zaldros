@@ -12,8 +12,8 @@ Derived from spec PART 1 §5 and PART 2. Layer names use the official project na
 │                                Desktop/Icons, Run, Clipboard History, Recycle Bin
 ├─ Display / Compositor ──────── KWin (Wayland) + xwayland, layer-shell, xdg-desktop-portal
 ├─ Hardware / System Services ── systemd, NetworkManager, PipeWire/WirePlumber, BlueZ,
-│                                UPower, iwd/wpa, fwupd, udisks2, CUPS (opt), SELinux
-├─ Core System ───────────────── glibc, systemd, bootc/ostree, podman, Flatpak, dbus
+│                                UPower, iwd/wpa, fwupd, udisks2, CUPS (opt), AppArmor
+├─ Core System ───────────────── glibc, systemd, apt/dpkg, Flatpak, dbus
 └─ Linux Kernel ──────────────── Fedora kernel + firmware, btrfs, zram, io_uring
 ```
 
@@ -24,8 +24,8 @@ CI enforces this: the `core` image target is built and booted headless without a
 
 | Area | Decision | Source |
 |---|---|---|
-| Base | Fedora, bootable-container (bootc) flavour | research/01 |
-| Init | systemd (non-negotiable given bootc/ostree, portals, logind) | research/01 |
+| Base | Ubuntu 26.04 LTS (`resolute`), live ISO — ADR-0009, PROPOSED until it boots | research/01, 03 |
+| Init | systemd (non-negotiable given portals, logind, session management) | research/01 |
 | Filesystem | btrfs + subvolumes + zstd:1 compression; zram swap; `/usr` read-only | ADR-0004 |
 | Display protocol | Wayland (xwayland for legacy) | research/02 |
 | Compositor | KWin 6 | research/02 |
@@ -34,8 +34,8 @@ CI enforces this: the `core` image target is built and booted headless without a
 | System package layer | rpm layered into the OS image at build time (not at runtime) | research/01 |
 | User app format | Flatpak (primary), Wine/Proton (Windows apps), distrobox (dev/`.deb`) | research/01 |
 | Update system | atomic A/B image update + rollback, Windows-like "update and restart" UX | research/01 |
-| Installer | Anaconda/`bootc install` for v0.x; custom Zaldros Setup UI once the shell exists | roadmap |
-| Security | SELinux enforcing, read-only `/usr`, Flatpak portals, signed images, LUKS opt-in, TPM-backed unlock | SECURITY.md |
+| Installer | Ubiquity/Calamares-class installer for v0.x; custom Zaldros Setup UI once the shell exists | roadmap |
+| Security | AppArmor enforcing (Ubuntu base, ADR-0009), Flatpak portals, LUKS opt-in, TPM-backed unlock. Read-only `/usr` and signed images are NOT in place — they were bootc properties | SECURITY.md |
 | Windows compat | Wine/Proton as an optional managed component | research/02 |
 
 ## 3. Performance profiles (PART 1 §8)

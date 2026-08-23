@@ -1,5 +1,11 @@
 # Recovery
 
+> **STATUS 2026-08-23 — this document describes a contract we currently cannot honour.** It was
+> written for the Fedora bootc base, which is superseded by ADR-0009 (Ubuntu 26.04). On apt there is
+> no atomic deployment and no `bootc rollback`. Everything below stays as the target design; the
+> replacement mechanism (btrfs snapshots and/or our own A/B scheme) is unbuilt. Do not present
+> atomic updates or rollback as Zaldros features until this line is deleted.
+
 Design contract for the update/rollback system (spec PART 4 §15–16, PART 5 §17). Not yet implemented
 or tested — no image exists.
 

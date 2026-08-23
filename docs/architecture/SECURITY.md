@@ -1,7 +1,9 @@
 # Security strategy
 
 - **Read-only `/usr`** and image-based updates: no drift, no unnoticed system modification.
-- **SELinux enforcing** by default; any policy exception is documented and reviewed.
+- **AppArmor enforcing** by default (Ubuntu base per ADR-0009); any profile exception is documented
+  and reviewed. This replaces the SELinux posture of the superseded Fedora base — comparable in
+  intent, narrower in coverage; the gap is not papered over.
 - **Signed OS images**; update client verifies signatures; rollback to the previous known-good image.
 - **Flatpak + portals** for user applications: filesystem, camera, microphone, screenshot and
   screen-share access mediated by portals, surfaced in Zaldros Settings as Windows-like permissions.

@@ -41,7 +41,7 @@ in where a real frame exists to compare against the reference screenshot.
 | Multi-monitor | KWin | MISSING | no | no | — | — | never run | P2 |
 | Accessibility | Orca + Qt a11y (planned) | MISSING | no | no | — | — | not started | P2 |
 | Registry | config files | NOT APPLICABLE | — | — | — | — | by design | — |
-| Windows Defender | SELinux/firewalld/sandboxing | NOT APPLICABLE (alternative) | — | — | — | — | different security model | — |
+| Windows Defender | AppArmor/firewalld/sandboxing | NOT APPLICABLE (alternative) | — | — | — | — | different security model | — |
 
 **Summary: 0 COMPLETE, 6 PARTIAL, 5 PROTOTYPE, 2 BACKEND ONLY, 19 MISSING.**
 Visual scores live in `docs/VISUAL_SCORE.md`; a score is a design metric, never proof of function.
