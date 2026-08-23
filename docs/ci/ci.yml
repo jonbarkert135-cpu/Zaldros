@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sysprobe:
+    name: bedrock-sysprobe (unit tests + live run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: pip install pytest
+      - name: Unit tests
+        run: python -m pytest tools/bedrock-sysprobe/tests -q
+      - name: Live probe on the runner (real systemd system)
+        working-directory: tools/bedrock-sysprobe
+        run: python -m bedrock_sysprobe -o service-map.md && head -30 service-map.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: service-map
+          path: tools/bedrock-sysprobe/service-map.md
