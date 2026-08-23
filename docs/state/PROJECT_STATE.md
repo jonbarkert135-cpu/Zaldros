@@ -3,21 +3,17 @@
 ```
 Base:          Ubuntu 26.04 LTS
 Status:        PROPOSED
-ISO:           BUILT — run #15 (0a210fe), all 3 variants:
-               full 3.19G / services 3.09G / legacy 2.84G
-Boot:          KERNEL + SYSTEMD PASS, DESKTOP FAIL (run #16, 9/9 profiles)
-               kernel 7.0.0-30-generic boots under OVMF/UEFI, systemd reaches
-               graphical.target, in-guest self-test ran and reported on ttyS0.
-               No kwin_wayland, no Wayland socket, konsole did not start:
-               the graphical session never began. ROOT CAUSE (run #16 serial log):
-               sddm ignored /etc/sddm.conf.d autologin ("Unable to find autologin
-               session entry"), fell back to an X greeter, and the image has no
-               Xorg -> "Failed to start display server process".
-               FIX (pending run #17): sddm removed, session started by
-               zaldros-session.service (systemd autologin on tty1).
-               CI green != boot PASS: the PASS verdict now requires
-               kernel+systemd+wayland+kwin+shell+app_launch.
-Architecture:  NOT ACCEPTED (no variant produced a desktop yet — nothing to compare)
+ISO:           BUILT — run #17 (0d364d1), all 3 variants
+Boot:          DESKTOP REACHED, VERDICT FAIL (run #17, 9/9 combinations)
+               kernel 7.0.0-30-generic + systemd + Wayland + KWin + shell all
+               observed; the session autologin unit works. Two open failures:
+               (1) systemd_state=starting (casper-md5check fails, state sampled
+               too early); (2) no session D-Bus in the test units + qdbus6 absent
+               -> konsole failed on services/legacy and all KWin window steps
+               returned nothing. Fixes pending run #18.
+Architecture:  NOT ACCEPTED (no green boot verdict yet)
+Idle RAM (QEMU, low profile): full 875 MiB / 39 proc, services 461 MiB / 22 proc,
+               legacy 467 MiB / 22 proc — comparison data only, not hardware evidence.
 ```
 
 _Last updated: 2026-08-23_

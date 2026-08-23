@@ -49,16 +49,32 @@ def launch_test(app="konsole"):
     sock = socks[0]
     cmd = ["runuser", "-u", "ubuntu", "--", "env",
            f"XDG_RUNTIME_DIR={sock.parent}", f"WAYLAND_DISPLAY={sock.name}",
+           f"DBUS_SESSION_BUS_ADDRESS=unix:path={sock.parent}/bus",
            "QT_QPA_PLATFORM=wayland", app]
     try:
         started = time.monotonic()
-        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Keep stderr: run #17 said only "started: false" for services/legacy, which explains nothing.
+        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
         time.sleep(2)
         alive = proc.poll() is None
-        proc.terminate()
-        return {"app": app, "started": alive, "seconds": round(time.monotonic() - started, 2)}
+        out = {"app": app, "started": alive, "seconds": round(time.monotonic() - started, 2)}
+        if alive:
+            proc.terminate()
+        else:
+            out["stderr"] = (proc.stderr.read() or "")[-1500:]
+            out["exit_code"] = proc.returncode
+        return out
     except Exception as exc:
         return {"app": app, "started": False, "error": str(exc)}
+
+
+def settled_systemd_state(timeout=120):
+    deadline = time.monotonic() + timeout
+    state = sh("systemctl", "is-system-running")
+    while state in ("starting", "initializing") and time.monotonic() < deadline:
+        time.sleep(3)
+        state = sh("systemctl", "is-system-running")
+    return state
 
 
 def main():
@@ -81,7 +97,9 @@ def main():
         "variant": Path("/etc/zaldros-variant").read_text().strip()
                    if Path("/etc/zaldros-variant").is_file() else "unknown",
         "kernel": sh("uname", "-r"),
-        "systemd_state": sh("systemctl", "is-system-running"),
+        # is-system-running is "starting" until every job settles; wait for a verdict instead of
+        # sampling one too early (run #17 failed the systemd check for exactly that reason).
+        "systemd_state": settled_systemd_state(),
         "failed_units": sh("systemctl", "list-units", "--state=failed", "--no-legend", "--plain"),
         "wayland_socket": [str(p) for p in wayland_sockets()],
         "kwin": "kwin_wayland" in procs,

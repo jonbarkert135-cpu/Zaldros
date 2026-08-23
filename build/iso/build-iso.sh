@@ -61,7 +61,7 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole fonts-dejavu-core python3 python3-pyside6.qtquick"
+BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session fonts-dejavu-core python3 python3-pyside6.qtquick"
 case "$VARIANT" in
   full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland" ;;
   services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
@@ -150,6 +150,7 @@ TTYVHangup=yes
 StandardInput=tty
 StandardOutput=journal
 Environment=XDG_SESSION_TYPE=wayland XDG_SEAT=seat0 XDG_CURRENT_DESKTOP=KDE
+Environment=XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 ExecStart=$SESSION_EXEC
 Restart=no
 [Install]
@@ -173,13 +174,15 @@ Type=oneshot
 ExecStart=/usr/local/bin/zaldros-selftest --serial /dev/ttyS0
 # Stage 2: pause so the host can inject input over QMP, then run the UI interaction test.
 ExecStart=/bin/sleep 45
-ExecStart=/bin/sh -c '/usr/local/bin/zaldros-uitest > /dev/ttyS0 2>/var/log/zaldros-uitest.err'
+ExecStart=/bin/sh -c 'XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland /usr/local/bin/zaldros-uitest > /dev/ttyS0 2>/var/log/zaldros-uitest.err'
 TimeoutStartSec=600
 ExecStopPost=/usr/bin/systemctl poweroff
 [Install]
 WantedBy=graphical.target
 EOS
 chroot "$ROOT" systemctl enable zaldros-selftest.service
+# It only re-verifies the ISO checksum; it fails on our generated image and holds is-system-running at "starting".
+chroot "$ROOT" systemctl mask casper-md5check.service
 
 echo "== squashfs + ISO"
 umount -l "$ROOT/dev" "$ROOT/proc" "$ROOT/sys" 2>/dev/null || true; trap - EXIT

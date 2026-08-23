@@ -73,14 +73,37 @@ class Sampler:
         self.rss = {n: round(rss_mib(p), 1) for n, p in self.pids.items()}
 
 
+# ponytail: run #17 reported every window step FAIL because qdbus6 is not in the image and the test
+# ran as root with no session bus. dbus-send ships with dbus itself, and the unit now exports the
+# session bus address, so the same call works under full Plasma and under bare kwin_wayland.
+DIAG = {}
+
+
+def kwin_call(method, *args):
+    out = sh("dbus-send", "--session", "--print-reply", "--dest=org.kde.KWin",
+             "/Scripting", f"org.kde.kwin.Scripting.{method}", *args)
+    DIAG[method] = out[:400]
+    return out
+
+
+def kwin_log():
+    """KWin logs console.info to the journal of whatever started it (a system unit here)."""
+    for cmd in (("journalctl", "-n", "200", "--no-pager", "-u", "zaldros-session"),
+                ("journalctl", "--user", "-n", "200", "--no-pager")):
+        out = sh(*cmd)
+        if "ZALDROS-WINDOWS" in out:
+            return out
+    return out
+
+
 def windows():
-    """Ask KWin for its window list; returns [] if the call fails (recorded, not hidden)."""
+    """Ask KWin for its window list; returns [] if the call fails (recorded in DIAG, not hidden)."""
     script = Path("/tmp/zaldros-windows.js")
     script.write_text(KWIN_SCRIPT)
-    sh("qdbus6", "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting.loadScript", str(script))
-    sh("qdbus6", "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting.start")
-    log = sh("journalctl", "--user", "-n", "50", "--no-pager")
-    hit = [l for l in log.splitlines() if "ZALDROS-WINDOWS" in l]
+    kwin_call("loadScript", f"string:{script}")
+    kwin_call("start")
+    time.sleep(0.3)
+    hit = [l for l in kwin_log().splitlines() if "ZALDROS-WINDOWS" in l]
     try:
         return json.loads(hit[-1].split("ZALDROS-WINDOWS ", 1)[1])
     except Exception:
@@ -139,15 +162,16 @@ def main():
         pid = pid_of(name)
         procs[name] = {"running": bool(pid), "rss_mib": round(rss_mib(pid), 1) if pid else 0}
 
-    print(MARK + json.dumps({"variant": variant, "steps": results, "processes": procs},
+    print(MARK + json.dumps({"variant": variant, "steps": results, "processes": procs,
+                         "dbus_diag": DIAG},
                             ensure_ascii=False), flush=True)
 
 
 def _kwin_eval(js):
     script = Path("/tmp/zaldros-op.js")
     script.write_text(js)
-    sh("qdbus6", "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting.loadScript", str(script))
-    return sh("qdbus6", "org.kde.KWin", "/Scripting", "org.kde.kwin.Scripting.start")
+    kwin_call("loadScript", f"string:{script}")
+    return kwin_call("start")
 
 
 def _move():

@@ -1,5 +1,33 @@
 # Worklog
 
+## 2026-08-23 — run #17 (0d364d1): DESKTOP UP on all 9 combinations, boot verdict still FAIL
+- Evidence: run 32669197023, all 12 jobs green; per-job JSON/serial/screenshots on `ci-logs-boot-*`.
+- **First real desktop.** The systemd autologin session works: `kwin_wayland` running,
+  `/run/user/1000/wayland-0` present, shell alive, on full/services/legacy x low/mid/modern.
+- Measured (idle, in QEMU/llvmpipe — architecture comparison only, NOT hardware evidence):
+
+  | variant | procs | RAM used (low/mid/modern MiB) | KWin RSS | shell RSS |
+  | --- | --- | --- | --- | --- |
+  | full (plasmashell) | 39 | 875 / 951 / 1043 | 245.7 | plasmashell 394.9 |
+  | services (KWin + Zaldros shell) | 22 | 461 / 482 / 542 | 188.9 | python3 33.5 |
+  | legacy (LayerShell) | 22 | 467 / 477 / 533 | 181.0 | python3 ~33 |
+
+- Boot verdict `FAIL` everywhere, on two real checks — no verdict softened:
+  1. `systemd_state = starting`: the self-test sampled `is-system-running` before jobs settled,
+     and `casper-md5check.service` (live-ISO checksum) fails on our generated image.
+     Fix: mask `casper-md5check`, and wait for the state to settle before reporting it.
+  2. `app_launch` FAIL on services/legacy (konsole exits at once) and every KWin window step
+     FAIL on all variants (`windows() == []`). ROOT CAUSE: the self-test/UI-test units run as
+     root with no session bus, and `qdbus6` is not even installed — so nothing could ever reach
+     `org.kde.KWin`. Full Plasma passed the host-side Start/taskbar checks because plasmashell
+     brings its own bus. Fix: install `dbus-user-session`, export
+     `DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus` to the session and to the tests,
+     and call KWin through `dbus-send` (ships with dbus) instead of qdbus6.
+- Host-side QMP input (full variant): Start open PASS 1.5 s, Start close PASS, taskbar PASS,
+  Alt+Tab FAIL (screen unchanged — only one window existed). services/legacy: all FAIL.
+- Architecture stays **NOT ACCEPTED**: no combination has a green boot verdict yet.
+
+
 ## 2026-08-23 — run #15: first real boot — kernel + systemd PASS, desktop FAIL
 - Evidence: run 32666821061 (0a210fe). Builds 3/3 PASS. Serial logs on the `ci-logs-boot-*` branches.
 - **The system boots.** `ZALDROS-SELFTEST {...}` reached ttyS0 from inside the guest:
