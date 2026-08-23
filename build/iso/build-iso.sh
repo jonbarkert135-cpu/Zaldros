@@ -21,16 +21,23 @@ case "$VARIANT" in
   *) echo "unknown variant $VARIANT" >&2; exit 2 ;;
 esac
 
-# GitHub runners ship an older debootstrap that has no script for a newer suite; Ubuntu suites all
-# use the same gutsy-derived script, so pointing the missing name at it is the standard workaround.
-if [ ! -e "/usr/share/debootstrap/scripts/$SUITE" ]; then
-  echo "== debootstrap has no script for $SUITE, linking it to the generic Ubuntu one"
-  ln -s gutsy "/usr/share/debootstrap/scripts/$SUITE"
+# Ubuntu publishes an official minimal rootfs tarball for the release, so we unpack that instead of
+# re-deriving it with debootstrap: no dependency on the runner's debootstrap version knowing the
+# suite, and it is faster. debootstrap stays as the fallback if the tarball is unavailable.
+BASE_TARBALL="${BASE_TARBALL:-https://cdimage.ubuntu.com/ubuntu-base/releases/$SUITE/release/ubuntu-base-26.04-base-amd64.tar.gz}"
+mkdir -p "$ROOT"
+echo "== fetch base rootfs: $BASE_TARBALL"
+if curl -fsSL "$BASE_TARBALL" | tar -xz -C "$ROOT"; then
+  echo "== unpacked the official Ubuntu base rootfs"
+else
+  echo "== tarball unavailable, falling back to debootstrap $SUITE"
+  # Older debootstrap has no script for a newer suite; Ubuntu suites share the gutsy-derived script.
+  [ -e "/usr/share/debootstrap/scripts/$SUITE" ] || ln -s gutsy "/usr/share/debootstrap/scripts/$SUITE"
+  debootstrap --arch=amd64 --variant=minbase --components=main,universe "$SUITE" "$ROOT" "$MIRROR" \
+    || { echo "== debootstrap failed, tail of its log:"; tail -50 "$ROOT/debootstrap/debootstrap.log" 2>/dev/null; exit 1; }
 fi
-
-echo "== debootstrap $SUITE"
-debootstrap --arch=amd64 --variant=minbase --components=main,universe "$SUITE" "$ROOT" "$MIRROR" \
-  || { echo "== debootstrap failed, tail of its log:"; tail -50 "$ROOT/debootstrap/debootstrap.log" 2>/dev/null; exit 1; }
+cp /etc/resolv.conf "$ROOT/etc/resolv.conf"
+rm -f "$ROOT/etc/apt/sources.list"   # the base image ships deb822 sources; ours replaces them
 
 cat > "$ROOT/etc/apt/sources.list.d/ubuntu.sources" <<EOF
 Types: deb
