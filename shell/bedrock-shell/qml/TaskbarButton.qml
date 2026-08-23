@@ -1,56 +1,72 @@
 import QtQuick
 import BedrockTheme
 
-// A taskbar item: icon, hover highlight, and the Windows-style "running" underline.
+// A taskbar application button. Windows 11 geometry: 40x40 hit target inside a 48 px bar, 24 px
+// icon, 3 px running indicator that widens when the window is active.
 Item {
-    id: root
-    property string glyph: ""
-    property color  glyphColor: Theme.accent
-    property string tooltip: ""
-    property bool   running: false
-    property bool   active: false
+    id: button
+    property string appName: ""
+    property string initial: "?"
+    property color tileColor: Theme.accent
+    property bool running: false
+    property bool active: false
+    property bool installed: true
+    property bool showTile: true
     signal activated()
+    signal contextRequested(int mouseX, int mouseY)
 
-    width: Theme.buttonSize
-    height: Theme.buttonSize
+    width: Theme.taskbarButton
+    height: Theme.taskbarButton
 
     Rectangle {
+        id: bg
         anchors.fill: parent
-        radius: 6
-        color: mouse.pressed ? Theme.pressed : (mouse.containsMouse ? Theme.hover : "transparent")
+        radius: Theme.radiusSmall + 1
+        color: area.pressed ? Theme.pressed : (area.containsMouse ? Theme.hover : "transparent")
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
     }
 
-    Rectangle {
+    AppTile {
+        visible: button.showTile
         anchors.centerIn: parent
-        width: Theme.iconSize; height: Theme.iconSize
-        radius: 5
-        color: root.glyphColor
-        Text {
-            anchors.centerIn: parent
-            text: root.glyph
-            color: "white"
-            font.pixelSize: 13
-            font.family: Theme.fontFamily
-        }
+        width: Theme.taskbarIcon
+        height: Theme.taskbarIcon
+        baseColor: button.tileColor
+        label: button.initial
+        dim: !button.installed
     }
 
-    // Windows 11 shows a short underline for a running app, wider when it is focused.
     Rectangle {
-        visible: root.running
+        id: indicator
+        visible: button.running
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 2
-        height: 3; radius: 2
-        width: root.active ? 16 : 6
-        color: Theme.accent
+        height: 3
+        radius: 1.5
+        width: button.active ? 16 : 6
+        color: button.active ? Theme.accent : Theme.textSecondary
         Behavior on width { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutCubic } }
     }
 
     MouseArea {
-        id: mouse
+        id: area
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: root.activated()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: function(mouse) {
+            if (mouse.button === Qt.RightButton)
+                button.contextRequested(button.x + mouse.x, mouse.y);
+            else
+                button.activated();
+        }
+    }
+
+    ToolTipLabel {
+        visible: area.containsMouse && button.appName !== ""
+        text: button.appName + (button.installed ? "" : " · не установлено")
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.top
+        anchors.bottomMargin: 8
     }
 }

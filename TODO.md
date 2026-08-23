@@ -10,9 +10,12 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 
 ## Real desktop (next slice)
 - [ ] Turn the taskbar into a real Wayland **layer-shell** panel on KWin (not a window)
-- [ ] Parse `.desktop` files; replace `data/pinned.json` placeholders
-- [ ] Launch applications from Start and from the taskbar
+- [x] Parse `.desktop` files; pins now cross-checked against the real application database
+- [x] Launch applications from Start and from the taskbar
 - [ ] Track real windows from the compositor; group them in the taskbar
+- [ ] Wire quick-settings toggles to NetworkManager / BlueZ / PipeWire / UPower
+- [ ] Vendor Fluent UI System Icons (MIT) and Selawik (OFL) once the build host has network
+- [ ] Window management: Alt+Tab, snap layouts, minimise/maximise/close on real windows
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files
 - [ ] Right-click context menus (Windows 11 rounded style)

@@ -19,14 +19,18 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--out", required=True)
     r.add_argument("--start", action="store_true", help="render with the Start menu open")
     r.add_argument("--locale", default="ru")
-    r.add_argument("--width", type=int, default=1280)
-    r.add_argument("--height", type=int, default=800)
+    r.add_argument("--quick", action="store_true", help="render with quick settings open")
+    r.add_argument("--context", action="store_true", help="render with the desktop context menu open")
+    r.add_argument("--light", action="store_true", help="render the light theme")
+    r.add_argument("--width", type=int, default=1600)
+    r.add_argument("--height", type=int, default=1000)
     args = parser.parse_args(argv)
 
     if args.command == "run":
         return run()
     path = render(args.out, start_open=args.start, width=args.width, height=args.height,
-                  locale=args.locale)
+                  locale=args.locale, quick_open=args.quick, context_open=args.context,
+                  light=args.light)
     print(f"rendered {path}")
     return 0
 

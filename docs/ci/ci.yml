@@ -94,9 +94,15 @@ jobs:
           python -m pytest tests -q
           python -m bedrock_shell render --out desktop.png
           python -m bedrock_shell render --start --out start.png
+          python -m bedrock_shell render --quick --out quick.png
+          python -m bedrock_shell render --context --out context.png
+          python -m bedrock_shell render --light --out light.png
       - uses: actions/upload-artifact@v4
         with:
           name: shell-screenshots
           path: |
             shell/bedrock-shell/desktop.png
             shell/bedrock-shell/start.png
+            shell/bedrock-shell/quick.png
+            shell/bedrock-shell/context.png
+            shell/bedrock-shell/light.png

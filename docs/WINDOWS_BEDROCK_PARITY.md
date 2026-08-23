@@ -9,17 +9,20 @@ in where a real frame exists to compare against the reference screenshot.
 
 | Windows feature | Bedrock implementation | Status | Working? | Tested? | Visual | Behaviour | Known limitations | Priority |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Desktop + wallpaper | QML gradient desktop | PROTOTYPE | yes (rendered) | yes (render test) | 3 | 2 | no icons, no right-click menu, not a session | P2 |
-| Taskbar | Bedrock Taskbar (QML) | PROTOTYPE | yes (rendered) | yes | 4 | 3 | window, not a layer-shell panel; no real window list; no previews | P1 |
-| Start menu | Bedrock Start (QML) | PROTOTYPE | yes (rendered) | yes | 4 | 2 | pinned list is placeholder JSON; no "All apps"; launches nothing | P1 |
+| Desktop + wallpaper | QML desktop with icons, dark/light themes | PROTOTYPE | yes (rendered) | yes (render tests) | 3.5 | 2 | icons are not interactive; no wallpaper engine | P2 |
+| Taskbar | Bedrock Taskbar (QML), Windows 11 metrics | PROTOTYPE | yes (rendered) | yes | 4.0 | 3 | window, not a layer-shell panel; no real window list | P1 |
+| Start menu | Bedrock Start, 640×726, pins + all apps | PARTIAL | yes — launches real apps | yes | 4.0 | 3 | no search results, Recommended empty by design | P1 |
 | Taskbar clock | real locale-formatted system clock | PARTIAL | yes | yes | 4 | 4 | no calendar flyout | P3 |
+| System tray | tray with real presence detection | PARTIAL | yes | yes | 3.7 | 2 | no per-icon backends, overflow is static | P2 |
+| Launching applications | real .desktop parsing + launch | PARTIAL | yes | yes (unit) | — | 3 | no window tracking after launch | P1 |
 | Running-app indicator | underline driven by real `/proc` process table | PARTIAL | yes | yes | 4 | 3 | matches process names, not real windows | P2 |
-| Search | search pill UI only | MISSING (UI shell only) | no | no | 3 | 0 | no index, no results, not clickable | P2 |
+| Search | search field in taskbar and Start | MISSING (UI only) | no | render only | 3.0 | 0 | no index, no results | P2 |
 | File Explorer | Dolphin fork (planned) | MISSING | no | no | — | — | nothing written | P1 |
 | Settings | Bedrock Settings (planned) | MISSING | no | no | — | — | nothing written | P2 |
-| Context menus | — | MISSING | no | no | — | — | Windows 11 rounded menus not started | P2 |
+| Context menus | Bedrock ContextMenu (QML) | PROTOTYPE | renders | yes | 3.8 | 2 | items perform no actions | P2 |
 | Notifications | — | MISSING | no | no | — | — | no notification daemon | P2 |
-| Quick settings | — | MISSING | no | no | — | — | needs NetworkManager/PipeWire/UPower backends | P2 |
+| Quick settings | Bedrock quick settings flyout | PARTIAL | yes — real readouts | yes | 3.7 | 2 | toggles not wired; unavailable items shown as unavailable | P2 |
+| Window decorations | Bedrock AppWindow design (KWin will draw) | PROTOTYPE | renders | yes | 3.7 | 2 | design only, no window management | P2 |
 | Window snapping / snap layouts | KWin rules (planned) | MISSING | no | no | — | — | never run on a compositor | P2 |
 | Alt+Tab / Task view | KWin (planned) | MISSING | no | no | — | — | — | P3 |
 | Virtual desktops | KWin (planned) | MISSING | no | no | — | — | — | P3 |
@@ -40,5 +43,5 @@ in where a real frame exists to compare against the reference screenshot.
 | Registry | config files | NOT APPLICABLE | — | — | — | — | by design | — |
 | Windows Defender | SELinux/firewalld/sandboxing | NOT APPLICABLE (alternative) | — | — | — | — | different security model | — |
 
-**Summary: 0 COMPLETE, 3 PARTIAL, 3 PROTOTYPE, 2 BACKEND ONLY, 21 MISSING.** That is the honest state
-of parity today.
+**Summary: 0 COMPLETE, 6 PARTIAL, 5 PROTOTYPE, 2 BACKEND ONLY, 19 MISSING.**
+Visual scores live in `docs/VISUAL_SCORE.md`; a score is a design metric, never proof of function.

@@ -16,40 +16,49 @@ from PySide6.QtCore import QCoreApplication, QTimer, QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuick import QQuickView
 
-from .model import AppModel, ShellState
+from .model import AppModel, InstalledAppModel, ShellState, SystemState
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
 
 
-def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, AppModel, ShellState]:
+def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]:
     view = QQuickView()
     view.engine().addImportPath(str(QML_DIR.parent))
     view.engine().addImportPath(str(QML_DIR))
-    model = AppModel()
+    installed = InstalledAppModel()
+    model = AppModel(installed=None)
     state = ShellState(locale=locale, tick=tick)
+    system_state = SystemState()
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
+    context.setContextProperty("installedModel", installed)
     context.setContextProperty("shellState", state)
+    context.setContextProperty("systemState", system_state)
     view.setSource(QUrl.fromLocalFile(str(QML_DIR / "Shell.qml")))
     if view.status() != QQuickView.Ready:
         errors = "\n".join(str(error.toString()) for error in view.errors())
         raise RuntimeError(f"QML failed to load:\n{errors}")
-    return view, model, state
+    return view, [model, installed, state, system_state]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
 
 
-def render(output: str, start_open: bool = False, width: int = 1280, height: int = 800,
-           locale: str = "ru") -> str:
+def render(output: str, start_open: bool = False, width: int = 1600, height: int = 1000,
+           locale: str = "ru", quick_open: bool = False, context_open: bool = False,
+           light: bool = False) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
     app = QCoreApplication.instance() or QGuiApplication(sys.argv[:1])
-    view, model, state = build_view(locale=locale, tick=False)
-    _KEEPALIVE.extend([view, model, state])
+    view, backends = build_view(locale=locale, tick=False)
+    _KEEPALIVE.extend([view, *backends])
     view.setWidth(width)
     view.setHeight(height)
-    view.rootObject().setProperty("startOpen", start_open)
+    root = view.rootObject()
+    root.setProperty("lightMode", light)
+    root.setProperty("startOpen", start_open)
+    root.setProperty("quickOpen", quick_open)
+    root.setProperty("contextOpen", context_open)
     view.show()
     result: dict[str, bool] = {}
 
@@ -72,7 +81,8 @@ def render(output: str, start_open: bool = False, width: int = 1280, height: int
 
 def run() -> int:
     app = QGuiApplication(sys.argv)
-    view, model, state = build_view()
-    view.resize(1280, 800)
+    view, backends = build_view()
+    _KEEPALIVE.extend([view, *backends])
+    view.resize(1600, 1000)
     view.show()
     return app.exec()

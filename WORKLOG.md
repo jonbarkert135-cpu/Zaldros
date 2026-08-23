@@ -2,6 +2,18 @@
 
 Newest first. Each entry states what was *run*, not only what was written.
 
+## 2026-08-23 — Visual foundation
+- Licence-audited the open-source Windows-like field into `docs/VISUAL_THIRD_PARTY.md`; found the
+  legally clean route: Fluent UI System Icons (MIT) + Selawik (OFL), both from Microsoft.
+- Rebuilt the shell around a full design-token system with dark **and** light themes.
+- Added: system tray, quick settings flyout, context menus, window decorations, keyboard navigation.
+- Added real backends: `.desktop` discovery + launching, and sysfs/wpctl readouts for battery,
+  brightness, network, volume, Bluetooth.
+- Ran it: 76 tests green (44 tools + 32 shell), six evidence renders in `docs/evidence/`.
+- Adopted the **ponytail** skill (lazy-senior-dev review): replaced the hand-written .desktop parser
+  with stdlib `configparser`.
+- Scores and honest limits: `docs/VISUAL_SCORE.md`.
+
 ## 2026-08-23 — Reality audit + first desktop vertical slice
 - Audited every component against REAL/PROTOTYPE/BACKEND ONLY/DOCUMENTATION ONLY/MISSING
   (`docs/REALITY_AUDIT.md`). Verdict: the project was documentation + backend only. Owner was right.
