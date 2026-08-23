@@ -61,7 +61,7 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber sddm dolphin konsole fonts-dejavu-core python3 python3-pyside6.qtquick"
+BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber sddm dolphin konsole fonts-dejavu-core python3 python3-pyside6.qtquick"
 case "$VARIANT" in
   full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland" ;;
   services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
@@ -114,7 +114,11 @@ chmod +x "$ROOT/usr/local/bin/zaldros-selftest" "$ROOT/usr/local/bin/zaldros-uit
 echo "$VARIANT" > "$ROOT/etc/zaldros-variant"
 
 # The themes: run the real upstream installers inside the image (no network at boot time).
-chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git sassc && /opt/zaldros/theme/fetch-sources.sh /usr/src && /opt/zaldros/theme/install-visual-theme.sh --dest / --variant dark"
+# ca-certificates is only a *recommend* of git, and we install with --no-install-recommends, so
+# without naming it the chroot has no CA store and every HTTPS clone dies on "Problem with the SSL CA cert".
+step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git sassc ca-certificates \
+  && /opt/zaldros/theme/fetch-sources.sh /usr/src \
+  && /opt/zaldros/theme/install-visual-theme.sh --dest / --variant dark"
 
 # Autologin straight into the variant's session, so a boot test needs no keyboard.
 install -d "$ROOT/etc/sddm.conf.d"
