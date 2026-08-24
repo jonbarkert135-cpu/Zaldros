@@ -139,9 +139,17 @@ export QT_QPA_PLATFORM=wayland PYTHONPATH=/opt/zaldros
 # before anything started. /tmp is writable by the session user, so log there.
 exec >>/tmp/zaldros-session.log 2>&1
 set -x
-exec kwin_wayland --xwayland -- sh -c 'python3 -m zaldros_shell run; echo "zaldros-shell exited $?"'
+# Run #23: kwin_wayland re-splits its application argument on spaces, so `sh -c '...'` arrived as
+# `sh -c python3 -m zaldros_shell run;` and argparse died on the token "run;". Pass one file path.
+exec kwin_wayland --xwayland -- /usr/local/bin/zaldros-shell-run
 EOS
 chmod +x "$ROOT/usr/local/bin/zaldros-session"
+cat > "$ROOT/usr/local/bin/zaldros-shell-run" <<'EOS'
+#!/bin/sh
+python3 -m zaldros_shell run
+echo "zaldros-shell exited $?"
+EOS
+chmod +x "$ROOT/usr/local/bin/zaldros-shell-run"
 # ponytail: no display manager. Run #16 proved sddm never honoured its autologin config and fell
 # back to an X greeter that does not exist in this image (no Xorg), so nothing ever started the
 # session: kwin=false, no wayland socket, every UI step FAIL. A systemd autologin unit on tty1 is

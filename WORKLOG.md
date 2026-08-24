@@ -269,3 +269,10 @@ Written and unit-tested locally (44 shell tests + shell render green); CI eviden
   has a matching python3-pyside6.x package in build-iso.sh.
 - full variant now runs /usr/local/bin/zaldros-session (own shell) instead of
   startplasma-wayland, as the spec requires.
+
+## Run #23 (2026-08-24)
+- CI 6358bdd: все 9 образов зелёные, kwin=true во всех, но shell=false. Из
+  /tmp/zaldros-session.log: `zaldros-shell: error: argument command: invalid choice: 'run;'`.
+- Причина: kwin_wayland заново разбивает аргумент приложения по пробелам, поэтому
+  `sh -c 'python3 -m zaldros_shell run; ...'` пришёл как отдельные слова.
+- Фикс: отдельный однофайловый враппер /usr/local/bin/zaldros-shell-run, kwin получает один путь.
