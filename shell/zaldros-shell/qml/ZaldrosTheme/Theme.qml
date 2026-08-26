@@ -9,7 +9,9 @@ import QtQuick
 // numbers are checked, not decorative.
 //
 // Colours are ours: Windows-neutral greys and a Zaldros accent, never sampled artwork.
-// Typography: Selawik is Microsoft's SIL-OFL-licensed metric companion to Segoe UI, so it ships.
+// Typography: PT Sans (SIL OFL 1.1, ParaType). Chosen by measurement against the Windows 11
+// capture in assets/refs (tools/visual/font_match.py) because it must carry Cyrillic — the previous
+// Selawik had none and the Russian UI silently fell back to DejaVu Sans.
 QtObject {
     id: theme
 
@@ -71,9 +73,9 @@ QtObject {
     readonly property int radiusLarge:        10
 
     // --- typography -------------------------------------------------------------------------
-    // Set at startup from the vendored Selawik faces; falls back to the host default when the font
-    // failed to load, so text never silently renders in a fake family.
-    property string fontFamily: "Selawik"
+    // Set at startup from the vendored faces; falls back to the host default when the font failed
+    // to load or cannot draw Cyrillic, so text never silently renders in a family we did not choose.
+    property string fontFamily: "PT Sans"
     // Wallpaper file URL, set at startup from assets/wallpaper.
     property string wallpaper: ""
     readonly property int fontCaption:   12   // tray, labels, list rows

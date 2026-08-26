@@ -517,3 +517,43 @@ Also from the maintainer's review of the shipped screenshots:
   would be, and it walks the nested page stack (`AppWindow.showIcon` / `showBack`).
 * Every window keeps its **8 px corners when maximised**. `BorderlessMaximizedWindows` is off in
   `kwinrc` for the same reason.
+
+## Run #28c — the UI font could not write Russian
+
+The maintainer's review of the shipped Settings screenshot: "шрифты в этой панели вообще не те".
+He was right, and the cause was not styling.
+
+`assets/fonts/selawik/selawk.ttf` has 383 glyphs and **zero Cyrillic codepoints**. Selawik was
+vendored (ADR-0007) for one property — metric compatibility with Segoe UI — and nobody checked
+whether it could draw the alphabet the interface is written in. Qt registered it, `Theme.fontFamily`
+said "Selawik", and every Russian label was quietly handed to fontconfig's fallback: `fonts-dejavu-core`,
+the only font family in the image. So the shell has been rendering in DejaVu Sans since the first
+ISO, in every screenshot we ever sent.
+
+Picked the replacement by measurement instead of taste. `tools/visual/font_match.py` crops real
+Segoe UI Cyrillic out of `assets/refs/win11_start_reference.png` (a Russian Windows 11 desktop),
+renders the same string in each candidate, scales to the reference's ink height and compares
+pixels. PT Sans wins both samples — 62.0 % difference on body text against DejaVu's 93.0 %, and
+PT Sans Bold lands 31.6 % from Segoe UI Semibold on the "Закрепленные" heading, with a width ratio
+of 0.99. It also tracks Segoe metrics best of the field (5.4 % mean advance deviation, identical
+x-height and cap height), so the geometry tokens measured for Segoe still hold.
+
+What changed:
+
+* `assets/fonts/pt-sans/` replaces `assets/fonts/selawik/` (SIL OFL 1.1, ParaType, licence shipped).
+* `app.load_fonts()` walks the whole font tree and returns a family only if it registered **and**
+  reports Cyrillic coverage; otherwise it prints the fallback it really got. `ZALDROS_UI_FONT`
+  overrides it for comparisons.
+* `install-visual-theme.sh` installs the faces into `/usr/share/fonts/truetype/zaldros`, writes
+  `/etc/fonts/conf.d/60-zaldros-ui-font.conf` (sans-serif, system-ui, Segoe UI and Selawik all map
+  to PT Sans) and names the family in kdeglobals, GTK 3/4, the GNOME schema override and
+  `visual.conf`. KWin decorations, Dolphin and Konsole were drawing in DejaVu too.
+* `tests/test_ui_font.py` — five gates: faces plus licence present, Cyrillic covered, every
+  character used in the shell sources covered, shell and theme name the same family, font installed
+  system-wide. Verified the coverage gate fails on the old Selawik file before committing.
+
+Tests: 116. Parity: 34/34 (unchanged — the geometry tokens were never the problem).
+
+Lesson, same shape as the `kglobalacceld` path guess: a dependency that "is installed" is not a
+dependency that *works*. Check the property you actually need — here, that the font can draw the
+text — not the property that was convenient to check.

@@ -14,7 +14,7 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Launch applications from Start and from the taskbar
 - [ ] Track real windows from the compositor; group them in the taskbar
 - [ ] Wire quick-settings toggles to NetworkManager / BlueZ / PipeWire / UPower
-- [x] Vendor Fluent UI System Icons (MIT) and Selawik (OFL) — done, in use
+- [x] Vendor Fluent UI System Icons (MIT) and PT Sans (OFL) — done, in use (Selawik dropped: no Cyrillic)
 - [x] Install the Fluent cursor theme (GPL-3) — the only borrowed pack (ADR-0010)
 - [ ] Draw our own Aurorae decoration theme so real app titlebars stop being Breeze
 - [ ] Replace the vendored GPL-3 app/place SVGs with our own artwork (last borrowed pixels besides the cursors)

@@ -36,6 +36,6 @@ by Microsoft. Windows and Windows 11 are trademarks of Microsoft Corporation.
 | Component | Version | Source | License | Modifications | Redistribution duty |
 | --- | --- | --- | --- | --- | --- |
 | Fluent UI System Icons (26 SVGs) | fetched 2026-08-23 | github.com/microsoft/fluentui-system-icons | MIT | none on disk; recoloured at runtime | keep MIT notice (`assets/icons/fluent/LICENSE`) |
-| Selawik | 1.01 | github.com/microsoft/Selawik | SIL OFL 1.1 | none | ship `LICENSE.txt`; reserved font name |
+| PT Sans | Web | github.com/google/fonts (ofl/ptsans) | SIL OFL 1.1 | none | ship `LICENSE.txt`; reserved font names "PT Sans", "ParaType" |
 
 Full analysis: `docs/VISUAL_LICENSE_AUDIT.md` and `docs/VISUAL_FOUNDATION_RESEARCH.md`.

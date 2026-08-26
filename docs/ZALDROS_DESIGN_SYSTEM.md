@@ -5,7 +5,7 @@ The single source of visual truth. Implemented as QML tokens in
 Values come from Microsoft's published Windows 11 metrics plus the measured comparison in
 `docs/VISUAL_FOUNDATION_RESEARCH.md` §2 — never from guesswork or from extracted Microsoft assets.
 
-## 1. Typography — Selawik (OFL 1.1)
+## 1. Typography — PT Sans (OFL 1.1, ParaType)
 
 | Token | Size | Weight | Use |
 | --- | --- | --- | --- |
@@ -14,8 +14,13 @@ Values come from Microsoft's published Windows 11 metrics plus the measured comp
 | `fontSubtitle` | 16 px | SemiBold | section headings ("Закреплено") |
 | `fontTitle` | 20 px | SemiBold | page titles |
 
-Family resolution is verified at runtime: if Selawik fails to register, the shell reports the family
-it actually got rather than claiming Selawik.
+Family resolution is verified at runtime: the shell only accepts a family that registered **and**
+reports Cyrillic coverage, otherwise it prints the fallback it actually got. Selawik was dropped in
+run #28c for exactly that reason — metrically Segoe UI, but a Latin-only cmap, so the Russian
+interface was silently drawn by DejaVu Sans. PT Sans was picked by measurement against the Windows
+capture in `assets/refs` (`tools/visual/font_match.py`): 62 % pixel difference on body text versus
+93 % for DejaVu, and PT Sans Bold sits within 1 % of Segoe UI Semibold on headings. `PT Sans` has
+no 600 weight, so `Font.DemiBold` resolves to Bold — which is what the measurement compared.
 
 ## 2. Colour
 

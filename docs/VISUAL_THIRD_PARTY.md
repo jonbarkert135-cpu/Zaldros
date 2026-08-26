@@ -11,7 +11,8 @@ claim that the code is already in the tree.
 | Component | Source | Licence | Can modify? | Can redistribute? | Attribution required? | Used in Zaldros? |
 | --- | --- | --- | --- | --- | --- | --- |
 | **Fluent UI System Icons** | github.com/microsoft/fluentui-system-icons | **MIT** (Microsoft) | yes | yes | yes — keep MIT notice | **Chosen** for system/tray iconography; not yet vendored (no network in build sandbox) |
-| **Selawik** | github.com/microsoft/Selawik | **SIL OFL 1.1** (Microsoft) | yes (rename if modified) | yes | OFL notice | **Chosen** as the UI font — Microsoft's own open replacement for Segoe UI, metric-compatible |
+| **PT Sans** | github.com/google/fonts/ofl/ptsans | **SIL OFL 1.1** (ParaType) | yes (rename if modified) | yes | OFL notice | **Chosen** as the UI font — native Cyrillic, closest measured match to Segoe UI on the reference capture |
+| ~~Selawik~~ | github.com/microsoft/Selawik | SIL OFL 1.1 (Microsoft) | — | — | — | **Dropped** in run #28c: metric-compatible with Segoe UI but Latin-only, unusable for a Russian interface |
 | **Inter** | github.com/rsms/inter | SIL OFL 1.1 | yes | yes | OFL notice | Fallback / Latin alternative |
 | **Noto Sans** | Google Fonts | SIL OFL 1.1 | yes | yes | OFL notice | Fallback, needed for Cyrillic coverage breadth |
 | **Papirus icon theme** | github.com/PapirusDevelopmentTeam/papirus-icon-theme | GPL-3.0 | yes | yes | yes | Candidate for application icons (GPL-3.0 matches our licence) |

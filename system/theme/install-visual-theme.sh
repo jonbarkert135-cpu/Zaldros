@@ -108,6 +108,32 @@ scheme="prefer-dark"; [[ "$VARIANT" == "light" ]] && scheme="prefer-light"
 
 install -d "$DEST/etc/xdg" "$DEST/etc/skel/.config/gtk-3.0" "$DEST/etc/skel/.config/gtk-4.0"
 
+# ------------------------------------------------------------------------------------- UI font
+# The interface is Russian, so the UI font has to *have* Cyrillic. Selawik did not (Latin-only
+# cmap), the shell silently fell back to DejaVu Sans and every label looked like plain Linux.
+# PT Sans (SIL OFL 1.1, ParaType) is the closest shipped match to Segoe UI Cyrillic measured
+# against assets/refs — see tools/visual/font_match.py. It is installed system-wide so KWin,
+# Dolphin and Konsole use it too, not only our shell.
+UI_FONT_FAMILY="PT Sans"
+FONT_SRC="$ASSETS/fonts/pt-sans"
+[[ -d "$FONT_SRC" ]] || { echo "no UI font in $FONT_SRC" >&2; exit 1; }
+install -d "$DEST/usr/share/fonts/truetype/zaldros"
+install -m644 "$FONT_SRC"/*.ttf "$DEST/usr/share/fonts/truetype/zaldros/"
+install -Dm644 "$FONT_SRC/LICENSE.txt" "$DEST/usr/share/doc/zaldros/licenses/PT-Sans-OFL.txt"
+
+# Anything that asks fontconfig for a generic sans — or for Segoe UI by name — gets our font.
+install -Dm644 /dev/stdin "$DEST/etc/fonts/conf.d/60-zaldros-ui-font.conf" <<EOF
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias><family>sans-serif</family><prefer><family>$UI_FONT_FAMILY</family></prefer></alias>
+  <alias><family>system-ui</family><prefer><family>$UI_FONT_FAMILY</family></prefer></alias>
+  <alias binding="same"><family>Segoe UI</family><accept><family>$UI_FONT_FAMILY</family></accept></alias>
+  <alias binding="same"><family>Selawik</family><accept><family>$UI_FONT_FAMILY</family></accept></alias>
+</fontconfig>
+EOF
+command -v fc-cache >/dev/null && fc-cache -f "$DEST/usr/share/fonts/truetype/zaldros" >/dev/null || true
+
 # ---------------------------------------------------------------------------- Qt / KDE defaults
 cat > "$DEST/etc/xdg/kdeglobals" <<EOF
 [Icons]
@@ -119,6 +145,13 @@ widgetStyle=Breeze
 
 [General]
 ColorScheme=ZaldrosDark
+font=$UI_FONT_FAMILY,10,-1,5,50,0,0,0,0,0
+menuFont=$UI_FONT_FAMILY,10,-1,5,50,0,0,0,0,0
+smallestReadableFont=$UI_FONT_FAMILY,8,-1,5,50,0,0,0,0,0
+toolBarFont=$UI_FONT_FAMILY,10,-1,5,50,0,0,0,0,0
+
+[WM]
+activeFont=$UI_FONT_FAMILY,10,-1,5,50,0,0,0,0,0
 EOF
 
 # KDE reads the pointer from kcminputrc, not from kdeglobals.
@@ -154,7 +187,7 @@ for version in 3.0 4.0; do
 [Settings]
 gtk-theme-name=Adwaita
 gtk-icon-theme-name=$icon_theme
-gtk-font-name=Selawik 10
+gtk-font-name=$UI_FONT_FAMILY 10
 gtk-application-prefer-dark-theme=$prefer_dark
 gtk-cursor-theme-name=$CURSOR_THEME
 gtk-cursor-theme-size=24
@@ -183,7 +216,7 @@ gtk-theme='Adwaita'
 icon-theme='$icon_theme'
 cursor-theme='$CURSOR_THEME'
 cursor-size=24
-font-name='Selawik 10'
+font-name='$UI_FONT_FAMILY 10'
 color-scheme='$scheme'
 EOF
 if command -v glib-compile-schemas >/dev/null; then
@@ -259,7 +292,7 @@ install -Dm644 /dev/stdin "$DEST/etc/zaldros/visual.conf" <<EOF
 icon_theme=$icon_theme
 gtk_theme=Adwaita
 cursor_theme=$CURSOR_THEME
-font=Selawik
+font=$UI_FONT_FAMILY
 taskbar_position=bottom
 taskbar_alignment=center
 corner_radius=10

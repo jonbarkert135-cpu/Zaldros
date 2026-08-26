@@ -7,7 +7,7 @@ Status: **COMPLETE / PARTIAL / PROTOTYPE / MISSING**. A high visual score never 
 | Component | Source | Implementation | Stack | Status | Visual score | Real behaviour today |
 | --- | --- | --- | --- | --- | --- | --- |
 | System icons | Fluent UI System Icons (MIT) | vendored SVG, recoloured per theme | SVG + Qt | **COMPLETE** | 5.0 | 26 glyphs, both themes, HiDPI |
-| UI font | Selawik (OFL 1.1) | vendored TTF, registered at startup | TTF | **COMPLETE** | 5.0 | Segoe-metric text everywhere |
+| UI font | PT Sans (OFL 1.1) | vendored TTF, registered at startup + fontconfig alias | TTF | **COMPLETE** | 5.0 | closest measured match to Segoe UI Cyrillic; installed system-wide so KWin/Dolphin match |
 | Design tokens | ours, informed by Win11-gtk-theme values | `ZaldrosTheme/Theme.qml` | QML | **COMPLETE** | 4.5 | dark + light, one source of truth |
 | Taskbar | ours; behaviour ref. sfwbar | `Taskbar.qml` | QML | PROTOTYPE | 4.3 | real clock, real running-app state; still a window, not a panel |
 | Start menu | ours; behaviour ref. Menu11 / menu-11-next | `StartMenu.qml` | QML | PARTIAL | 4.3 | launches real applications, keyboard navigation |

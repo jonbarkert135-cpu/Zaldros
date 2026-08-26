@@ -37,15 +37,40 @@ def _assets_dir() -> Path:
 
 
 ASSETS = _assets_dir()
-FONT_DIR = ASSETS / "fonts" / "selawik"
+FONT_DIR = ASSETS / "fonts"
+
+# Ordered preference for the UI family. The first entry that both loaded *and* covers Cyrillic
+# wins. Selawik was metrically Segoe UI but its cmap is Latin-only (383 glyphs, zero Cyrillic), so
+# the Russian interface fell through to whatever fontconfig offered — DejaVu Sans on our ISO,
+# which is why every label looked wrong. PT Sans replaced it: measured against the Windows 11
+# capture in assets/refs it is the closest Cyrillic match we can ship (tools/visual/font_match.py).
+# Coverage is now a condition, not an assumption.
+UI_FONT_PREFERENCE = ("PT Sans",)
+UI_FONT_ENV = "ZALDROS_UI_FONT"          # override, used by the font comparison tool
+
+
+def _covers_cyrillic(family: str) -> bool:
+    return QFontDatabase.WritingSystem.Cyrillic in QFontDatabase.writingSystems(family)
 
 
 def load_fonts() -> str:
-    """Register the vendored Selawik faces (Microsoft, SIL OFL 1.1). Returns the family actually
-    available, so the caller never claims a font that failed to load."""
-    for ttf in sorted(FONT_DIR.glob("*.ttf")):
+    """Register the vendored faces and return the family actually usable for the UI.
+
+    Never returns a family that cannot draw the interface's own alphabet: a font that renders
+    boxes or silently falls back is worse than admitting we are on the host default.
+    """
+    for ttf in sorted(FONT_DIR.rglob("*.ttf")):
         QFontDatabase.addApplicationFont(str(ttf))
-    return "Selawik" if "Selawik" in QFontDatabase.families() else QFont().defaultFamily()
+    available = set(QFontDatabase.families())
+    override = os.environ.get(UI_FONT_ENV)
+    wanted = [override] if override else list(UI_FONT_PREFERENCE)
+    for family in wanted:
+        if family in available and _covers_cyrillic(family):
+            return family
+    fallback = QFont().defaultFamily()
+    print(f"ui font: none of {wanted} is installed with Cyrillic coverage, using {fallback}",
+          flush=True)
+    return fallback
 
 
 def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]:

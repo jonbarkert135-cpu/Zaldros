@@ -47,5 +47,5 @@ notification centre width and edge gap; context menu width and stack height.
 - Motion: durations are set from the reference theme (75 ms hover), but nothing measures them.
 - Iconography: system glyphs are Fluent UI System Icons (Microsoft, MIT). Application icons come
   from the host icon theme, so a machine without one still shows lettered tiles.
-- Typography: Selawik (Microsoft, SIL OFL 1.1) is metric-compatible with Segoe UI and legal to
+- Typography: PT Sans (ParaType, SIL OFL 1.1) covers Cyrillic and is the closest measured match to Segoe UI; it is legal to
   ship. Segoe UI itself is not redistributable and is never bundled.
