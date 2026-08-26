@@ -1,0 +1,14 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Description": "Alt+Tab window switching for the Zaldros desktop",
+        "Description[ru]": "Переключение окон по Alt+Tab для Zaldros",
+        "EnabledByDefault": true,
+        "Id": "zaldros-switcher",
+        "License": "GPL-3.0-or-later",
+        "Name": "Zaldros switcher",
+        "Name[ru]": "Переключатель окон Zaldros"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

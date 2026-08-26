@@ -7,6 +7,22 @@ from pathlib import Path
 
 MARK = "ZALDROS-SELFTEST "
 LATE_MARK = "ZALDROS-LATE "
+GEOMETRY_MARK = "ZALDROS-GEOMETRY "
+UITEST_MARK = "ZALDROS-UITEST "
+
+
+def marked(mark, payload):
+    """One marker line whose body can never contain a second marker.
+
+    Run #34: the late report embeds the session log, the session log had already echoed a
+    self-test line, and the host's `grep -o 'ZALDROS-SELFTEST {.*' | tail -1` happily picked
+    that *escaped* copy — `{\\"kernel\\"...` is not JSON, so every boot job died on a
+    JSONDecodeError. Markers appear once per line, at the front, or not at all.
+    """
+    body = json.dumps(payload, ensure_ascii=False)
+    for other in (MARK, LATE_MARK, GEOMETRY_MARK, UITEST_MARK):
+        body = body.replace(other.strip(), other.strip().replace("ZALDROS-", "ZALDROS_"))
+    return mark + body
 
 
 def sh(*cmd, timeout=20):
@@ -230,6 +246,46 @@ def tail_file(path, n=4000):
     except OSError:
         return None
 
+
+def kwin_environ(name):
+    """One variable out of the live compositor's environment — proof, not assumption.
+
+    A logging category that was exported by the session script but never reached kwin looks
+    exactly like a category that produced no output, and run #34 could not tell them apart.
+    """
+    pid = sh("pgrep", "-x", "kwin_wayland").split("\n")[0].strip()
+    if not pid.isdigit():
+        return "no kwin_wayland process"
+    try:
+        blob = Path(f"/proc/{pid}/environ").read_bytes().decode(errors="replace")
+    except OSError as exc:
+        return f"ERROR: {exc}"
+    for entry in blob.split("\0"):
+        if entry.startswith(name + "="):
+            return entry[len(name) + 1:]
+    return f"{name} not set for kwin"
+
+
+def invoke_and_watch(action="Zaldros Walk Through Windows", component="zaldros-switcher"):
+    """Fire the switch over D-Bus and report exactly what the session log gained.
+
+    This separates the two ways Alt+Tab can be broken: the key never reaching a shortcut, or the
+    shortcut running and drawing nothing. The key press is the host's job; this is the other half.
+    """
+    log = Path("/tmp/zaldros-session.log")
+    before = log.stat().st_size if log.is_file() else 0
+    reply = user_sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
+                    "--object-path", "/kglobalaccel", "--method",
+                    "org.kde.KGlobalAccel.invokeShortcut", component, action, "default")
+    time.sleep(1.5)
+    after = ""
+    if log.is_file():
+        with open(log, errors="replace") as fh:
+            fh.seek(before)
+            after = fh.read()[:4000]
+    return {"component": component, "action": action, "reply": reply, "log_gained": after}
+
+
 def late_report():
     """Everything that only exists *after* the host has pressed Alt+Tab.
 
@@ -244,8 +300,14 @@ def late_report():
     return {
         "session_log_tail": text[-6000:],
         "tabbox_lines": interesting[-40:],
+        "switcher_script_lines": [line for line in text.splitlines()
+                                  if "ZALDROS_SWITCHER" in line or "ZALDROS-SWITCHER" in line][-40:],
+        "kwin_logging_rules": kwin_environ("QT_LOGGING_RULES"),
+        "invoke_delta": invoke_and_watch(),
         "qml_import_paths": sh("sh", "-c",
                                "ls -d /usr/lib/x86_64-linux-gnu/qt6/qml/QtQuick* 2>&1 | head -n 20"),
+        "kwin_scripts_installed": sh("sh", "-c", "ls /usr/share/kwin/scripts 2>&1"),
+        "user_shortcuts_file": tail_file("/home/ubuntu/.config/kglobalshortcutsrc", 1200),
         "switcher": switcher(),
     }
 
@@ -260,7 +322,7 @@ def main():
                     help="seconds to wait for the compositor before reporting what is there")
     args = ap.parse_args()
     if args.late:
-        line = LATE_MARK + json.dumps(late_report(), ensure_ascii=False)
+        line = marked(LATE_MARK, late_report())
         print(line, flush=True)
         if args.serial:
             with open(args.serial, "w") as fh:
@@ -322,9 +384,9 @@ def main():
     except Exception as exc:                                    # noqa: BLE001 - reported, not hidden
         geometry = {"error": str(exc)}
     result["ui_geometry"] = geometry
-    geometry_line = "ZALDROS-GEOMETRY " + json.dumps(geometry, ensure_ascii=False)
+    geometry_line = marked(GEOMETRY_MARK, geometry)
     print(geometry_line, flush=True)
-    line = MARK + json.dumps(result, ensure_ascii=False)
+    line = marked(MARK, result)
     print(line, flush=True)
     if args.serial:
         with open(args.serial, "w") as fh:

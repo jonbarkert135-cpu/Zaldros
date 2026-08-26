@@ -66,9 +66,10 @@ ELAPSED=$(( $(date +%s) - START ))
 # The self-test line is the evidence; without it the boot failed, whatever QEMU's exit code says.
 # ponytail: the marker is not always at the start of a line — run #15 printed it right after
 # getty's "ubuntu login: " prompt, so an anchored grep called a real boot a FAIL.
-if grep -q 'ZALDROS-SELFTEST {' "$SERIAL" 2>/dev/null; then
-  grep -o 'ZALDROS-SELFTEST {.*' "$SERIAL" | tail -1 | cut -c18- > "$JSON"
-  grep -o 'ZALDROS-UITEST {.*' "$SERIAL" | tail -1 | cut -c16- > "$OUT/$NAME.ui-guest.json" 2>/dev/null || true
+EXTRACT="$(dirname "$0")/extract_marked.py"
+if python3 "$EXTRACT" "$SERIAL" 'ZALDROS-SELFTEST ' --out "$JSON"; then
+  python3 "$EXTRACT" "$SERIAL" 'ZALDROS-UITEST ' --out "$OUT/$NAME.ui-guest.json" --optional || true
+  python3 "$EXTRACT" "$SERIAL" 'ZALDROS-LATE ' --out "$OUT/$NAME.late.json" --optional || true
   python3 - "$JSON" "$ELAPSED" "$PROFILE" <<'PY'
 import json, sys
 data = json.load(open(sys.argv[1]))
@@ -92,6 +93,7 @@ data["checks"] = checks
 data["boot"] = "PASS" if all(checks.values()) else "FAIL"
 data["failed_checks"] = [k for k, v in checks.items() if not v]
 for extra, key in ((sys.argv[1].replace(".json", ".ui-guest.json"), "ui_guest"),
+                   (sys.argv[1].replace(".json", ".late.json"), "late"),
                    (sys.argv[1].replace(".json", "-host.json"), "ui_host")):
     try:
         data[key] = json.load(open(extra))
@@ -103,5 +105,5 @@ PY
 else
   python3 -c 'import json,sys; json.dump({"profile":sys.argv[1],"boot":"FAIL","wall_seconds":int(sys.argv[2]),"qemu_rc":int(sys.argv[3]),"serial_tail":open(sys.argv[4],errors="replace").read()[-4000:]},open(sys.argv[5],"w"),ensure_ascii=False,indent=2)' \
     "$PROFILE" "$ELAPSED" "$RC" "$SERIAL" "$JSON"
-  echo "FAIL: no self-test marker on the serial log — see $SERIAL"
+  echo "FAIL: no parsable self-test report on the serial log — see $SERIAL"
 fi

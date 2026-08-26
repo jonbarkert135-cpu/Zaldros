@@ -742,3 +742,38 @@ and the root `currentIndex: grid.currentIndex` binding is gone — `grid` lives 
 Instantiator's delegate, a different component scope, and kwin sets that property itself.
 
 Tests: 164.
+
+### Run #34: the report that ate the build, and Alt+Tab moved out of KWin's tabbox
+
+Run #33's diagnostics worked, and then killed the job. The `--late` report embeds the session
+log; the session log already contained an echoed `ZALDROS-SELFTEST {...}` line; the host picked
+the *last* marker on the serial log with `grep -o … | tail -1`, so it read that escaped copy and
+`json.load` died on `{\"kernel\"…`. A boot that had passed every check was reported as a failed
+build. Both halves are fixed: the guest scrubs any nested marker out of a report before printing
+it (`marked()`), and the host no longer trusts position — `build/iso/extract_marked.py` tries every
+candidate newest-first and takes the first one that parses. The late report now lands in the
+artifact JSON as `late`, next to `ui_guest` and `ui_host`.
+
+Reading run #33's late report through the new extractor gave the answer we paid 20 minutes for:
+`tabbox_lines` is empty. Not a broken-package warning, not a QML error — with
+`kwin_tabbox.debug=true` on, KWin's tabbox says *nothing at all*, which means it never activates.
+Meanwhile the Meta key opens Start, so key injection works; but Start is handled by `Shell.qml`'s
+own `Keys` handler, not by a global shortcut, so nothing in this session had ever proven that the
+global shortcut path works end to end.
+
+Alt+Tab therefore leaves KWin's tabbox, in line with ADR-0012: `system/theme/kwin-scripts/
+zaldros-switcher` is a KWin script that registers `Alt+Tab` / `Alt+Shift+Tab`, walks
+`workspace.stackingOrder` and sets `workspace.activeWindow` — and prints `ZALDROS-SWITCHER` for
+every step, so the next boot shows whether the shortcut fired, whether it found windows, and which
+one it activated. KWin's own `Walk Through Windows` binding is set to `none` (it registers first
+and would otherwise keep the key), and the shortcut file is installed into `/etc/skel/.config` and
+the live home as well as `/etc/xdg`, because kglobalaccel reads the user's copy first.
+
+Three more instruments for the same boot: `kwin_environ()` reads `QT_LOGGING_RULES` out of the
+live compositor's `/proc/<pid>/environ` (a rule that never reached KWin looks exactly like a
+category with no output), `invoke_and_watch()` fires the action over D-Bus and reports what the
+session log gained in the next 1.5 s — separating "the key never arrived" from "the action ran and
+drew nothing" — and `/etc/xdg/menus/applications.menu` now exists, because 90 % of the session log
+was one repeated `"applications.menu" not found` line pushing the real evidence out of every tail.
+
+Tests: 178.

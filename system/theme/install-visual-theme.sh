@@ -371,6 +371,9 @@ roundedcornersEnabled=true
 blurEnabled=true
 contrastEnabled=true
 kwin4_effect_squashEnabled=true
+# Our own Alt+Tab (system/theme/kwin-scripts/zaldros-switcher). KWin's tabbox drew nothing in
+# runs #29-#34 and logged nothing either; a KWin script does the switching and says so in the log.
+zaldros-switcherEnabled=true
 
 [Effect-blur]
 BlurStrength=8
@@ -460,8 +463,10 @@ fi
 install -Dm644 /dev/stdin "$DEST/etc/xdg/kglobalshortcutsrc" <<'EOF'
 [kwin]
 _k_friendly_name=KWin
-Walk Through Windows=Alt+Tab,Alt+Tab,Walk Through Windows
-Walk Through Windows (Reverse)=Alt+Shift+Backtab,Alt+Shift+Backtab,Walk Through Windows (Reverse)
+# Run #34: KWin's own Walk Through Windows holds the Alt+Tab grab, so our script could never get
+# it. KWin keeps the action (no dangling shortcut), but the key belongs to zaldros-switcher now.
+Walk Through Windows=none,Alt+Tab,Walk Through Windows
+Walk Through Windows (Reverse)=none,Alt+Shift+Backtab,Walk Through Windows (Reverse)
 Walk Through Windows of Current Application=Alt+`,Alt+`,Walk Through Windows of Current Application
 Show Desktop=Meta+D,Meta+D,Peek at Desktop
 Window Close=Alt+F4,Alt+F4,Close Window
@@ -469,6 +474,47 @@ Window Maximize=Meta+Up,Meta+Up,Maximize Window
 Window Minimize=Meta+Down,Meta+Down,Minimize Window
 Window Quick Tile Left=Meta+Left,Meta+Left,Quick Tile Window to the Left
 Window Quick Tile Right=Meta+Right,Meta+Right,Quick Tile Window to the Right
+
+[zaldros-switcher]
+_k_friendly_name=Zaldros switcher
+Zaldros Walk Through Windows=Alt+Tab,Alt+Tab,Zaldros: следующее окно
+Zaldros Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Zaldros: предыдущее окно
+EOF
+# kglobalaccel reads the *user's* config first and only falls back to /etc/xdg. The live user has
+# a writable home, so run #34's file in /etc/xdg alone was silently outranked by KWin's built-in
+# defaults; ship the same content in the skeleton home as well.
+install -Dm644 "$DEST/etc/xdg/kglobalshortcutsrc" "$DEST/etc/skel/.config/kglobalshortcutsrc"
+install -d "$DEST/home/ubuntu/.config"
+install -Dm644 "$DEST/etc/xdg/kglobalshortcutsrc" "$DEST/home/ubuntu/.config/kglobalshortcutsrc"
+
+# Our Alt+Tab lives in a KWin script, not in KWin's tabbox (see the file header for why).
+KWINSCRIPT_SRC="$(dirname "$0")/kwin-scripts/zaldros-switcher"
+if [[ -d "$KWINSCRIPT_SRC" ]]; then
+  install -Dm644 "$KWINSCRIPT_SRC/metadata.json" \
+    "$DEST/usr/share/kwin/scripts/zaldros-switcher/metadata.json"
+  install -Dm644 "$KWINSCRIPT_SRC/contents/code/main.js" \
+    "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code/main.js"
+else
+  echo "warning: no KWin script in $KWINSCRIPT_SRC, Alt+Tab will do nothing" >&2
+fi
+
+# Run #34: the session log was 90% one repeated line — `"applications.menu" not found in
+# QList("/etc/xdg/menus")` — printed by KService every time something asked for the application
+# menu, which pushed the real evidence out of every log tail we collect. A session with no Plasma
+# still needs the freedesktop menu file; this is the standard minimal one.
+install -Dm644 /dev/stdin "$DEST/etc/xdg/menus/applications.menu" <<'EOF'
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/menu-1.0.dtd">
+<Menu>
+  <Name>Applications</Name>
+  <Directory>Applications.directory</Directory>
+  <DefaultAppDirs/>
+  <DefaultDirectoryDirs/>
+  <DefaultMergeDirs/>
+  <Include>
+    <All/>
+  </Include>
+</Menu>
 EOF
 
 # The shell reads this file: it must never disagree with what was installed above.
