@@ -12,6 +12,14 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
   `tests/test_ui_font.py` (ADR-0011).
 
 ### Added
+- Windows 11 window decorations: the Aurorae themes from the "windows-eleven" Plasma global themes
+  (GPL-3, zayronXIO) are vendored and selected in `kwinrc`, replacing Breeze title bars on every
+  non-shell window; `kwin-style-aurorae` added to the ISO base set.
+- Icon coverage: the Windows-Eleven icon theme (~29 700 names, GPL-3) ships as the fallback parent
+  of the Zaldros icon theme.
+- `docs/PLASMA_THEME_AUDIT.md` — component-by-component audit of both Plasma global themes with
+  USE/ADAPT/REFERENCE verdicts, and `tools/visual/kns_audit.py` which resolves their KNewStuff
+  dependencies through the OCS API.
 - `tools/visual/font_match.py` — ranks candidate UI fonts against real Segoe UI text cropped from
   the reference capture.
 - Full specification PARTS 1–5 preserved in `spec/`.

@@ -61,3 +61,12 @@ behavioural reference (their GPL-2.0+ terms are compatible with our GPL-3.0-or-l
 | GPL-2.0+ / GPL-3.0 (Plasma, Papirus, launchers) | Ship source and licence; our derived code stays GPL |
 
 Every entry that moves to "used" must also be added to `THIRD_PARTY_LICENSES.md` with its version.
+
+## Run #29 — the two "windows-eleven" Plasma global themes
+
+Audited component by component in `docs/PLASMA_THEME_AUDIT.md`. Both are GPL-3.0 by zayronXIO and
+consist almost entirely of KNewStuff references to plasmashell-only content. Two parts work under
+plain KWin and are now used: the **Aurorae window decorations** (light and dark) and the
+**Windows-Eleven icon theme** as the fallback parent of ours. Everything else is REFERENCE ONLY —
+adopting it would mean adopting plasmashell, which ADR-0008 rejected.
+

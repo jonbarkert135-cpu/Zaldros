@@ -56,17 +56,33 @@ EOF
 # ------------------------------------------------------------------- our own icon theme (Zaldros)
 # Built from the icons in this repository, not from a theme pack. Freedesktop layout so every
 # toolkit (Qt, GTK, the shell's QIcon.fromTheme) resolves the same names.
+# ------------------------------------------------------------------- borrowed icon fallback pack
+# Our own set is 116 hand-picked SVGs; Dolphin, Konsole and every KDE dialog ask for thousands of
+# names we do not have and fall back to hicolor, which is mostly empty. The Windows-Eleven icon
+# theme (store.kde.org/p/1977340, GPL-3, zayronXIO) covers ~29 700 names in the Windows 11 style,
+# so it becomes the *parent* of ours: our icons win, its icons fill the gaps.
+FALLBACK_ICONS="Windows-eleven"
+ICON_PACK="$ASSETS/themes/icons/Windows-Eleven-icons-4.8.8.tar.xz"
+if [[ -f "$ICON_PACK" ]]; then
+  rm -rf "$ICONS/Windows-Eleven"
+  tar xf "$ICON_PACK" -C "$ICONS"
+  install -Dm644 "$ASSETS/themes/NOTICE.md" "$DEST/usr/share/doc/zaldros/licenses/theme-assets-NOTICE.md"
+else
+  echo "warning: no icon fallback pack at $ICON_PACK, Zaldros icons will stand alone" >&2
+  FALLBACK_ICONS="hicolor"
+fi
+
 ZICONS="$ICONS/Zaldros"
 rm -rf "$ZICONS"
 install -d "$ZICONS/apps/scalable" "$ZICONS/places/scalable" "$ZICONS/actions/scalable"
 cp "$ASSETS/icons/apps/"*.svg   "$ZICONS/apps/scalable/"
 cp "$ASSETS/icons/places/"*.svg "$ZICONS/places/scalable/"
 cp "$ASSETS/icons/fluent/"*.svg "$ZICONS/actions/scalable/"
-install -Dm644 /dev/stdin "$ZICONS/index.theme" <<'EOF'
+install -Dm644 /dev/stdin "$ZICONS/index.theme" <<EOF
 [Icon Theme]
 Name=Zaldros
 Comment=Zaldros system icons
-Inherits=hicolor
+Inherits=$FALLBACK_ICONS,hicolor
 Directories=apps/scalable,places/scalable,actions/scalable
 
 [apps/scalable]
@@ -107,6 +123,28 @@ icon_theme="Zaldros"
 scheme="prefer-dark"; [[ "$VARIANT" == "light" ]] && scheme="prefer-light"
 
 install -d "$DEST/etc/xdg" "$DEST/etc/skel/.config/gtk-3.0" "$DEST/etc/skel/.config/gtk-4.0"
+
+# --------------------------------------------------------------------- window decoration (Aurorae)
+# Aurorae is KWin's SVG decoration engine and ships in `kwin-style-aurorae` — it does *not* need
+# plasmashell, which is why this is the one part of the "windows-eleven" Plasma global themes that
+# fits our architecture. Breeze drew KDE-style title bars on every non-shell window (Dolphin,
+# Konsole); these draw Windows 11 ones with the caption buttons on the right.
+AURORAE_THEME="Windows-Eleven-Dark"
+[[ "$VARIANT" == "light" ]] && AURORAE_THEME="Windows-Eleven"
+AURORAE_SRC="$ASSETS/themes/aurorae"
+if [[ -d "$AURORAE_SRC/$AURORAE_THEME" ]]; then
+  install -d "$DEST/usr/share/aurorae/themes"
+  rm -rf "$DEST/usr/share/aurorae/themes/Windows-Eleven" \
+         "$DEST/usr/share/aurorae/themes/Windows-Eleven-Dark"
+  cp -r "$AURORAE_SRC/Windows-Eleven" "$AURORAE_SRC/Windows-Eleven-Dark" \
+        "$DEST/usr/share/aurorae/themes/"
+  decoration_library="org.kde.kwin.aurorae"
+  decoration_theme="__aurorae__svg__$AURORAE_THEME"
+else
+  echo "warning: no Aurorae theme in $AURORAE_SRC, falling back to Breeze decorations" >&2
+  decoration_library="org.kde.breeze"
+  decoration_theme=""
+fi
 
 # ------------------------------------------------------------------------------------- UI font
 # The interface is Russian, so the UI font has to *have* Cyrillic. Selawik did not (Latin-only
@@ -227,7 +265,7 @@ fi
 # Windows 11 geometry: rounded corners, blur behind panels and menus, no titlebar on maximised
 # windows. Decorations are Breeze with no border until our own Aurorae theme exists — an honest
 # placeholder, not a claim of parity (VISUAL_COMPONENT_MATRIX.md).
-install -Dm644 /dev/stdin "$DEST/etc/xdg/kwinrc" <<'EOF'
+install -Dm644 /dev/stdin "$DEST/etc/xdg/kwinrc" <<EOF
 [Compositing]
 Enabled=true
 Backend=OpenGL
@@ -248,8 +286,10 @@ NoiseStrength=2
 # decoration and its corners instead of going borderless and square.
 BorderlessMaximizedWindows=false
 
+# KWin 6 loads kdecoration3 plugins but still reads this group name (kwin/src/decorations).
 [org.kde.kdecoration2]
-library=org.kde.breeze
+library=$decoration_library
+theme=$decoration_theme
 BorderSize=None
 ButtonsOnLeft=
 ButtonsOnRight=IAX
@@ -290,6 +330,9 @@ EOF
 # The shell reads this file: it must never disagree with what was installed above.
 install -Dm644 /dev/stdin "$DEST/etc/zaldros/visual.conf" <<EOF
 icon_theme=$icon_theme
+icon_fallback=$FALLBACK_ICONS
+decoration=$decoration_library
+decoration_theme=$decoration_theme
 gtk_theme=Adwaita
 cursor_theme=$CURSOR_THEME
 font=$UI_FONT_FAMILY

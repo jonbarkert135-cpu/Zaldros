@@ -557,3 +557,40 @@ Tests: 116. Parity: 34/34 (unchanged — the geometry tokens were never the prob
 Lesson, same shape as the `kglobalacceld` path guess: a dependency that "is installed" is not a
 dependency that *works*. Check the property you actually need — here, that the font can draw the
 text — not the property that was convenient to check.
+
+## Run #29 — the Plasma "windows-eleven" themes: what could be borrowed, and what could not
+
+The maintainer sent two Look-and-Feel packages by zayronXIO with a clear instruction: prove that
+existing Plasma work cannot be used before writing more visuals ourselves.
+
+First finding: the archives contain almost nothing. A Plasma global theme is configuration — a
+panel build script, a `defaults` file, a splash, previews — and every visible asset is a KNewStuff
+dependency fetched from kde-look.org (19 products for light, 20 for dark). `tools/visual/kns_audit.py`
+resolved all of them through the OCS API; each one was downloaded and opened.
+
+Second finding: the panel script literally builds a plasmashell panel out of plasmoids (OnzeMenu,
+icontasks, systemtray, digitalclock). Zaldros replaced plasmashell with its own shell (ADR-0008),
+so most of the package cannot execute here at all — not a licensing problem, an architecture one.
+
+Third finding, the useful one: two components need KWin or freedesktop paths only.
+
+* **Aurorae decorations** (p/1977804 light, p/1984455 dark, GPL-3). Aurorae is KWin's SVG
+  decoration engine, packaged as `kwin-style-aurorae` — verified in the Ubuntu 26.04 contents
+  index rather than guessed, after the `kglobalacceld` lesson. Breeze title bars were the most
+  obviously non-Windows thing on any Dolphin window; these are Windows 11 title bars with the
+  caption buttons on the right, close 40 px wide, centred title. Both variants are vendored and
+  wired through `kwinrc` (`[org.kde.kdecoration2]` is still the config group name in KWin 6, even
+  though it loads kdecoration3 plugins).
+* **Windows-Eleven icon theme** (p/1977340, GPL-3, ~29 700 files). Our own set is 116 SVGs, so
+  every other KDE dialog fell through to an empty hicolor. The pack is now the *parent* of the
+  Zaldros theme: our icons win, its icons fill the gaps.
+
+Everything else is REFERENCE ONLY with a written reason, including the Plasma theme SVGs (they only
+render inside plasmashell's FrameSvg), OnzeMenu, the plasmoids and the wallpapers. Kvantum is a
+candidate for a later cycle: it would restyle Dolphin's widgets and needs no Plasma, but neither
+the package nor a Win11 Kvantum theme was in these archives.
+
+Gates: `tests/test_borrowed_theme.py` (6). Tests: 122. Parity: 34/34.
+
+Still open: how the Aurorae title bars actually look has to come from a booted ISO — the offscreen
+renderer draws our shell, not KWin decorations.
