@@ -284,11 +284,25 @@ Item {
         z: 40
         shown: shell.contextOpen
         items: [
-            { label: "Вид", glyph: "grid", submenu: true },
-            { label: "Сортировка", glyph: "sort", submenu: true },
+            { label: "Вид", glyph: "grid", submenu: true, children: [
+                { label: "Крупные значки", action: "view-large" },
+                { label: "Обычные значки", action: "view-medium" },
+                { label: "Мелкие значки", action: "view-small" },
+                { separator: true },
+                { label: "Упорядочить значки автоматически", action: "view-auto" }
+            ] },
+            { label: "Сортировка", glyph: "sort", submenu: true, children: [
+                { label: "Имя", action: "sort-name" },
+                { label: "Размер", action: "sort-size" },
+                { label: "Тип элемента", action: "sort-type" },
+                { label: "Дата изменения", action: "sort-date" }
+            ] },
             { label: "Обновить", glyph: "refresh", shortcut: "F5", action: "refresh" },
             { separator: true },
-            { label: "Создать", glyph: "add-circle", submenu: true },
+            { label: "Создать", glyph: "add-circle", submenu: true, children: [
+                { label: "Папку", glyph: "folder", action: "new-folder" },
+                { label: "Текстовый документ", glyph: "document", action: "new-text" }
+            ] },
             { label: "Параметры экрана", glyph: "desktop", action: "display" },
             { label: "Персонализация", glyph: "paint-brush", action: "personalize" },
             { separator: true },

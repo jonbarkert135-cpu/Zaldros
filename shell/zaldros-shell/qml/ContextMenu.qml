@@ -9,7 +9,11 @@ Item {
     property bool shown: false
     property var items: []
     property int menuWidth: 300
+    // index of the row whose submenu is open, -1 for none
+    property int openSubmenu: -1
     signal itemChosen(string action)
+
+    onShownChanged: if (!shown) openSubmenu = -1
 
     width: menuWidth
     height: column.implicitHeight + Theme.menuPadding * 2
@@ -121,7 +125,31 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         enabled: !modelData.separator
-                        onClicked: menu.itemChosen(modelData.action ? modelData.action : "")
+                        onEntered: menu.openSubmenu = modelData.submenu === true ? index : -1
+                        onClicked: {
+                            if (modelData.submenu === true)
+                                menu.openSubmenu = menu.openSubmenu === index ? -1 : index;
+                            else
+                                menu.itemChosen(modelData.action ? modelData.action : "");
+                        }
+                    }
+
+                    // Windows 11 opens the submenu flush with the parent row, slightly overlapping.
+                    // QML refuses to instantiate a component inside itself, so the submenu is
+                    // loaded by file name at runtime instead of nested statically.
+                    Loader {
+                        id: submenuLoader
+                        active: menu.openSubmenu === index && modelData.submenu === true
+                        source: "ContextMenu.qml"
+                        x: menu.menuWidth - 6
+                        y: -Theme.menuPadding
+                        z: 10
+                        onLoaded: {
+                            item.menuWidth = 220;
+                            item.items = modelData.children !== undefined ? modelData.children : [];
+                            item.shown = true;
+                            item.itemChosen.connect(menu.itemChosen);
+                        }
                     }
                 }
             }
