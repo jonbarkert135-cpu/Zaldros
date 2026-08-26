@@ -55,6 +55,11 @@ function cycle(reverse) {
         next = windows[(index - 1 + windows.length) % windows.length];
     }
     log("activating " + next.caption + " (was " + (active ? active.caption : "none") + ")");
+    if (next.minimized) {
+        // Activating a minimized window leaves it minimized in KWin; Alt+Tab in Windows 11
+        // restores it, and the boot test can only see a restored window.
+        next.minimized = false;
+    }
     workspace.activeWindow = next;
 }
 

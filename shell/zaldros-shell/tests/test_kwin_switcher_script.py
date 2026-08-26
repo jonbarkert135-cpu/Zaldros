@@ -56,11 +56,19 @@ def test_the_installer_ships_and_enables_the_script(needle):
 
 
 def test_kwin_no_longer_holds_the_alt_tab_grab():
-    # KWin registers Alt+Tab for its own action at startup; whoever asks first wins the key, so
-    # our script could never receive it while KWin's default binding stood.
-    assert "Walk Through Windows=none,Alt+Tab,Walk Through Windows" in INSTALLER
-    assert "Zaldros Walk Through Windows=Alt+Tab,Alt+Tab," in INSTALLER
-    assert "[zaldros-switcher]" in INSTALLER
+    # Run #35, measured in a booted ISO: leaving Alt+Tab as KWin's *default* while blanking only
+    # the current key restored the grab, and our action came back as ",none,". Both fields must
+    # be none.
+    assert "Walk Through Windows=none,none,Walk Through Windows" in INSTALLER
+    assert "Walk Through Windows (Reverse)=none,none," in INSTALLER
+
+
+def test_our_shortcut_lives_in_the_component_kwin_registers_into():
+    # KWin script actions register into kglobalaccel's "kwin" component; a [zaldros-switcher]
+    # group only created a phantom component with no action behind it.
+    kwin_group = INSTALLER.split("[kwin]", 1)[1].split("EOF", 1)[0]
+    assert "Zaldros Walk Through Windows=Alt+Tab,Alt+Tab," in kwin_group
+    assert "[zaldros-switcher]" not in INSTALLER
 
 
 def test_the_shortcut_config_reaches_the_live_user():
@@ -73,9 +81,19 @@ def test_the_shortcut_config_reaches_the_live_user():
 def test_the_boot_can_fire_the_shortcut_without_a_keyboard():
     selftest = (REPO / "build" / "iso" / "selftest.py").read_text()
     assert "def invoke_and_watch" in selftest
-    assert "org.kde.KGlobalAccel.invokeShortcut" in selftest
+    assert "org.kde.kglobalaccel.Component.invokeShortcut" in selftest
+    assert "/component/{component}" in selftest        # the method does not exist on /kglobalaccel
+    assert "def shortcut_lines" in selftest            # and read the whole config, not its tail
     assert "def kwin_environ" in selftest              # and prove the logging rules got through
 
 
 def test_the_session_log_is_not_drowned_by_the_missing_menu_file():
     assert "etc/xdg/menus/applications.menu" in INSTALLER
+
+
+def test_the_switch_restores_a_minimized_window():
+    # Run #35 boot log: the second window was minimized when Alt+Tab fired, and activating a
+    # minimized window in KWin leaves it minimized — invisible to the screen comparison and to
+    # the person pressing the key.
+    js = MAIN_JS.read_text()
+    assert "next.minimized = false" in js

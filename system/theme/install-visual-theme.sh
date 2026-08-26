@@ -463,10 +463,15 @@ fi
 install -Dm644 /dev/stdin "$DEST/etc/xdg/kglobalshortcutsrc" <<'EOF'
 [kwin]
 _k_friendly_name=KWin
-# Run #34: KWin's own Walk Through Windows holds the Alt+Tab grab, so our script could never get
-# it. KWin keeps the action (no dangling shortcut), but the key belongs to zaldros-switcher now.
-Walk Through Windows=none,Alt+Tab,Walk Through Windows
-Walk Through Windows (Reverse)=none,Alt+Shift+Backtab,Walk Through Windows (Reverse)
+# Run #35, measured: our KWin script registers its actions in kglobalaccel's *kwin* component, and
+# the live file came back with "Zaldros Walk Through Windows=,none," while KWin's own action still
+# held Alt+Tab (allShortcutInfos: 150994945). Writing "none" only in the current-key field left the
+# default Alt+Tab in place and it was restored; both fields must be none for the key to be free,
+# and our own action has to sit in this same [kwin] group to be autoloaded.
+Walk Through Windows=none,none,Walk Through Windows
+Walk Through Windows (Reverse)=none,none,Walk Through Windows (Reverse)
+Zaldros Walk Through Windows=Alt+Tab,Alt+Tab,Zaldros: следующее окно
+Zaldros Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Zaldros: предыдущее окно
 Walk Through Windows of Current Application=Alt+`,Alt+`,Walk Through Windows of Current Application
 Show Desktop=Meta+D,Meta+D,Peek at Desktop
 Window Close=Alt+F4,Alt+F4,Close Window
@@ -474,12 +479,10 @@ Window Maximize=Meta+Up,Meta+Up,Maximize Window
 Window Minimize=Meta+Down,Meta+Down,Minimize Window
 Window Quick Tile Left=Meta+Left,Meta+Left,Quick Tile Window to the Left
 Window Quick Tile Right=Meta+Right,Meta+Right,Quick Tile Window to the Right
-
-[zaldros-switcher]
-_k_friendly_name=Zaldros switcher
-Zaldros Walk Through Windows=Alt+Tab,Alt+Tab,Zaldros: следующее окно
-Zaldros Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Zaldros: предыдущее окно
 EOF
+# No group of our own: kglobalaccel turns every group into a component, and run #35 found
+# the phantom /component/zaldros_switcher there with no action behind it while the real actions
+# lived under [kwin]. One home for the shortcut, the one KWin actually registers into.
 # kglobalaccel reads the *user's* config first and only falls back to /etc/xdg. The live user has
 # a writable home, so run #34's file in /etc/xdg alone was silently outranked by KWin's built-in
 # defaults; ship the same content in the skeleton home as well.

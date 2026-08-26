@@ -196,11 +196,15 @@ def switcher():
     # Application" entry instead and proved nothing about Alt+Tab.
     walk = ""
     walk_exact = ""
+    zaldros_action = ""
     for part in shortcut.split("('"):
         if part.startswith("Walk Through Windows"):
             walk = walk or part[:400]
             if part.startswith("Walk Through Windows', "):
                 walk_exact = part[:400]
+        # Our own action registers into this same component; its key list is the whole question.
+        if part.startswith("Zaldros Walk Through Windows', "):
+            zaldros_action = part[:400]
     # Ask kglobalaccel to fire KWin's own shortcut. If this errors, the key never had a chance and
     # the layout is innocent; if it succeeds while Alt+Tab still does nothing, the input path is
     # the suspect. Either way the answer is recorded, not guessed.
@@ -234,6 +238,7 @@ def switcher():
         "all_shortcut_infos_error": shortcut[:300] if not walk else "",
         "walk_through_windows": walk,
         "walk_through_windows_exact": walk_exact,
+        "zaldros_action": zaldros_action,
         "kwin_journal": sh("sh", "-c",
                            "journalctl -b --no-pager | grep -iE 'tabbox|switcher|kwin_tabbox' | tail -n 20"),
     }
@@ -266,7 +271,25 @@ def kwin_environ(name):
     return f"{name} not set for kwin"
 
 
-def invoke_and_watch(action="Zaldros Walk Through Windows", component="zaldros-switcher"):
+def shortcut_lines(pattern="Walk Through"):
+    """Every configured shortcut line matching pattern, from the file kglobalaccel actually uses.
+
+    Run #35 read only the tail of that file and could not see whether KWin's own Alt+Tab entry
+    had survived; the answer to "who holds the key" must never depend on a byte budget.
+    """
+    out = {}
+    for path in ("/home/ubuntu/.config/kglobalshortcutsrc", "/etc/xdg/kglobalshortcutsrc"):
+        try:
+            text = Path(path).read_text(errors="replace")
+        except OSError as exc:
+            out[path] = f"ERROR: {exc}"
+            continue
+        out[path] = [line for line in text.splitlines()
+                     if pattern.lower() in line.lower() or line.startswith("[")][:60]
+    return out
+
+
+def invoke_and_watch(action="Zaldros Walk Through Windows", component="kwin"):
     """Fire the switch over D-Bus and report exactly what the session log gained.
 
     This separates the two ways Alt+Tab can be broken: the key never reaching a shortcut, or the
@@ -274,9 +297,12 @@ def invoke_and_watch(action="Zaldros Walk Through Windows", component="zaldros-s
     """
     log = Path("/tmp/zaldros-session.log")
     before = log.stat().st_size if log.is_file() else 0
+    # Run #35: /kglobalaccel has no invokeShortcut. The method lives on the *component* object
+    # (org.kde.kglobalaccel.Component), and our action registers into the kwin component, so that
+    # is the only address that can fire it.
     reply = user_sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
-                    "--object-path", "/kglobalaccel", "--method",
-                    "org.kde.KGlobalAccel.invokeShortcut", component, action, "default")
+                    "--object-path", f"/component/{component}", "--method",
+                    "org.kde.kglobalaccel.Component.invokeShortcut", action)
     time.sleep(1.5)
     after = ""
     if log.is_file():
@@ -308,6 +334,7 @@ def late_report():
                                "ls -d /usr/lib/x86_64-linux-gnu/qt6/qml/QtQuick* 2>&1 | head -n 20"),
         "kwin_scripts_installed": sh("sh", "-c", "ls /usr/share/kwin/scripts 2>&1"),
         "user_shortcuts_file": tail_file("/home/ubuntu/.config/kglobalshortcutsrc", 1200),
+        "shortcut_lines": shortcut_lines(),
         "switcher": switcher(),
     }
 

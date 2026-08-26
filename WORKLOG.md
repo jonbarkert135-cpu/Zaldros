@@ -777,3 +777,40 @@ drew nothing" — and `/etc/xdg/menus/applications.menu` now exists, because 90 
 was one repeated `"applications.menu" not found` line pushing the real evidence out of every tail.
 
 Tests: 178.
+
+### Run #35: who actually holds Alt+Tab, measured in the running system
+
+The KWin script from run #34 loaded — `js: ZALDROS-SWITCHER loaded, windows=0` is in the session
+log — and the key still did nothing: `alt_tab` FAIL, `switcher_fraction` 0.0, `switched_fraction`
+0.0, the frames byte-identical. This time the boot could say why, because kglobalaccel was asked
+instead of guessed:
+
+* `allShortcutInfos` on `/component/kwin` reported KWin's own **Walk Through Windows** still bound
+  to `150994945` (Alt+Tab) and `285212673` (Meta+Tab), even though `/etc/xdg/kglobalshortcutsrc`
+  and both user copies said `Walk Through Windows=none,Alt+Tab,…`. Blanking only the *current*
+  field leaves the default in place and the default is what came back.
+* The live `~/.config/kglobalshortcutsrc` had our action written into the **`[kwin]`** group as
+  `Zaldros Walk Through Windows=,none,` — no keys. A KWin script registers into kglobalaccel's
+  `kwin` component, so our separate `[zaldros-switcher]` group was never its home; it only created
+  the phantom component `/component/zaldros_switcher` that `allComponents` now shows, with no
+  action behind it. The conflict with KWin's live Alt+Tab is what emptied our binding.
+* Firing KWin's own shortcut over D-Bus succeeded (`()`) and produced **zero** tabbox lines with
+  `kwin_tabbox.debug=true` confirmed present in kwin's own `/proc/<pid>/environ`. KWin's tabbox is
+  not slow or mis-themed here; it does nothing at all. ADR-0012 stands.
+* Our probe call itself was wrong and said so: `invokeShortcut` does not exist on `/kglobalaccel`,
+  only on `/component/<name>` (`org.kde.kglobalaccel.Component`). Fixed, and the report now dumps
+  every `Walk Through` line of both config files instead of the last 1200 bytes.
+
+So the fix is small and entirely in configuration: both fields `none` for KWin's two actions, our
+two actions seeded inside `[kwin]` where they are autoloaded, and no group of our own. The script
+also un-minimises the window it activates — the boot log shows Dolphin was minimised when Alt+Tab
+fired, and KWin leaves an activated window minimised, which no person and no screen comparison
+would ever call a switch.
+
+Also from this run, from the public Windows 11 reference library: the desktop context menu was
+drawing «Показать дополнительные параметры» straight through «Shift+F10». Windows 11 grows a menu
+to its widest row; ours was pinned at 300 px whatever the language. `ContextMenu` now measures its
+content (`TextMetrics`, the same row arithmetic the delegate uses) with 300 px as the floor, the
+reference records `min_width` instead of `width`, parity gained a `min` comparator, and
+`test_context_menu_fit.py` renders the menu and demands a real background gutter before the
+shortcut column — a pixel gate, not a re-run of the layout maths.
