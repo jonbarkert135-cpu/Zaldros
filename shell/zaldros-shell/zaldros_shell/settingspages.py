@@ -269,7 +269,8 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
     page("start", "Пуск", "grid", "personalisation", [
         Entry("Закреплённые приложения", "Сетка Пуска", "grid", "18"),
-        Entry("Недавние файлы", "Показывать в разделе «Рекомендуем»", "document", "", toggle=True),
+        Entry("Недавние файлы", "Показывать в разделе «Рекомендуем»", "document", "",
+              toggle=switches["start.recent"], pref="start.recent"),
     ])
     page("taskbar", "Панель задач", "taskview", "personalisation", [
         Entry("Выравнивание", "Положение группы значков", "taskview", "По центру"),

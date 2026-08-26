@@ -29,6 +29,11 @@ Item {
     Behavior on opacity { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutCubic } }
     Behavior on y { NumberAnimation { duration: Theme.animSlow; easing.type: Easing.OutCubic } }
 
+    // Settings > Персонализация > Пуск writes these; a switch that changes nothing is worse than
+    // no switch at all (see zaldros_shell/prefs.py).
+    property var prefValues: (typeof prefs !== "undefined" && prefs && prefs.values) ? prefs.values : ({})
+    function shown_(key) { return prefValues[key] !== false }
+
     property bool allApps: false
     onShownChanged: { if (!shown) { allApps = false; selectedIndex = -1 } }
 
@@ -190,7 +195,7 @@ Item {
         // --- recommended ---------------------------------------------------------------------
         Item {
             id: recommendedHeader
-            visible: !start.allApps
+            visible: !start.allApps && start.shown_("start.recent")
             x: Theme.startPadding
             width: parent.width - Theme.startPadding * 2
             anchors.top: pinnedGrid.bottom
@@ -210,7 +215,7 @@ Item {
         // found the section says so — it is never filled with sample documents.
         Grid {
             id: recommended
-            visible: !start.allApps
+            visible: !start.allApps && start.shown_("start.recent")
             x: Theme.startPadding
             anchors.top: recommendedHeader.bottom
             anchors.topMargin: 8
@@ -264,7 +269,8 @@ Item {
         }
 
         Text {
-            visible: !start.allApps && (!start.recent || start.recent.count === 0)
+            visible: !start.allApps && start.shown_("start.recent")
+                     && (!start.recent || start.recent.count === 0)
             x: Theme.startPadding
             anchors.top: recommendedHeader.bottom
             anchors.topMargin: 16

@@ -23,6 +23,7 @@ DEFAULTS: dict[str, bool] = {
     "taskbar.clock": True,         # the clock in the tray
     "visual.transparency": True,   # translucent panels and menus
     "visual.animations": True,     # transitions in the shell
+    "start.recent": True,          # the "Рекомендуем" section in the Start panel
 }
 
 

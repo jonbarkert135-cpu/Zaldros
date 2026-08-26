@@ -73,3 +73,15 @@ def test_the_taskbar_hides_what_the_user_switched_off() -> None:
     assert 'typeof prefs !== "undefined"' in qml, (
         "the renderer loads the taskbar without the shell context; it must still draw"
     )
+
+
+def test_start_hides_its_recommendations_when_the_switch_is_off() -> None:
+    """Персонализация > Пуск > «Недавние файлы» is a real switch: it must reach the section it
+    names, header and empty state included, or the Start panel keeps a stray heading."""
+    qml = (Path(__file__).resolve().parents[1] / "qml" / "StartMenu.qml").read_text(encoding="utf-8")
+    assert qml.count('shown_("start.recent")') == 3, (
+        "the header, the grid and the empty-state text all belong to that section"
+    )
+    assert 'typeof prefs !== "undefined"' in qml, (
+        "the offscreen renderer has no prefs context; Start must still draw"
+    )
