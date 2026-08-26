@@ -13,21 +13,20 @@ Item {
     id: settings
     property var host: null
     property var system: null
+    property var tree: null
+    // `page` stays an index into the rail so the renderer and the UI test can select a category;
+    // `stack` is the nested path inside it, exactly like the back arrow in Windows 11 Settings.
     property int page: 0
+    property var stack: []
+    property var railItems: tree ? tree.rail : []
+    readonly property string currentId: stack.length > 0 ? stack[stack.length - 1]
+                                        : (railItems && railItems.length > page ? railItems[page].id : "home")
+    readonly property var current: tree ? tree.page(currentId) : ({ title: "", entries: [] })
 
-    readonly property var pages: [
-        { title: "Главная",              glyph: "home" },
-        { title: "Система",              glyph: "desktop" },
-        { title: "Bluetooth и устройства", glyph: "bluetooth" },
-        { title: "Сеть и Интернет",      glyph: "globe" },
-        { title: "Персонализация",       glyph: "paint-brush" },
-        { title: "Приложения",           glyph: "apps" },
-        { title: "Учётные записи",       glyph: "person" },
-        { title: "Время и язык",         glyph: "clock" },
-        { title: "Специальные возможности", glyph: "accessibility" },
-        { title: "Конфиденциальность и защита", glyph: "shield" },
-        { title: "О системе",            glyph: "info" }
-    ]
+    function openPage(id) { var next = stack.slice(); next.push(id); stack = next }
+    function goBack() { var next = stack.slice(); next.pop(); stack = next }
+    function selectRail(index) { page = index; stack = [] }
+
 
     function reading(key) {
         var value = settings.host ? settings.host.value(key) : "";
@@ -111,7 +110,7 @@ Item {
             x: 12
             spacing: 2
             Repeater {
-                model: settings.pages
+                model: settings.railItems
                 delegate: Rectangle {
                     width: rail.width - 24
                     height: 36
@@ -149,7 +148,7 @@ Item {
                         id: navArea
                         anchors.fill: parent
                         hoverEnabled: true
-                        onClicked: settings.page = index
+                        onClicked: settings.selectRail(index)
                     }
                 }
             }
@@ -175,17 +174,39 @@ Item {
             width: body.width - 96
             spacing: 16
 
-            Text {
-                text: settings.pages[settings.page].title
-                color: Theme.textPrimary
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontPageTitle
-                font.weight: Font.DemiBold
+            // back arrow, shown only inside a nested page
+            Row {
+                spacing: 12
+                Rectangle {
+                    visible: settings.stack.length > 0
+                    width: 32; height: 32; radius: Theme.radiusSmall
+                    color: backArea.containsMouse ? Theme.hover : "transparent"
+                    SysIcon {
+                        anchors.centerIn: parent
+                        glyph: "arrow-left"; width: 16; height: 16
+                        color: Theme.textPrimary
+                    }
+                    MouseArea {
+                        id: backArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: settings.goBack()
+                    }
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: settings.current.title
+                    color: Theme.textPrimary
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontPageTitle
+                    font.weight: Font.DemiBold
+                }
             }
 
             // device banner, shown on Главная / Система / О системе like Windows does
             Row {
-                visible: settings.page === 0 || settings.page === 1 || settings.page === 10
+                visible: settings.currentId === "home" || settings.currentId === "system"
+                         || settings.currentId === "about"
                 spacing: 20
                 Rectangle {
                     width: 124; height: 76
@@ -226,77 +247,61 @@ Item {
 
             // page cards
             Repeater {
-                model: settings.cards(settings.page)
-                delegate: SettingsCard {
+                model: settings.current.entries
+                delegate: Column {
                     width: pageColumn.width
+                    spacing: 8
+                    // Windows breaks long pages into named sections; ours carries the same headings
+                    Text {
+                        visible: modelData.group !== ""
+                        text: modelData.group
+                        color: Theme.textPrimary
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontBody
+                        font.weight: Font.DemiBold
+                        topPadding: index === 0 ? 0 : 12
+                    }
+                    SettingsCard {
+                    width: parent.width
                     glyph: modelData.glyph
                     title: modelData.title
-                    detail: modelData.detail
-                    value: modelData.value !== undefined ? modelData.value : ""
+                    detail: modelData.subtitle
+                    value: modelData.value
+                    hasToggle: modelData.hasToggle
+                    toggled: modelData.toggle
+                    navigable: modelData.page !== "" || modelData.url !== ""
+                    onTriggered: {
+                        if (modelData.page !== "") settings.openPage(modelData.page);
+                        else if (modelData.url !== "") Qt.openUrlExternally(modelData.url);
+                    }
+                    }
+                }
+            }
+
+            // Windows ends its pages with a help link; ours points at the project's issue tracker,
+            // which is the only place help for this system actually exists.
+            Row {
+                spacing: 10
+                Item { width: 1; height: 1 }
+                SysIcon {
+                    glyph: "info"; width: 16; height: 16
+                    color: Theme.accent
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Получить помощь"
+                    color: Theme.accent
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontCaption + 1
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Qt.openUrlExternally(settings.tree ? settings.tree.helpUrl : "")
+                    }
                 }
             }
         }
     }
 
-    // Card contents per page. Values marked with reading() come from this machine; pages whose
-    // backend does not exist yet say so in their own words instead of showing invented switches.
-    function cards(index) {
-        if (index === 0) return [
-            { glyph: "desktop", title: "Система", detail: "Дисплей, звук, питание, память", value: reading("osName") },
-            { glyph: "globe", title: "Сеть и Интернет", detail: settings.system ? settings.system.networkDetail : "", value: "" },
-            { glyph: "person", title: "Учётные записи", detail: "Текущий сеанс", value: settings.system ? settings.system.userName : "" },
-            { glyph: "clock", title: "Время и язык", detail: reading("timezone"), value: reading("localTime") }
-        ];
-        if (index === 1) return [
-            { glyph: "desktop", title: "Дисплей", detail: "Сеанс " + reading("sessionType"), value: "" },
-            { glyph: "speaker", title: "Звук", detail: settings.system ? settings.system.volumeDetail : "", value: "" },
-            { glyph: "bell", title: "Уведомления", detail: "Оповещения приложений и системы", value: "" },
-            { glyph: "power", title: "Питание и батарея", detail: settings.system ? settings.system.batteryDetail : "", value: "" },
-            { glyph: "hard-drive", title: "Память", detail: "Занято на системном диске", value: reading("diskUsed") + " из " + reading("diskTotal") },
-            { glyph: "info", title: "Оперативная память", detail: "Используется сейчас", value: reading("memoryUsed") + " из " + reading("memoryTotal") }
-        ];
-        if (index === 2) return [
-            { glyph: "bluetooth", title: "Bluetooth", detail: settings.system ? settings.system.bluetoothDetail : "", value: "" },
-            { glyph: "keyboard", title: "Клавиатура", detail: settings.system ? settings.system.keyboardDetail : "", value: settings.system ? settings.system.keyboardLayout : "" },
-            { glyph: "phone", title: "Устройства", detail: "Подключённые устройства перечисляет ядро", value: "" }
-        ];
-        if (index === 3) return [
-            { glyph: "wifi", title: "Состояние", detail: settings.system ? settings.system.networkDetail : "", value: "" },
-            { glyph: "ethernet", title: "Ethernet", detail: "Интерфейсы читаются из /sys/class/net", value: "" },
-            { glyph: "vpn", title: "VPN", detail: "Профили не настроены", value: "" }
-        ];
-        if (index === 4) return [
-            { glyph: "image", title: "Фон", detail: "Обои Zaldros", value: "" },
-            { glyph: "paint-brush", title: "Цвета", detail: "Тема оформления", value: Theme.dark ? "Тёмная" : "Светлая" },
-            { glyph: "dark-theme", title: "Темы", detail: "Оформление окон и панели", value: "Zaldros" }
-        ];
-        if (index === 5) return [
-            { glyph: "apps", title: "Установленные приложения", detail: "Найдено по файлам .desktop", value: "" },
-            { glyph: "add-circle", title: "Приложения по умолчанию", detail: "Обработчики типов файлов", value: "" }
-        ];
-        if (index === 6) return [
-            { glyph: "person", title: "Ваши данные", detail: "Локальная учётная запись", value: settings.system ? settings.system.userName : "" },
-            { glyph: "shield", title: "Варианты входа", detail: "Пароль сеанса", value: "" }
-        ];
-        if (index === 7) return [
-            { glyph: "clock", title: "Дата и время", detail: reading("timezone"), value: reading("localTime") },
-            { glyph: "globe", title: "Язык и регион", detail: "Интерфейс", value: "Русский" }
-        ];
-        if (index === 8) return [
-            { glyph: "accessibility", title: "Размер текста", detail: "Масштаб интерфейса", value: "100 %" },
-            { glyph: "brightness", title: "Контрастные темы", detail: "Не включены", value: "" }
-        ];
-        if (index === 9) return [
-            { glyph: "shield", title: "Безопасность", detail: "Обновления и права доступа", value: "" },
-            { glyph: "info", title: "Диагностика", detail: "Телеметрия не собирается", value: "" }
-        ];
-        return [
-            { glyph: "desktop", title: "Имя устройства", detail: "", value: reading("deviceName") },
-            { glyph: "info", title: "Выпуск", detail: "", value: reading("osName") },
-            { glyph: "hard-drive", title: "Ядро", detail: reading("architecture"), value: reading("kernel") },
-            { glyph: "apps", title: "Процессор", detail: reading("cpuCores") + " потоков", value: reading("cpuModel") },
-            { glyph: "info", title: "Оперативная память", detail: "Всего", value: reading("memoryTotal") },
-            { glyph: "clock", title: "Время работы", detail: "С момента загрузки", value: reading("uptime") }
-        ];
-    }
 }

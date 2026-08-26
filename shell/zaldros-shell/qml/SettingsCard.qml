@@ -9,7 +9,11 @@ Item {
     property string title: ""
     property string detail: ""
     property string value: ""
+    property bool hasToggle: false      // a real switch, not decoration
+    property bool toggled: false
+    property bool navigable: true       // chevron only when the row opens another page
     signal triggered()
+    signal toggledChanged2()
 
     height: 74
 
@@ -67,7 +71,24 @@ Item {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontCaption
         }
+        // Windows 11 switch: 40x20 track, 12 px knob that slides to the right when on.
+        Rectangle {
+            visible: card.hasToggle
+            anchors.verticalCenter: parent.verticalCenter
+            width: 40; height: 20; radius: 10
+            color: card.toggled ? Theme.accent : "transparent"
+            border.width: card.toggled ? 0 : 1
+            border.color: Theme.textSecondary
+            Rectangle {
+                width: 12; height: 12; radius: 6
+                y: 4
+                x: card.toggled ? parent.width - width - 4 : 4
+                color: card.toggled ? "#ffffff" : Theme.textSecondary
+                Behavior on x { NumberAnimation { duration: Theme.animFast } }
+            }
+        }
         SysIcon {
+            visible: card.navigable
             anchors.verticalCenter: parent.verticalCenter
             glyph: "chevron-right"
             width: 12; height: 12

@@ -19,7 +19,7 @@ from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
-from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, RecentModel, WeatherState,
+from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, RecentModel, SettingsTree, WeatherState,
                     ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
@@ -62,6 +62,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     recent_model = RecentModel()
     host_info = HostInfo()
     weather_state = WeatherState(fetch=tick)
+    settings_tree = SettingsTree()
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
     context.setContextProperty("installedModel", installed)
@@ -71,6 +72,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("recentModel", recent_model)
     context.setContextProperty("hostInfo", host_info)
     context.setContextProperty("weatherState", weather_state)
+    context.setContextProperty("settingsTree", settings_tree)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
     context.setContextProperty(
@@ -80,7 +82,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
         errors = "\n".join(str(error.toString()) for error in view.errors())
         raise RuntimeError(f"QML failed to load:\n{errors}")
     return view, [model, installed, state, system_state, file_model, recent_model, host_info,
-                  weather_state]
+                  weather_state, settings_tree]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
@@ -106,6 +108,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     root.setProperty("notificationsOpen", notifications_open)
     root.setProperty("contextOpen", context_open)
     root.setProperty("focusedWindow", focused_window)
+    root.setProperty("settingsPage", settings_page)
     view.show()
     result: dict[str, bool] = {}
 

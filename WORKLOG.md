@@ -472,3 +472,33 @@ Fix in this commit, three parts because all three must hold:
 `tests/test_iso_packages.py::test_alt_tab_is_wired_end_to_end` asserts all three so this cannot
 regress quietly. The switcher's own skin is still KWin's, not a Windows 11 one — that is on the
 cycle 3 list, together with Explorer file operations and nested Settings pages.
+
+## Run #28 — the taskbar and Settings measured against the second reference set
+
+The maintainer sent a full-width taskbar capture, the keyboard-layout flyout, Quick Settings and
+ten Settings pages (all at 125 %). Measured, then deleted: only numbers reached the repository.
+
+Taskbar, from measurement rather than memory:
+
+* the search pill is **220** logical pixels wide, not 200;
+* the bar is a flat **#212121** with a 1 px lighter top edge — no wallpaper showing through, so
+  the 95 % alpha fill is gone;
+* Windows keeps a **handful** of pins on the bar. Ours showed all eighteen, which was the single
+  biggest reason the screenshot did not read as Windows. `pinned.json` now marks the six that
+  live on the bar; Start still shows the whole set;
+* the left end carries a weather widget: 24 px icon at x=20 and two text lines. `weather.py`
+  fetches it from Open-Meteo using `/etc/zaldros/weather.conf`; with no config or no network the
+  widget says so instead of inventing a temperature.
+
+Settings became a real tree instead of one flat list per category. `settingspages.py` holds the
+Windows 11 information architecture — 65 pages, every row either navigating somewhere real or
+showing a reading — and `SettingsTree` hands it to QML, which now has a back arrow, nested pages,
+section headings ("Зрение", "Слух", "Взаимодействие") and Windows-style switches.
+
+Deliberately dropped, because Raven has no counterpart and a dead row is worse than no row:
+activation, OneDrive, Microsoft accounts, subscriptions, payments, order history.
+`tests/test_settings_tree.py` fails if any of them comes back, if a row leads to a page that does
+not exist, or if a page becomes unreachable from the rail. "Получить помощь" opens this
+repository's issue tracker.
+
+Parity: 34/34 (four new taskbar checks). Tests: 67.

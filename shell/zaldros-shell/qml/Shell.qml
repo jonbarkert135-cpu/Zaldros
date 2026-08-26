@@ -17,6 +17,7 @@ Item {
     height: 1000
 
     property bool startOpen: false
+    property int settingsPage: 1        // rail index the renderer opens Settings on
     property bool quickOpen: false
     property bool searchOpen: false
     property bool notificationsOpen: false
@@ -187,9 +188,12 @@ Item {
         onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "settings", false)
 
         Settings {
+            id: settingsApp
             anchors.fill: parent
             host: shell.backendHost
             system: shell.backendSystem
+            tree: settingsTree
+            page: shell.settingsPage
         }
     }
 

@@ -12,7 +12,7 @@ from PySide6.QtCore import (
 
 from .backend import AppEntry, format_clock, load_pinned, memory_percent, read_running_commands
 from .desktop_entries import DesktopApp, discover, launch
-from . import files, hostinfo, system, weather
+from . import files, hostinfo, settingspages, system, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
@@ -471,3 +471,31 @@ class WeatherState(QObject):
     @Property(str, notify=changed)
     def detail(self) -> str:
         return self._reading.detail
+
+
+class SettingsTree(QObject):
+    """The Settings information architecture (settingspages.py) as plain data for QML."""
+
+    changed = Signal()
+
+    def __init__(self, pages: dict | None = None) -> None:
+        super().__init__()
+        self._pages = pages if pages is not None else settingspages.to_variant(settingspages.build())
+
+    @Slot()
+    def refresh(self) -> None:
+        self._pages = settingspages.to_variant(settingspages.build())
+        self.changed.emit()
+
+    @Slot(str, result="QVariantMap")
+    def page(self, page_id: str) -> dict:
+        return self._pages.get(page_id, {"id": page_id, "title": "", "parent": "", "entries": []})
+
+    @Property("QVariantList", notify=changed)
+    def rail(self) -> list:
+        return [{"id": pid, "title": self._pages[pid]["title"], "glyph": self._pages[pid]["glyph"]}
+                for pid in settingspages.RAIL if pid in self._pages]
+
+    @Property(str, constant=True)
+    def helpUrl(self) -> str:  # noqa: N802
+        return settingspages.HELP_URL
