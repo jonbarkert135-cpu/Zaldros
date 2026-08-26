@@ -59,3 +59,23 @@ def test_alt_tab_is_wired_end_to_end() -> None:
     assert "Walk Through Windows=Alt+Tab" in theme, (
         "kglobalshortcutsrc must bind Alt+Tab to the KWin window walker"
     )
+
+
+def test_the_image_can_interrogate_its_own_shortcut_daemon() -> None:
+    """Run #30 failed Alt+Tab again with no way to tell which link in the chain broke. The image
+    now carries gdbus so the self-test can ask kglobalaccel what KWin actually registered."""
+    build = BUILD.read_text()
+    assert "libglib2.0-bin" in build, "the self-test's D-Bus probe needs gdbus in the image"
+    selftest = (REPO / "build" / "iso" / "selftest.py").read_text()
+    assert "/usr/share/kwin/tabbox/zaldros" in selftest, (
+        "the self-test must report whether our switcher package reached the image"
+    )
+    assert "Walk Through Windows" in selftest, (
+        "the self-test must report whether the daemon knows KWin's own shortcut"
+    )
+
+
+def test_the_switcher_package_is_installed_by_the_theme_installer() -> None:
+    theme = THEME.read_text()
+    assert "/usr/share/kwin/tabbox/zaldros" in theme, "the layout must be installed where KWin looks"
+    assert "LayoutName=zaldros" in theme, "and selected in kwinrc"

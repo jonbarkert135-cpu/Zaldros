@@ -112,6 +112,12 @@ step apt-accel chroot "$ROOT" sh -c 'DEBIAN_FRONTEND=noninteractive apt-get inst
   || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kglobalaccel-bin \
   || echo "no global shortcut daemon available in this suite"'
 
+# The self-test asks kglobalaccel over D-Bus what shortcuts KWin registered, which needs gdbus
+# (libglib2.0-bin). Without it the switcher probe would report "no answer" and we would be
+# diagnosing our own missing tool instead of the desktop.
+step apt-dbus chroot "$ROOT" sh -c 'DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  --no-install-recommends libglib2.0-bin || echo "no gdbus in this suite"'
+
 # Run #28: the package installed but the session found no binary - KF6 ships kglobalacceld under a
 # multiarch libexec directory, not /usr/bin - so Alt+Tab stayed dead. Ask dpkg where the binary
 # really is and bake that path into the image instead of guessing at boot.

@@ -30,6 +30,11 @@ class QMP:
                   for d in (True, False) for k in (keys if d else reversed(keys))]
         self.cmd("input-send-event", events=events)
 
+    def key_state(self, key, down):
+        """One key down or up, so a modifier can be *held* across screenshots."""
+        self.cmd("input-send-event", events=[
+            {"type": "key", "data": {"down": down, "key": {"type": "qcode", "data": key}}}])
+
     def click(self, x, y, width, height):
         absolute = lambda v, span: int(v / span * 0x7FFF)
         self.cmd("input-send-event", events=[
@@ -84,6 +89,49 @@ def timed_step(qmp, out, name, action, settle=1.5):
     return {"status": "PASS" if changed else "FAIL", "seconds": elapsed,
             "screen_changed": changed, "changed_fraction": fraction,
             "screenshot": after.name}
+
+
+def alt_tab_step(qmp, out, settle=1.2):
+    """Alt+Tab the way a person does it: hold Alt, tap Tab, *look at the screen*, then let go.
+
+    Run #29 pressed and released in one batch and could only see the aftermath, which made a
+    switcher that never drew indistinguishable from one that drew and vanished. Two measurements
+    are taken instead: `switcher_fraction` with Alt still held (did the switcher appear?) and
+    `switched_fraction` after release (did the window actually change?).
+    """
+    before = out / "alt_tab-before.ppm"
+    held = out / "alt_tab-held.ppm"
+    after = out / "alt_tab-after.ppm"
+    qmp.screendump(before)
+    started = time.monotonic()
+    qmp.key_state("alt_l", True)
+    time.sleep(0.2)
+    qmp.key_state("tab", True)
+    qmp.key_state("tab", False)
+    time.sleep(settle)
+    qmp.screendump(held)
+    qmp.key_state("alt_l", False)
+    time.sleep(settle)
+    qmp.screendump(after)
+    elapsed = round(time.monotonic() - started, 3)
+    try:
+        showed = changed_fraction(before, held)
+        switched = changed_fraction(before, after)
+    except Exception as exc:                                # noqa: BLE001 - reported, not hidden
+        return {"status": "FAIL", "error": str(exc)}
+    ok = switched >= CHANGE_THRESHOLD or showed >= CHANGE_THRESHOLD
+    return {
+        "status": "PASS" if ok else "FAIL",
+        "seconds": elapsed,
+        "switcher_visible": showed >= CHANGE_THRESHOLD,
+        "switcher_fraction": showed,
+        "switched": switched >= CHANGE_THRESHOLD,
+        "switched_fraction": switched,
+        "screenshot": after.name,
+        "held_screenshot": held.name,
+        "note": ("measured with the guest's Dolphin window open. The held frame shows the switcher "
+                 "itself; the after frame shows whether the window really changed."),
+    }
 
 
 def hit_boxes(serial_path):
@@ -151,10 +199,7 @@ def main():
     # FAIL for a shortcut that may well have worked. With no second window the honest answer is
     # BLOCKED, not FAIL.
     if start:
-        results["alt_tab"] = timed_step(qmp, out, "alt_tab", lambda: qmp.key("alt_l", "tab"))
-        results["alt_tab"]["note"] = ("measured with the guest's Dolphin window open; a pass means "
-                                      "the frame changed, i.e. the switcher appeared or the "
-                                      "stacking order changed")
+        results["alt_tab"] = alt_tab_step(qmp, out)
     else:
         results["alt_tab"] = {
             "status": "BLOCKED",

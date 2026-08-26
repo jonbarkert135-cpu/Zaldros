@@ -124,6 +124,57 @@ def visual_layer():
     }
 
 
+def switcher():
+    """Facts about the Alt+Tab path, because three runs in a row failed it for three different
+    reasons and each diagnosis cost a 45-minute image build.
+
+    Nothing here is inferred: what is on disk, what the configuration says, and what
+    kglobalaccel reports about KWin's own shortcut."""
+    package = Path("/usr/share/kwin/tabbox/zaldros")
+    layout = ""
+    tabbox = {}
+    kwinrc = Path("/etc/xdg/kwinrc")
+    if kwinrc.is_file():
+        section = ""
+        for line in kwinrc.read_text(errors="replace").splitlines():
+            line = line.strip()
+            if line.startswith("["):
+                section = line
+            elif "=" in line and section == "[TabBox]":
+                key, _, value = line.partition("=")
+                tabbox[key.strip()] = value.strip()
+        layout = tabbox.get("LayoutName", "")
+    shortcut = sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
+                  "--object-path", "/component/kwin",
+                  "--method", "org.kde.kglobalaccel.Component.allShortcutInfos")
+    walk = ""
+    for part in shortcut.split("('"):
+        if part.startswith("Walk Through Windows"):
+            walk = part[:400]
+            break
+    # Ask kglobalaccel to fire KWin's own shortcut. If this errors, the key never had a chance and
+    # the layout is innocent; if it succeeds while Alt+Tab still does nothing, the input path is
+    # the suspect. Either way the answer is recorded, not guessed.
+    invoked = sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
+                 "--object-path", "/component/kwin",
+                 "--method", "org.kde.kglobalaccel.Component.invokeShortcut",
+                 "Walk Through Windows")
+    return {
+        "package_installed": package.is_dir(),
+        "invoke_shortcut_reply": invoked[:200],
+        "package_files": sorted(str(f.relative_to(package)) for f in package.rglob("*") if f.is_file())
+                         if package.is_dir() else [],
+        "installed_layouts": sorted(p.name for p in Path("/usr/share/kwin/tabbox").iterdir())
+                             if Path("/usr/share/kwin/tabbox").is_dir() else [],
+        "configured_layout": layout,
+        "tabbox_config": tabbox,
+        "kglobalaccel_component_present": "org.kde.kglobalaccel" in shortcut or bool(walk),
+        "walk_through_windows": walk,
+        "kwin_journal": sh("sh", "-c",
+                           "journalctl -b --no-pager | grep -iE 'tabbox|switcher|kwin_tabbox' | tail -n 20"),
+    }
+
+
 def tail_file(path, n=4000):
     """Last n chars of a log file, or None when it does not exist (never a guess)."""
     try:
@@ -176,6 +227,7 @@ def main():
         "session_log": tail_file("/tmp/zaldros-session.log"),
         "app_launch": launch_test(),
         "visual_layer": visual_layer(),
+        "switcher": switcher(),
         # Session diagnostics: run #15 booted fine but no compositor ever started.
         "sessions_available": sorted(p.name for p in Path("/usr/share/wayland-sessions").glob("*.desktop"))
                               if Path("/usr/share/wayland-sessions").is_dir() else [],
