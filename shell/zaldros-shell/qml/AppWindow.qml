@@ -11,6 +11,11 @@ Item {
     property string title: "Окно"
     property string iconName: ""
     property string iconGlyph: "window"
+    // Windows 11 Settings has no app icon in its title bar: a back arrow sits where the icon
+    // would be. Apps that keep an icon leave these two alone.
+    property bool showIcon: true
+    property bool showBack: false
+    signal backRequested()
     property bool active: true
     property bool maximized: false
     property bool showTitleText: true
@@ -45,7 +50,9 @@ Item {
     Rectangle {
         id: frame
         anchors.fill: parent
-        radius: win.maximized ? 0 : Theme.radiusMedium
+        // Rounded on every window, maximised included: the maintainer asked for it on 2026-08-26
+        // and it is what the shell's own windows look like against the wallpaper.
+        radius: Theme.radiusMedium
         color: Theme.appBackground
         border.width: 1
         border.color: win.active ? Theme.borderStrong : Theme.border
@@ -77,7 +84,26 @@ Item {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.titleLeftMargin
                 spacing: 10
+                Rectangle {
+                    visible: win.showBack
+                    width: 28; height: 28; radius: Theme.radiusSmall
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: backHover.containsMouse ? Theme.hover : "transparent"
+                    SysIcon {
+                        anchors.centerIn: parent
+                        glyph: "arrow-left"
+                        width: 14; height: 14
+                        color: win.active ? Theme.textPrimary : Theme.textSecondary
+                    }
+                    MouseArea {
+                        id: backHover
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: win.backRequested()
+                    }
+                }
                 SysIcon {
+                    visible: win.showIcon
                     width: Theme.titleIcon
                     height: Theme.titleIcon
                     anchors.verticalCenter: parent.verticalCenter

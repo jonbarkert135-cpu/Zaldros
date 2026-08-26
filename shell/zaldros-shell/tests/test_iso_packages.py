@@ -49,8 +49,11 @@ def test_alt_tab_is_wired_end_to_end() -> None:
     assert "kglobalacceld" in build, "the ISO must install a global shortcut daemon"
     session = build.split("cat > \"$ROOT/usr/local/bin/zaldros-session\"")[1]
     session = session.split("exec kwin_wayland")[0]
-    assert "kglobalacceld" in session, (
-        "the daemon must also be started by the session, before kwin_wayland"
+    assert "accel-path" in session, (
+        "the session must start the daemon from the path dpkg reported, before kwin_wayland"
+    )
+    assert "accel-path" in build.split("apt-accel")[1].split("zaldros-session")[0], (
+        "the build must resolve the daemon path with dpkg instead of guessing"
     )
     assert "[TabBox]" in theme, "kwinrc must configure the window switcher"
     assert "Walk Through Windows=Alt+Tab" in theme, (

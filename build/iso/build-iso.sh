@@ -112,6 +112,11 @@ step apt-accel chroot "$ROOT" sh -c 'DEBIAN_FRONTEND=noninteractive apt-get inst
   || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kglobalaccel-bin \
   || echo "no global shortcut daemon available in this suite"'
 
+# Run #28: the package installed but the session found no binary - KF6 ships kglobalacceld under a
+# multiarch libexec directory, not /usr/bin - so Alt+Tab stayed dead. Ask dpkg where the binary
+# really is and bake that path into the image instead of guessing at boot.
+step accel-path chroot "$ROOT" sh -c 'mkdir -p /etc/zaldros; dpkg -L kglobalacceld kglobalaccel-bin 2>/dev/null | grep -E "/(kglobalacceld|kglobalaccel5|kglobalaccel6)$" | head -1 > /etc/zaldros/accel-path; echo "global shortcut daemon: $(cat /etc/zaldros/accel-path)"'
+
 echo "== install the Zaldros shell, theme scripts and self-test"
 mkdir -p "$ROOT/opt/zaldros"
 # Run #24: `data/` was missing here, so the shell crashed on /opt/zaldros/data/pinned.json.
@@ -159,9 +164,13 @@ set -x
 # `sh -c python3 -m zaldros_shell run;` and argparse died on the token "run;". Pass one file path.
 # Run #27: the accelerator daemon must be up before KWin registers "Walk Through Windows",
 # otherwise the registration is silently dropped and Alt+Tab is dead for the whole session.
-for accel in /usr/bin/kglobalacceld /usr/libexec/kglobalacceld /usr/bin/kglobalaccel5 /usr/bin/kglobalaccel6; do
-  if [ -x "$accel" ]; then "$accel" & sleep 1; break; fi
-done
+accel="$(cat /etc/zaldros/accel-path 2>/dev/null)"
+if [ -n "$accel" ] && [ -x "$accel" ]; then
+  "$accel" &
+  sleep 1
+else
+  echo "no global shortcut daemon on this image: Alt+Tab will not work"
+fi
 exec kwin_wayland --xwayland -- /usr/local/bin/zaldros-shell-run
 EOS
 chmod +x "$ROOT/usr/local/bin/zaldros-session"

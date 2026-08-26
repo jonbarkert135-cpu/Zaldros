@@ -174,6 +174,9 @@ Item {
         objectName: "settingsWindow"
         title: "Параметры"
         iconGlyph: "settings"
+        showIcon: false                       // Windows 11 Settings shows no icon, only the arrow
+        showBack: true
+        onBackRequested: settingsApp.goBack()
         visible: shell.isOpen("settings")
         active: shell.focusedWindow === "settings"
         maximized: shell.maximised["settings"] === true

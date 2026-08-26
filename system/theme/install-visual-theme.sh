@@ -201,6 +201,7 @@ Backend=OpenGL
 WindowsBlockCompositing=false
 
 [Plugins]
+roundedcornersEnabled=true
 blurEnabled=true
 contrastEnabled=true
 kwin4_effect_squashEnabled=true
@@ -210,7 +211,9 @@ BlurStrength=8
 NoiseStrength=2
 
 [Windows]
-BorderlessMaximizedWindows=true
+# Run #28: the maintainer wants rounded corners on every window, so a maximised window keeps its
+# decoration and its corners instead of going borderless and square.
+BorderlessMaximizedWindows=false
 
 [org.kde.kdecoration2]
 library=org.kde.breeze

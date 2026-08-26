@@ -502,3 +502,18 @@ not exist, or if a page becomes unreachable from the rail. "Получить п�
 repository's issue tracker.
 
 Parity: 34/34 (four new taskbar checks). Tests: 67.
+
+## Run #28b — the shortcut daemon was installed but never found, and windows keep their corners
+
+The run #27 fix installed `kglobalacceld` and the session still logged four failed `[ -x ]` tests:
+KF6 ships the binary under a multiarch libexec directory, not `/usr/bin`. The build now asks
+`dpkg -L` where the binary actually is and writes it to `/etc/zaldros/accel-path`; the session
+starts exactly that path and says so in its log when there is none. Guessing paths is what cost
+this a whole ISO cycle.
+
+Also from the maintainer's review of the shipped screenshots:
+
+* Settings has **no application icon** in its title bar — a back arrow stands where the icon
+  would be, and it walks the nested page stack (`AppWindow.showIcon` / `showBack`).
+* Every window keeps its **8 px corners when maximised**. `BorderlessMaximizedWindows` is off in
+  `kwinrc` for the same reason.
