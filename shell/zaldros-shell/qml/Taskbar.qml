@@ -253,10 +253,13 @@ Item {
             tooltip: "Скрытые значки"
         }
 
-        // keyboard layout, read from the session rather than invented
+        // Keyboard layout, read from the session rather than invented. Clicking it switches to
+        // the next layout, which is what the badge does in Windows.
         TrayButton {
+            objectName: "trayLayoutButton"
             width: layoutText.implicitWidth + 16
             tooltip: taskbar.system ? taskbar.system.keyboardDetail : "нет данных"
+            onTriggered: if (taskbar.system) taskbar.system.switchLayout()
             content: Text {
                 id: layoutText
                 anchors.centerIn: parent

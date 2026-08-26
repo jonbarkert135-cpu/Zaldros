@@ -407,6 +407,32 @@ MinimizedMode=0
 LayoutName=zaldros
 EOF
 
+# Two layouts, switched with Alt+Shift, exactly like a Russian Windows install. Run #30 booted with
+# no keymap configured at all, which is why localectl answered "(unset)": the image had never been
+# told what keyboard it has.
+#
+# The file is kxkbrc, group [Layout] — verified in kwin v6.6.0 (src/main.cpp opens "kxkbrc",
+# src/xkb.cpp reads LayoutList/Options/ResetOldOptions from the "Layout" group). kwinrc is the
+# wrong file for this and would have been silently ignored.
+install -Dm644 /dev/stdin "$DEST/etc/xdg/kxkbrc" <<'EOF'
+[Layout]
+Use=true
+LayoutList=us,ru
+DisplayNames=,
+Options=grp:alt_shift_toggle
+ResetOldOptions=true
+SwitchMode=Global
+EOF
+
+# Console and X11 keymap for everything outside KWin (the VT, the installer, xdg apps).
+install -Dm644 /dev/stdin "$DEST/etc/default/keyboard" <<'EOF'
+XKBMODEL="pc105"
+XKBLAYOUT="us,ru"
+XKBVARIANT=""
+XKBOPTIONS="grp:alt_shift_toggle"
+BACKSPACE="guess"
+EOF
+
 # The switcher QML itself. Colours come from the same tokens as the colour scheme above, so the
 # switcher can never drift away from the rest of the desktop: one edit, both surfaces.
 TABBOX_SRC="$(dirname "$0")/tabbox/zaldros"

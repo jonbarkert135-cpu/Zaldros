@@ -80,3 +80,47 @@ def test_layout_badges_follow_windows_and_never_invent_a_name():
     assert system.layout_badge("us") == "ENG"
     assert system.layout_badge("ru,us") == "РУС", "the active layout is the first one"
     assert system.layout_badge("xy") == "XY", "an unknown layout keeps its own code"
+
+
+LAYOUT_LIST = "([('us', 'English (US)', 'us'), ('ru', 'Russian', 'ru')],)\n"
+
+
+def _kwin_runner(current="(uint32 1,)", calls=None):
+    def runner(args, **_kwargs):
+        if calls is not None:
+            calls.append(args)
+        method = args[args.index("--method") + 1]
+        if method.endswith("getLayoutsList"):
+            return SimpleNamespace(returncode=0, stdout=LAYOUT_LIST)
+        if method.endswith("getLayout"):
+            return SimpleNamespace(returncode=0, stdout=current)
+        return SimpleNamespace(returncode=0, stdout="()\n")
+    return runner
+
+
+def test_the_badge_follows_kwin_because_kwin_owns_the_keyboard():
+    """localectl only knows what the image was configured with; after the user switches layout,
+    KWin is the only process that knows which one is active."""
+    with mock.patch.object(system.shutil, "which", return_value="/usr/bin/gdbus"):
+        reading = system.keyboard_layout(runner=_kwin_runner())
+    assert reading.available and reading.source == "kwin"
+    assert reading.detail == "РУС", "index 1 of us,ru is Russian"
+
+
+def test_switching_asks_kwin_for_the_next_layout_and_wraps_around():
+    calls = []
+    with mock.patch.object(system.shutil, "which", return_value="/usr/bin/gdbus"):
+        assert system.switch_layout(runner=_kwin_runner(current="(uint32 1,)", calls=calls))
+    setters = [c for c in calls if c[c.index("--method") + 1].endswith("setLayout")]
+    assert setters, "the switch must go through KWin"
+    assert setters[0][-1] == "uint32 0", "after the last layout it wraps to the first"
+
+
+def test_without_kwin_the_badge_falls_back_instead_of_disappearing():
+    def dead(*_args, **_kwargs):
+        return SimpleNamespace(returncode=1, stdout="")
+
+    with mock.patch.object(system.shutil, "which", side_effect=lambda name: "/usr/bin/" + name), \
+         mock.patch.dict(system.os.environ, {"LANG": "ru_RU.UTF-8"}, clear=False):
+        reading = system.keyboard_layout(runner=dead)
+    assert reading.available and reading.detail == "РУС" and reading.source != "kwin"

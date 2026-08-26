@@ -213,6 +213,15 @@ class SystemState(QObject):
     def keyboardDetail(self) -> str:  # noqa: N802
         return self._detail("keyboard")
 
+    @Slot(result=bool)
+    def switchLayout(self) -> bool:  # noqa: N802
+        """Clicking the tray badge moves to the next layout, as it does in Windows. KWin owns the
+        keyboard on Wayland, so KWin is asked; if it does not answer, nothing pretends to happen."""
+        switched = system.switch_layout()
+        if switched:
+            self.refresh()
+        return switched
+
     @Property(str, constant=True)
     def userName(self) -> str:  # noqa: N802
         return system.user_name()

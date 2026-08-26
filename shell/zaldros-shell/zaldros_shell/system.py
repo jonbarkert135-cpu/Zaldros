@@ -8,6 +8,7 @@ battery level, a Wi-Fi signal or a volume percentage to make a screenshot look c
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -120,9 +121,64 @@ def layout_badge(code: str) -> str:
     return LAYOUT_BADGES.get(first, first.upper()[:3])
 
 
+# Verified against kwin v6.6.0 src/keyboard_layout.cpp: the service is org.kde.keyboard (not
+# org.kde.KWin), the object /Layouts, the interface org.kde.KeyboardLayouts.
+KWIN_LAYOUTS = ("gdbus", "call", "--session", "--dest", "org.kde.keyboard",
+                "--object-path", "/Layouts", "--method")
+
+
+def _gdbus(runner, method: str, *args: str) -> str:
+    """One call to KWin's keyboard-layout interface. Empty string when it cannot be reached."""
+    if not shutil.which("gdbus"):
+        return ""
+    try:
+        result = runner([*KWIN_LAYOUTS, f"org.kde.KeyboardLayouts.{method}", *args],
+                        capture_output=True, text=True, timeout=2)
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def _parse_gvariant_uint(text: str) -> int | None:
+    """gdbus prints "(uint32 1,)" — and "uint32" is full of digits, so match the type explicitly."""
+    match = re.search(r"uint32\s+(\d+)", text) or re.search(r"\((\d+)", text)
+    return int(match.group(1)) if match else None
+
+
+def _parse_gvariant_layouts(text: str) -> list[tuple[str, str, str]]:
+    """gdbus prints "([('us', 'English (US)', 'us'), ('ru', 'Russian', 'ru')],)"."""
+    return [(a, b, c) for a, b, c in
+            re.findall(r"\('([^']*)',\s*'([^']*)',\s*'([^']*)'\)", text)]
+
+
+def kwin_layouts(runner=subprocess.run) -> tuple[list[tuple[str, str, str]], int | None]:
+    """(layouts, active index) as KWin reports them, or ([], None) when KWin is not answering.
+
+    KWin owns the keyboard on Wayland: when the user switches layout, this is the only place that
+    knows. localectl only ever reports what the image was configured with.
+    """
+    listed = _parse_gvariant_layouts(_gdbus(runner, "getLayoutsList"))
+    if not listed:
+        return ([], None)
+    return (listed, _parse_gvariant_uint(_gdbus(runner, "getLayout")))
+
+
+def switch_layout(runner=subprocess.run) -> bool:
+    """Move to the next layout, the way clicking the Windows tray badge does."""
+    layouts, current = kwin_layouts(runner)
+    if not layouts or current is None:
+        return False
+    nxt = (current + 1) % len(layouts)
+    return _gdbus(runner, "setLayout", f"uint32 {nxt}") != ""
+
+
 def keyboard_layout(runner=subprocess.run) -> Reading:
     """Active keyboard layout, read from the session. Windows shows it in the tray, so we do too —
     but only when something really reports one."""
+    layouts, current = kwin_layouts(runner)
+    if layouts and current is not None and current < len(layouts):
+        return Reading(True, current, layout_badge(layouts[current][0]),
+                       source="kwin")
     if shutil.which("localectl"):
         try:
             result = runner(["localectl", "status"], capture_output=True, text=True, timeout=2)

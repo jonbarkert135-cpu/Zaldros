@@ -79,3 +79,13 @@ def test_the_switcher_package_is_installed_by_the_theme_installer() -> None:
     theme = THEME.read_text()
     assert "/usr/share/kwin/tabbox/zaldros" in theme, "the layout must be installed where KWin looks"
     assert "LayoutName=zaldros" in theme, "and selected in kwinrc"
+
+
+def test_the_image_configures_a_keyboard_it_can_actually_switch() -> None:
+    """Run #30 booted with no keymap at all — localectl answered "(unset)". A Russian desktop ships
+    two layouts and a way to swap them, and KWin reads that from kxkbrc, not kwinrc."""
+    theme = THEME.read_text()
+    assert "/etc/xdg/kxkbrc" in theme, "KWin reads layouts from kxkbrc (kwin v6.6.0 src/main.cpp)"
+    kxkb = theme.split('"$DEST/etc/xdg/kxkbrc"')[1].split("EOF")[1]
+    assert "LayoutList=us,ru" in kxkb and "grp:alt_shift_toggle" in kxkb
+    assert "/etc/default/keyboard" in theme, "the console and X11 need the same keymap"

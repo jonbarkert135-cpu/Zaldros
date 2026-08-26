@@ -697,3 +697,23 @@ selected and in rename mode; right-click opens the Windows 11 context menu with 
 that work. Double-clicking a file now hands it to `xdg-open` instead of doing nothing.
 
 Tests: 147.
+
+### The keyboard the image never had
+
+Run #30's tray badge read "ENG" honestly — and that was the whole problem: the image had never
+been told what keyboard it has, so `localectl` answered `(unset)` and LANG was the only source
+left. A Russian-facing desktop ships two layouts.
+
+`kxkbrc` now carries `LayoutList=us,ru` with `grp:alt_shift_toggle`, and `/etc/default/keyboard`
+matches it for the console and X11 clients. The file matters: KWin reads layouts from **kxkbrc**,
+group `[Layout]` (kwin v6.6.0 `src/main.cpp` opens it, `src/xkb.cpp` reads `LayoutList`,
+`Options`, `ResetOldOptions`). Putting the same keys in kwinrc would have been ignored without a
+word.
+
+The badge now asks KWin instead of the image. On Wayland KWin owns the keyboard, so after the user
+presses Alt+Shift only KWin knows which layout is active; the shell reads
+`org.kde.keyboard /Layouts org.kde.KeyboardLayouts` (service name verified in
+`src/keyboard_layout.cpp` — it is *not* org.kde.KWin) and falls back to localectl and then LANG
+when KWin does not answer. Clicking the badge switches to the next layout, as it does in Windows.
+
+Tests: 153.
