@@ -54,6 +54,7 @@ def test_volume_without_an_audio_server_is_unavailable_not_zero():
 
 def test_snapshot_covers_every_quick_setting():
     snapshot = system.snapshot()
-    assert set(snapshot) == {"battery", "brightness", "network", "volume", "bluetooth"}
+    assert set(snapshot) == {"battery", "brightness", "network", "volume", "bluetooth",
+                             "keyboard"}
     for reading in snapshot.values():
         assert reading.available or reading.value is None

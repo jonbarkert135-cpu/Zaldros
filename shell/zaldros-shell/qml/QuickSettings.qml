@@ -6,6 +6,7 @@ import ZaldrosTheme
 // machine renders disabled and states why, instead of pretending to toggle something.
 Item {
     id: quick
+    objectName: "quickPanel"
     property bool shown: false
     property var system: null
     width: Theme.quickWidth

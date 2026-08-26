@@ -1,21 +1,33 @@
 import QtQuick
 import ZaldrosTheme
 
-// Zaldros Taskbar. Windows 11 layout: 48 px bar, centred Start + search + app group, tray on the
-// right with two-line clock. Everything shown here is either real (clock, running processes,
-// network/battery presence) or explicitly marked unavailable.
+// Zaldros taskbar, built to the measured Windows 11 layout (system/theme/win11-reference.json):
+// 48 px bar, centred group of 44 px buttons holding Start, the search field, task view and the
+// application buttons, and a right-hand tray of 36 px buttons ending in the two-line clock.
+// Everything shown is real (clock, running processes, network/battery presence) or marked absent.
 Item {
     id: taskbar
+    objectName: "taskbar"
+
     property var state: null
     property var system: null
     property var apps: null
     property bool startActive: false
     property bool quickActive: false
+    property bool searchActive: false
+    property bool notificationsActive: false
+    property bool taskViewActive: false
     property string activeApp: ""
+    // Buttons for the windows the shell itself owns: [{ id, name, glyph, running, active }]
+    property var windowButtons: []
+
     signal startToggled()
     signal quickToggled()
+    signal searchToggled()
+    signal notificationsToggled()
+    signal taskViewToggled()
     signal appActivated(int row)
-    signal searchRequested()
+    signal windowActivated(string id)
     signal contextRequested(int posX)
 
     height: Theme.taskbarHeight
@@ -36,11 +48,12 @@ Item {
         }
     }
 
-    // --- centre group: Start, search, pinned + running applications ------------------------
+    // --- centre group: Start, search, task view, pinned + running applications ----------------
     Row {
         id: centreGroup
+        objectName: "taskbarGroup"
         anchors.centerIn: parent
-        spacing: 4
+        spacing: 0
 
         TaskbarButton {
             id: startButton
@@ -48,8 +61,7 @@ Item {
             appName: "Пуск"
             showTile: false
             running: false
-            width: Theme.taskbarButton
-            height: Theme.taskbarButton
+            active: taskbar.startActive
             onActivated: taskbar.startToggled()
             ZaldrosMark {
                 anchors.centerIn: parent
@@ -60,33 +72,38 @@ Item {
             }
         }
 
+        // Windows 11 keeps the search field inside the centred group, immediately after Start.
         Item {
-            width: searchPill.width
-            height: Theme.taskbarButton
+            objectName: "taskbarSearch"
+            width: Theme.taskbarSearchWidth + 8
+            height: Theme.taskbarHeight
+
             Rectangle {
                 id: searchPill
-                anchors.verticalCenter: parent.verticalCenter
-                width: 180
-                height: 32
-                radius: 16
-                color: searchArea.containsMouse ? Theme.selected : Theme.hover
+                anchors.centerIn: parent
+                width: Theme.taskbarSearchWidth
+                height: Theme.taskbarSearchHeight
+                radius: height / 2
+                color: taskbar.searchActive ? Theme.selected
+                       : (searchArea.containsMouse ? Theme.hover : (Theme.dark ? "#14ffffff" : "#0a000000"))
                 border.width: 1
                 border.color: Theme.border
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
                 Row {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
-                    anchors.leftMargin: 10
-                    spacing: 8
+                    anchors.leftMargin: 12
+                    spacing: 10
                     SysIcon {
                         glyph: "search"
                         width: 16; height: 16
-                        color: Theme.textSecondary
+                        color: Theme.textPrimary
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     Text {
                         text: "Поиск"
-                        color: Theme.textSecondary
+                        color: Theme.textPrimary
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontCaption + 1
                         anchors.verticalCenter: parent.verticalCenter
@@ -96,8 +113,36 @@ Item {
                     id: searchArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: taskbar.searchRequested()
+                    onClicked: taskbar.searchToggled()
                 }
+            }
+        }
+
+        TaskbarButton {
+            objectName: "taskViewButton"
+            appName: "Представление задач"
+            showTile: false
+            active: taskbar.taskViewActive
+            onActivated: taskbar.taskViewToggled()
+            SysIcon {
+                anchors.centerIn: parent
+                glyph: "taskview"
+                width: Theme.taskbarIcon
+                height: Theme.taskbarIcon
+                color: Theme.textPrimary
+                z: 2
+            }
+        }
+
+        Repeater {
+            model: taskbar.windowButtons
+            delegate: TaskbarButton {
+                appName: modelData.name
+                iconGlyph: modelData.glyph
+                initial: modelData.name.substring(0, 1)
+                running: modelData.running
+                active: modelData.active
+                onActivated: taskbar.windowActivated(modelData.id)
             }
         }
 
@@ -116,22 +161,39 @@ Item {
         }
     }
 
-    // --- system tray ------------------------------------------------------------------------
+    // --- system tray ---------------------------------------------------------------------------
     Row {
         id: tray
+        objectName: "trayGroup"
         anchors.right: parent.right
-        anchors.rightMargin: 4
+        anchors.rightMargin: Theme.taskbarRightMargin
         anchors.verticalCenter: parent.verticalCenter
         spacing: 0
 
-        // hidden-items overflow chevron, exactly as Windows 11 places it
+        // hidden-items overflow chevron, where Windows 11 places it
         TrayButton {
             glyph: "chevron-up"
             tooltip: "Скрытые значки"
         }
 
+        // keyboard layout, read from the session rather than invented
+        TrayButton {
+            width: layoutText.implicitWidth + 16
+            tooltip: taskbar.system ? taskbar.system.keyboardDetail : "нет данных"
+            content: Text {
+                id: layoutText
+                anchors.centerIn: parent
+                text: taskbar.system ? taskbar.system.keyboardLayout : ""
+                color: Theme.textPrimary
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontCaption
+            }
+        }
+
+        // network + volume + battery share one hover pill, exactly like Windows 11
         TrayButton {
             id: quickButton
+            objectName: "trayQuickButton"
             width: 78
             highlighted: taskbar.quickActive
             tooltip: taskbar.system
@@ -165,14 +227,17 @@ Item {
             }
         }
 
-        // two-line clock: time above date, right aligned (Windows 11)
+        // two-line clock: time above date, right aligned, opens the notification centre
         TrayButton {
+            objectName: "clock"
             width: clockColumn.implicitWidth + 20
-            tooltip: "Календарь"
+            highlighted: taskbar.notificationsActive
+            tooltip: "Уведомления и календарь"
+            onTriggered: taskbar.notificationsToggled()
             content: Column {
                 id: clockColumn
                 anchors.centerIn: parent
-                spacing: 0
+                spacing: 1
                 Text {
                     text: taskbar.state ? taskbar.state.timeText : ""
                     color: Theme.textPrimary
@@ -193,20 +258,26 @@ Item {
         }
 
         TrayButton {
+            objectName: "notificationButton"
+            width: 28
             glyph: "bell"
-            tooltip: "Уведомления"
+            highlighted: taskbar.notificationsActive
+            tooltip: "Центр уведомлений"
+            onTriggered: taskbar.notificationsToggled()
         }
+    }
 
-        // "Show desktop" strip at the very edge — Windows keeps a thin hot zone here
-        Item {
-            width: 6
-            height: Theme.taskbarHeight
-            Rectangle {
-                anchors.centerIn: parent
-                width: 1
-                height: 24
-                color: Theme.border
-            }
+    // "Show desktop" hot zone at the very edge — a 4 px strip, as in Windows 11
+    Item {
+        width: 4
+        height: Theme.taskbarHeight
+        anchors.right: parent.right
+        Rectangle {
+            anchors.centerIn: parent
+            width: 1
+            height: 24
+            color: showDesktop.containsMouse ? Theme.textSecondary : Theme.border
         }
+        MouseArea { id: showDesktop; anchors.fill: parent; hoverEnabled: true }
     }
 }

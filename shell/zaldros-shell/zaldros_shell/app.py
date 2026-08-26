@@ -19,7 +19,8 @@ from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
-from .model import AppModel, InstalledAppModel, ShellState, SystemState
+from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, RecentModel,
+                    ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
 def _assets_dir() -> Path:
@@ -57,11 +58,17 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     model = AppModel(installed=None)
     state = ShellState(locale=locale, tick=tick)
     system_state = SystemState()
+    file_model = FileModel()
+    recent_model = RecentModel()
+    host_info = HostInfo()
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
     context.setContextProperty("installedModel", installed)
     context.setContextProperty("shellState", state)
     context.setContextProperty("systemState", system_state)
+    context.setContextProperty("fileModel", file_model)
+    context.setContextProperty("recentModel", recent_model)
+    context.setContextProperty("hostInfo", host_info)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
     context.setContextProperty(
@@ -70,7 +77,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     if view.status() != QQuickView.Ready:
         errors = "\n".join(str(error.toString()) for error in view.errors())
         raise RuntimeError(f"QML failed to load:\n{errors}")
-    return view, [model, installed, state, system_state]
+    return view, [model, installed, state, system_state, file_model, recent_model, host_info]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
@@ -78,7 +85,9 @@ _KEEPALIVE: list = []  # QML context properties must outlive the call; Python mu
 
 def render(output: str, start_open: bool = False, width: int = 1600, height: int = 1000,
            locale: str = "ru", quick_open: bool = False, context_open: bool = False,
-           light: bool = False) -> str:
+           light: bool = False, search_open: bool = False, notifications_open: bool = False,
+           focused_window: str = "explorer", settings_page: int = 1,
+           geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
     app = QCoreApplication.instance() or QGuiApplication(sys.argv[:1])
@@ -90,11 +99,16 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     root.setProperty("lightMode", light)
     root.setProperty("startOpen", start_open)
     root.setProperty("quickOpen", quick_open)
+    root.setProperty("searchOpen", search_open)
+    root.setProperty("notificationsOpen", notifications_open)
     root.setProperty("contextOpen", context_open)
+    root.setProperty("focusedWindow", focused_window)
     view.show()
     result: dict[str, bool] = {}
 
     def grab() -> None:
+        if geometry_output:
+            write_hit_boxes(view, geometry_output)
         image = view.grabWindow()
         result["ok"] = image.save(output)
         result["size"] = (image.width(), image.height())
@@ -111,6 +125,17 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     return output
 
 
+# Every named item the UI test clicks or the visual parity tool measures. Names live on the QML
+# items themselves (objectName), so a renamed component fails loudly here instead of silently.
+NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskViewButton",
+               "trayGroup", "trayQuickButton", "clock", "notificationButton",
+               "startPanel", "startSearch", "startPinnedGrid", "startFooter",
+               "searchFlyout", "notificationCentre", "quickPanel", "contextMenu",
+               "explorerWindow", "explorerTabStrip", "explorerNavBar", "explorerCommandBar",
+               "explorerSidebar", "explorerFileList", "settingsWindow", "settingsRail",
+               "settingsBody", "titleBar", "captionButtons")
+
+
 def hit_boxes(view: QQuickView) -> dict:
     """Screen coordinates of the widgets an external UI test needs to click.
 
@@ -122,14 +147,16 @@ def hit_boxes(view: QQuickView) -> dict:
     root = view.rootObject()
     if root is None:
         return boxes
-    for name in ("startButton",):
+    for name in NAMED_ITEMS:
         item = root.findChild(QObject, name)
         if item is None:
             continue
         width = float(item.property("width") or 0)
         height = float(item.property("height") or 0)
         centre = item.mapToItem(root, QPointF(width / 2, height / 2))
+        origin = item.mapToItem(root, QPointF(0, 0))
         boxes[name] = {"x": round(centre.x()), "y": round(centre.y()),
+                       "left": round(origin.x()), "top": round(origin.y()),
                        "width": round(width), "height": round(height)}
     return boxes
 

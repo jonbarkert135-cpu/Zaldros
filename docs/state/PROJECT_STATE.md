@@ -68,3 +68,4 @@ _Last updated: 2026-08-26_
 - Run #18: all CI jobs green, boot=FAIL on all 9 (systemd/app_launch), root causes fixed in run #19 candidate. Architecture: NOT ACCEPTED. [ci run 32670157459, 2026-08-23]
 - Run #24: iso + CI green, boot=FAIL on all 9 (`shell`) — the ISO never shipped `data/pinned.json`.
   Fixed in the run #25 candidate together with a flat-layout guard test. [ci run 32675722125, 2026-08-24]
+- Run #27 (visual parity cycle 1): Windows 11 geometry measured into `system/theme/win11-reference.json`; `tools/visual/parity.py` reports 29/29 component checks matching; Explorer and Settings became real applications. Boot verdict unchanged from run #25 (PASS 9/9). [local render + pytest, 2026-08-26]

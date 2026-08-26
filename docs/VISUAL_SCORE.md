@@ -10,14 +10,17 @@ colour, iconography, shadow and motion.
 | Desktop | 4 | 4 | 5 | 4 | 4 | 3 | **4.0** | PROTOTYPE — no icon interaction, no wallpaper engine |
 | Taskbar | 5 | 4 | 5 | 4 | 5 | 4 | **4.5** | PROTOTYPE — real clock and process state, not a layer-shell panel |
 | Start | 5 | 4 | 5 | 4 | 4 | 4 | **4.3** | PARTIAL — real app list and launching; no search results, no Recommended |
-| Search | 3 | 3 | 4 | 4 | 3 | 1 | **3.0** | MISSING — field only, no index |
+| Search | 4 | 4 | 5 | 4 | 5 | 4 | **4.3** | PARTIAL — real installed-app results, no file or web index |
 | System tray | 4 | 4 | 5 | 4 | 5 | 3 | **4.2** | PARTIAL — real presence detection, no per-icon backends |
 | Quick settings | 4 | 4 | 5 | 4 | 5 | 3 | **4.2** | PARTIAL — real readouts, toggles not wired |
 | Window decorations | 4 | 4 | 5 | 4 | 5 | 2 | **4.0** | PROTOTYPE — design only; KWin will draw the real ones |
 | Context menus | 4 | 4 | 5 | 4 | 5 | 4 | **4.3** | PROTOTYPE — no actions behind the items |
-| Explorer | 2 | 2 | 3 | 3 | 2 | 0 | **2.0** | MISSING — sidebar mock inside the window demo |
-| Settings | 0 | 0 | 0 | 0 | 0 | 0 | **0.0** | MISSING |
-| Notifications | 0 | 0 | 0 | 0 | 0 | 0 | **0.0** | MISSING |
+| Explorer | 5 | 4 | 5 | 4 | 4 | 3 | **4.2** | PARTIAL — real directory listing and navigation; no file operations |
+| Settings | 5 | 4 | 5 | 4 | 4 | 3 | **4.2** | PARTIAL — real machine readings on 11 pages; nothing is editable yet |
+| Notifications | 4 | 4 | 5 | 4 | 4 | 3 | **4.0** | PARTIAL — real calendar; no notification daemon behind the list |
+
+Geometry scores are no longer opinions: `tools/visual/parity.py` measures them against
+`system/theme/win11-reference.json` and fails the build on drift (see `docs/VISUAL_PARITY_PROCESS.md`).
 
 **Weakest links after the open-source integration cycle:** motion (no live blur, no window
 animations), application icons (real only when the host icon theme has them), and everything that

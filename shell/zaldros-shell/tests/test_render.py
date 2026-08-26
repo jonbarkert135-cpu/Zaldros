@@ -35,12 +35,20 @@ def test_desktop_renders_at_the_requested_size(desktop):
 
 
 def test_taskbar_band_is_drawn_at_the_documented_height(desktop):
-    """A 48 px bar must exist: the pixel just above the bar edge is taskbar, 2 px higher is not."""
+    """A 48 px bar of the measured Windows 11 colour must exist.
+
+    Brightness alone cannot prove it: the bar is #222222 and a dark wallpaper can be just as dark.
+    What is provable is that the band is a flat fill of that colour while the row above it is not.
+    """
     image = QImage(desktop)
-    inside = image.pixelColor(20, H - TASKBAR_HEIGHT // 2)
-    above = image.pixelColor(20, H - TASKBAR_HEIGHT - 30)
-    assert inside.lightness() < 110, "taskbar band is not dark"
-    assert abs(inside.lightness() - above.lightness()) > 8, "taskbar is indistinguishable from desktop"
+    row = H - TASKBAR_HEIGHT // 2
+    band = [image.pixelColor(x, row) for x in range(10, 200, 10)]
+    assert all(colour.lightness() < 110 for colour in band), "taskbar band is not dark"
+    # the bar is 95 % opaque over the wallpaper, so a couple of levels of variation are expected
+    spread = max(colour.lightness() for colour in band) - min(colour.lightness() for colour in band)
+    assert spread <= 4, f"taskbar band is not a flat fill (spread {spread})"
+    above = [image.pixelColor(x, H - TASKBAR_HEIGHT - 30).lightness() for x in range(10, 200, 10)]
+    assert max(above) - min(above) > spread, "the wallpaper row looks like the taskbar"
 
 
 def test_start_button_and_tray_occupy_the_expected_zones(desktop):

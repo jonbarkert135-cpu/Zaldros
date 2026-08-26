@@ -1,0 +1,249 @@
+{
+  "reference": "system/theme/win11-reference.json",
+  "checks": [
+    {
+      "component": "taskbar",
+      "metric": "height",
+      "expected": 48.0,
+      "actual": 48.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "taskbar",
+      "metric": "start button pitch",
+      "expected": 44.0,
+      "actual": 44.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "taskbar",
+      "metric": "group centred",
+      "expected": 800.0,
+      "actual": 800.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "taskbar",
+      "metric": "search height",
+      "expected": 32.0,
+      "actual": 32.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "taskbar",
+      "metric": "tray right margin",
+      "expected": 12.0,
+      "actual": 12.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "width",
+      "expected": 640.0,
+      "actual": 640.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "height",
+      "expected": 726.0,
+      "actual": 726.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "centred",
+      "expected": 800.0,
+      "actual": 800.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "gap above taskbar",
+      "expected": 12.0,
+      "actual": 12.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "padding",
+      "expected": 32.0,
+      "actual": 32.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "search width",
+      "expected": 576.0,
+      "actual": 576.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "search height",
+      "expected": 38.0,
+      "actual": 38.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "search top inset",
+      "expected": 32.0,
+      "actual": 32.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "pin cell width",
+      "expected": 96.0,
+      "actual": 96.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "pin cell height",
+      "expected": 84.0,
+      "actual": 84.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "start",
+      "metric": "footer height",
+      "expected": 64.0,
+      "actual": 64.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "window",
+      "metric": "title bar height",
+      "expected": 32.0,
+      "actual": 32.0,
+      "tolerance": 1.0,
+      "passed": true
+    },
+    {
+      "component": "window",
+      "metric": "caption button width",
+      "expected": 46.0,
+      "actual": 46.0,
+      "tolerance": 1.0,
+      "passed": true
+    },
+    {
+      "component": "explorer",
+      "metric": "tab strip height",
+      "expected": 40.0,
+      "actual": 40.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "explorer",
+      "metric": "navigation bar height",
+      "expected": 48.0,
+      "actual": 48.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "explorer",
+      "metric": "command bar height",
+      "expected": 48.0,
+      "actual": 48.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "explorer",
+      "metric": "sidebar width",
+      "expected": 190.0,
+      "actual": 190.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "settings",
+      "metric": "rail width",
+      "expected": 320.0,
+      "actual": 320.0,
+      "tolerance": 3.0,
+      "passed": true
+    },
+    {
+      "component": "quick settings",
+      "metric": "width",
+      "expected": 360.0,
+      "actual": 360.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "quick settings",
+      "metric": "gap from edge",
+      "expected": 12.0,
+      "actual": 12.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "notifications",
+      "metric": "width",
+      "expected": 360.0,
+      "actual": 360.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "notifications",
+      "metric": "gap from edge",
+      "expected": 12.0,
+      "actual": 12.0,
+      "tolerance": 2.0,
+      "passed": true
+    },
+    {
+      "component": "context menu",
+      "metric": "width",
+      "expected": 300.0,
+      "actual": 300.0,
+      "tolerance": 1.0,
+      "passed": true
+    },
+    {
+      "component": "context menu",
+      "metric": "stack height",
+      "expected": 278.0,
+      "actual": 278.0,
+      "tolerance": 1.0,
+      "passed": true
+    }
+  ],
+  "failed": 0,
+  "total": 29,
+  "components": [
+    "taskbar.png",
+    "startPanel.png",
+    "searchFlyout.png",
+    "quickPanel.png",
+    "notificationCentre.png",
+    "contextMenu.png",
+    "explorerWindow.png",
+    "settingsWindow.png"
+  ]
+}

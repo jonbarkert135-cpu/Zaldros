@@ -7,11 +7,13 @@ import ZaldrosTheme
 // "Все приложения" flips the body to the real installed-application list read from .desktop files.
 Item {
     id: start
+    objectName: "startPanel"
     property bool shown: false
     property var state: null
     property var system: null
     property var apps: null
     property var installed: null
+    property var recent: null
     property int selectedIndex: -1
     signal appLaunched(int row)
     signal powerRequested()
@@ -64,11 +66,12 @@ Item {
         // --- search ------------------------------------------------------------------------
         Rectangle {
             id: search
+            objectName: "startSearch"
             x: Theme.startPadding
             y: Theme.startPadding
             width: parent.width - Theme.startPadding * 2
-            height: 36
-            radius: Theme.radiusSmall
+            height: Theme.startSearchHeight
+            radius: 6
             color: Theme.surface
             border.width: 1
             border.color: searchInput.activeFocus ? Theme.accent : Theme.border
@@ -129,14 +132,15 @@ Item {
         // --- pinned grid ---------------------------------------------------------------------
         GridView {
             id: pinnedGrid
+            objectName: "startPinnedGrid"
             visible: !start.allApps
             x: Theme.startPadding
             anchors.top: pinnedHeader.bottom
             anchors.topMargin: 8
             width: parent.width - Theme.startPadding * 2
-            height: Theme.startPinCell * 3
-            cellWidth: Math.floor(width / 6)
-            cellHeight: Theme.startPinCell
+            height: Theme.startCellHeight * 3
+            cellWidth: Math.floor(width / Theme.startColumns)
+            cellHeight: Theme.startCellHeight
             interactive: false
             model: start.apps
             delegate: Item {
@@ -152,7 +156,7 @@ Item {
                     Behavior on color { ColorAnimation { duration: Theme.animFast } }
                 }
                 AppTile {
-                    y: 14
+                    y: 12
                     width: Theme.startPinIcon
                     height: Theme.startPinIcon
                     baseColor: model.color
@@ -162,7 +166,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text {
-                    y: 14 + Theme.startPinIcon + 8
+                    y: 12 + Theme.startPinIcon + 6
                     width: pinnedGrid.cellWidth - 10
                     anchors.horizontalCenter: parent.horizontalCenter
                     horizontalAlignment: Text.AlignHCenter
@@ -202,41 +206,74 @@ Item {
             }
         }
 
-        Item {
+        // Real recently modified files from the home directory (RecentModel). When nothing was
+        // found the section says so — it is never filled with sample documents.
+        Grid {
+            id: recommended
             visible: !start.allApps
             x: Theme.startPadding
             anchors.top: recommendedHeader.bottom
             anchors.topMargin: 8
             width: parent.width - Theme.startPadding * 2
-            height: 120
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.radiusSmall
-                color: Theme.hover
-                border.width: 1
-                border.color: Theme.border
-            }
-            Column {
-                anchors.centerIn: parent
-                spacing: 6
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Пока нечего рекомендовать"
-                    color: Theme.textPrimary
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontBody
+            columns: 2
+            Repeater {
+                model: start.recent
+                delegate: Item {
+                    width: recommended.width / 2
+                    height: 48
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: 2
+                        radius: Theme.radiusSmall
+                        color: recentArea.pressed ? Theme.pressed
+                               : (recentArea.containsMouse ? Theme.hover : "transparent")
+                    }
+                    Row {
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 10
+                        spacing: 12
+                        SysIcon {
+                            glyph: model.glyph
+                            width: 20; height: 20
+                            color: Theme.textSecondary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+                            Text {
+                                width: recommended.width / 2 - 60
+                                elide: Text.ElideRight
+                                text: model.name
+                                color: Theme.textPrimary
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontCaption + 1
+                            }
+                            Text {
+                                text: model.subtitle
+                                color: Theme.textSecondary
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontCaption - 1
+                            }
+                        }
+                    }
+                    MouseArea { id: recentArea; anchors.fill: parent; hoverEnabled: true }
                 }
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: 420
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.WordWrap
-                    text: "Служба недавних файлов ещё не подключена. Здесь появятся последние документы — раздел не заполняется вымышленными данными."
-                    color: Theme.textSecondary
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontCaption
-                }
             }
+        }
+
+        Text {
+            visible: !start.allApps && (!start.recent || start.recent.count === 0)
+            x: Theme.startPadding
+            anchors.top: recommendedHeader.bottom
+            anchors.topMargin: 16
+            width: parent.width - Theme.startPadding * 2
+            wrapMode: Text.WordWrap
+            text: "Недавних файлов не найдено — здесь появятся документы, с которыми вы работали."
+            color: Theme.textSecondary
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontCaption
         }
 
         // --- all applications list -------------------------------------------------------------
@@ -247,7 +284,7 @@ Item {
             anchors.top: pinnedHeader.bottom
             anchors.topMargin: 8
             width: parent.width - Theme.startPadding * 2
-            height: Theme.startPinCell * 3 + 152
+            height: Theme.startCellHeight * 3 + 152
             clip: true
             model: start.installed
             ScrollBar.vertical: ScrollBar { }
@@ -303,9 +340,10 @@ Item {
         // --- footer ---------------------------------------------------------------------------
         Rectangle {
             id: footer
+            objectName: "startFooter"
             anchors.bottom: parent.bottom
             width: parent.width
-            height: 68
+            height: Theme.startFooterHeight
             color: Theme.hover
             Rectangle { width: parent.width; height: 1; color: Theme.border }
 

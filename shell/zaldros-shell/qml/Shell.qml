@@ -1,8 +1,10 @@
 import QtQuick
 import ZaldrosTheme
+import "apps"
 
-// Composition root of the Zaldros Shell: desktop, window layer, Start, quick settings, context
-// menus and the taskbar. Backends are injected as properties by zaldros_shell/app.py.
+// Composition root of the Zaldros Shell: desktop, window layer with the two system applications,
+// Start, search, quick settings, notification centre, context menus and the taskbar.
+// Backends are injected as context properties by zaldros_shell/app.py.
 Item {
     id: shell
 
@@ -16,47 +18,81 @@ Item {
 
     property bool startOpen: false
     property bool quickOpen: false
+    property bool searchOpen: false
+    property bool notificationsOpen: false
     property bool contextOpen: false
     property bool lightMode: false
-    // Which of the two window-layer surfaces holds focus. Alt+Tab flips it, exactly like the
-    // Windows 11 switcher does with two open windows.
-    property int focusedWindow: 1
 
-    // Global shell keys. KWin runs bare here (no plasmashell), so nothing else in the session
-    // owns Meta or Alt+Tab: the shell has to handle them itself or they do nothing at all.
-    // Run #25 proved that: every host-injected keystroke left the frame byte-identical.
-    focus: true
-    Keys.onPressed: function(event) {
-        if (event.key === Qt.Key_Super_L || event.key === Qt.Key_Super_R || event.key === Qt.Key_Meta) {
-            shell.startOpen = !shell.startOpen;
-            shell.quickOpen = false;
-            shell.contextOpen = false;
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.AltModifier)) {
-            shell.focusedWindow = shell.focusedWindow === 0 ? 1 : 0;
-            shell.startOpen = false;
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Escape) {
-            shell.startOpen = false;
-            shell.quickOpen = false;
-            shell.contextOpen = false;
-            event.accepted = true;
-        }
+    // --- window manager --------------------------------------------------------------------
+    // Two real applications live in the window layer. Each one has open / minimised / maximised
+    // state and a z order; the taskbar reflects it and Alt+Tab walks it.
+    property var windowIds: ["explorer", "settings"]
+    property string focusedWindow: "explorer"
+    property var openWindows: ({ explorer: true, settings: true })
+    property var minimised: ({ explorer: false, settings: false })
+    property var maximised: ({ explorer: false, settings: false })
+
+    function isOpen(id) { return openWindows[id] === true && minimised[id] !== true }
+    function focusWindow(id) {
+        var next = {};
+        for (var key in shell.minimised) next[key] = shell.minimised[key];
+        next[id] = false;
+        shell.minimised = next;
+        shell.openWindows[id] = true;
+        shell.focusedWindow = id;
     }
+    function setFlag(map, id, value) {
+        var next = {};
+        for (var key in map) next[key] = map[key];
+        next[id] = value;
+        return next;
+    }
+    function toggleWindow(id) {
+        if (shell.openWindows[id] !== true) { shell.openWindows = setFlag(shell.openWindows, id, true); shell.focusWindow(id); }
+        else if (shell.focusedWindow === id && shell.minimised[id] !== true) shell.minimised = setFlag(shell.minimised, id, true);
+        else shell.focusWindow(id);
+    }
+    function closeAllFlyouts() {
+        shell.startOpen = false;
+        shell.quickOpen = false;
+        shell.searchOpen = false;
+        shell.notificationsOpen = false;
+        shell.contextOpen = false;
+    }
+
     property var backendState: shellState
     property var backendApps: appModel
     property var backendInstalled: installedModel
     property var backendSystem: systemState
+    property var backendFiles: fileModel
+    property var backendRecent: recentModel
+    property var backendHost: hostInfo
 
     onLightModeChanged: Theme.dark = !lightMode
 
-    // Tab is consumed by Qt's focus chain before Keys.onPressed sees it, so the switcher binding
-    // has to be a real shortcut rather than a key handler.
+    // Global shell keys. KWin runs bare here (no plasmashell), so nothing else in the session owns
+    // Meta or Alt+Tab: the shell handles them itself or they do nothing at all.
+    focus: true
+    Keys.onPressed: function(event) {
+        if (event.key === Qt.Key_Super_L || event.key === Qt.Key_Super_R || event.key === Qt.Key_Meta) {
+            var open = !shell.startOpen;
+            shell.closeAllFlyouts();
+            shell.startOpen = open;
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Escape) {
+            shell.closeAllFlyouts();
+            event.accepted = true;
+        }
+    }
+
+    // Tab is consumed by Qt's focus chain before Keys.onPressed sees it, so the switcher has to be
+    // a real shortcut rather than a key handler.
     Shortcut {
         sequences: ["Alt+Tab"]
         context: Qt.ApplicationShortcut
         onActivated: {
-            shell.focusedWindow = shell.focusedWindow === 0 ? 1 : 0;
+            var index = shell.windowIds.indexOf(shell.focusedWindow);
+            shell.focusWindow(shell.windowIds[(index + 1) % shell.windowIds.length]);
             shell.startOpen = false;
         }
     }
@@ -78,14 +114,11 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: function(mouse) {
-                shell.startOpen = false;
-                shell.quickOpen = false;
+                shell.closeAllFlyouts();
                 if (mouse.button === Qt.RightButton) {
                     desktopMenu.x = mouse.x;
                     desktopMenu.y = mouse.y;
                     shell.contextOpen = true;
-                } else {
-                    shell.contextOpen = false;
                 }
             }
         }
@@ -97,9 +130,9 @@ Item {
         y: 24
         spacing: 8
         Repeater {
-            model: [{ n: "Этот компьютер", i: "computer" },
-                    { n: "Корзина", i: "user-trash" },
-                    { n: "Проводник", i: "system-file-manager" }]
+            model: [{ n: "Этот компьютер", i: "computer", a: "explorer" },
+                    { n: "Корзина", i: "user-trash", a: "" },
+                    { n: "Проводник", i: "system-file-manager", a: "explorer" }]
             delegate: Column {
                 width: 92
                 spacing: 6
@@ -123,106 +156,72 @@ Item {
                     font.pixelSize: Theme.fontCaption
                     wrapMode: Text.WordWrap
                 }
-            }
-        }
-    }
-
-    // --- window layer (decoration design, see AppWindow.qml) --------------------------------
-    AppWindow {
-        id: inactiveWindow
-        title: "Параметры"
-        active: shell.focusedWindow === 0
-        z: shell.focusedWindow === 0 ? 11 : 10
-        x: 300; y: 150
-        width: 520; height: 340
-        Item {
-            anchors.fill: parent
-            Text {
-                anchors.centerIn: parent
-                text: inactiveWindow.active ? "Параметры" : "Неактивное окно"
-                color: Theme.textSecondary
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontBody
-            }
-        }
-    }
-
-    AppWindow {
-        id: activeWindow
-        title: "Проводник — Документы"
-        active: shell.focusedWindow === 1
-        z: shell.focusedWindow === 1 ? 11 : 10
-        x: 380; y: 210
-        width: 620; height: 400
-        Item {
-            anchors.fill: parent
-            Rectangle {
-                id: sidebar
-                width: 180
-                height: parent.height
-                color: Theme.surface
-                Column {
-                    anchors.fill: parent
-                    anchors.margins: 8
-                    spacing: 2
-                    Repeater {
-                        // Sidebar entries carry the freedesktop icon name; the artwork comes from
-                        // the Win11 icon theme (GPL-3), never from hand-drawn strokes.
-                        model: [{ t: "Быстрый доступ", i: "user-home" },
-                                { t: "Рабочий стол", i: "user-desktop" },
-                                { t: "Загрузки", i: "folder-download" },
-                                { t: "Документы", i: "folder-documents" },
-                                { t: "Изображения", i: "folder-pictures" },
-                                { t: "Этот компьютер", i: "computer" }]
-                        delegate: Item {
-                            width: sidebar.width - 16
-                            height: 30
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: Theme.radiusSmall
-                                color: index === 3 ? Theme.selected : "transparent"
-                            }
-                            Row {
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 8
-                                spacing: 10
-                                Image {
-                                    width: 18; height: 18
-                                    source: "image://zaldrosicon/app/" + modelData.i
-                                    sourceSize.width: 36; sourceSize.height: 36
-                                    asynchronous: false
-                                    fillMode: Image.PreserveAspectFit
-                                    smooth: true
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                                Text {
-                                    text: modelData.t
-                                    color: Theme.textPrimary
-                                    font.family: Theme.fontFamily
-                                    font.pixelSize: Theme.fontCaption + 1
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-                        }
-                    }
+                MouseArea {
+                    width: 92
+                    height: 76
+                    y: -76
+                    onDoubleClicked: if (modelData.a !== "") shell.focusWindow(modelData.a)
                 }
             }
-            Text {
-                anchors.centerIn: parent
-                anchors.horizontalCenterOffset: 90
-                width: 320
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-                text: "Проводник ещё не реализован.\nЭто макет оформления окна, а не рабочее приложение."
-                color: Theme.textSecondary
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontCaption + 1
-            }
         }
     }
 
-    // --- Start -------------------------------------------------------------------------------
+    // --- window layer -------------------------------------------------------------------------
+    AppWindow {
+        id: settingsWindow
+        objectName: "settingsWindow"
+        title: "Параметры"
+        iconGlyph: "settings"
+        visible: shell.isOpen("settings")
+        active: shell.focusedWindow === "settings"
+        maximized: shell.maximised["settings"] === true
+        z: shell.focusedWindow === "settings" ? 12 : 10
+        x: maximized ? 0 : 220
+        y: maximized ? 0 : 90
+        width: maximized ? shell.width : 940
+        height: maximized ? shell.height - Theme.taskbarHeight : 620
+        onActivateRequested: shell.focusWindow("settings")
+        onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "settings", true)
+        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "settings", !maximized)
+        onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "settings", false)
+
+        Settings {
+            anchors.fill: parent
+            host: shell.backendHost
+            system: shell.backendSystem
+        }
+    }
+
+    AppWindow {
+        id: explorerWindow
+        objectName: "explorerWindow"
+        title: "Проводник"
+        iconGlyph: "folder"
+        showTitleText: false
+        tabs: [{ title: shell.backendFiles
+                        ? shell.backendFiles.breadcrumbs[shell.backendFiles.breadcrumbs.length - 1].name
+                        : "Проводник",
+                 glyph: "folder" }]
+        visible: shell.isOpen("explorer")
+        active: shell.focusedWindow === "explorer"
+        maximized: shell.maximised["explorer"] === true
+        z: shell.focusedWindow === "explorer" ? 12 : 10
+        x: maximized ? 0 : 340
+        y: maximized ? 0 : 150
+        width: maximized ? shell.width : 1000
+        height: maximized ? shell.height - Theme.taskbarHeight : 640
+        onActivateRequested: shell.focusWindow("explorer")
+        onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "explorer", true)
+        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "explorer", !maximized)
+        onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "explorer", false)
+
+        Explorer {
+            anchors.fill: parent
+            model: shell.backendFiles
+        }
+    }
+
+    // --- Start ---------------------------------------------------------------------------------
     StartMenu {
         id: startMenu
         z: 30
@@ -231,8 +230,9 @@ Item {
         system: shell.backendSystem
         apps: shell.backendApps
         installed: shell.backendInstalled
+        recent: shell.backendRecent
         anchors.horizontalCenter: parent.horizontalCenter
-        baseY: shell.height - Theme.taskbarHeight - height - 12
+        baseY: shell.height - Theme.taskbarHeight - height - Theme.startGap
         y: baseY
         onAppLaunched: function(row) {
             shell.backendApps.launchRow(row);
@@ -240,38 +240,69 @@ Item {
         }
     }
 
-    // --- quick settings ------------------------------------------------------------------------
+    // --- search ---------------------------------------------------------------------------------
+    SearchFlyout {
+        id: searchFlyout
+        z: 30
+        shown: shell.searchOpen
+        installed: shell.backendInstalled
+        anchors.horizontalCenter: parent.horizontalCenter
+        baseY: shell.height - Theme.taskbarHeight - height - Theme.startGap
+        y: baseY
+        onAppLaunched: function(row) {
+            shell.backendInstalled.launchRow(row);
+            shell.searchOpen = false;
+        }
+    }
+
+    // --- quick settings ----------------------------------------------------------------------------
     QuickSettings {
         id: quickPanel
+        objectName: "quickPanel"
         z: 30
         shown: shell.quickOpen
         system: shell.backendSystem
-        x: shell.width - width - 12
-        baseY: shell.height - Theme.taskbarHeight - height - 12
+        x: shell.width - width - Theme.flyoutGap
+        baseY: shell.height - Theme.taskbarHeight - height - Theme.flyoutGap
         y: baseY
     }
 
-    // --- context menus --------------------------------------------------------------------------
+    // --- notification centre -------------------------------------------------------------------------
+    NotificationCenter {
+        id: notificationCentre
+        z: 30
+        shown: shell.notificationsOpen
+        x: shell.width - width - Theme.flyoutGap
+        baseY: shell.height - Theme.taskbarHeight - height - Theme.flyoutGap
+        y: baseY
+    }
+
+    // --- context menus ----------------------------------------------------------------------------------
     ContextMenu {
         id: desktopMenu
+        objectName: "contextMenu"
         z: 40
         shown: shell.contextOpen
         items: [
-            { label: "Вид", glyph: "chevron-right" },
-            { label: "Сортировка", glyph: "chevron-right" },
-            { label: "Обновить", shortcut: "F5", action: "refresh" },
+            { label: "Вид", glyph: "grid", submenu: true },
+            { label: "Сортировка", glyph: "sort", submenu: true },
+            { label: "Обновить", glyph: "refresh", shortcut: "F5", action: "refresh" },
             { separator: true },
-            { label: "Создать", glyph: "folder", action: "new" },
-            { label: "Параметры экрана", glyph: "cast", action: "display" },
-            { label: "Персонализация", glyph: "brightness", action: "personalize" },
+            { label: "Создать", glyph: "add-circle", submenu: true },
+            { label: "Параметры экрана", glyph: "desktop", action: "display" },
+            { label: "Персонализация", glyph: "paint-brush", action: "personalize" },
             { separator: true },
-            { label: "Открыть терминал", glyph: "chevron-right", action: "terminal" },
-            { label: "Показать дополнительные параметры", shortcut: "Shift+F10" }
+            { label: "Открыть терминал", glyph: "list", action: "terminal" },
+            { label: "Показать дополнительные параметры", glyph: "more", shortcut: "Shift+F10" }
         ]
-        onItemChosen: shell.contextOpen = false
+        onItemChosen: function(action) {
+            shell.contextOpen = false;
+            if (action === "display") { shell.focusWindow("settings"); }
+            else if (action === "personalize") { shell.focusWindow("settings"); }
+        }
     }
 
-    // --- taskbar ------------------------------------------------------------------------------
+    // --- taskbar ------------------------------------------------------------------------------------
     Taskbar {
         id: taskbar
         z: 20
@@ -279,12 +310,26 @@ Item {
         anchors.bottom: parent.bottom
         startActive: shell.startOpen
         quickActive: shell.quickOpen
-        activeApp: "Terminal"
+        searchActive: shell.searchOpen
+        notificationsActive: shell.notificationsOpen
+        windowButtons: [
+            { id: "explorer", name: "Проводник", glyph: "folder",
+              running: shell.openWindows["explorer"] === true,
+              active: shell.focusedWindow === "explorer" && shell.isOpen("explorer") },
+            { id: "settings", name: "Параметры", glyph: "settings",
+              running: shell.openWindows["settings"] === true,
+              active: shell.focusedWindow === "settings" && shell.isOpen("settings") }
+        ]
         state: shell.backendState
         system: shell.backendSystem
         apps: shell.backendApps
-        onStartToggled: { shell.startOpen = !shell.startOpen; shell.quickOpen = false }
-        onQuickToggled: { shell.quickOpen = !shell.quickOpen; shell.startOpen = false }
+        onStartToggled: { var open = !shell.startOpen; shell.closeAllFlyouts(); shell.startOpen = open }
+        onSearchToggled: { var open = !shell.searchOpen; shell.closeAllFlyouts(); shell.searchOpen = open }
+        onQuickToggled: { var open = !shell.quickOpen; shell.closeAllFlyouts(); shell.quickOpen = open }
+        onNotificationsToggled: { var open = !shell.notificationsOpen; shell.closeAllFlyouts(); shell.notificationsOpen = open }
+        onTaskViewToggled: shell.focusWindow(shell.focusedWindow === "explorer" ? "settings" : "explorer")
         onAppActivated: function(row) { shell.backendApps.launchRow(row) }
+        onWindowActivated: function(id) { shell.toggleWindow(id) }
     }
+
 }

@@ -4,6 +4,7 @@ testable without Qt."""
 from __future__ import annotations
 
 import time
+from pathlib import Path
 
 from PySide6.QtCore import (
     Property, QAbstractListModel, QModelIndex, QObject, Qt, QTimer, Signal, Slot,
@@ -11,7 +12,7 @@ from PySide6.QtCore import (
 
 from .backend import AppEntry, format_clock, load_pinned, memory_percent, read_running_commands
 from .desktop_entries import DesktopApp, discover, launch
-from . import system
+from . import files, hostinfo, system
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
@@ -181,6 +182,16 @@ class SystemState(QObject):
     def bluetoothDetail(self) -> str:  # noqa: N802
         return self._detail("bluetooth")
 
+    @Property(str, notify=changed)
+    def keyboardLayout(self) -> str:  # noqa: N802
+        """Tray layout badge. Empty when nothing reported one, so the tray shows no badge."""
+        reading = self._readings.get("keyboard")
+        return reading.detail if reading and reading.available else ""
+
+    @Property(str, notify=changed)
+    def keyboardDetail(self) -> str:  # noqa: N802
+        return self._detail("keyboard")
+
     @Property(str, constant=True)
     def userName(self) -> str:  # noqa: N802
         return system.user_name()
@@ -225,3 +236,176 @@ class ShellState(QObject):
         """-1 means 'not measurable here' — the UI must show a dash, not a fabricated number."""
         value = memory_percent(self._proc_root)
         return -1 if value is None else value
+
+
+NAME_R, PATH_R, KIND_R, SIZE_R, MODIFIED_R, GLYPH_R, ISDIR_R, SUB_R = (
+    Qt.UserRole + 20 + n for n in range(8))
+
+
+class FileModel(QAbstractListModel):
+    """The contents of one directory on this machine — the Explorer list.
+
+    Navigation is real: `openRow` descends into folders, `goUp` walks to the parent, `navigate`
+    jumps to a path. A directory that cannot be read leaves the list empty and sets `errorText`.
+    """
+
+    changed = Signal()
+
+    def __init__(self, path: str | None = None) -> None:
+        super().__init__()
+        self._path = str(Path(path) if path else Path.home())
+        self._entries: list[files.Entry] = []
+        self._error = ""
+        self._history: list[str] = []
+        self._forward: list[str] = []
+        self.reload()
+
+    def roleNames(self) -> dict:  # noqa: N802
+        return {NAME_R: b"name", PATH_R: b"path", KIND_R: b"kind", SIZE_R: b"size",
+                MODIFIED_R: b"modified", GLYPH_R: b"glyph", ISDIR_R: b"isDir"}
+
+    def rowCount(self, parent=QModelIndex()) -> int:  # noqa: N802
+        return 0 if parent.isValid() else len(self._entries)
+
+    def data(self, index, role=Qt.DisplayRole):
+        if not index.isValid() or not 0 <= index.row() < len(self._entries):
+            return None
+        entry = self._entries[index.row()]
+        return {NAME_R: entry.name, PATH_R: entry.path, KIND_R: entry.kind,
+                SIZE_R: files.human_size(entry.size, entry.is_dir),
+                MODIFIED_R: files.format_modified(entry.modified),
+                GLYPH_R: entry.glyph, ISDIR_R: entry.is_dir}.get(role)
+
+    @Slot()
+    def reload(self) -> None:
+        self.beginResetModel()
+        try:
+            self._entries = files.list_directory(self._path)
+            self._error = ""
+        except OSError as exc:
+            self._entries = []
+            self._error = f"Не удалось открыть папку: {exc.strerror or exc}"
+        self.endResetModel()
+        self.changed.emit()
+
+    @Slot(str)
+    def navigate(self, path: str) -> None:
+        if not Path(path).is_dir():
+            self._error = "Папка недоступна"
+            self.changed.emit()
+            return
+        self._history.append(self._path)
+        self._forward.clear()
+        self._path = str(Path(path))
+        self.reload()
+
+    @Slot(int)
+    def openRow(self, row: int) -> None:  # noqa: N802
+        if 0 <= row < len(self._entries) and self._entries[row].is_dir:
+            self.navigate(self._entries[row].path)
+
+    @Slot()
+    def goUp(self) -> None:  # noqa: N802
+        parent = str(Path(self._path).parent)
+        if parent != self._path:
+            self.navigate(parent)
+
+    @Slot()
+    def goBack(self) -> None:  # noqa: N802
+        if self._history:
+            self._forward.append(self._path)
+            self._path = self._history.pop()
+            self.reload()
+
+    @Slot()
+    def goForward(self) -> None:  # noqa: N802
+        if self._forward:
+            self._history.append(self._path)
+            self._path = self._forward.pop()
+            self.reload()
+
+    @Property(str, notify=changed)
+    def path(self) -> str:
+        return self._path
+
+    @Property(str, notify=changed)
+    def errorText(self) -> str:  # noqa: N802
+        return self._error
+
+    @Property(int, notify=changed)
+    def count(self) -> int:
+        return len(self._entries)
+
+    @Property(bool, notify=changed)
+    def canGoBack(self) -> bool:  # noqa: N802
+        return bool(self._history)
+
+    @Property(bool, notify=changed)
+    def canGoForward(self) -> bool:  # noqa: N802
+        return bool(self._forward)
+
+    @Property("QVariantList", notify=changed)
+    def breadcrumbs(self) -> list:
+        """[{name, path}] from the filesystem root to the current directory."""
+        parts = Path(self._path).parts
+        crumbs = []
+        for index in range(len(parts)):
+            path = str(Path(*parts[: index + 1]))
+            crumbs.append({"name": parts[index].strip("/") or "Этот компьютер", "path": path})
+        return crumbs
+
+    @Property("QVariantList", constant=True)
+    def shortcuts(self) -> list:
+        return [{"name": name, "path": path, "icon": icon}
+                for name, path, icon in files.quick_access()]
+
+
+class RecentModel(QAbstractListModel):
+    """Recently modified files under the home directory — the Start panel's recommendations."""
+
+    changed = Signal()
+
+    def __init__(self, home: str | None = None, limit: int = 6) -> None:
+        super().__init__()
+        self._entries = files.recent_files(home, limit)
+
+    def roleNames(self) -> dict:  # noqa: N802
+        return {NAME_R: b"name", PATH_R: b"path", GLYPH_R: b"glyph", SUB_R: b"subtitle"}
+
+    def rowCount(self, parent=QModelIndex()) -> int:  # noqa: N802
+        return 0 if parent.isValid() else len(self._entries)
+
+    def data(self, index, role=Qt.DisplayRole):
+        if not index.isValid() or not 0 <= index.row() < len(self._entries):
+            return None
+        entry = self._entries[index.row()]
+        return {NAME_R: entry.name, PATH_R: entry.path, GLYPH_R: entry.glyph,
+                SUB_R: files.format_modified(entry.modified)}.get(role)
+
+    @Property(int, notify=changed)
+    def count(self) -> int:
+        return len(self._entries)
+
+
+class HostInfo(QObject):
+    """Real machine facts for the Settings application (hostinfo.py)."""
+
+    changed = Signal()
+
+    def __init__(self, readings: dict[str, str] | None = None) -> None:
+        super().__init__()
+        self._data = readings if readings is not None else hostinfo.snapshot()
+
+    @Slot()
+    def refresh(self) -> None:
+        self._data = hostinfo.snapshot()
+        self.changed.emit()
+
+    @Slot(str, result=str)
+    def value(self, key: str) -> str:
+        """Empty string means 'not measurable here' — Settings then shows a dash."""
+        return self._data.get(key, "")
+
+    @Property("QVariantMap", notify=changed)
+    def all(self) -> dict:
+        return dict(self._data)

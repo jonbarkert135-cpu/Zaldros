@@ -1,5 +1,41 @@
 # Worklog
 
+## 2026-08-26 — run #27: Windows 11 visual parity, cycle 1
+
+Goal for this cycle, set by the maintainer: pixel-level Windows 11 parity for the shell. Kernel,
+base and KWin untouched; performance work restricted to the backend.
+
+**Reference is now numeric.** `tools/visual/measure_reference.py` measures real Windows 11 captures
+(the committed 1920x1280 Start capture plus private maintainer screenshots that were measured and
+then deliberately not committed) and writes logical values to `system/theme/win11-reference.json`:
+taskbar 48 / icon 24 / button pitch 44, Start 640x726 with 32 padding and a 576x38 search field,
+6 x 96x84 pin cells, 64 footer, 12 gap above the taskbar, Explorer 40/48/48 bars with a 190 sidebar
+on #191919, Settings rail 320, flyouts 360 at 12 from the edge, menu items 32.
+
+**Checked, not claimed.** `tools/visual/parity.py` renders seven states offscreen, reads the live
+geometry of every named component back out of the scene graph and compares it against those
+numbers: **29 of 29 checks match**. `tests/test_visual_parity.py` runs the same comparison in CI,
+so drift fails the build. Evidence: `docs/visual/current/` (frames, per-component crops,
+`parity-report.json`).
+
+**Reworked to the measurements:** taskbar (centred group at 44 px pitch, search field, task view,
+window buttons, tray with layout badge, grouped network/volume/battery pill, two-line clock,
+notification button, show-desktop strip); window chrome (32 px Mica title bar, 46x32 captions with
+the #c42b1c close hover, layered shadow, real drag/minimise/maximise/close, tabbed title bar for
+Explorer); Start (measured grid, real recent files instead of an empty Recommended panel); search
+flyout over installed applications; quick settings; notification centre with a real month calendar;
+context menu.
+
+**Explorer and Settings are applications now, not mockups.** Explorer lists and navigates this
+machine's real directories (`zaldros_shell/files.py`) with breadcrumbs, back/forward/up, command
+bar, column header, status count and honest empty/error states. Settings shows 11 pages of real
+readings from `zaldros_shell/hostinfo.py` (device, OS, kernel, CPU, RAM, disk, uptime, session,
+time zone); anything the system cannot report renders as a dash. A test fails the build if
+placeholder copy reappears in either application.
+
+Also: 55 real Fluent UI System Icons (Microsoft, MIT) vendored for the new controls, and the tray
+keyboard badge now reads the session layout instead of printing whatever `LANG` contains.
+
 ## 2026-08-23 — run #17 (0d364d1): DESKTOP UP on all 9 combinations, boot verdict still FAIL
 - Evidence: run 32669197023, all 12 jobs green; per-job JSON/serial/screenshots on `ci-logs-boot-*`.
 - **First real desktop.** The systemd autologin session works: `kwin_wayland` running,

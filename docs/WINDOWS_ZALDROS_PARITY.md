@@ -16,13 +16,13 @@ in where a real frame exists to compare against the reference screenshot.
 | System tray | tray with real presence detection | PARTIAL | yes | yes | 3.7 | 2 | no per-icon backends, overflow is static | P2 |
 | Launching applications | real .desktop parsing + launch | PARTIAL | yes | yes (unit) | — | 3 | no window tracking after launch | P1 |
 | Running-app indicator | underline driven by real `/proc` process table | PARTIAL | yes | yes | 4 | 3 | matches process names, not real windows | P2 |
-| Search | search field in taskbar and Start | MISSING (UI only) | no | render only | 3.0 | 0 | no index, no results | P2 |
-| File Explorer | Dolphin fork (planned) | MISSING | no | no | — | — | nothing written | P1 |
-| Settings | Zaldros Settings (planned) | MISSING | no | no | — | — | nothing written | P2 |
+| Search | Zaldros search flyout over the taskbar field | PARTIAL | yes — filters installed apps | yes | 4.3 | 3 | no file or web index | P2 |
+| File Explorer | Zaldros Explorer (QML + FileModel) | PARTIAL | yes — lists and navigates real directories | yes | 4.2 | 3 | no copy/move/delete, no tabs beyond the first | P1 |
+| Settings | Zaldros Settings (QML + hostinfo) | PARTIAL | yes — real machine readings, 11 pages | yes | 4.2 | 2 | read-only, nothing is applied yet | P2 |
 | Context menus | Zaldros ContextMenu (QML) | PROTOTYPE | renders | yes | 3.8 | 2 | items perform no actions | P2 |
-| Notifications | — | MISSING | no | no | — | — | no notification daemon | P2 |
+| Notifications | Zaldros notification centre + calendar | PARTIAL | calendar is real | yes | 4.0 | 2 | no notification daemon yet | P2 |
 | Quick settings | Zaldros quick settings flyout | PARTIAL | yes — real readouts | yes | 3.7 | 2 | toggles not wired; unavailable items shown as unavailable | P2 |
-| Window decorations | Zaldros AppWindow design (KWin will draw) | PROTOTYPE | renders | yes | 3.7 | 2 | design only, no window management | P2 |
+| Window decorations | Zaldros AppWindow (32 px bar, 46x32 captions) | PARTIAL | yes — drag, minimise, maximise, close | yes | 4.3 | 3 | shell-drawn; KWin decorations still to match | P2 |
 | Window snapping / snap layouts | KWin rules (planned) | MISSING | no | no | — | — | never run on a compositor | P2 |
 | Alt+Tab / Task view | KWin (planned) | MISSING | no | no | — | — | — | P3 |
 | Virtual desktops | KWin (planned) | MISSING | no | no | — | — | — | P3 |

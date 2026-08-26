@@ -1,8 +1,9 @@
 import QtQuick
 import ZaldrosTheme
 
-// A taskbar application button. Windows 11 geometry: 40x40 hit target inside a 48 px bar, 24 px
-// icon, 3 px running indicator that widens when the window is active.
+// One taskbar button. Measured Windows 11 geometry: 44 px pitch inside the 48 px bar, a 40 px
+// square hover plate, a 24 px icon and the running indicator — 6 px wide idle, 16 px when the
+// window is in the foreground.
 Item {
     id: button
     property string appName: ""
@@ -12,18 +13,23 @@ Item {
     property bool active: false
     property bool installed: true
     property string iconName: ""
+    property string iconGlyph: ""
     property bool showTile: true
     signal activated()
     signal contextRequested(int mouseX, int mouseY)
 
     width: Theme.taskbarButton
-    height: Theme.taskbarButton
+    height: Theme.taskbarHeight
 
     Rectangle {
-        id: bg
-        anchors.fill: parent
+        id: plate
+        anchors.centerIn: parent
+        width: Theme.taskbarButtonHeight
+        height: Theme.taskbarButtonHeight
         radius: Theme.radiusSmall + 1
-        color: area.pressed ? Theme.pressed : (area.containsMouse ? Theme.hover : "transparent")
+        color: area.pressed ? Theme.pressed
+               : (button.active ? Theme.selected
+               : (area.containsMouse ? Theme.hover : "transparent"))
         Behavior on color { ColorAnimation { duration: Theme.animFast } }
     }
 
@@ -34,6 +40,7 @@ Item {
         height: Theme.taskbarIcon
         baseColor: button.tileColor
         iconName: button.iconName
+        glyph: button.iconGlyph
         label: button.initial
         dim: !button.installed
     }
@@ -43,10 +50,10 @@ Item {
         visible: button.running
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 2
-        height: 3
-        radius: 1.5
-        width: button.active ? 16 : 6
+        anchors.bottomMargin: 3
+        height: Theme.indicatorHeight
+        radius: height / 2
+        width: button.active ? Theme.indicatorActive : Theme.indicatorWidth
         color: button.active ? Theme.accent : Theme.textSecondary
         Behavior on width { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutCubic } }
     }
@@ -70,5 +77,6 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.top
         anchors.bottomMargin: 8
+        z: 60
     }
 }

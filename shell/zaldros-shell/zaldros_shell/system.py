@@ -107,10 +107,29 @@ def bluetooth(sys_root: str = "/sys/class/bluetooth") -> Reading:
     return Reading(False, detail="адаптер не найден", source=sys_root)
 
 
+def keyboard_layout(runner=subprocess.run) -> Reading:
+    """Active keyboard layout, read from the session. Windows shows it in the tray, so we do too —
+    but only when something really reports one."""
+    if shutil.which("localectl"):
+        try:
+            result = runner(["localectl", "status"], capture_output=True, text=True, timeout=2)
+        except (OSError, subprocess.SubprocessError):
+            result = None
+        if result is not None and result.returncode == 0:
+            for line in result.stdout.splitlines():
+                key, _, value = line.partition(":")
+                if key.strip() in ("X11 Layout", "VC Keymap") and value.strip() not in ("", "n/a"):
+                    return Reading(True, None, value.strip().upper()[:3], source="localectl")
+    language = os.environ.get("LANG", "").split(".")[0].split("_")[0]
+    if len(language) == 2 and language.isalpha():
+        return Reading(True, None, language.upper(), source="LANG")
+    return Reading(False, detail="раскладка не определена", source="localectl")
+
+
 def user_name() -> str:
     return os.environ.get("USER") or os.environ.get("LOGNAME") or "пользователь"
 
 
 def snapshot() -> dict[str, Reading]:
     return {"battery": battery(), "brightness": backlight(), "network": network(),
-            "volume": volume(), "bluetooth": bluetooth()}
+            "volume": volume(), "bluetooth": bluetooth(), "keyboard": keyboard_layout()}
