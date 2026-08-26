@@ -124,6 +124,69 @@ scheme="prefer-dark"; [[ "$VARIANT" == "light" ]] && scheme="prefer-light"
 
 install -d "$DEST/etc/xdg" "$DEST/etc/skel/.config/gtk-3.0" "$DEST/etc/skel/.config/gtk-4.0"
 
+# ------------------------------------------------------------------------------- KDE colour scheme
+# Run #29, from the live boot log: `Could not find color scheme "ZaldrosDark" falling back to
+# BreezeLight`. kdeglobals named a scheme that was never installed, so every KDE application in the
+# image — Dolphin, Konsole, the KWin decoration — ran in Breeze *light* on a dark desktop.
+# The values are the same tokens as qml/ZaldrosTheme/Theme.qml; KDE wants decimal r,g,b.
+if [[ "$VARIANT" == "light" ]]; then
+  c_window="243,243,243"; c_text="27,27,27"; c_view="255,255,255"; c_button="251,251,251"
+  c_accent="0,103,192";   c_accent_text="255,255,255"; c_scheme_name="ZaldrosLight"
+else
+  c_window="32,32,32";    c_text="255,255,255"; c_view="25,25,25";  c_button="44,44,44"
+  c_accent="96,205,255";  c_accent_text="0,36,61";     c_scheme_name="ZaldrosDark"
+fi
+install -Dm644 /dev/stdin "$DEST/usr/share/color-schemes/$c_scheme_name.colors" <<EOF
+[General]
+ColorScheme=$c_scheme_name
+Name=$c_scheme_name
+shadeSortColumn=true
+
+[Colors:Window]
+BackgroundNormal=$c_window
+BackgroundAlternate=$c_button
+ForegroundNormal=$c_text
+ForegroundInactive=122,122,122
+DecorationFocus=$c_accent
+DecorationHover=$c_accent
+
+[Colors:View]
+BackgroundNormal=$c_view
+BackgroundAlternate=$c_window
+ForegroundNormal=$c_text
+ForegroundInactive=122,122,122
+DecorationFocus=$c_accent
+DecorationHover=$c_accent
+
+[Colors:Button]
+BackgroundNormal=$c_button
+BackgroundAlternate=$c_window
+ForegroundNormal=$c_text
+DecorationFocus=$c_accent
+DecorationHover=$c_accent
+
+[Colors:Selection]
+BackgroundNormal=$c_accent
+BackgroundAlternate=$c_accent
+ForegroundNormal=$c_accent_text
+DecorationFocus=$c_accent
+DecorationHover=$c_accent
+
+[Colors:Tooltip]
+BackgroundNormal=$c_button
+ForegroundNormal=$c_text
+
+[Colors:Complementary]
+BackgroundNormal=$c_window
+ForegroundNormal=$c_text
+
+[WM]
+activeBackground=$c_window
+activeForeground=$c_text
+inactiveBackground=$c_window
+inactiveForeground=122,122,122
+EOF
+
 # --------------------------------------------------------------------- window decoration (Aurorae)
 # Aurorae is KWin's SVG decoration engine and ships in `kwin-style-aurorae` — it does *not* need
 # plasmashell, which is why this is the one part of the "windows-eleven" Plasma global themes that
@@ -182,7 +245,7 @@ LookAndFeelPackage=org.zaldros.desktop
 widgetStyle=Breeze
 
 [General]
-ColorScheme=ZaldrosDark
+ColorScheme=$c_scheme_name
 font=$UI_FONT_FAMILY,10,-1,5,50,0,0,0,0,0
 menuFont=$UI_FONT_FAMILY,10,-1,5,50,0,0,0,0,0
 smallestReadableFont=$UI_FONT_FAMILY,8,-1,5,50,0,0,0,0,0

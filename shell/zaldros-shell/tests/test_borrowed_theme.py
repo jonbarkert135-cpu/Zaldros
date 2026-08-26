@@ -70,3 +70,14 @@ def test_adopting_the_theme_did_not_adopt_the_plasma_session() -> None:
     for line in build.splitlines():
         if line.strip().startswith("SESSION_EXEC="):
             assert "plasma" not in line, f"a variant would start plasmashell: {line.strip()}"
+
+
+def test_the_colour_scheme_kdeglobals_names_is_actually_installed() -> None:
+    """Run #29 live boot log: 'Could not find color scheme "ZaldrosDark" falling back to
+    BreezeLight' — kdeglobals pointed at a scheme no file provided, so every KDE app ran light."""
+    theme = THEME.read_text()
+    assert '"$DEST/usr/share/color-schemes/$c_scheme_name.colors"' in theme, \
+        "the scheme file must be installed where KDE looks for it"
+    assert theme.count("ColorScheme=$c_scheme_name") >= 2, \
+        "kdeglobals and the scheme file must name the same scheme"
+    assert "c_scheme_name=\"ZaldrosDark\"" in theme and "c_scheme_name=\"ZaldrosLight\"" in theme

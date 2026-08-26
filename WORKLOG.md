@@ -594,3 +594,22 @@ Gates: `tests/test_borrowed_theme.py` (6). Tests: 122. Parity: 34/34.
 
 Still open: how the Aurorae title bars actually look has to come from a booted ISO — the offscreen
 renderer draws our shell, not KWin decorations.
+
+### Run #29b — why Alt+Tab kept failing, and the colour scheme that was never installed
+
+The ISO for `21e75c0` finished while the audit was running. Two things from its logs:
+
+1. **Alt+Tab: the test was wrong, not (necessarily) the system.** The session log now shows the fix
+   from #28b working — `/etc/zaldros/accel-path` resolved, `kglobalacceld` started, then
+   `exec kwin_wayland`. Yet `changed_fraction` is still exactly 0.0. The reason is in the driver:
+   the host pressed Alt+Tab as its *third* step, seconds after boot, when the fullscreen shell was
+   the only toplevel window. KWin shows no switcher for a single window, and QEMU's chord releases
+   Alt long before the screenshot — so the frame could not change whatever the shortcut did. The
+   step now runs last, after the guest has published its geometry (by which time the in-guest test
+   has opened Dolphin), and reports BLOCKED rather than FAIL when no second window exists.
+2. **`Could not find color scheme "ZaldrosDark" falling back to BreezeLight`.** `kdeglobals` named a
+   scheme that no file provided, so every KDE application in the image — Dolphin, Konsole and the
+   window decoration — was rendering in Breeze *light* on a dark desktop. The scheme is now
+   generated from the same tokens as `Theme.qml` into `/usr/share/color-schemes/`, in both
+   variants, and `test_borrowed_theme.py` fails if kdeglobals ever names a scheme that is not
+   installed. This also explains part of why borrowed KDE surfaces never looked like the shell.

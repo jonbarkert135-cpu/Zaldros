@@ -126,7 +126,6 @@ def main():
     steps = {
         "start_open": lambda: qmp.key("meta_l"),
         "start_close": lambda: qmp.key("esc"),
-        "alt_tab": lambda: qmp.key("alt_l", "tab"),
     }
     results = {name: timed_step(qmp, out, name, action) for name, action in steps.items()}
 
@@ -144,6 +143,23 @@ def main():
             "status": "BLOCKED",
             "why": "the guest did not publish /tmp/zaldros-ui-geometry.json, so the Start button "
                    "position on screen is unknown and clicking a guessed point proves nothing"}
+
+    # Alt+Tab runs last, and only once the guest has published its geometry — that line is printed
+    # by the in-guest test, which by then has launched Dolphin. Runs #27-#28b measured Alt+Tab
+    # while the shell was the *only* toplevel window: KWin shows no switcher for a single window
+    # and releases Alt before the screenshot, so the frame could not change and the step reported
+    # FAIL for a shortcut that may well have worked. With no second window the honest answer is
+    # BLOCKED, not FAIL.
+    if start:
+        results["alt_tab"] = timed_step(qmp, out, "alt_tab", lambda: qmp.key("alt_l", "tab"))
+        results["alt_tab"]["note"] = ("measured with the guest's Dolphin window open; a pass means "
+                                      "the frame changed, i.e. the switcher appeared or the "
+                                      "stacking order changed")
+    else:
+        results["alt_tab"] = {
+            "status": "BLOCKED",
+            "why": "the guest never came up far enough to open a second window, and Alt+Tab with "
+                   "one toplevel window cannot change the screen either way"}
     (out / f"{args.name}-host.json").write_text(json.dumps(results, indent=2, ensure_ascii=False))
     print(json.dumps(results, indent=2, ensure_ascii=False))
 
