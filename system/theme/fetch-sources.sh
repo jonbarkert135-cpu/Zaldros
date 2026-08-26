@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
-# Fetch the upstream visual sources that install-visual-theme.sh consumes.
-# Pinned to commits so an image build is reproducible (spec PART 1 §12).
+# Fetch the one upstream visual source Zaldros still ships: the cursor theme.
+#
+# ADR-0010 (2026-08-26): cursors are the only third-party *theme* we install. GTK and icon theme
+# packs are no longer fetched — the look is drawn by our own shell and our own icon set, because a
+# theme pack cannot reach Windows 11 pixel parity and hides where a mismatch comes from.
+# Pinned to a commit so an image build is reproducible (spec PART 1 §12).
 set -euo pipefail
 
 DEST="${1:-/usr/src}"
-clone() {  # url dir ref
-  local url="$1" dir="$DEST/$2" ref="$3"
-  [[ -d "$dir/.git" ]] || git clone --quiet "$url" "$dir"
-  git -C "$dir" fetch --quiet origin "$ref" || true
-  git -C "$dir" checkout --quiet "$ref"
-  echo "$2 @ $(git -C "$dir" rev-parse --short HEAD)"
-}
+CURSOR_REF="${CURSOR_REF:-master}"
 
 mkdir -p "$DEST"
-clone https://github.com/yeyushengfan258/Win11-gtk-theme.git  Win11-gtk-theme  "${GTK_REF:-main}"
-clone https://github.com/yeyushengfan258/Win11-icon-theme.git Win11-icon-theme "${ICON_REF:-main}"
-clone https://github.com/vinceliuice/Fluent-icon-theme.git    Fluent-icon-theme "${CURSOR_REF:-master}"
+dir="$DEST/Fluent-icon-theme"
+[[ -d "$dir/.git" ]] || git clone --quiet --filter=blob:none --no-checkout \
+  https://github.com/vinceliuice/Fluent-icon-theme.git "$dir"
+git -C "$dir" sparse-checkout set --no-cone cursors >/dev/null
+git -C "$dir" fetch --quiet origin "$CURSOR_REF" || true
+git -C "$dir" checkout --quiet "$CURSOR_REF"
+echo "Fluent-icon-theme @ $(git -C "$dir" rev-parse --short HEAD) (cursors/ only)"
 
-# Cursors come from Fluent-icon-theme; its installer lives in the cursors/ subdirectory.
-echo "next: install-visual-theme.sh --dest <rootfs> --gtk $DEST/Win11-gtk-theme --icons $DEST/Win11-icon-theme"
+# The cursors are prebuilt in cursors/dist and cursors/dist-dark, so no inkscape/xcursorgen at
+# build time. install-visual-theme.sh copies them unmodified.
+echo "next: install-visual-theme.sh --dest <rootfs> --cursors $dir"

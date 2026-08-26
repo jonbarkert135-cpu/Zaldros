@@ -59,8 +59,8 @@ def test_unknown_application_icon_falls_back_instead_of_guessing():
 def test_system_icon_theme_is_read_from_the_installed_config(tmp_path):
     from zaldros_shell.icons import system_icon_theme
     conf = tmp_path / "visual.conf"
-    conf.write_text("icon_theme=Win11-dark\ncursor_theme=Win11-cursors\n")
-    assert system_icon_theme(conf) == "Win11-dark"
+    conf.write_text("icon_theme=Zaldros\ncursor_theme=Fluent-dark-cursors\n")
+    assert system_icon_theme(conf) == "Zaldros"
 
 
 def test_missing_visual_config_means_vendored_fallback(tmp_path):

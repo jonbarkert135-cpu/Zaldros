@@ -15,7 +15,10 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Track real windows from the compositor; group them in the taskbar
 - [ ] Wire quick-settings toggles to NetworkManager / BlueZ / PipeWire / UPower
 - [x] Vendor Fluent UI System Icons (MIT) and Selawik (OFL) — done, in use
-- [ ] Vendor Fluent-icon-theme (GPL-3) for app/mime icons and its cursor theme
+- [x] Install the Fluent cursor theme (GPL-3) — the only borrowed pack (ADR-0010)
+- [ ] Draw our own Aurorae decoration theme so real app titlebars stop being Breeze
+- [ ] Replace the vendored GPL-3 app/place SVGs with our own artwork (last borrowed pixels besides the cursors)
+- [ ] Extend the `Zaldros` icon theme to mime and device names (currently apps/places/actions only)
 - [ ] Ship Win11-gtk-theme (GPL-3) so GTK applications match the shell
 - [ ] Build the ISO the AnduinOS way (debootstrap + squashfs + xorriso) — no container runtime needed
 - [ ] Window management: Alt+Tab, snap layouts, minimise/maximise/close on real windows

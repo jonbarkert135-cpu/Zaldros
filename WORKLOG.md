@@ -414,3 +414,30 @@ Fixes in this commit:
 Still open after this run: the missing `ZaldrosDark` colour scheme, no `default` cursor theme, no
 `applications.menu`, the absent `org.kde.kwin.aurorae.v2` decoration plugin, and the icon
 provider failing for `soffice`, `zutty` and `gvim` in the pinned grid.
+
+## Run #27 — visual parity cycle 1 measured, and why Alt+Tab was dead
+
+Boot: 9/9 profiles PASS with the rebuilt shell (`shell=true`, `kwin=true`, no failed units;
+608-745 MiB used, 21-24 s to self-test). Host UI: `start_open`, `start_close` and
+`taskbar_response` PASS; `alt_tab` FAIL with `changed_fraction` exactly 0.0 in all nine.
+
+Zero change is the tell: the key never reached anything. The shell's own `Alt+Tab` `Shortcut`
+only fires while the shell surface has focus, and by that step Dolphin owns it. The switcher is
+KWin's job — but KWin does not grab keys itself. It registers "Walk Through Windows" with the
+global accelerator daemon, and that daemon (`kglobalacceld`) is only a *recommend* of
+`kwin-wayland`, so `--no-install-recommends` left it out of every image we have ever built. With
+no daemon, the registration is dropped without an error and Alt+Tab is dead for the session.
+
+Fix in this commit, three parts because all three must hold:
+
+* `build-iso.sh` installs `kglobalacceld`, falling back to `kglobalaccel-bin` on KF5 suites, and
+  keeps building if neither exists rather than failing the ISO over a shortcut.
+* `zaldros-session` starts the daemon before `exec kwin_wayland`, so the registration has
+  somewhere to go.
+* `install-visual-theme.sh` writes `[TabBox]` in `/etc/xdg/kwinrc` (thumbnail grid, the closest
+  KWin switcher to the Windows 11 layout) and `/etc/xdg/kglobalshortcutsrc` with Alt+Tab,
+  Alt+`, Meta+D, Alt+F4 and the Meta+arrow snap bindings.
+
+`tests/test_iso_packages.py::test_alt_tab_is_wired_end_to_end` asserts all three so this cannot
+regress quietly. The switcher's own skin is still KWin's, not a Windows 11 one — that is on the
+cycle 3 list, together with Explorer file operations and nested Settings pages.

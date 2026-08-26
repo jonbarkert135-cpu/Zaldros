@@ -98,6 +98,32 @@ def settled_systemd_state(timeout=120):
 
 
 
+def visual_layer():
+    """Evidence that the installed visual layer is really on disk and picked up.
+
+    The session log has complained about a missing cursor theme since run #17; that stays invisible
+    unless the self-test reports it, so it is reported here as fact rather than assumed.
+    """
+    cursor = ""
+    conf = Path("/etc/zaldros/visual.conf")
+    if conf.is_file():
+        for line in conf.read_text().splitlines():
+            key, _, value = line.partition("=")
+            if key.strip() == "cursor_theme":
+                cursor = value.strip()
+    theme_dir = Path("/usr/share/icons") / cursor if cursor else None
+    return {
+        "cursor_theme": cursor,
+        "cursor_theme_installed": bool(theme_dir and theme_dir.is_dir()),
+        "cursor_shapes": len(list((theme_dir / "cursors").glob("*"))) if theme_dir and (theme_dir / "cursors").is_dir() else 0,
+        "cursor_default_alias": Path("/usr/share/icons/default/index.theme").is_file(),
+        "xcursor_theme_env": os.environ.get("XCURSOR_THEME", ""),
+        "icon_theme_installed": Path("/usr/share/icons/Zaldros/index.theme").is_file(),
+        "icon_theme_apps": len(list(Path("/usr/share/icons/Zaldros/apps/scalable").glob("*.svg")))
+                           if Path("/usr/share/icons/Zaldros/apps/scalable").is_dir() else 0,
+    }
+
+
 def tail_file(path, n=4000):
     """Last n chars of a log file, or None when it does not exist (never a guess)."""
     try:
@@ -149,6 +175,7 @@ def main():
         "loadavg": Path("/proc/loadavg").read_text().split()[:3],
         "session_log": tail_file("/tmp/zaldros-session.log"),
         "app_launch": launch_test(),
+        "visual_layer": visual_layer(),
         # Session diagnostics: run #15 booted fine but no compositor ever started.
         "sessions_available": sorted(p.name for p in Path("/usr/share/wayland-sessions").glob("*.desktop"))
                               if Path("/usr/share/wayland-sessions").is_dir() else [],

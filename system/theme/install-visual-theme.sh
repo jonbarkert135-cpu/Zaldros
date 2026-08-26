@@ -1,56 +1,114 @@
 #!/usr/bin/env bash
-# Install the Windows-11-like visual layer into a Zaldros root filesystem and make it the default
-# for every user. Run inside the image chroot during the build, or with sudo on a running system.
+# Install the Zaldros visual layer into a root filesystem and make it the default for every user.
+# Run inside the image chroot during the build, or with sudo on a running system.
 #
-#   install-visual-theme.sh [--dest ROOTFS] [--gtk DIR] [--icons DIR] [--variant dark|light]
+#   install-visual-theme.sh [--dest ROOTFS] [--cursors DIR] [--assets DIR] [--variant dark|light]
 #
-# Sources are the upstream projects, used unmodified through their own installers:
-#   Win11-gtk-theme   (GPL-3.0)  -> /usr/share/themes/Win11-*
-#   Win11-icon-theme  (GPL-3.0)  -> /usr/share/icons/Win11
+# What is ours and what is borrowed (ADR-0010, 2026-08-26):
+#   ours     — icon theme (built here from assets/icons), colour scheme, GTK overrides, KWin config
+#   borrowed — the cursor theme only: Fluent-icon-theme/cursors (GPL-3.0), copied unmodified
 # Licences and obligations: docs/VISUAL_LICENSE_AUDIT.md
 set -euo pipefail
 
 DEST="/"
-GTK_SRC="${GTK_SRC:-/usr/src/Win11-gtk-theme}"
-ICON_SRC="${ICON_SRC:-/usr/src/Win11-icon-theme}"
+CURSOR_SRC="${CURSOR_SRC:-/usr/src/Fluent-icon-theme}"
+ASSETS="${ASSETS:-/opt/zaldros/assets}"
 VARIANT="dark"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dest)    DEST="$2"; shift 2 ;;
-    --gtk)     GTK_SRC="$2"; shift 2 ;;
-    --icons)   ICON_SRC="$2"; shift 2 ;;
+    --cursors) CURSOR_SRC="$2"; shift 2 ;;
+    --assets)  ASSETS="$2"; shift 2 ;;
     --variant) VARIANT="$2"; shift 2 ;;
     -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
 done
 
-for dir in "$GTK_SRC" "$ICON_SRC"; do
-  [[ -x "$dir/install.sh" ]] || { echo "no install.sh in $dir" >&2; exit 1; }
-done
+[[ -d "$CURSOR_SRC/cursors/dist-dark/cursors" ]] || { echo "no prebuilt cursors in $CURSOR_SRC" >&2; exit 1; }
+[[ -d "$ASSETS/icons/apps" ]] || { echo "no icon assets in $ASSETS" >&2; exit 1; }
 
 THEMES="$DEST/usr/share/themes"
 ICONS="$DEST/usr/share/icons"
 mkdir -p "$THEMES" "$ICONS"
 
-# Upstream installers do the actual work — we do not re-implement or patch them.
-# GTK: round windows, blurred panels, default title buttons; both colour schemes are installed so
-# the user can switch light/dark without a second install.
-# Flags verified against the upstream usage text: -d/--dest, -t/--theme, -c/--color, -s/--size,
-# -i/--icon and --tweaks (round = rounded windows, blur = blurred panels).
-"$GTK_SRC/install.sh" --dest "$THEMES" --theme default --color dark --color light \
-                      --size standard --icon default --tweaks round blur
-"$ICON_SRC/install.sh" --dest "$ICONS" --name Win11 --theme default
+CURSOR_THEME="Fluent-dark-cursors"
+[[ "$VARIANT" == "light" ]] && CURSOR_THEME="Fluent-cursors"
 
-gtk_theme="Win11-Dark"; icon_theme="Win11-dark"; scheme="prefer-dark"
-if [[ "$VARIANT" == "light" ]]; then
-  gtk_theme="Win11-Light"; icon_theme="Win11"; scheme="prefer-light"
+# ---------------------------------------------------------------- cursors (the only borrowed pack)
+# Copied verbatim, names kept: a GPL-3 work stays identifiable, and the licence travels with it.
+rm -rf "$ICONS/Fluent-cursors" "$ICONS/Fluent-dark-cursors"
+cp -r "$CURSOR_SRC/cursors/dist"      "$ICONS/Fluent-cursors"
+cp -r "$CURSOR_SRC/cursors/dist-dark" "$ICONS/Fluent-dark-cursors"
+install -Dm644 "$CURSOR_SRC/cursors/LICENSE" "$DEST/usr/share/doc/zaldros/licenses/Fluent-icon-theme-COPYING"
+
+# Xcursor only looks at the "default" theme unless an application asks otherwise, so the choice has
+# to exist as a theme of that name; without this the session logs "no cursor theme" and falls back
+# to the X11 core font cursor.
+install -Dm644 /dev/stdin "$ICONS/default/index.theme" <<EOF
+[Icon Theme]
+Name=Default
+Comment=Zaldros default pointer
+Inherits=$CURSOR_THEME
+EOF
+
+# ------------------------------------------------------------------- our own icon theme (Zaldros)
+# Built from the icons in this repository, not from a theme pack. Freedesktop layout so every
+# toolkit (Qt, GTK, the shell's QIcon.fromTheme) resolves the same names.
+ZICONS="$ICONS/Zaldros"
+rm -rf "$ZICONS"
+install -d "$ZICONS/apps/scalable" "$ZICONS/places/scalable" "$ZICONS/actions/scalable"
+cp "$ASSETS/icons/apps/"*.svg   "$ZICONS/apps/scalable/"
+cp "$ASSETS/icons/places/"*.svg "$ZICONS/places/scalable/"
+cp "$ASSETS/icons/fluent/"*.svg "$ZICONS/actions/scalable/"
+install -Dm644 /dev/stdin "$ZICONS/index.theme" <<'EOF'
+[Icon Theme]
+Name=Zaldros
+Comment=Zaldros system icons
+Inherits=hicolor
+Directories=apps/scalable,places/scalable,actions/scalable
+
+[apps/scalable]
+Context=Applications
+Size=48
+MinSize=16
+MaxSize=512
+Type=Scalable
+
+[places/scalable]
+Context=Places
+Size=48
+MinSize=16
+MaxSize=512
+Type=Scalable
+
+[actions/scalable]
+Context=Actions
+Size=24
+MinSize=16
+MaxSize=512
+Type=Scalable
+EOF
+if command -v gtk-update-icon-cache >/dev/null; then
+  gtk-update-icon-cache --force --quiet "$ZICONS" || true
 fi
+# The app and place SVGs are still GPL-3 work from upstream icon themes, so their COPYING and
+# AUTHORS travel with the image even though the theme itself is assembled here.
+for directory in apps places fluent; do
+  for notice in COPYING AUTHORS LICENSE; do
+    [[ -f "$ASSETS/icons/$directory/$notice" ]] &&
+      install -Dm644 "$ASSETS/icons/$directory/$notice" \
+        "$DEST/usr/share/doc/zaldros/licenses/icons-$directory-$notice"
+  done
+done
+
+icon_theme="Zaldros"
+scheme="prefer-dark"; [[ "$VARIANT" == "light" ]] && scheme="prefer-light"
 
 install -d "$DEST/etc/xdg" "$DEST/etc/skel/.config/gtk-3.0" "$DEST/etc/skel/.config/gtk-4.0"
 
-# Qt / KDE applications (Dolphin, Konsole, Ark, Spectacle and the Zaldros shell read the icon theme)
+# ---------------------------------------------------------------------------- Qt / KDE defaults
 cat > "$DEST/etc/xdg/kdeglobals" <<EOF
 [Icons]
 Theme=$icon_theme
@@ -63,15 +121,57 @@ widgetStyle=Breeze
 ColorScheme=ZaldrosDark
 EOF
 
-# GTK 3 and GTK 4 applications
+# KDE reads the pointer from kcminputrc, not from kdeglobals.
+cat > "$DEST/etc/xdg/kcminputrc" <<EOF
+[Mouse]
+cursorTheme=$CURSOR_THEME
+cursorSize=24
+EOF
+
+# The X11/Wayland fallback path for everything that predates the settings daemons.
+install -Dm644 /dev/stdin "$DEST/etc/X11/Xresources/x11-common" <<EOF
+Xcursor.theme: $CURSOR_THEME
+Xcursor.size: 24
+EOF
+install -Dm644 /dev/stdin "$DEST/etc/profile.d/zaldros-cursor.sh" <<EOF
+export XCURSOR_THEME=$CURSOR_THEME
+export XCURSOR_SIZE=24
+EOF
+
+# ------------------------------------------------------------------------------- GTK applications
+# No third-party GTK theme. GTK apps run on the stock Adwaita with our tokens applied on top, so a
+# GTK window is close to the shell's palette without pulling in a pack we would then have to patch.
+# GTK parity beyond colour is tracked in docs/VISUAL_COMPONENT_MATRIX.md, it is not claimed here.
+if [[ "$VARIANT" == "dark" ]]; then
+  gtk_bg="#202020"; gtk_fg="#ffffff"; gtk_base="#191919"; gtk_accent="#60cdff"; gtk_accent_fg="#00243d"
+  prefer_dark=1
+else
+  gtk_bg="#f3f3f3"; gtk_fg="#1b1b1b"; gtk_base="#ffffff"; gtk_accent="#0067c0"; gtk_accent_fg="#ffffff"
+  prefer_dark=0
+fi
 for version in 3.0 4.0; do
   cat > "$DEST/etc/skel/.config/gtk-$version/settings.ini" <<EOF
 [Settings]
-gtk-theme-name=$gtk_theme
+gtk-theme-name=Adwaita
 gtk-icon-theme-name=$icon_theme
 gtk-font-name=Selawik 10
-gtk-application-prefer-dark-theme=$([[ "$VARIANT" == dark ]] && echo 1 || echo 0)
-gtk-cursor-theme-name=Win11-cursors
+gtk-application-prefer-dark-theme=$prefer_dark
+gtk-cursor-theme-name=$CURSOR_THEME
+gtk-cursor-theme-size=24
+gtk-decoration-layout=:minimize,maximize,close
+EOF
+  cat > "$DEST/etc/skel/.config/gtk-$version/gtk.css" <<EOF
+/* Zaldros tokens on top of Adwaita — same values as qml/ZaldrosTheme/Theme.qml */
+@define-color accent_color $gtk_accent;
+@define-color accent_bg_color $gtk_accent;
+@define-color accent_fg_color $gtk_accent_fg;
+@define-color theme_bg_color $gtk_bg;
+@define-color theme_fg_color $gtk_fg;
+@define-color theme_base_color $gtk_base;
+@define-color window_bg_color $gtk_bg;
+@define-color window_fg_color $gtk_fg;
+@define-color view_bg_color $gtk_base;
+window { border-radius: 8px; }
 EOF
 done
 
@@ -79,8 +179,10 @@ done
 install -d "$DEST/usr/share/glib-2.0/schemas"
 cat > "$DEST/usr/share/glib-2.0/schemas/90_zaldros-theme.gschema.override" <<EOF
 [org.gnome.desktop.interface]
-gtk-theme='$gtk_theme'
+gtk-theme='Adwaita'
 icon-theme='$icon_theme'
+cursor-theme='$CURSOR_THEME'
+cursor-size=24
 font-name='Selawik 10'
 color-scheme='$scheme'
 EOF
@@ -88,8 +190,10 @@ if command -v glib-compile-schemas >/dev/null; then
   glib-compile-schemas "$DEST/usr/share/glib-2.0/schemas" >/dev/null
 fi
 
-# KWin: Windows 11 geometry — rounded corners, blur behind panels and menus, no titlebar on
-# maximised windows. Values live in a config file, not in shell code.
+# ------------------------------------------------------------------------------------------ KWin
+# Windows 11 geometry: rounded corners, blur behind panels and menus, no titlebar on maximised
+# windows. Decorations are Breeze with no border until our own Aurorae theme exists — an honest
+# placeholder, not a claim of parity (VISUAL_COMPONENT_MATRIX.md).
 install -Dm644 /dev/stdin "$DEST/etc/xdg/kwinrc" <<'EOF'
 [Compositing]
 Enabled=true
@@ -109,22 +213,53 @@ NoiseStrength=2
 BorderlessMaximizedWindows=true
 
 [org.kde.kdecoration2]
-library=org.kde.kwin.aurorae
-theme=__aurorae__svg__Win11
+library=org.kde.breeze
 BorderSize=None
 ButtonsOnLeft=
 ButtonsOnRight=IAX
+
+# Alt+Tab. Windows 11 shows large window thumbnails in a grid, so thumbnail_grid is the closest
+# switcher KWin ships; the alternative list layout is left on the same value so both key paths
+# look the same instead of one of them falling back to the KDE default.
+[TabBox]
+LayoutName=thumbnail_grid
+ShowTabBox=true
+HighlightWindows=true
+SwitchingMode=0
+MultiScreenMode=0
+ApplicationsMode=0
+MinimizedMode=0
+
+[TabBoxAlternative]
+LayoutName=thumbnail_grid
 EOF
 
-# The Zaldros shell reads this to pick the icon theme instead of its vendored fallback set.
+# The switcher only appears if some process holds the Alt+Tab grab. KWin asks the global
+# accelerator daemon for it at startup and the daemon reads its defaults from here, so this file
+# is what actually makes Alt+Tab live in a session with no Plasma behind it (run #27).
+install -Dm644 /dev/stdin "$DEST/etc/xdg/kglobalshortcutsrc" <<'EOF'
+[kwin]
+_k_friendly_name=KWin
+Walk Through Windows=Alt+Tab,Alt+Tab,Walk Through Windows
+Walk Through Windows (Reverse)=Alt+Shift+Backtab,Alt+Shift+Backtab,Walk Through Windows (Reverse)
+Walk Through Windows of Current Application=Alt+`,Alt+`,Walk Through Windows of Current Application
+Show Desktop=Meta+D,Meta+D,Peek at Desktop
+Window Close=Alt+F4,Alt+F4,Close Window
+Window Maximize=Meta+Up,Meta+Up,Maximize Window
+Window Minimize=Meta+Down,Meta+Down,Minimize Window
+Window Quick Tile Left=Meta+Left,Meta+Left,Quick Tile Window to the Left
+Window Quick Tile Right=Meta+Right,Meta+Right,Quick Tile Window to the Right
+EOF
+
+# The shell reads this file: it must never disagree with what was installed above.
 install -Dm644 /dev/stdin "$DEST/etc/zaldros/visual.conf" <<EOF
 icon_theme=$icon_theme
-gtk_theme=$gtk_theme
-cursor_theme=Win11-cursors
+gtk_theme=Adwaita
+cursor_theme=$CURSOR_THEME
 font=Selawik
 taskbar_position=bottom
 taskbar_alignment=center
 corner_radius=10
 EOF
 
-echo "installed: $gtk_theme + $icon_theme into $DEST"
+echo "installed: icon theme $icon_theme (ours) + cursor theme $CURSOR_THEME (Fluent, GPL-3) into $DEST"

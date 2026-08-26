@@ -18,9 +18,10 @@ Status: **COMPLETE / PARTIAL / PROTOTYPE / MISSING**. A high visual score never 
 | Desktop icons | ours + Fluent glyphs | `Shell.qml` | QML | PROTOTYPE | 3.8 | not interactive |
 | Wallpaper | **ours** — generated artwork | `assets/wallpaper/generate.py` | Qt painter | **COMPLETE** | 4.5 | 3840×2160 render, reproducible from source |
 | Application icons | host icon theme, then vendored Fluent-icon-theme (GPL-3) | `icons.py` `_app_icon` + `assets/icons/apps/` | SVG | **PARTIAL** | 4.5 | colour icons always render; lettered tile only for unknown apps |
-| Mime / device icon theme | Fluent-icon-theme (GPL-3) | — | SVG theme | MISSING | — | app icons vendored; full theme ships with the ISO |
-| Cursor theme | Fluent-icon-theme cursors (GPL-3) — approved | — | Xcursor | MISSING | — | pending |
-| GTK app styling | Win11-gtk-theme (GPL-3) — approved | — | GTK3/4 | MISSING | — | pending; makes GTK apps match the shell |
+| System icon theme | **ours** — built from `assets/icons/` | `/usr/share/icons/Zaldros` | SVG theme | **COMPLETE** | 4.3 | 17 apps, 9 places, 26 glyphs; unknown names fall back to the lettered tile |
+| Cursor theme | Fluent-icon-theme cursors (GPL-3) — the only borrowed pack | `/usr/share/icons/Fluent-dark-cursors` + `default` alias | Xcursor | **COMPLETE** | 4.5 | 111 shapes, set for KDE, GTK, GNOME schemas and the session env |
+| GTK app styling | **ours** — tokens over stock Adwaita | `gtk.css` in `/etc/skel` | GTK3/4 | PARTIAL | 3.0 | colour and font match the shell; chrome is Adwaita, not Fluent |
+| Window titlebars (real apps) | placeholder | borderless Breeze via `kwinrc` | KWin | PROTOTYPE | 2.5 | our own Aurorae theme not written yet |
 | Search | ours | field only | QML | MISSING | 3.0 | no index |
 | Explorer | Dolphin fork planned | window mock | — | MISSING | 2.0 | nothing real |
 | Settings | ours (Zaldros backend) | — | — | MISSING | 0 | — |

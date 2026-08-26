@@ -13,21 +13,23 @@ Anything not on this list is not shipped. Reference-only projects are in
 | Selawik (5 faces) | `assets/fonts/selawik/` | github.com/microsoft/Selawik | 1.01 | **SIL OFL 1.1** | © 2015 Microsoft, Reserved Font Name **Selawik** | yes | yes, incl. bundling | ship `LICENSE.txt` | **must rename** any modified face; may not be sold on its own |
 | Application icons (18 SVGs) | `assets/icons/apps/` | github.com/vinceliuice/Fluent-icon-theme | fetched 2026-08-23 | **GPL-3.0** | © vinceliuice and contributors | yes | yes | ship `COPYING` + `AUTHORS` (both vendored) | publish modifications; offer source |
 | Places/device icons (10 SVGs) | `assets/icons/places/` | github.com/yeyushengfan258/Win11-icon-theme | fetched 2026-08-23 | **GPL-3.0** (derived from Ubuntu Yaru) | © yeyushengfan258, Yaru authors | yes | yes | ship `COPYING` + `AUTHORS` (both vendored) | publish modifications; offer source |
-| Full GTK + icon themes on the ISO | installed by `system/theme/install-visual-theme.sh` | Win11-gtk-theme, Win11-icon-theme, Fluent-icon-theme | pinned refs | GPL-3.0 | upstream authors | unmodified | yes | ship each project's COPYING and an offer of source | — |
+| Cursor theme on the ISO (111 shapes) | installed by `system/theme/install-visual-theme.sh` to `/usr/share/icons/Fluent-{dark-,}cursors` | vinceliuice/Fluent-icon-theme (`cursors/dist`, `dist-dark`) | pinned ref | GPL-3.0 | © vinceliuice and contributors | **unmodified** | yes | `cursors/LICENSE` installed as `/usr/share/doc/zaldros/licenses/Fluent-icon-theme-COPYING` | offer of source |
 | Wallpaper | `assets/wallpaper/` | **ours** (`generate.py`) | 2026-08-23 | GPL-3.0 (Zaldros) | Zaldros project | — | — | — | — |
 | GPL-3.0 licence text | `LICENSE` | gnu.org | 3, 29 June 2007 | — | FSF | verbatim only | yes | — | — |
 
 Recolouring the icons at runtime (`shell/zaldros-shell/zaldros_shell/icons.py`) is a permitted
 modification under MIT; no icon file is altered on disk.
 
-## 2. Approved for the next integration step (audited, not yet vendored)
+## 2. Dropped from the plan (ADR-0010, 2026-08-26)
 
-| Asset | Upstream | Licence | Conditions we must meet |
-| --- | --- | --- | --- |
-| Full mime/device icon theme | vinceliuice/Fluent-icon-theme | GPL-3.0 | app icons already vendored; the complete theme follows with the ISO |
-| Cursor theme | vinceliuice/Fluent-icon-theme (`cursors/`) | GPL-3.0 | same |
-| App / mime icons (alternative) | yeyushengfan258/Win11-icon-theme | GPL-3.0, derived from Ubuntu **Yaru** | ship COPYING + `AUTHORS` credit to Yaru |
-| GTK application theme | yeyushengfan258/Win11-gtk-theme | GPL-3.0 | ship COPYING; if we patch the SCSS, publish the patch |
+Owner decision: of the third-party theme packs, only the cursors ship. Nothing below is fetched,
+installed or referenced by the build any more; `test_visual_layer.py` fails if one comes back.
+
+| Asset | Upstream | Why it is out |
+| --- | --- | --- |
+| GTK application theme | yeyushengfan258/Win11-gtk-theme | a pack we would keep patching; GTK apps now use Adwaita + our tokens |
+| Full icon theme | yeyushengfan258/Win11-icon-theme | our own `Zaldros` icon theme is generated from `assets/icons/` |
+| Full mime/device icon theme | vinceliuice/Fluent-icon-theme (icons) | same; only its `cursors/` directory is used |
 
 ## 3. Explicitly rejected
 

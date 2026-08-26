@@ -103,6 +103,15 @@ echo "== install packages ($VARIANT): $BASE $EXTRA"
 step apt-install chroot "$ROOT" env DEBIAN_FRONTEND=noninteractive \
   apt-get install -y --no-install-recommends $BASE $EXTRA
 
+# Run #27: Alt+Tab did nothing in every variant. KWin does not grab keys itself; it registers its
+# shortcuts with the global accelerator daemon, which is only a *recommend* of kwin-wayland and so
+# was never installed under --no-install-recommends. The package is kglobalacceld on KF6 and
+# kglobalaccel-bin on KF5, so try both and keep booting if neither exists.
+step apt-accel chroot "$ROOT" sh -c 'DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  --no-install-recommends kglobalacceld \
+  || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kglobalaccel-bin \
+  || echo "no global shortcut daemon available in this suite"'
+
 echo "== install the Zaldros shell, theme scripts and self-test"
 mkdir -p "$ROOT/opt/zaldros"
 # Run #24: `data/` was missing here, so the shell crashed on /opt/zaldros/data/pinned.json.
@@ -116,12 +125,13 @@ cp "$(dirname "$0")/uitest.py"   "$ROOT/usr/local/bin/zaldros-uitest"
 chmod +x "$ROOT/usr/local/bin/zaldros-selftest" "$ROOT/usr/local/bin/zaldros-uitest"
 echo "$VARIANT" > "$ROOT/etc/zaldros-variant"
 
-# The themes: run the real upstream installers inside the image (no network at boot time).
+# The visual layer. ADR-0010: the only upstream theme fetched here is the cursor pack; the icon
+# theme is generated from this repository's own assets by install-visual-theme.sh.
 # ca-certificates is only a *recommend* of git, and we install with --no-install-recommends, so
 # without naming it the chroot has no CA store and every HTTPS clone dies on "Problem with the SSL CA cert".
-step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git sassc ca-certificates gtk-update-icon-cache \
+step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git ca-certificates gtk-update-icon-cache \
   && /opt/zaldros/theme/fetch-sources.sh /usr/src \
-  && /opt/zaldros/theme/install-visual-theme.sh --dest / --variant dark"
+  && /opt/zaldros/theme/install-visual-theme.sh --dest / --assets /opt/zaldros/assets --variant dark"
 
 case "$VARIANT" in
   # Run #22: full used startplasma-wayland only as a fallback while the shell crashed on a missing
@@ -134,6 +144,9 @@ cat > "$ROOT/usr/local/bin/zaldros-session" <<'EOS'
 #!/bin/sh
 # KWin as the compositor, the Zaldros shell as the only shell process. No plasmashell.
 export QT_QPA_PLATFORM=wayland PYTHONPATH=/opt/zaldros
+# systemd starts this as a plain /bin/sh, so /etc/profile.d is never sourced: without these two
+# exports KWin logs "no cursor theme" and draws the X11 core cursor instead of the Fluent pointer.
+export XCURSOR_THEME="$(sed -n 's/^cursor_theme=//p' /etc/zaldros/visual.conf)" XCURSOR_SIZE=24
 # ponytail: the "run" subcommand is required by the shell CLI. Without it argparse exited 2 at
 # startup, which is why services/legacy booted to a black screen in run #18.
 # Run #19: the shell process was gone by self-test time and the unit journal held nothing about
@@ -144,6 +157,11 @@ exec >>/tmp/zaldros-session.log 2>&1
 set -x
 # Run #23: kwin_wayland re-splits its application argument on spaces, so `sh -c '...'` arrived as
 # `sh -c python3 -m zaldros_shell run;` and argparse died on the token "run;". Pass one file path.
+# Run #27: the accelerator daemon must be up before KWin registers "Walk Through Windows",
+# otherwise the registration is silently dropped and Alt+Tab is dead for the whole session.
+for accel in /usr/bin/kglobalacceld /usr/libexec/kglobalacceld /usr/bin/kglobalaccel5 /usr/bin/kglobalaccel6; do
+  if [ -x "$accel" ]; then "$accel" & sleep 1; break; fi
+done
 exec kwin_wayland --xwayland -- /usr/local/bin/zaldros-shell-run
 EOS
 chmod +x "$ROOT/usr/local/bin/zaldros-session"

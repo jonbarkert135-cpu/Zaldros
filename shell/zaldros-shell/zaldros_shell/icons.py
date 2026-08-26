@@ -45,7 +45,7 @@ class IconProvider(QQuickImageProvider):
         self.place_directory = self.directory.parent / "places"  # Win11-icon-theme, GPL-3
         theme = system_icon_theme()
         if theme:
-            QIcon.setThemeName(theme)   # the installed Win11 theme wins over anything vendored
+            QIcon.setThemeName(theme)   # the installed Zaldros icon theme wins over anything vendored
 
     def requestImage(self, request_id: str, size: QSize, requested: QSize) -> QImage:
         name, _, colour = unquote(request_id).partition("?")   # QML sends "%23rrggbb"
