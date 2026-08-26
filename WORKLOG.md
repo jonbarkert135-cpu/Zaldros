@@ -1,5 +1,36 @@
 # Worklog
 
+## 2026-08-26 — ADR-0010: of the theme packs, only the cursors ship
+
+The maintainer asked why Zaldros exists when Linuxfx/WindowsFX (now Winux) already does this, and
+whether it could be copied one to one. It cannot: that project is proprietary and paid, its own
+components are unpublished, and its Windows look is — by its maintainer's own description — Ubuntu
+plus open-source theme packs on KDE Plasma. So there was nothing unique to copy, only the same GPL-3
+packs anyone can take. His decision: **take the cursors, draw everything else ourselves.**
+
+Implemented in this cycle:
+
+* `fetch-sources.sh` sparse-clones one project, `vinceliuice/Fluent-icon-theme`, `cursors/` only.
+  Its prebuilt `dist` / `dist-dark` are copied unmodified (111 shapes), licence installed to
+  `/usr/share/doc/zaldros/licenses/`.
+* The pointer is now actually applied, which it never was: `/usr/share/icons/default/index.theme`
+  (Xcursor ignores everything else), `/etc/xdg/kcminputrc` for KDE, GTK settings, the GNOME schema
+  override, `/etc/profile.d` and an explicit `XCURSOR_THEME` export in `zaldros-session` — systemd
+  starts it as a plain `/bin/sh`, so profile.d alone would have changed nothing. This is the
+  `no cursor theme` line that has been in the session log since run #17.
+* `Win11-gtk-theme` and `Win11-icon-theme` are out of the image. The system icon theme `Zaldros` is
+  generated from `assets/icons/{apps,places,fluent}` in freedesktop layout, so Qt, GTK and the shell
+  resolve the same names. GTK apps get stock Adwaita plus our colour tokens — recorded as colour
+  parity only, not as Windows parity.
+* `selftest.py` reports a `visual_layer` block (cursor theme installed, shape count, default alias,
+  `XCURSOR_THEME`, icon theme present) so a missing theme shows up in CI, not only in a log tail.
+* `tests/test_visual_layer.py` fails the build if a theme pack reappears in the build scripts or if
+  `visual.conf` names a cursor theme nothing installs.
+
+Still borrowed after this: the 17 app and 9 place SVGs vendored in `assets/icons/` are upstream
+GPL-3 artwork. Replacing them with our own is in `TODO.md`; window titlebars stay borderless Breeze
+until our own Aurorae theme exists, and that is named as a placeholder in the component matrix.
+
 ## 2026-08-26 — run #27: Windows 11 visual parity, cycle 1
 
 Goal for this cycle, set by the maintainer: pixel-level Windows 11 parity for the shell. Kernel,
