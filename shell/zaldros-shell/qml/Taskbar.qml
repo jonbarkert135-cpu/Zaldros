@@ -12,6 +12,7 @@ Item {
     property var state: null
     property var system: null
     property var apps: null
+    property var weather: null
     property bool startActive: false
     property bool quickActive: false
     property bool searchActive: false
@@ -45,6 +46,78 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.RightButton
             onClicked: function(mouse) { taskbar.contextRequested(mouse.x) }
+        }
+    }
+
+    // --- widgets button: weather at the left end, where Windows 11 puts it --------------------
+    // The reading is real (zaldros_shell/weather.py) or the button says it has none. Measured
+    // from the reference: icon left edge 20 px, 24 px icon, two text lines beside it.
+    Item {
+        id: widgets
+        objectName: "widgetsButton"
+        anchors.verticalCenter: parent.verticalCenter
+        height: Theme.taskbarButtonHeight
+        // The hover pill starts 12 px in; the icon then sits at the measured 20 px from the edge.
+        x: 12
+        width: (Theme.taskbarWidgetLeft - 12) + Theme.taskbarIcon + Theme.taskbarWidgetGap
+               + weatherText.implicitWidth + 14
+
+        Rectangle {
+            anchors.fill: parent
+            radius: Theme.radiusSmall
+            color: widgetsArea.containsMouse ? Theme.hover : "transparent"
+            Behavior on color { ColorAnimation { duration: Theme.animFast } }
+        }
+
+        SysIcon {
+            id: weatherIcon
+            objectName: "weatherIcon"
+            x: Theme.taskbarWidgetLeft - widgets.x
+            anchors.verticalCenter: parent.verticalCenter
+            width: Theme.taskbarIcon
+            height: Theme.taskbarIcon
+            glyph: taskbar.weather && taskbar.weather.available ? taskbar.weather.glyph : "weather-cloud"
+            color: Theme.textPrimary
+            dim: !(taskbar.weather && taskbar.weather.available)
+        }
+
+        Column {
+            id: weatherText
+            anchors.left: weatherIcon.right
+            anchors.leftMargin: Theme.taskbarWidgetGap - 4
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 0
+            Text {
+                objectName: "weatherTemperature"
+                text: taskbar.weather && taskbar.weather.available ? taskbar.weather.temperature : "—"
+                color: Theme.textPrimary
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontCaption
+            }
+            Text {
+                objectName: "weatherCondition"
+                text: taskbar.weather ? (taskbar.weather.available ? taskbar.weather.condition
+                                                                   : taskbar.weather.detail)
+                                      : "нет данных"
+                color: Theme.textSecondary
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontCaption - 1
+                elide: Text.ElideRight
+                width: Math.min(implicitWidth, 150)
+            }
+        }
+
+        MouseArea {
+            id: widgetsArea
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: taskbar.searchToggled()
+        }
+        ToolTipLabel {
+            visible: widgetsArea.containsMouse
+            text: taskbar.weather ? taskbar.weather.detail : "нет данных"
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.top
         }
     }
 
@@ -146,17 +219,18 @@ Item {
             }
         }
 
+        // Windows 11 keeps a handful of pins on the bar; the rest of the set lives in Start.
         Repeater {
-            model: taskbar.apps
+            model: taskbar.apps ? taskbar.apps.taskbarPins : []
             delegate: TaskbarButton {
-                appName: model.name
-                initial: model.name.substring(0, 1).toUpperCase()
-                tileColor: model.color
-                iconName: model.icon
-                running: model.running
-                installed: model.installed
-                active: model.running && model.name === taskbar.activeApp
-                onActivated: taskbar.appActivated(index)
+                appName: modelData.name
+                initial: modelData.name.substring(0, 1).toUpperCase()
+                tileColor: modelData.color
+                iconName: modelData.icon
+                running: modelData.running
+                installed: modelData.installed
+                active: modelData.running && modelData.name === taskbar.activeApp
+                onActivated: taskbar.appActivated(modelData.row)
             }
         }
     }

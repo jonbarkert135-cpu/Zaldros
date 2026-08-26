@@ -1,113 +1,131 @@
 {
-  "_comment": "Zaldros default pin set. 'installed' is NOT stored here: it is computed at runtime against the machine's real .desktop database (zaldros_shell/desktop_entries.py).",
+  "_comment": "Zaldros default pin set. 'installed' is NOT stored here: it is computed at runtime against the machine's real .desktop database (zaldros_shell/desktop_entries.py). 'taskbar' marks the six pins Windows 11 keeps on the bar itself; the rest live in Start.",
   "pinned": [
     {
       "name": "Проводник",
       "exec_name": "dolphin",
       "icon": "П",
-      "color": "#c9a227"
+      "color": "#c9a227",
+      "taskbar": true
     },
     {
       "name": "Firefox",
       "exec_name": "firefox",
       "icon": "F",
-      "color": "#e2601f"
+      "color": "#e2601f",
+      "taskbar": true
     },
     {
       "name": "Терминал",
       "exec_name": "konsole",
       "icon": "Т",
-      "color": "#3a3f4b"
+      "color": "#3a3f4b",
+      "taskbar": true
     },
     {
       "name": "Параметры",
       "exec_name": "zaldros-settings",
       "icon": "П",
-      "color": "#3a7ebf"
+      "color": "#3a7ebf",
+      "taskbar": true
     },
     {
       "name": "Блокнот",
       "exec_name": "zaldros-notepad",
       "icon": "Б",
-      "color": "#4a90d9"
+      "color": "#4a90d9",
+      "taskbar": false
     },
     {
       "name": "Диспетчер задач",
       "exec_name": "zaldros-taskmgr",
       "icon": "Д",
-      "color": "#2f8f96"
+      "color": "#2f8f96",
+      "taskbar": false
     },
     {
       "name": "Магазин",
       "exec_name": "zaldros-store",
       "icon": "М",
-      "color": "#8a5cc4"
+      "color": "#8a5cc4",
+      "taskbar": true
     },
     {
       "name": "Медиа",
       "exec_name": "mpv",
       "icon": "М",
-      "color": "#c1483f"
+      "color": "#c1483f",
+      "taskbar": false
     },
     {
       "name": "Почта",
       "exec_name": "thunderbird",
       "icon": "П",
-      "color": "#2b6cb0"
+      "color": "#2b6cb0",
+      "taskbar": true
     },
     {
       "name": "Калькулятор",
       "exec_name": "kcalc",
       "icon": "К",
-      "color": "#3f8f5f"
+      "color": "#3f8f5f",
+      "taskbar": false
     },
     {
       "name": "Фото",
       "exec_name": "gwenview",
       "icon": "Ф",
-      "color": "#c95d2b"
+      "color": "#c95d2b",
+      "taskbar": false
     },
     {
       "name": "Python",
       "exec_name": "python3",
       "icon": "P",
-      "color": "#3572a5"
+      "color": "#3572a5",
+      "taskbar": false
     },
     {
       "name": "LibreOffice",
       "exec_name": "soffice",
       "icon": "L",
-      "color": "#18a303"
+      "color": "#18a303",
+      "taskbar": false
     },
     {
       "name": "Vim",
       "exec_name": "vim",
       "icon": "V",
-      "color": "#019833"
+      "color": "#019833",
+      "taskbar": false
     },
     {
       "name": "Zutty",
       "exec_name": "zutty",
       "icon": "Z",
-      "color": "#5a6b7b"
+      "color": "#5a6b7b",
+      "taskbar": false
     },
     {
       "name": "Просмотр PDF",
       "exec_name": "okular",
       "icon": "П",
-      "color": "#b5442e"
+      "color": "#b5442e",
+      "taskbar": false
     },
     {
       "name": "Архиватор",
       "exec_name": "ark",
       "icon": "А",
-      "color": "#7a6ea8"
+      "color": "#7a6ea8",
+      "taskbar": false
     },
     {
       "name": "Снимок экрана",
       "exec_name": "spectacle",
       "icon": "С",
-      "color": "#2f7f8f"
+      "color": "#2f7f8f",
+      "taskbar": false
     }
   ]
 }

@@ -12,7 +12,7 @@ from PySide6.QtCore import (
 
 from .backend import AppEntry, format_clock, load_pinned, memory_percent, read_running_commands
 from .desktop_entries import DesktopApp, discover, launch
-from . import files, hostinfo, system
+from . import files, hostinfo, system, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
@@ -23,6 +23,8 @@ class AppModel(QAbstractListModel):
     `installed` is real: it is true only when a matching .desktop entry exists on this system.
     Pins that are not installed are shown dimmed — never silently presented as available.
     """
+
+    barChanged = Signal()
 
     def __init__(self, entries: list[AppEntry] | None = None, proc_root: str = "/proc",
                  installed: list[DesktopApp] | None = None) -> None:
@@ -65,9 +67,28 @@ class AppModel(QAbstractListModel):
         match = self._match(self._entries[row])
         return launch(match) if match else False
 
+    @Property("QVariantList", notify=barChanged)
+    def taskbarPins(self) -> list:  # noqa: N802
+        """The pins Windows 11 keeps on the bar itself. Start still shows the whole set."""
+        rows = []
+        for row, entry in enumerate(self._entries):
+            if not entry.taskbar:
+                continue
+            match = self._match(entry)
+            rows.append({
+                "row": row,
+                "name": entry.name,
+                "color": entry.color,
+                "icon": match.icon if (match and match.icon) else entry.exec_name,
+                "running": entry.exec_name in self._running,
+                "installed": match is not None,
+            })
+        return rows
+
     @Slot()
     def refresh(self) -> None:
         self._running = read_running_commands(self._proc_root)
+        self.barChanged.emit()
         if self._entries:
             top = self.index(0, 0)
             self.dataChanged.emit(top, self.index(len(self._entries) - 1, 0), [RUNNING])
@@ -409,3 +430,44 @@ class HostInfo(QObject):
     @Property("QVariantMap", notify=changed)
     def all(self) -> dict:
         return dict(self._data)
+
+
+class WeatherState(QObject):
+    """The taskbar weather widget. Empty until a real reading arrives (weather.py)."""
+
+    changed = Signal()
+
+    def __init__(self, reading: "weather.Reading | None" = None, fetch: bool = True) -> None:
+        super().__init__()
+        self._reading = reading or weather.UNAVAILABLE
+        if reading is None and fetch:
+            weather.fetch_async(self._apply)
+
+    def _apply(self, reading: "weather.Reading") -> None:
+        # Called from the worker thread: only touch the attribute and emit, Qt queues the rest.
+        self._reading = reading
+        self.changed.emit()
+
+    @Property(bool, notify=changed)
+    def available(self) -> bool:
+        return self._reading.available
+
+    @Property(str, notify=changed)
+    def temperature(self) -> str:
+        return self._reading.temperature
+
+    @Property(str, notify=changed)
+    def condition(self) -> str:
+        return self._reading.condition
+
+    @Property(str, notify=changed)
+    def place(self) -> str:
+        return self._reading.place
+
+    @Property(str, notify=changed)
+    def glyph(self) -> str:
+        return self._reading.glyph
+
+    @Property(str, notify=changed)
+    def detail(self) -> str:
+        return self._reading.detail

@@ -64,6 +64,7 @@ Item {
     property var backendApps: appModel
     property var backendInstalled: installedModel
     property var backendSystem: systemState
+    property var backendWeather: weatherState
     property var backendFiles: fileModel
     property var backendRecent: recentModel
     property var backendHost: hostInfo
@@ -337,6 +338,7 @@ Item {
         state: shell.backendState
         system: shell.backendSystem
         apps: shell.backendApps
+        weather: shell.backendWeather
         onStartToggled: { var open = !shell.startOpen; shell.closeAllFlyouts(); shell.startOpen = open }
         onSearchToggled: { var open = !shell.searchOpen; shell.closeAllFlyouts(); shell.searchOpen = open }
         onQuickToggled: { var open = !shell.quickOpen; shell.closeAllFlyouts(); shell.quickOpen = open }

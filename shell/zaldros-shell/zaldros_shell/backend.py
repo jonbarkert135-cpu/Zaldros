@@ -43,6 +43,7 @@ class AppEntry:
     exec_name: str
     icon: str
     color: str
+    taskbar: bool = False   # shown on the bar itself; the others are Start-only pins
 
 
 def load_pinned(path: Path | None = None) -> list[AppEntry]:

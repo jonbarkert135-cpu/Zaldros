@@ -42,11 +42,13 @@ def test_taskbar_band_is_drawn_at_the_documented_height(desktop):
     """
     image = QImage(desktop)
     row = H - TASKBAR_HEIGHT // 2
-    band = [image.pixelColor(x, row) for x in range(10, 200, 10)]
+    # x < 220 now holds the weather widget, so sample the empty stretch between it and the
+    # centred group instead of the left edge.
+    band = [image.pixelColor(x, row) for x in range(260, 460, 10)]
     assert all(colour.lightness() < 110 for colour in band), "taskbar band is not dark"
-    # the bar is 95 % opaque over the wallpaper, so a couple of levels of variation are expected
+    # the measured bar colour is opaque #212121, so the fill has to be perfectly flat
     spread = max(colour.lightness() for colour in band) - min(colour.lightness() for colour in band)
-    assert spread <= 4, f"taskbar band is not a flat fill (spread {spread})"
+    assert spread <= 2, f"taskbar band is not a flat fill (spread {spread})"
     above = [image.pixelColor(x, H - TASKBAR_HEIGHT - 30).lightness() for x in range(10, 200, 10)]
     assert max(above) - min(above) > spread, "the wallpaper row looks like the taskbar"
 

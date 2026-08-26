@@ -15,6 +15,11 @@
       "file": "private captures supplied by the maintainer on 2026-08-26",
       "display_scale": 1.25,
       "note": "desktop, Explorer, Settings, notification centre and context menu were measured from the maintainer's own screenshots. Those files show a personal desktop and are deliberately NOT committed: only the measurements below survive."
+    },
+    "taskbar_widgets_quick_settings": {
+      "file": "private captures supplied by the maintainer on 2026-08-26 (second set)",
+      "display_scale": 1.25,
+      "note": "the full-width taskbar, the keyboard-layout flyout and Quick Settings were measured from the maintainer's own screenshots; the files are deliberately NOT committed, only these numbers."
     }
   },
   "taskbar": {
@@ -31,7 +36,14 @@
     "search_height": 32,
     "clock_lines": 2,
     "right_margin": 12,
-    "tolerance": 2
+    "tolerance": 2,
+    "search_width": 220,
+    "background": "#212121",
+    "widget_icon_left": 20,
+    "widget_icon": 24,
+    "widget_text_left": 52,
+    "widget_lines": 2,
+    "pinned_on_bar": 6
   },
   "start": {
     "width": 640,
@@ -85,7 +97,12 @@
     "corner_radius": 8,
     "tile_columns": 3,
     "gap_from_edge": 12,
-    "tolerance": 2
+    "tolerance": 2,
+    "padding": 25,
+    "tile_width": 95,
+    "tile_height": 47,
+    "tile_gap": 13,
+    "columns": 3
   },
   "notifications": {
     "width": 360,

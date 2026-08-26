@@ -19,7 +19,7 @@ from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
-from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, RecentModel,
+from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, RecentModel, WeatherState,
                     ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
@@ -61,6 +61,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     file_model = FileModel()
     recent_model = RecentModel()
     host_info = HostInfo()
+    weather_state = WeatherState(fetch=tick)
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
     context.setContextProperty("installedModel", installed)
@@ -69,6 +70,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("fileModel", file_model)
     context.setContextProperty("recentModel", recent_model)
     context.setContextProperty("hostInfo", host_info)
+    context.setContextProperty("weatherState", weather_state)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
     context.setContextProperty(
@@ -77,7 +79,8 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     if view.status() != QQuickView.Ready:
         errors = "\n".join(str(error.toString()) for error in view.errors())
         raise RuntimeError(f"QML failed to load:\n{errors}")
-    return view, [model, installed, state, system_state, file_model, recent_model, host_info]
+    return view, [model, installed, state, system_state, file_model, recent_model, host_info,
+                  weather_state]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
@@ -128,6 +131,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
 # Every named item the UI test clicks or the visual parity tool measures. Names live on the QML
 # items themselves (objectName), so a renamed component fails loudly here instead of silently.
 NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskViewButton",
+               "widgetsButton", "weatherIcon", "weatherTemperature", "weatherCondition",
                "trayGroup", "trayQuickButton", "clock", "notificationButton",
                "startPanel", "startSearch", "startPinnedGrid", "startFooter",
                "searchFlyout", "notificationCentre", "quickPanel", "contextMenu",

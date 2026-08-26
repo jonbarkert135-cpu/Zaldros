@@ -26,9 +26,11 @@ QtObject {
     readonly property int indicatorWidth:     6
     readonly property int indicatorActive:   16
     readonly property int indicatorHeight:    3
-    readonly property int taskbarSearchWidth: 200
+    readonly property int taskbarSearchWidth: 220
     readonly property int taskbarSearchHeight: 32
     readonly property int taskbarRightMargin: 12
+    readonly property int taskbarWidgetLeft:  20   // left edge of the weather icon, measured
+    readonly property int taskbarWidgetGap:   12   // icon to the two text lines
 
     // --- Start (win11-reference.json → start) --------------------------------------------------
     readonly property int startWidth:        640
@@ -93,7 +95,7 @@ QtObject {
     readonly property color surfaceElevated: dark ? "#383838" : "#fbfbfb"
     readonly property color surfaceCard:     dark ? "#2b2b2b" : "#fdfdfd"   // Settings row cards
     readonly property color surfaceAcrylic:  dark ? "#f7262626" : "#f9fafafa"
-    readonly property color taskbarBg:       dark ? "#f2222222" : "#f2f3f3f3"
+    readonly property color taskbarBg:       dark ? "#212121" : "#f3f3f3"   // measured, opaque
     readonly property color mica:            dark ? "#202020" : "#f5f5f5"   // title bar / tab strip
     readonly property color border:          dark ? "#1fffffff" : "#14000000"
     readonly property color borderStrong:    dark ? "#33ffffff" : "#22000000"

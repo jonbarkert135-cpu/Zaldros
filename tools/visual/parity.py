@@ -105,8 +105,17 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     add("taskbar", "group centred", WIDTH / 2, desktop["taskbarGroup"]["x"], tolerance)
     add("taskbar", "search height", bar["search_height"],
         desktop["taskbarSearch"]["height"] - 16, tolerance)   # search pill inside the 48 px band
+    add("taskbar", "search width", bar["search_width"],
+        desktop["taskbarSearch"]["width"] - 8, tolerance)      # the pill inside its hit area
     add("taskbar", "tray right margin", bar["right_margin"],
         WIDTH - (desktop["trayGroup"]["left"] + desktop["trayGroup"]["width"]), tolerance)
+    # Widgets button: Windows 11 puts weather at the left end, icon then two text lines.
+    add("taskbar", "widget icon left", bar["widget_icon_left"], desktop["weatherIcon"]["left"], tolerance)
+    add("taskbar", "widget icon size", bar["widget_icon"], desktop["weatherIcon"]["width"], tolerance)
+    add("taskbar", "widget text left", bar["widget_text_left"],
+        desktop["weatherTemperature"]["left"], tolerance)
+    add("taskbar", "widget second line below the first", 1.0,
+        1.0 if desktop["weatherCondition"]["top"] > desktop["weatherTemperature"]["top"] else 0.0, 0.01)
 
     # --- Start ---------------------------------------------------------------------------------
     start = reference["start"]
