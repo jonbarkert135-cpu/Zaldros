@@ -96,9 +96,12 @@ Item {
             }
             Text {
                 objectName: "weatherCondition"
-                text: taskbar.weather ? (taskbar.weather.available ? taskbar.weather.condition
-                                                                   : taskbar.weather.detail)
-                                      : "нет данных"
+                // Run #29 in the booted ISO: with no location configured the taskbar carried the
+                // sentence "местоположение не задано" where Windows carries a weather condition.
+                // The state is real and stays visible — dimmed icon, em dash, full explanation in
+                // the tooltip — but the panel is not the place for an error message.
+                text: taskbar.weather && taskbar.weather.available ? taskbar.weather.condition
+                                                                   : "нет данных"
                 color: Theme.textSecondary
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontCaption - 1

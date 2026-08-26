@@ -53,6 +53,24 @@ Item {
         else if (shell.focusedWindow === id && shell.minimised[id] !== true) shell.minimised = setFlag(shell.minimised, id, true);
         else shell.focusWindow(id);
     }
+    // Window placement. The design canvas is 1280x1000; a real screen is often shorter (the ISO
+    // boots at 1280x800) and run #29 caught the Explorer window hanging 60 px off the right edge
+    // with its search field and caption buttons cut off. Keep the designed offset when the window
+    // fits, otherwise shrink it to the work area and centre it, which is what Windows does with a
+    // window that cannot be placed where it was asked for.
+    readonly property int workWidth: shell.width
+    readonly property int workHeight: shell.height - Theme.taskbarHeight
+    function placedWidth(w) { return Math.min(w, shell.workWidth) }
+    function placedHeight(h) { return Math.min(h, shell.workHeight) }
+    function placedX(x, w) {
+        var ww = shell.placedWidth(w);
+        return (x + ww <= shell.workWidth) ? x : Math.round((shell.workWidth - ww) / 2);
+    }
+    function placedY(y, h) {
+        var hh = shell.placedHeight(h);
+        return (y + hh <= shell.workHeight) ? y : Math.round((shell.workHeight - hh) / 2);
+    }
+
     function closeAllFlyouts() {
         shell.startOpen = false;
         shell.quickOpen = false;
@@ -181,10 +199,10 @@ Item {
         active: shell.focusedWindow === "settings"
         maximized: shell.maximised["settings"] === true
         z: shell.focusedWindow === "settings" ? 12 : 10
-        x: maximized ? 0 : 220
-        y: maximized ? 0 : 90
-        width: maximized ? shell.width : 940
-        height: maximized ? shell.height - Theme.taskbarHeight : 620
+        x: maximized ? 0 : shell.placedX(220, 940)
+        y: maximized ? 0 : shell.placedY(90, 620)
+        width: maximized ? shell.width : shell.placedWidth(940)
+        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(620)
         onActivateRequested: shell.focusWindow("settings")
         onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "settings", true)
         onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "settings", !maximized)
@@ -214,10 +232,10 @@ Item {
         active: shell.focusedWindow === "explorer"
         maximized: shell.maximised["explorer"] === true
         z: shell.focusedWindow === "explorer" ? 12 : 10
-        x: maximized ? 0 : 340
-        y: maximized ? 0 : 150
-        width: maximized ? shell.width : 1000
-        height: maximized ? shell.height - Theme.taskbarHeight : 640
+        x: maximized ? 0 : shell.placedX(340, 1000)
+        y: maximized ? 0 : shell.placedY(150, 640)
+        width: maximized ? shell.width : shell.placedWidth(1000)
+        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(640)
         onActivateRequested: shell.focusWindow("explorer")
         onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "explorer", true)
         onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "explorer", !maximized)

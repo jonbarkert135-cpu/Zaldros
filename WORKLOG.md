@@ -644,3 +644,33 @@ directory`. The icon fallback pack is vendored as a `.tar.xz` and the minimal ro
 the environment can actually use it. `xz-utils` is now installed alongside `git`, `ca-certificates`
 and `gtk-update-icon-cache` in that chroot step, and a gate ties the two together: if the pack is a
 `.tar.xz`, the theme step must install `xz-utils`.
+
+### Run #30 — the three defects the live ISO showed
+
+The first ISO that booted with the borrowed theme stack was also the first honest look at it. Three
+things were wrong, and two of them had been invisible to the whole test suite.
+
+**Alt+Tab did nothing.** Diagnosed in ADR-0012: KWin 6.6 ships one switcher layout and it imports
+the Plasma QML stack we do not run, so it never loaded. We now ship our own layout,
+`system/theme/tabbox/zaldros` — QtQuick plus `org.kde.kwin`, Windows 11 shape, tokens shared with
+the colour scheme. It is loaded and checked in `tests/test_switcher.py` against stubs of KWin's
+own types, so QML mistakes cost seconds instead of a 45-minute image build. Note the honest
+limitation recorded in the ADR: Explorer and Settings live inside the shell window, so the switcher
+sees one "Zaldros" entry rather than one card each.
+
+**The Explorer window hung 60 px off the right edge.** It is placed at x=340 with a width of 1000,
+which fits the 1600-wide design canvas and not a 1280x800 screen. Windows keep their designed
+offset when it fits and are shrunk to the work area and centred when it does not. The reason no
+test caught this is worse than the bug: `render()` resized the *window* but left the root item on
+the design canvas, so every offscreen frame we have ever reviewed was drawn at 1600x1000 no matter
+what size was asked for. Renders now resize the root item the way the live session does, and a test
+renders at 1280x800 and asserts no window crosses an edge.
+
+**The tray said "(UN".** `localectl` answers `(unset)` on an image where no keymap was configured,
+and the badge was the first three characters of that. Unset values are now skipped — LANG answers
+instead — and the badge is the Windows form: РУС, ENG, УКР. A layout we have no name for keeps its
+own code rather than getting an invented one. The taskbar weather line no longer carries the
+sentence "местоположение не задано" either; the state stays visible as a dimmed icon and a short
+label, with the full explanation in the tooltip.
+
+Tests: 134. Parity: 34/34.

@@ -107,6 +107,19 @@ def bluetooth(sys_root: str = "/sys/class/bluetooth") -> Reading:
     return Reading(False, detail="адаптер не найден", source=sys_root)
 
 
+# Windows 11 shows the layout as a three-letter badge in the UI language: РУС, ENG, УКР. Layouts
+# we have no name for keep their own code rather than getting an invented translation.
+LAYOUT_BADGES = {"ru": "РУС", "us": "ENG", "en": "ENG", "gb": "ENG", "ua": "УКР", "uk": "УКР",
+                 "de": "DEU", "fr": "FRA", "es": "ESP", "it": "ITA", "pl": "POL", "he": "ИВР",
+                 "tr": "TUR", "pt": "POR", "cz": "ČES", "kk": "ҚАЗ"}
+
+
+def layout_badge(code: str) -> str:
+    """Tray badge for a keyboard layout code such as "ru", "us" or "ru,us"."""
+    first = code.split(",")[0].strip().lower()
+    return LAYOUT_BADGES.get(first, first.upper()[:3])
+
+
 def keyboard_layout(runner=subprocess.run) -> Reading:
     """Active keyboard layout, read from the session. Windows shows it in the tray, so we do too —
     but only when something really reports one."""
@@ -118,11 +131,18 @@ def keyboard_layout(runner=subprocess.run) -> Reading:
         if result is not None and result.returncode == 0:
             for line in result.stdout.splitlines():
                 key, _, value = line.partition(":")
-                if key.strip() in ("X11 Layout", "VC Keymap") and value.strip() not in ("", "n/a"):
-                    return Reading(True, None, value.strip().upper()[:3], source="localectl")
+                if key.strip() not in ("X11 Layout", "VC Keymap"):
+                    continue
+                code = value.strip()
+                # localectl answers "(unset)" on an image where nothing configured a keymap. Run
+                # #29 shipped that straight to the tray, which read "(UN": a real value in the
+                # protocol, no value to a human.
+                if code.lower() in ("", "n/a", "unset", "(unset)"):
+                    continue
+                return Reading(True, None, layout_badge(code), source="localectl")
     language = os.environ.get("LANG", "").split(".")[0].split("_")[0]
     if len(language) == 2 and language.isalpha():
-        return Reading(True, None, language.upper(), source="LANG")
+        return Reading(True, None, layout_badge(language), source="LANG")
     return Reading(False, detail="раскладка не определена", source="localectl")
 
 

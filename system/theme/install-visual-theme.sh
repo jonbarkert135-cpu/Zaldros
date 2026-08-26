@@ -389,11 +389,13 @@ BorderSize=None
 ButtonsOnLeft=
 ButtonsOnRight=IAX
 
-# Alt+Tab. Windows 11 shows large window thumbnails in a grid, so thumbnail_grid is the closest
-# switcher KWin ships; the alternative list layout is left on the same value so both key paths
-# look the same instead of one of them falling back to the KDE default.
+# Alt+Tab. Run #29 in the booted ISO: pressing it changed nothing at all. KWin 6.6 ships exactly
+# one switcher layout, thumbnail_grid, and that layout imports org.kde.plasma.core, org.kde.ksvg,
+# org.kde.plasma.components and org.kde.kirigami — the Plasma QML stack a Zaldros session
+# deliberately does not run (ADR-0008), so it cannot load and the switcher never appears. We ship
+# our own layout instead: system/theme/tabbox/zaldros, QtQuick plus org.kde.kwin and nothing else.
 [TabBox]
-LayoutName=thumbnail_grid
+LayoutName=zaldros
 ShowTabBox=true
 HighlightWindows=true
 SwitchingMode=0
@@ -402,8 +404,29 @@ ApplicationsMode=0
 MinimizedMode=0
 
 [TabBoxAlternative]
-LayoutName=thumbnail_grid
+LayoutName=zaldros
 EOF
+
+# The switcher QML itself. Colours come from the same tokens as the colour scheme above, so the
+# switcher can never drift away from the rest of the desktop: one edit, both surfaces.
+TABBOX_SRC="$(dirname "$0")/tabbox/zaldros"
+if [[ -d "$TABBOX_SRC" ]]; then
+  if [[ "$VARIANT" == "light" ]]; then
+    t_backdrop="#cc000000"; t_surface="#f3f3f3"; t_text="#ffffff"; t_accent="#0067c0"
+  else
+    t_backdrop="#cc000000"; t_surface="#202020"; t_text="#ffffff"; t_accent="#60cdff"
+  fi
+  rm -rf "$DEST/usr/share/kwin/tabbox/zaldros"
+  install -d "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui"
+  install -Dm644 "$TABBOX_SRC/metadata.json" "$DEST/usr/share/kwin/tabbox/zaldros/metadata.json"
+  sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
+      -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
+      -e "s|@RADIUS@|8|g" \
+      "$TABBOX_SRC/contents/ui/main.qml" > "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui/main.qml"
+  chmod 644 "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui/main.qml"
+else
+  echo "warning: no switcher package in $TABBOX_SRC, Alt+Tab will have no layout" >&2
+fi
 
 # The switcher only appears if some process holds the Alt+Tab grab. KWin asks the global
 # accelerator daemon for it at startup and the daemon reads its defaults from here, so this file

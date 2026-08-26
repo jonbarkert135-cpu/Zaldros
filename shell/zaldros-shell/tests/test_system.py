@@ -1,6 +1,8 @@
 """Tests for the system readouts. The contract under test is the honesty rule: unknown values must
 come back as unavailable, never as a plausible-looking number."""
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
 from zaldros_shell import system
 
@@ -58,3 +60,23 @@ def test_snapshot_covers_every_quick_setting():
                              "keyboard"}
     for reading in snapshot.values():
         assert reading.available or reading.value is None
+
+
+def test_unset_keymap_never_reaches_the_tray():
+    """Run #29 in the booted ISO showed "(UN" in the tray: localectl had answered "(unset)" and
+    the badge was the first three characters of it."""
+    def runner(*_args, **_kwargs):
+        return SimpleNamespace(returncode=0, stdout="   VC Keymap: (unset)\n  X11 Layout: (unset)\n")
+
+    with mock.patch.object(system.shutil, "which", return_value="/usr/bin/localectl"), \
+         mock.patch.dict(system.os.environ, {"LANG": "ru_RU.UTF-8"}, clear=False):
+        reading = system.keyboard_layout(runner=runner)
+    assert reading.available, "LANG still tells us the layout"
+    assert reading.detail == "РУС", f"expected the Windows-style badge, got {reading.detail!r}"
+
+
+def test_layout_badges_follow_windows_and_never_invent_a_name():
+    assert system.layout_badge("ru") == "РУС"
+    assert system.layout_badge("us") == "ENG"
+    assert system.layout_badge("ru,us") == "РУС", "the active layout is the first one"
+    assert system.layout_badge("xy") == "XY", "an unknown layout keeps its own code"

@@ -1,0 +1,12 @@
+{
+    "KPackageStructure": "KWin/WindowSwitcher",
+    "KPlugin": {
+        "Description": "Windows 11-like window switcher for the Zaldros desktop",
+        "Description[ru]": "Переключатель окон в стиле Windows 11 для Zaldros",
+        "Id": "zaldros",
+        "License": "GPL-3.0-or-later",
+        "Name": "Zaldros",
+        "Name[ru]": "Zaldros"
+    },
+    "X-Plasma-API": "declarativeappletscript"
+}

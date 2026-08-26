@@ -6,12 +6,16 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
 ## [Unreleased]
 
 ### Fixed
+- Windows are kept inside the work area, so nothing hangs off the edge of a 1280x800 screen.
+- The tray keyboard badge shows РУС/ENG instead of "(UN" when no keymap is configured.
 - UI font: the vendored Selawik has no Cyrillic, so the Russian interface was silently rendered in
   DejaVu Sans on every ISO. Replaced with PT Sans (OFL 1.1), chosen by measuring against the
   Windows 11 reference capture, installed system-wide with a fontconfig alias, and guarded by
   `tests/test_ui_font.py` (ADR-0011).
 
 ### Added
+- A Windows 11-style Alt+Tab switcher of our own (`system/theme/tabbox/zaldros`); the stock KWin
+  layout needs the Plasma QML stack and silently did nothing in a Zaldros session.
 - Windows 11 widget style for QWidget applications: the `Windows-modern` Kvantum theme (GPL-3)
   plus the `qt6-style-kvantum` engine, so Dolphin and Konsole stop rendering in Breeze.
 - Windows 11 window decorations: the Aurorae themes from the "windows-eleven" Plasma global themes

@@ -125,7 +125,13 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     _KEEPALIVE.extend([view, *backends])
     view.setWidth(width)
     view.setHeight(height)
+    # The live session resizes the root item to the screen (see run(), SizeRootObjectToView).
+    # Renders used to leave it on the 1600x1000 design canvas, so a window could hang off the edge
+    # of a real 1280x800 screen — run #29 — and no offscreen render would ever show it.
+    view.setResizeMode(QQuickView.SizeRootObjectToView)
     root = view.rootObject()
+    root.setProperty("width", width)
+    root.setProperty("height", height)
     root.setProperty("lightMode", light)
     root.setProperty("startOpen", start_open)
     root.setProperty("quickOpen", quick_open)
