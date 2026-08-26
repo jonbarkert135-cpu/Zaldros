@@ -12,6 +12,8 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
   `tests/test_ui_font.py` (ADR-0011).
 
 ### Added
+- Windows 11 widget style for QWidget applications: the `Windows-modern` Kvantum theme (GPL-3)
+  plus the `qt6-style-kvantum` engine, so Dolphin and Konsole stop rendering in Breeze.
 - Windows 11 window decorations: the Aurorae themes from the "windows-eleven" Plasma global themes
   (GPL-3, zayronXIO) are vendored and selected in `kwinrc`, replacing Breeze title bars on every
   non-shell window; `kwin-style-aurorae` added to the ISO base set.

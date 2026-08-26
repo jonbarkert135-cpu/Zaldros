@@ -65,8 +65,11 @@ def test_adopting_the_theme_did_not_adopt_the_plasma_session() -> None:
     """
     build = BUILD.read_text()
     base = next(line for line in build.splitlines() if line.startswith("BASE="))
-    for package in ("plasma-desktop", "plasma-workspace", "plasmashell", "kvantum"):
+    for package in ("plasma-desktop", "plasma-workspace", "plasmashell"):
         assert package not in base, f"{package} does not belong in the shared base set"
+    # qt6-style-kvantum is the exception that proves the rule: a Qt style engine, no Plasma session.
+    assert "plasma" not in base.replace("qt6-style-kvantum", ""), \
+        "the base set must stay free of the Plasma stack"
     for line in build.splitlines():
         if line.strip().startswith("SESSION_EXEC="):
             assert "plasma" not in line, f"a variant would start plasmashell: {line.strip()}"
@@ -81,3 +84,21 @@ def test_the_colour_scheme_kdeglobals_names_is_actually_installed() -> None:
     assert theme.count("ColorScheme=$c_scheme_name") >= 2, \
         "kdeglobals and the scheme file must name the same scheme"
     assert "c_scheme_name=\"ZaldrosDark\"" in theme and "c_scheme_name=\"ZaldrosLight\"" in theme
+
+
+def test_kvantum_style_is_installed_selected_and_licensed() -> None:
+    """QWidget applications (Dolphin, Konsole) get their look from the Qt style, not from us."""
+    theme = THEME.read_text()
+    kvantum = ASSETS / "kvantum" / "Windows-modern"
+    for name in ("Windows-modern.kvconfig", "Windows-modernDark.kvconfig",
+                 "Windows-modern.svg", "Windows-modernDark.svg"):
+        assert (kvantum / name).exists(), f"missing Kvantum file {name}"
+    assert (ASSETS / "kvantum" / "LICENSE").exists()
+    assert (ASSETS / "kvantum" / "ATTRIBUTION.md").exists(), "upstream lists its own ancestry"
+    assert "/usr/share/Kvantum" in theme, "the theme must be installed where Kvantum looks"
+    assert "/etc/xdg/Kvantum/kvantum.kvconfig" in theme and "/etc/skel/.config/Kvantum" in theme, \
+        "a live user has no home yet, so the default must exist system-wide and in the skeleton"
+    assert "widgetStyle=$widget_style" in theme, "kdeglobals must select the style we installed"
+    assert 'KVANTUM_STYLE="kvantum-dark"' in theme
+    assert "qt6-style-kvantum" in BUILD.read_text(), \
+        "qt6-style-kvantum provides the engine; without it the style name is ignored"

@@ -47,7 +47,7 @@ the subset that plugs into KWin or into freedesktop paths and needs no Plasma se
 | KSplash screen | in package | GPL-3.0 | ksplash | yes (ksplash) | **ADAPT later** — we have no splash yet; it is a plain QML file |
 | SDDM themes | p/2053613, p/2060880 | GPL-3.0 | SDDM | no | **ADAPT later** — we do not ship a display manager yet |
 | Cursors `Win7Build` | p/1436673 | mixed | any | no | **REJECT** — we already ship Fluent cursors (ADR-0010) and they are closer to Windows 11 |
-| Widget style **Kvantum** | not in the packages | — | Qt apps | no | **CANDIDATE** — Kvantum would restyle Dolphin/Konsole widgets; needs the `qt6-style-kvantum` package plus a Win11 Kvantum theme, neither supplied here |
+| Widget style **Kvantum** | engine: `qt6-style-kvantum` 1.1.5-1; theme: github.com/Jeysef/KDE-Windows-Modern | GPL-3.0 | Qt 5/6 apps | no | **USE DIRECTLY — integrated** (run #29c). The global themes only *named* `widgetStyle=kvantum` without shipping a theme; the Windows-modern Kvantum theme was sourced separately |
 | Wallpapers (8 products) | various | GPL-3.0 | any | no | **REJECT** — ours are original, and several of these are photographs with unclear provenance |
 
 ## 3. Comparison: Windows 11 vs current Zaldros vs these themes
@@ -81,7 +81,11 @@ Both of those are now integrated; nothing was rewritten from scratch that could 
 * `assets/themes/icons/Windows-Eleven-icons-4.8.8.tar.xz` — extracted into
   `/usr/share/icons/Windows-Eleven`; the Zaldros theme now declares
   `Inherits=Windows-eleven,hicolor`, so our icons still win and the pack fills the gaps.
-* `tests/test_borrowed_theme.py` — six gates: both variants complete, notice present and installed,
+* `assets/themes/kvantum/Windows-modern` — Kvantum SVG style installed to `/usr/share/Kvantum`,
+  selected system-wide through `/etc/xdg/Kvantum/kvantum.kvconfig` and `/etc/skel`, with
+  `widgetStyle=kvantum-dark` in kdeglobals (`kvantum` for the light build). QWidget applications
+  only — our QtQuick shell draws itself and is unaffected.
+* `tests/test_borrowed_theme.py` — gates: both variants complete, notice present and installed,
   kwinrc names the decoration, the ISO ships the engine, the icon pack stays a parent rather than a
   replacement, and no variant starts plasmashell.
 

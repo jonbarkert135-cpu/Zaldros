@@ -39,5 +39,6 @@ by Microsoft. Windows and Windows 11 are trademarks of Microsoft Corporation.
 | PT Sans | Web | github.com/google/fonts (ofl/ptsans) | SIL OFL 1.1 | none | ship `LICENSE.txt`; reserved font names "PT Sans", "ParaType" |
 | Windows-Eleven Aurorae decorations (light + dark) | 1.6.1 / 1.6.9 | store.kde.org/p/1977804, p/1984455 | GPL-3.0 | none (SVG is the source) | ship notice; rename if modified |
 | Windows-Eleven icon theme | 4.8.8 | store.kde.org/p/1977340 | GPL-3.0 | none | ship notice; used as fallback parent of the Zaldros theme |
+| Windows-modern Kvantum theme | 2026-08 snapshot | github.com/Jeysef/KDE-Windows-Modern | GPL-3.0 | none | ship `LICENSE` and `ATTRIBUTION.md`; unmodified |
 
 Full analysis: `docs/VISUAL_LICENSE_AUDIT.md` and `docs/VISUAL_FOUNDATION_RESEARCH.md`.

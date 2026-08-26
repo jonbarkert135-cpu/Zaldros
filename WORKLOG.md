@@ -613,3 +613,25 @@ The ISO for `21e75c0` finished while the audit was running. Two things from its 
    generated from the same tokens as `Theme.qml` into `/usr/share/color-schemes/`, in both
    variants, and `test_borrowed_theme.py` fails if kdeglobals ever names a scheme that is not
    installed. This also explains part of why borrowed KDE surfaces never looked like the shell.
+
+### Run #29c — Kvantum: the widget style the global themes asked for but never shipped
+
+Both Plasma packages set `widgetStyle=kvantum` in their `defaults` and shipped no Kvantum theme —
+the KNS dependency list has none. So the engine and the skin were sourced separately:
+
+* engine: `qt6-style-kvantum` 1.1.5-1, confirmed present in the resolute package index;
+* theme: `Windows-modern` from github.com/Jeysef/KDE-Windows-Modern (GPL-3), which documents its own
+  ancestry in `ATTRIBUTION.md` — Fluent-kde by vinceliuice and Win11OS-kde by yeyushengfan258.
+
+This only touches **QWidget** applications: Dolphin, Konsole and every KDE dialog took their
+buttons, tabs, scrollbars and menus from Breeze. Our shell is QtQuick and paints itself, so nothing
+about the taskbar or Start changes — the goal is that opening Dolphin no longer looks like opening
+KDE. Installed to `/usr/share/Kvantum`, selected in `/etc/xdg/Kvantum/kvantum.kvconfig` and in
+`/etc/skel` (a live user has no home when the session starts), with `widgetStyle=kvantum-dark` in
+kdeglobals — `kvantum` for the light build.
+
+The same repository also carries its own Aurorae decorations and colour schemes. We keep
+zayronXIO's for now because they are already measured and wired; comparing the two decoration sets
+needs live captures, which is the open item of this cycle either way.
+
+Tests: 124. Parity: 34/34.

@@ -61,7 +61,7 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg qml6-module-qtquick-controls"
+BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg qml6-module-qtquick-controls"
 case "$VARIANT" in
   full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland" ;;
   services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;

@@ -124,6 +124,38 @@ scheme="prefer-dark"; [[ "$VARIANT" == "light" ]] && scheme="prefer-light"
 
 install -d "$DEST/etc/xdg" "$DEST/etc/skel/.config/gtk-3.0" "$DEST/etc/skel/.config/gtk-4.0"
 
+# ------------------------------------------------------------------------ Qt widget style (Kvantum)
+# Our shell is QtQuick and draws itself, but Dolphin and Konsole are QWidget applications: they take
+# their buttons, tabs, scrollbars and menus from the Qt style. Breeze made every one of them look
+# like KDE. Kvantum is an SVG-driven style engine that needs no Plasma session, and the
+# "Windows-modern" theme (GPL-3, Jeysef/KDE-Windows-Modern, itself built on Fluent-kde and
+# Win11OS-kde) is the Windows 11 skin for it. Package: qt6-style-kvantum (1.1.5-1 in resolute).
+KVANTUM_STYLE="kvantum-dark"
+[[ "$VARIANT" == "light" ]] && KVANTUM_STYLE="kvantum"
+KVANTUM_SRC="$ASSETS/themes/kvantum/Windows-modern"
+if [[ -d "$KVANTUM_SRC" ]]; then
+  rm -rf "$DEST/usr/share/Kvantum/Windows-modern"
+  install -d "$DEST/usr/share/Kvantum"
+  cp -r "$KVANTUM_SRC" "$DEST/usr/share/Kvantum/"
+  install -Dm644 "$ASSETS/themes/kvantum/LICENSE" \
+    "$DEST/usr/share/doc/zaldros/licenses/Windows-modern-Kvantum-COPYING"
+  install -Dm644 "$ASSETS/themes/kvantum/ATTRIBUTION.md" \
+    "$DEST/usr/share/doc/zaldros/licenses/Windows-modern-Kvantum-ATTRIBUTION.md"
+  # Kvantum reads Kvantum/kvantum.kvconfig (capital K) from XDG config dirs; the live user has no
+  # home yet, so the default must exist system-wide *and* in the skeleton.
+  for target in "$DEST/etc/xdg/Kvantum/kvantum.kvconfig" \
+                "$DEST/etc/skel/.config/Kvantum/kvantum.kvconfig"; do
+    install -Dm644 /dev/stdin "$target" <<EOF
+[General]
+theme=Windows-modern
+EOF
+  done
+  widget_style="$KVANTUM_STYLE"
+else
+  echo "warning: no Kvantum theme in $KVANTUM_SRC, KDE applications stay on Breeze" >&2
+  widget_style="Breeze"
+fi
+
 # ------------------------------------------------------------------------------- KDE colour scheme
 # Run #29, from the live boot log: `Could not find color scheme "ZaldrosDark" falling back to
 # BreezeLight`. kdeglobals named a scheme that was never installed, so every KDE application in the
@@ -242,7 +274,7 @@ Theme=$icon_theme
 
 [KDE]
 LookAndFeelPackage=org.zaldros.desktop
-widgetStyle=Breeze
+widgetStyle=$widget_style
 
 [General]
 ColorScheme=$c_scheme_name
@@ -394,6 +426,7 @@ EOF
 install -Dm644 /dev/stdin "$DEST/etc/zaldros/visual.conf" <<EOF
 icon_theme=$icon_theme
 icon_fallback=$FALLBACK_ICONS
+widget_style=$widget_style
 decoration=$decoration_library
 decoration_theme=$decoration_theme
 gtk_theme=Adwaita
