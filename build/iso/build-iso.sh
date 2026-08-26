@@ -134,7 +134,9 @@ echo "$VARIANT" > "$ROOT/etc/zaldros-variant"
 # theme is generated from this repository's own assets by install-visual-theme.sh.
 # ca-certificates is only a *recommend* of git, and we install with --no-install-recommends, so
 # without naming it the chroot has no CA store and every HTTPS clone dies on "Problem with the SSL CA cert".
-step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git ca-certificates gtk-update-icon-cache \
+# xz-utils for the same reason one level down: the icon fallback pack is a .tar.xz and the minimal
+# rootfs has no xz binary, so tar died with "xz: Cannot exec" and took the whole run #29 ISO with it.
+step theme chroot "$ROOT" sh -c "apt-get install -y --no-install-recommends git ca-certificates gtk-update-icon-cache xz-utils \
   && /opt/zaldros/theme/fetch-sources.sh /usr/src \
   && /opt/zaldros/theme/install-visual-theme.sh --dest / --assets /opt/zaldros/assets --variant dark"
 

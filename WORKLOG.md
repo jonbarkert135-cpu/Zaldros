@@ -635,3 +635,12 @@ zayronXIO's for now because they are already measured and wired; comparing the t
 needs live captures, which is the open item of this cycle either way.
 
 Tests: 124. Parity: 34/34.
+
+### Run #29d — the ISO build died on a missing `xz`
+
+All three variants failed at the theme step: `tar (child): xz: Cannot exec: No such file or
+directory`. The icon fallback pack is vendored as a `.tar.xz` and the minimal rootfs has no
+`xz-utils` — the same class of mistake as `kglobalacceld`: shipping something without checking that
+the environment can actually use it. `xz-utils` is now installed alongside `git`, `ca-certificates`
+and `gtk-update-icon-cache` in that chroot step, and a gate ties the two together: if the pack is a
+`.tar.xz`, the theme step must install `xz-utils`.

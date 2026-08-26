@@ -102,3 +102,14 @@ def test_kvantum_style_is_installed_selected_and_licensed() -> None:
     assert 'KVANTUM_STYLE="kvantum-dark"' in theme
     assert "qt6-style-kvantum" in BUILD.read_text(), \
         "qt6-style-kvantum provides the engine; without it the style name is ignored"
+
+
+def test_the_chroot_can_unpack_what_we_ship_it() -> None:
+    """Run #29 ISO failure: the icon pack is .tar.xz and the minimal rootfs had no xz binary,
+    so `tar` exited with 'xz: Cannot exec' and the theme step killed the build."""
+    build = BUILD.read_text()
+    pack = ASSETS / "icons" / "Windows-Eleven-icons-4.8.8.tar.xz"
+    if pack.suffix == ".xz":
+        start = build.index("step theme chroot")
+        theme_step = build[start:build.index("install-visual-theme.sh", start)]
+        assert "xz-utils" in theme_step, "the theme step must be able to unpack a .tar.xz"
