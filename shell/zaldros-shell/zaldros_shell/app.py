@@ -19,7 +19,7 @@ from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
-from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, RecentModel, SettingsTree, WeatherState,
+from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, Prefs, RecentModel, SettingsTree, WeatherState,
                     ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
@@ -88,6 +88,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     host_info = HostInfo()
     weather_state = WeatherState(fetch=tick)
     settings_tree = SettingsTree()
+    user_prefs = Prefs()
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
     context.setContextProperty("installedModel", installed)
@@ -98,6 +99,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("hostInfo", host_info)
     context.setContextProperty("weatherState", weather_state)
     context.setContextProperty("settingsTree", settings_tree)
+    context.setContextProperty("prefs", user_prefs)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
     context.setContextProperty(
@@ -107,7 +109,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
         errors = "\n".join(str(error.toString()) for error in view.errors())
         raise RuntimeError(f"QML failed to load:\n{errors}")
     return view, [model, installed, state, system_state, file_model, recent_model, host_info,
-                  weather_state, settings_tree]
+                  weather_state, settings_tree, user_prefs]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference

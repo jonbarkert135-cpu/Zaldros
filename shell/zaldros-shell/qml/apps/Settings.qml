@@ -21,7 +21,16 @@ Item {
     property var railItems: tree ? tree.rail : []
     readonly property string currentId: stack.length > 0 ? stack[stack.length - 1]
                                         : (railItems && railItems.length > page ? railItems[page].id : "home")
-    readonly property var current: tree ? tree.page(currentId) : ({ title: "", entries: [] })
+    // page() is a slot, not a property, so nothing would re-read it after a switch was flipped:
+    // the revision counter is what makes the row redraw with the value that was just stored.
+    property int treeRevision: 0
+    readonly property var current: (treeRevision, tree ? tree.page(currentId)
+                                                       : ({ title: "", entries: [] }))
+
+    function reloadTree() {
+        if (settings.tree) settings.tree.refresh();
+        settings.treeRevision += 1;
+    }
 
     function openPage(id) { var next = stack.slice(); next.push(id); stack = next }
     function goBack() { var next = stack.slice(); next.pop(); stack = next }
@@ -273,6 +282,12 @@ Item {
                     onTriggered: {
                         if (modelData.page !== "") settings.openPage(modelData.page);
                         else if (modelData.url !== "") Qt.openUrlExternally(modelData.url);
+                        // A switch that is backed by prefs.py really flips, is written to disk and
+                        // the tree is rebuilt so the row shows the stored state, not an assumption.
+                        else if (modelData.pref !== "" && typeof prefs !== "undefined") {
+                            prefs.toggle(modelData.pref);
+                            settings.reloadTree();
+                        }
                     }
                     }
                 }

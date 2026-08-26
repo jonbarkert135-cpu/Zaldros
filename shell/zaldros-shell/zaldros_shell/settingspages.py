@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from . import hostinfo, system
+from . import hostinfo, prefs, system
 
 HELP_URL = "https://github.com/jonbarkert135-cpu/Zaldros/issues"
 
@@ -30,6 +30,7 @@ class Entry:
     page: str = ""           # id of the nested page this row opens, empty for a leaf
     toggle: bool | None = None   # real on/off state, None when the row is not a switch
     url: str = ""            # opens in the browser instead of navigating
+    pref: str = ""           # key in prefs.py when this switch really changes the desktop
     group: str = ""          # section heading above this row, as Windows groups long pages
 
 
@@ -76,10 +77,16 @@ class _State:
         return f"{reading.value} %" if reading and reading.available and reading.value is not None else "–"
 
 
-def build(readings: dict[str, str] | None = None, state: dict | None = None) -> dict[str, Page]:
-    """The whole tree, with real values already resolved. Pure function: easy to test."""
+def build(readings: dict[str, str] | None = None, state: dict | None = None,
+          switches: dict[str, bool] | None = None) -> dict[str, Page]:
+    """The whole tree, with real values already resolved. Pure function: easy to test.
+
+    `switches` are the user preferences that really change the desktop (prefs.py). They are read
+    once here so a switch shows its stored state instead of a hard-coded True.
+    """
     r = readings if readings is not None else hostinfo.snapshot()
     s = _State(state if state is not None else system.snapshot())
+    switches = dict(prefs.DEFAULTS) | (switches if switches is not None else prefs.load())
     pages: list[Page] = []
 
     def page(id_: str, title: str, glyph: str, parent: str, entries: list[Entry]) -> None:
@@ -246,7 +253,8 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None) -> 
     ])
     page("colours", "Цвета", "paint-brush", "personalisation", [
         Entry("Режим", "Светлое или тёмное оформление", "dark-theme", "Тёмный"),
-        Entry("Эффекты прозрачности", "Материал панелей и меню", "view", "", toggle=True),
+        Entry("Эффекты прозрачности", "Материал панелей и меню", "view", "",
+              toggle=switches["visual.transparency"], pref="visual.transparency"),
         Entry("Цвет акцента", "Подсветка активных элементов", "paint-brush", "#0067c0"),
     ])
     page("themes", "Темы", "dark-theme", "personalisation", [
@@ -256,7 +264,8 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None) -> 
     ])
     page("lockscreen", "Экран блокировки", "shield", "personalisation", [
         Entry("Изображение", "Фон экрана блокировки", "image", "как рабочий стол"),
-        Entry("Часы на экране", "Показывать время", "clock", "", toggle=True),
+        Entry("Часы на экране", "Показывать время", "clock", "", toggle=switches["taskbar.clock"],
+              pref="taskbar.clock"),
     ])
     page("start", "Пуск", "grid", "personalisation", [
         Entry("Закреплённые приложения", "Сетка Пуска", "grid", "18"),
@@ -264,9 +273,12 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None) -> 
     ])
     page("taskbar", "Панель задач", "taskview", "personalisation", [
         Entry("Выравнивание", "Положение группы значков", "taskview", "По центру"),
-        Entry("Поиск", "Поле поиска на панели", "search", "", toggle=True),
-        Entry("Виджеты", "Погода слева на панели", "weather-cloud", "", toggle=True),
-        Entry("Представление задач", "Кнопка переключения окон", "taskview", "", toggle=True),
+        Entry("Поиск", "Поле поиска на панели", "search", "", toggle=switches["taskbar.search"],
+              pref="taskbar.search"),
+        Entry("Виджеты", "Погода слева на панели", "weather-cloud", "",
+              toggle=switches["taskbar.widgets"], pref="taskbar.widgets"),
+        Entry("Представление задач", "Кнопка переключения окон", "taskview", "",
+              toggle=switches["taskbar.taskview"], pref="taskbar.taskview"),
     ])
     page("fonts", "Шрифты", "document", "personalisation", [
         Entry("Системный шрифт", "Интерфейс оболочки", "document", "Selawik"),
@@ -370,7 +382,8 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None) -> 
     ])
     page("visual-effects", "Визуальные эффекты", "view", "accessibility", [
         Entry("Эффекты прозрачности", "Материал панелей", "view", "", toggle=True),
-        Entry("Анимация", "Плавные переходы", "refresh", "", toggle=True),
+        Entry("Анимация", "Плавные переходы", "refresh", "", toggle=switches["visual.animations"],
+              pref="visual.animations"),
     ])
     page("pointer", "Указатель мыши", "computer", "accessibility", [
         Entry("Размер указателя", "Курсор сеанса", "computer", "24 px"),
@@ -451,7 +464,8 @@ def to_variant(pages: dict[str, Page]) -> dict:
                 {"title": e.title, "subtitle": e.subtitle, "glyph": e.glyph, "value": e.value,
                  "group": e.group,
                  "page": e.page, "url": e.url,
-                 "hasToggle": e.toggle is not None, "toggle": bool(e.toggle)}
+                 "hasToggle": e.toggle is not None, "toggle": bool(e.toggle),
+                 "pref": e.pref}
                 for e in p.entries
             ],
         }

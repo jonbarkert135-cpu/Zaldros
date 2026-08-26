@@ -21,6 +21,10 @@ Item {
     property string activeApp: ""
     // Buttons for the windows the shell itself owns: [{ id, name, glyph, running, active }]
     property var windowButtons: []
+    // Settings switches that really switch something (zaldros_shell/prefs.py). The render tool
+    // loads this file without the shell context, so a missing `prefs` means "everything shown".
+    property var prefValues: (typeof prefs !== "undefined" && prefs && prefs.values) ? prefs.values : ({})
+    function shown(key) { return prefValues[key] !== false }
 
     signal startToggled()
     signal quickToggled()
@@ -55,6 +59,7 @@ Item {
     Item {
         id: widgets
         objectName: "widgetsButton"
+        visible: taskbar.shown("taskbar.widgets")
         anchors.verticalCenter: parent.verticalCenter
         height: Theme.taskbarButtonHeight
         // The hover pill starts 12 px in; the icon then sits at the measured 20 px from the edge.
@@ -151,6 +156,7 @@ Item {
         // Windows 11 keeps the search field inside the centred group, immediately after Start.
         Item {
             objectName: "taskbarSearch"
+            visible: taskbar.shown("taskbar.search")
             width: Theme.taskbarSearchWidth + 8
             height: Theme.taskbarHeight
 
@@ -196,6 +202,7 @@ Item {
 
         TaskbarButton {
             objectName: "taskViewButton"
+            visible: taskbar.shown("taskbar.taskview")
             appName: "Представление задач"
             showTile: false
             active: taskbar.taskViewActive
@@ -310,6 +317,7 @@ Item {
         // two-line clock: time above date, right aligned, opens the notification centre
         TrayButton {
             objectName: "clock"
+            visible: taskbar.shown("taskbar.clock")
             width: clockColumn.implicitWidth + 20
             highlighted: taskbar.notificationsActive
             tooltip: "Уведомления и календарь"

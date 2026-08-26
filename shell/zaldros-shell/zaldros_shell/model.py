@@ -12,7 +12,7 @@ from PySide6.QtCore import (
 
 from .backend import AppEntry, format_clock, load_pinned, memory_percent, read_running_commands
 from .desktop_entries import DesktopApp, discover, launch
-from . import files, hostinfo, settingspages, system, weather
+from . import files, hostinfo, prefs, settingspages, system, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
@@ -554,3 +554,43 @@ class SettingsTree(QObject):
     @Property(str, constant=True)
     def helpUrl(self) -> str:  # noqa: N802
         return settingspages.HELP_URL
+
+
+class Prefs(QObject):
+    """The switches that really switch something, backed by prefs.py.
+
+    QML reads them as one map (`prefs.values["taskbar.search"]`) and writes with `prefs.set(...)`.
+    A write that names an unimplemented key returns false instead of pretending to store it.
+    """
+
+    changed = Signal()
+
+    def __init__(self, home: Path | None = None) -> None:
+        super().__init__()
+        self._home = home
+        self._values = prefs.load(home)
+
+    @Slot(str, result=bool)
+    def value(self, key: str) -> bool:
+        return bool(self._values.get(key, prefs.DEFAULTS.get(key, False)))
+
+    @Slot(str, bool, result=bool)
+    def set(self, key: str, value: bool) -> bool:
+        if not prefs.set_value(key, value, self._home):
+            return False
+        self._values = prefs.load(self._home)
+        self.changed.emit()
+        return True
+
+    @Slot(str, result=bool)
+    def toggle(self, key: str) -> bool:
+        return self.set(key, not self.value(key))
+
+    @Slot()
+    def refresh(self) -> None:
+        self._values = prefs.load(self._home)
+        self.changed.emit()
+
+    @Property("QVariantMap", notify=changed)
+    def values(self) -> dict:
+        return dict(self._values)
