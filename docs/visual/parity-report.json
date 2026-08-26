@@ -7,6 +7,7 @@
       "expected": 48.0,
       "actual": 48.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -15,6 +16,7 @@
       "expected": 44.0,
       "actual": 44.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -23,6 +25,7 @@
       "expected": 800.0,
       "actual": 800.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -31,6 +34,7 @@
       "expected": 32.0,
       "actual": 32.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -39,6 +43,7 @@
       "expected": 220.0,
       "actual": 220.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -47,6 +52,7 @@
       "expected": 12.0,
       "actual": 12.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -55,6 +61,7 @@
       "expected": 20.0,
       "actual": 20.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -63,6 +70,7 @@
       "expected": 24.0,
       "actual": 24.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -71,6 +79,7 @@
       "expected": 52.0,
       "actual": 52.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -79,6 +88,7 @@
       "expected": 1.0,
       "actual": 1.0,
       "tolerance": 0.01,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -87,6 +97,7 @@
       "expected": 640.0,
       "actual": 640.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -95,6 +106,7 @@
       "expected": 726.0,
       "actual": 726.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -103,6 +115,7 @@
       "expected": 800.0,
       "actual": 800.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -111,6 +124,7 @@
       "expected": 12.0,
       "actual": 12.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -119,6 +133,7 @@
       "expected": 32.0,
       "actual": 32.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -127,6 +142,7 @@
       "expected": 576.0,
       "actual": 576.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -135,6 +151,7 @@
       "expected": 38.0,
       "actual": 38.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -143,6 +160,7 @@
       "expected": 32.0,
       "actual": 32.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -151,6 +169,7 @@
       "expected": 96.0,
       "actual": 96.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -159,6 +178,7 @@
       "expected": 84.0,
       "actual": 84.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -167,6 +187,7 @@
       "expected": 64.0,
       "actual": 64.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -175,6 +196,7 @@
       "expected": 32.0,
       "actual": 32.0,
       "tolerance": 1.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -183,6 +205,7 @@
       "expected": 46.0,
       "actual": 46.0,
       "tolerance": 1.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -191,6 +214,7 @@
       "expected": 40.0,
       "actual": 40.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -199,6 +223,7 @@
       "expected": 48.0,
       "actual": 48.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -207,6 +232,7 @@
       "expected": 48.0,
       "actual": 48.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -215,6 +241,7 @@
       "expected": 190.0,
       "actual": 190.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -223,6 +250,7 @@
       "expected": 320.0,
       "actual": 320.0,
       "tolerance": 3.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -231,6 +259,7 @@
       "expected": 360.0,
       "actual": 360.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -239,6 +268,7 @@
       "expected": 12.0,
       "actual": 12.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -247,6 +277,7 @@
       "expected": 360.0,
       "actual": 360.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
@@ -255,14 +286,16 @@
       "expected": 12.0,
       "actual": 12.0,
       "tolerance": 2.0,
+      "comparator": "eq",
       "passed": true
     },
     {
       "component": "context menu",
-      "metric": "width",
+      "metric": "min width",
       "expected": 300.0,
-      "actual": 300.0,
+      "actual": 342.0,
       "tolerance": 1.0,
+      "comparator": "min",
       "passed": true
     },
     {
@@ -271,6 +304,7 @@
       "expected": 278.0,
       "actual": 278.0,
       "tolerance": 1.0,
+      "comparator": "eq",
       "passed": true
     }
   ],

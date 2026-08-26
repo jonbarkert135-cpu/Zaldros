@@ -20,6 +20,11 @@
       "file": "private captures supplied by the maintainer on 2026-08-26 (second set)",
       "display_scale": 1.25,
       "note": "the full-width taskbar, the keyboard-layout flyout and Quick Settings were measured from the maintainer's own screenshots; the files are deliberately NOT committed, only these numbers."
+    },
+    "public_library": {
+      "file": "assets/refs/win11/library.json",
+      "note": "Public Microsoft screenshots (Microsoft Learn, Microsoft support, Windows blogs). Not committed \u2014 copyright Microsoft; tools/visual/fetch_references.py re-downloads them by URL and verifies the recorded sha256.",
+      "measured_by": "tools/visual/measure_library.py"
     }
   },
   "taskbar": {
@@ -115,7 +120,9 @@
     "item_height": 32,
     "separator_height": 7,
     "padding": 4,
-    "width": 300,
-    "tolerance": 1
+    "tolerance": 1,
+    "min_width": 300,
+    "label_shortcut_gap": 24,
+    "note": "Windows 11 sizes a context menu to its widest row; 300 is the measured floor, not a fixed width. Confirmed on the public 100 %-scale capture quick-access-update2.png, whose file menu is narrower than the desktop menu."
   }
 }

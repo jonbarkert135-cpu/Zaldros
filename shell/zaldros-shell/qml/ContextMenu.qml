@@ -8,12 +8,61 @@ Item {
     id: menu
     property bool shown: false
     property var items: []
-    property int menuWidth: 300
+    // Windows 11 sizes a context menu to its content and never clips a label under its shortcut;
+    // win11-reference.json → context_menu.min_width is the measured floor, not a fixed width.
+    property int minWidth: 300
+    property int maxWidth: 560
+    property int contentWidth: 0
+    readonly property int menuWidth: Math.max(minWidth, Math.min(maxWidth, contentWidth))
     // index of the row whose submenu is open, -1 for none
     property int openSubmenu: -1
     signal itemChosen(string action)
 
     onShownChanged: if (!shown) openSubmenu = -1
+    onItemsChanged: measureContent()
+    Component.onCompleted: measureContent()
+
+    // Geometry of one row, in the same order the delegate lays it out below.
+    readonly property int rowLeftMargin:  12
+    readonly property int rowGlyph:       16
+    readonly property int rowGlyphGap:    14
+    readonly property int rowTrailingGap: 24   // measured gap between a label and its shortcut
+    readonly property int rowRightMargin: 12
+
+    TextMetrics {
+        id: labelMetrics
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontCaption + 1
+    }
+    TextMetrics {
+        id: shortcutMetrics
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontCaption
+    }
+
+    /* Widest row wins: left margin + glyph column + label + gap + shortcut/chevron + right margin.
+       Run #35 found the desktop menu drawing "Показать дополнительные параметры" straight through
+       "Shift+F10" because the width was pinned at 300 whatever the language. */
+    function measureContent() {
+        var widest = 0;
+        for (var i = 0; i < items.length; i++) {
+            var entry = items[i];
+            if (!entry || entry.separator === true)
+                continue;
+            labelMetrics.text = entry.label ? entry.label : "";
+            var row = rowLeftMargin + labelMetrics.width + rowTrailingGap + rowRightMargin;
+            if (entry.glyph)
+                row += rowGlyph + rowGlyphGap;
+            if (entry.shortcut) {
+                shortcutMetrics.text = entry.shortcut;
+                row += shortcutMetrics.width;
+            } else if (entry.submenu === true) {
+                row += 12;
+            }
+            widest = Math.max(widest, row);
+        }
+        contentWidth = Math.ceil(widest);
+    }
 
     width: menuWidth
     height: column.implicitHeight + Theme.menuPadding * 2
@@ -145,7 +194,7 @@ Item {
                         y: -Theme.menuPadding
                         z: 10
                         onLoaded: {
-                            item.menuWidth = 220;
+                            item.minWidth = 220;
                             item.items = modelData.children !== undefined ? modelData.children : [];
                             item.shown = true;
                             item.itemChosen.connect(menu.itemChosen);

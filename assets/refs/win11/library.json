@@ -1,0 +1,669 @@
+{
+  "about": {
+    "purpose": "Reference library of authentic Windows 11 screenshots published by Microsoft. Used as the REFERENCE end of the parity loop in docs/VISUAL_PARITY_PROCESS.md.",
+    "rule": "Every entry is hosted on a Microsoft domain (learn.microsoft.com, support.microsoft.com, blogs.windows.com / winblogs asset CDN, news.microsoft.com). Third-party blogs, Linux themes, concepts and fan mockups are not admitted.",
+    "images_not_committed": "The files themselves are Microsoft's copyright and are NOT stored in this repository. tools/visual/fetch_references.py re-downloads them into assets/refs/win11/cache/ (gitignored) and verifies the sha256 recorded here.",
+    "measured_by": "tools/visual/measure_library.py",
+    "collected": "2026-08-27"
+  },
+  "states": [
+    "desktop",
+    "taskbar",
+    "start",
+    "search",
+    "settings",
+    "file_explorer",
+    "context_menu",
+    "quick_settings",
+    "notifications",
+    "window_decorations",
+    "dark_mode",
+    "light_mode",
+    "dialogs",
+    "multiple_windows",
+    "snap_layouts"
+  ],
+  "entries": [
+    {
+      "id": "context-menu-2021",
+      "file": "image3.png",
+      "states": [
+        "context_menu"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/3/2021/07/image3.png",
+      "page": "https://blogs.windows.com/windowsdeveloper/2021/07/19/extending-the-context-menu-and-share-dialog-in-windows-11/",
+      "width": 648,
+      "height": 1060,
+      "bytes": 151242,
+      "sha256": "bcb3d5394cbb8e0359dece270ae3cdd55e96b56092a3428a815f6751106499c0",
+      "windows_version": "Windows 11 21H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Developer Blog \"Extending the Context Menu\": the shell context menu with the icon command row and \"Show more options\"."
+    },
+    {
+      "id": "context-menu-2026",
+      "file": "new-right-click-menu.png",
+      "states": [
+        "context_menu"
+      ],
+      "url": "https://winblogs.thesourcemediaassets.com/sites/44/2026/08/new-right-click-menu.png",
+      "page": "https://blogs.windows.com/windows-insider/2026/08/17/improving-file-explorer-context-menu-faster-simpler-and-more-customizable/",
+      "width": 1129,
+      "height": 1053,
+      "bytes": 759586,
+      "sha256": "1c5ac3aeec97ce8166a75db27c6f157061cce71bff29e5d41ad7382557d01c9f",
+      "windows_version": "Windows 11 Insider, Aug 2026",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Insider Blog post on the redesigned context menu; shows the icon command row, verbs, submenu and \"Customize menu\"."
+    },
+    {
+      "id": "context-menu-click-to-do",
+      "file": "c2d-refine-text-action.png",
+      "states": [
+        "context_menu",
+        "multiple_windows"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2025/01/c2d-refine-text-action.png",
+      "page": "https://blogs.windows.com/windows-insider/2025/01/17/previewing-improved-windows-search-on-copilot-pcs-with-windows-insiders-in-the-dev-channel/",
+      "width": 3680,
+      "height": 2300,
+      "bytes": 3550515,
+      "sha256": "f6532e9aa56da16ccbefbe89d4e0a7b4c232f64269693f923e7738fb97772085",
+      "windows_version": "Windows 11 Dev, Jan 2025",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Same series: an app window with a Click-to-Do action menu on top of it."
+    },
+    {
+      "id": "dialog-run",
+      "file": "run-with-mica.png",
+      "states": [
+        "dialogs"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/run-with-mica.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 664,
+      "height": 423,
+      "bytes": 84777,
+      "sha256": "244d7aec771e92174956b8031bf82f6cff88d2f5edf56fe8e6b4e193afd73f46",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: the Run dialog with Mica."
+    },
+    {
+      "id": "explorer-100pct",
+      "file": "quick-access-update2.png",
+      "states": [
+        "file_explorer",
+        "context_menu",
+        "light_mode"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/quick-access-update2.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 1324,
+      "height": 862,
+      "bytes": 225022,
+      "sha256": "fae767a700653351c96f9957b5654116c7e52479d19e261b253ee1296cc3005a",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": 1.0,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: File Explorer Quick access with a file context menu. Caption glyph pitch measures 46 px, so this capture is at 100 % display scale — the most measurable public reference in the library."
+    },
+    {
+      "id": "explorer-folder-previews",
+      "file": "file-explorer-folder-previews.png",
+      "states": [
+        "file_explorer",
+        "light_mode"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/file-explorer-folder-previews.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 1866,
+      "height": 1285,
+      "bytes": 653365,
+      "sha256": "3cc501c2034541fc8623eb275ff48127ac66f8ff53b248a3e9a13b3d5c3a904b",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: File Explorer with folder previews, navigation pane and command bar."
+    },
+    {
+      "id": "explorer-menu-acrylic",
+      "file": "acrylic-transient-context-menu.png",
+      "states": [
+        "context_menu",
+        "file_explorer",
+        "dark_mode"
+      ],
+      "url": "https://learn.microsoft.com/en-us/windows/apps/design/style/images/acrylic-transient-context-menu.png",
+      "page": "https://learn.microsoft.com/en-us/windows/apps/design/style/acrylic",
+      "width": 1591,
+      "height": 871,
+      "bytes": 492018,
+      "sha256": "619f4a78df9d604bd7cb1eed5346fa65a126b3aada39717919ee00a7f4c5087d",
+      "windows_version": "Windows 11 21H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft Learn Acrylic material page; File Explorer with a transient acrylic context menu, used by Microsoft to illustrate the material."
+    },
+    {
+      "id": "explorer-tabs",
+      "file": "Tabs-in-File-Explorer-8-.png",
+      "states": [
+        "file_explorer",
+        "desktop"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/2/2022/09/Tabs-in-File-Explorer-8-.png",
+      "page": "https://blogs.windows.com/windowsexperience/2022/09/20/available-today-the-windows-11-2022-update/",
+      "width": 4000,
+      "height": 2500,
+      "bytes": 2935602,
+      "sha256": "bae4ce62391998015e6d6ba0b05fd106fa4252601dbc5e41c18fe830042a2b09",
+      "windows_version": "Windows 11 22H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Experience Blog 22H2 launch post: tabs in File Explorer. Marketing-composited (upscaled to 4000 px) — good for layout, not for pixel measurement."
+    },
+    {
+      "id": "press-notifications",
+      "file": "Windows-11-Chat-Integration-Screen.jpg",
+      "states": [
+        "notifications",
+        "taskbar"
+      ],
+      "url": "https://msftstories.thesourcemediaassets.com/sites/612/2021/06/Windows-11-Chat-Integration-Screen.jpg",
+      "page": "https://news.microsoft.com/june-24-2021/",
+      "width": 2100,
+      "height": 1313,
+      "bytes": 141418,
+      "sha256": "16a31db7644ba87ef24136274c2a8e8016f1aa2bd7bdcf53605dd4c09d253f65",
+      "windows_version": "Windows 11 21H2 press kit",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft News press kit: a notification stack above the centred taskbar."
+    },
+    {
+      "id": "press-settings",
+      "file": "Windows-11-Accessibility-Screen.jpg",
+      "states": [
+        "settings",
+        "light_mode"
+      ],
+      "url": "https://msftstories.thesourcemediaassets.com/sites/612/2021/06/Windows-11-Accessibility-Screen.jpg",
+      "page": "https://news.microsoft.com/june-24-2021/",
+      "width": 2100,
+      "height": 1181,
+      "bytes": 191026,
+      "sha256": "a022e8eafcdf67f5c0a189071a526259bc44b3282784bdcc7402d76ee5ab22e7",
+      "windows_version": "Windows 11 21H2 press kit",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft News press kit: Settings > Accessibility > Color filters."
+    },
+    {
+      "id": "press-start-dark",
+      "file": "Windows-11-Start-Dark.jpg",
+      "states": [
+        "start",
+        "desktop",
+        "dark_mode"
+      ],
+      "url": "https://msftstories.thesourcemediaassets.com/sites/612/2021/06/Windows-11-Start-Dark.jpg",
+      "page": "https://news.microsoft.com/june-24-2021/",
+      "width": 2100,
+      "height": 1181,
+      "bytes": 184575,
+      "sha256": "44d027c103d5884406fae59c3fc15eddba42f0647a46ec0f7e61181441512462",
+      "windows_version": "Windows 11 21H2 press kit",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft News press kit for the Windows 11 announcement (news.microsoft.com/june-24-2021). Official product image."
+    },
+    {
+      "id": "press-start-light",
+      "file": "Wondows-11-Start.jpg",
+      "states": [
+        "start",
+        "desktop",
+        "taskbar",
+        "light_mode"
+      ],
+      "url": "https://msftstories.thesourcemediaassets.com/sites/612/2021/06/Wondows-11-Start.jpg",
+      "page": "https://news.microsoft.com/june-24-2021/",
+      "width": 2100,
+      "height": 1181,
+      "bytes": 171968,
+      "sha256": "efd939c7ac17c5b27829b7442b30427d4f035dadbcc480307c6b1aae64fc7f30",
+      "windows_version": "Windows 11 21H2 press kit",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft News press kit product image, Start on a light desktop."
+    },
+    {
+      "id": "press-widgets",
+      "file": "Windows-11-Widgets-Screen.jpg",
+      "states": [
+        "taskbar"
+      ],
+      "url": "https://msftstories.thesourcemediaassets.com/sites/612/2021/06/Windows-11-Widgets-Screen.jpg",
+      "page": "https://news.microsoft.com/june-24-2021/",
+      "width": 2100,
+      "height": 1182,
+      "bytes": 291255,
+      "sha256": "253bc2144f83050767ab4ac34ba69f4f35b48f6927d8595bb2be49edf3200fc6",
+      "windows_version": "Windows 11 21H2 press kit",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft News press kit: the Widgets board."
+    },
+    {
+      "id": "quick-settings",
+      "file": "color-profile-quick-settings.png",
+      "states": [
+        "quick_settings",
+        "taskbar"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/color-profile-quick-settings.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 606,
+      "height": 898,
+      "bytes": 275577,
+      "sha256": "14bf2ce81da30ec7ab97e5485f2ec76106d619061db49e99f5feaca5027603c0",
+      "windows_version": "Windows 11 build 22553",
+      "display_scale": 1.5,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Insider Blog build 22557 post; Quick Settings flyout above the taskbar, watermark \"Evaluation copy. Build 22553\" visible — a real running build, not a mockup."
+    },
+    {
+      "id": "search-flyout",
+      "file": "taskbar-semantic-search.png",
+      "states": [
+        "search",
+        "taskbar"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2025/01/taskbar-semantic-search.png",
+      "page": "https://blogs.windows.com/windows-insider/2025/01/17/previewing-improved-windows-search-on-copilot-pcs-with-windows-insiders-in-the-dev-channel/",
+      "width": 2880,
+      "height": 1800,
+      "bytes": 2429726,
+      "sha256": "5edcc919ea93481add8243dbd55ccfe7dd781b1b6e6a6316c616aaba9adf1594",
+      "windows_version": "Windows 11 Copilot+ Dev, Jan 2025",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider blog post on improved Windows Search: the taskbar search flyout with Top/Apps/Documents/Web tabs over the desktop."
+    },
+    {
+      "id": "settings-context-menu",
+      "file": "context-menu-personalisation.png",
+      "states": [
+        "settings",
+        "context_menu"
+      ],
+      "url": "https://winblogs.thesourcemediaassets.com/sites/44/2026/08/context-menu-personalisation.png",
+      "page": "https://blogs.windows.com/windows-insider/2026/08/17/improving-file-explorer-context-menu-faster-simpler-and-more-customizable/",
+      "width": 1234,
+      "height": 1662,
+      "bytes": 335094,
+      "sha256": "90fecc0799270a8966f64b4232141d1673f71efd1159307b2097c28cf963b36c",
+      "windows_version": "Windows 11 Insider, Aug 2026",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Same Insider post: Settings > Personalization > Context menu page with toggle rows."
+    },
+    {
+      "id": "settings-contrast-themes",
+      "file": "Contrast-Themes-1920x1080-fixed-1x.png",
+      "states": [
+        "settings"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/2/2021/10/Contrast-Themes-1920x1080-fixed-1x.png",
+      "page": "https://blogs.windows.com/windowsexperience/2021/10/04/windows-11-a-new-era-for-the-pc-begins-today/",
+      "width": 1920,
+      "height": 1081,
+      "bytes": 908370,
+      "sha256": "b134b8160f1a5892a7fda392ea949369ed78f8f9267012e1886b3c648eef649d",
+      "windows_version": "Windows 11 21H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Experience Blog GA post: Settings > Accessibility > Contrast themes."
+    },
+    {
+      "id": "settings-dark",
+      "file": "Windows-Studio-Effects-in-Windows-11-5-.png",
+      "states": [
+        "settings",
+        "dark_mode"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/2/2022/09/Windows-Studio-Effects-in-Windows-11-5-.png",
+      "page": "https://blogs.windows.com/windowsexperience/2022/09/20/available-today-the-windows-11-2022-update/",
+      "width": 3000,
+      "height": 2000,
+      "bytes": 1988358,
+      "sha256": "1163a43fc6adf8fe2990d533bc58c4e6918651a4236fd619763a1173dba74f04",
+      "windows_version": "Windows 11 22H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Experience Blog 22H2 post: Settings > Bluetooth & devices > Cameras in dark mode."
+    },
+    {
+      "id": "settings-notifications",
+      "file": "notif-settings.png",
+      "states": [
+        "settings",
+        "notifications"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/notif-settings.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 1280,
+      "height": 720,
+      "bytes": 645049,
+      "sha256": "c5721f6b77c83ab04c9cc61090088747cab6b1e8934a864df99c31b877d1c5b9",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: Settings > System > Notifications."
+    },
+    {
+      "id": "settings-start",
+      "file": "6.png",
+      "states": [
+        "settings"
+      ],
+      "url": "https://winblogs.thesourcemediaassets.com/sites/44/2026/05/6.png",
+      "page": "https://blogs.windows.com/windows-insider/2026/05/15/improving-windows-quality-making-taskbar-and-start-more-personal/",
+      "width": 2146,
+      "height": 1477,
+      "bytes": 903035,
+      "sha256": "da902ccb236656678baa1731ef1d7928bb5059cb3e0d870e324e466e69eb0a38",
+      "windows_version": "Windows 11 Insider, May 2026",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Insider Blog post on taskbar/Start personalisation: Settings > Personalization > Start."
+    },
+    {
+      "id": "settings-taskbar",
+      "file": "4.png",
+      "states": [
+        "settings",
+        "taskbar"
+      ],
+      "url": "https://winblogs.thesourcemediaassets.com/sites/44/2026/05/4.png",
+      "page": "https://blogs.windows.com/windows-insider/2026/05/15/improving-windows-quality-making-taskbar-and-start-more-personal/",
+      "width": 2146,
+      "height": 1444,
+      "bytes": 1075915,
+      "sha256": "bd38d1c169930a79c27f21197ab5624ed3bc6f3d87e07c6bcbe0a9b9f342e0bf",
+      "windows_version": "Windows 11 Insider, May 2026",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Same post: Settings > Personalization > Taskbar, including the taskbar alignment cards."
+    },
+    {
+      "id": "settings-windows-update",
+      "file": "24h2-rp.png",
+      "states": [
+        "settings"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2024/05/24h2-rp.png",
+      "page": "https://blogs.windows.com/windows-insider/2024/05/22/releasing-windows-11-version-24h2-to-the-release-preview-channel/",
+      "width": 2377,
+      "height": 1677,
+      "bytes": 374279,
+      "sha256": "0310d760d8da54897e4f9496b9c5a79afc4cc46d67d1f53af9de843204cb7775",
+      "windows_version": "Windows 11 24H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider blog announcing 24H2 in Release Preview: Settings > Windows Update."
+    },
+    {
+      "id": "snap-bar-2022",
+      "file": "2022-02-02-7.png",
+      "states": [
+        "snap_layouts",
+        "multiple_windows"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/2022-02-02-7.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 2162,
+      "height": 765,
+      "bytes": 3079273,
+      "sha256": "e60947d8ac2b0bafa4fd27da4f18b9b74c533f64f188d386bbe787bd129a0fba",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: the snap bar shown when a window is dragged to the top of the screen."
+    },
+    {
+      "id": "snap-bar-2025",
+      "file": "snap-bar1.png",
+      "states": [
+        "snap_layouts"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2025/01/snap-bar1.png",
+      "page": "https://blogs.windows.com/windows-insider/2025/01/24/announcing-windows-11-insider-preview-build-22635-4805-beta-channel/",
+      "width": 1017,
+      "height": 325,
+      "bytes": 82927,
+      "sha256": "971bb0ca8b2e6a5143602a4bc153abd497dff5b20dde81c81b65a7d8c957fbfc",
+      "windows_version": "Windows 11 build 22635, Jan 2025",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider blog post about the Snap Bar: \"Drag a window here to arrange it on your screen\" with the layout zones and the Win+Z hint."
+    },
+    {
+      "id": "snap-layouts-flyout",
+      "file": "WIN11_22H2_CML_JIT_TouchAssist_SnapLayouts_Flow-1_HERO_16x9_en-US_1920.png",
+      "states": [
+        "snap_layouts",
+        "dark_mode"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/2/2022/09/WIN11_22H2_CML_JIT_TouchAssist_SnapLayouts_Flow-1_HERO_16x9_en-US_1920.png",
+      "page": "https://blogs.windows.com/windowsexperience/2022/09/20/available-today-the-windows-11-2022-update/",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 1057126,
+      "sha256": "a564f4430593784c8a3a095f8196db9c5b708469e0167185bd665821c954d094",
+      "windows_version": "Windows 11 22H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Experience Blog 22H2 post: snap layouts flyout at the top of a dark desktop."
+    },
+    {
+      "id": "start-annotated",
+      "file": "windows-11-settings.png",
+      "states": [
+        "start"
+      ],
+      "url": "https://learn.microsoft.com/en-us/windows/configuration/start/images/windows-11-settings.png",
+      "page": "https://learn.microsoft.com/en-us/windows/configuration/start/",
+      "width": 1838,
+      "height": 1583,
+      "bytes": 1033640,
+      "sha256": "41f25b5fe29b40b1966a0dd5037a51bef726ee73aea823ff10fed12ab90ae70e",
+      "windows_version": "Windows 11 22H2+",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft Learn \"Start menu\" configuration article; the same capture Microsoft annotates with the Start layout regions."
+    },
+    {
+      "id": "start-commercial",
+      "file": "windows-11-commercial.png",
+      "states": [
+        "start"
+      ],
+      "url": "https://learn.microsoft.com/en-us/windows/configuration/start/images/windows-11-commercial.png",
+      "page": "https://learn.microsoft.com/en-us/windows/configuration/start/layout",
+      "width": 1736,
+      "height": 1800,
+      "bytes": 812747,
+      "sha256": "4e624aa368981c3349d643e15b6f6ed317ec777819f4632f23149ec454e60cfb",
+      "windows_version": "Windows 11 commercial default",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft Learn Start layout article, commercial default pin set."
+    },
+    {
+      "id": "start-folders",
+      "file": "Start-Folders.png",
+      "states": [
+        "start"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/Start-Folders.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 1129,
+      "height": 759,
+      "bytes": 587644,
+      "sha256": "f66775c979ef9d52234ad6dedab1a041eed28b42a6463953a2697fc2c28b6886",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: Start with pinned folders."
+    },
+    {
+      "id": "start-light-desktop",
+      "file": "WIN_Start_GenZ_Light_16x10_en-US.png",
+      "states": [
+        "start",
+        "desktop",
+        "taskbar",
+        "light_mode"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/2/2021/06/WIN_Start_GenZ_Light_16x10_en-US.png",
+      "page": "https://blogs.windows.com/windowsexperience/2021/06/24/introducing-windows-11/",
+      "width": 4000,
+      "height": 2500,
+      "bytes": 5607608,
+      "sha256": "71b23198245887d82a9fc5c9e8924735b0ef0d6d869341a5104f3d38dc914693",
+      "windows_version": "Windows 11 21H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Experience Blog \"Introducing Windows 11\": Start open on a light desktop. Marketing render at 4000 px — layout reference only."
+    },
+    {
+      "id": "start-support",
+      "file": "windows-start-menu.png",
+      "states": [
+        "start"
+      ],
+      "url": "https://support.microsoft.com/en-us/windows/media/windows-start-menu.png",
+      "page": "https://support.microsoft.com/en-us/windows/experience/personalization/customize-the-windows-start-menu",
+      "width": 1748,
+      "height": 1800,
+      "bytes": 838000,
+      "sha256": "4a33ff34bba5ac81fc7252b8f15d721898b895a5a0f740b6dfa095473b722b42",
+      "windows_version": "Windows 11 (support article, 24H2 era)",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Served from support.microsoft.com/.../media/ inside the Microsoft Support article \"Customize the Windows Start Menu\"; Fluent iconography, rounded 8 px panel, pinned grid + Recommended + user/power footer."
+    },
+    {
+      "id": "task-manager-dark",
+      "file": "task-manager1.png",
+      "states": [
+        "dark_mode",
+        "window_decorations"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/task-manager1.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 1561,
+      "height": 1135,
+      "bytes": 229703,
+      "sha256": "4ce3f133acb381d4ae4d3f780581ee131be8bd205fbd89a71f0c5df8da335ad7",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: the new Task Manager in dark mode."
+    },
+    {
+      "id": "task-manager-processes",
+      "file": "task-manager2-b.png",
+      "states": [
+        "dark_mode"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/02/task-manager2-b.png",
+      "page": "https://blogs.windows.com/windows-insider/2022/02/16/announcing-windows-11-insider-preview-build-22557/",
+      "width": 1477,
+      "height": 1258,
+      "bytes": 445480,
+      "sha256": "7aa6253c6d275e7bea0dd222984e9d01f825aa4c6bed6e8adffc72a5b97d39f4",
+      "windows_version": "Windows 11 build 22557",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insider build 22557 post: Task Manager processes page (efficiency mode)."
+    },
+    {
+      "id": "titlebar-overview",
+      "file": "titlebar-overview.png",
+      "states": [
+        "window_decorations"
+      ],
+      "url": "https://learn.microsoft.com/en-us/windows/apps/design/basics/images/titlebar/titlebar-overview.png",
+      "page": "https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design",
+      "width": 1880,
+      "height": 640,
+      "bytes": 301214,
+      "sha256": "231feba758f0e838b9c70da59c451090300a6362923d1b53359ced9c8e3dc0be",
+      "windows_version": "Windows App SDK title bar spec",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft Learn title bar design page; Microsoft-drawn spec image of caption buttons and title bar zones (schematic, not a photo of a session)."
+    },
+    {
+      "id": "titlebar-search",
+      "file": "search.png",
+      "states": [
+        "window_decorations",
+        "search"
+      ],
+      "url": "https://learn.microsoft.com/en-us/windows/apps/design/basics/images/titlebar/search.png",
+      "page": "https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design",
+      "width": 1880,
+      "height": 640,
+      "bytes": 312515,
+      "sha256": "3336ec20024873ecd2548221e611c2fe37f14d199739f0063d2c01002066d084",
+      "windows_version": "Windows App SDK title bar spec",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft Learn title bar design page: search box inside the title bar."
+    },
+    {
+      "id": "titlebar-tabs",
+      "file": "tabs.png",
+      "states": [
+        "window_decorations",
+        "multiple_windows"
+      ],
+      "url": "https://learn.microsoft.com/en-us/windows/apps/design/basics/images/titlebar/tabs.png",
+      "page": "https://learn.microsoft.com/en-us/windows/apps/design/basics/titlebar-design",
+      "width": 1880,
+      "height": 640,
+      "bytes": 264611,
+      "sha256": "565c24f39b1864debf3304ea0295db8f21980659032d4e91af9fa434cf78baa6",
+      "windows_version": "Windows App SDK title bar spec",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft Learn title bar design page: tabs in the title bar."
+    },
+    {
+      "id": "widgets",
+      "file": "widgets-expanded-view.png",
+      "states": [
+        "taskbar",
+        "notifications"
+      ],
+      "url": "https://blogs.windows.com/wp-content/uploads/prod/sites/44/2022/09/widgets-expanded-view.png",
+      "page": "https://blogs.windows.com/windowsexperience/2022/09/20/available-today-the-windows-11-2022-update/",
+      "width": 3008,
+      "height": 2006,
+      "bytes": 4787806,
+      "sha256": "b3898b9a78a94df842b2fbbf0795376a95886b7d3a248c554df3f8f17002fa05",
+      "windows_version": "Windows 11 22H2",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Windows Experience Blog 22H2 launch post: expanded Widgets board."
+    }
+  ]
+}

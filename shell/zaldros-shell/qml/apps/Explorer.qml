@@ -508,7 +508,7 @@ Item {
         objectName: "explorerRowMenu"
         z: 50
         property int row: -1
-        menuWidth: 240
+        minWidth: 240
         items: [
             { label: "Открыть", glyph: "folder", action: "open" },
             { separator: true },

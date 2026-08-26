@@ -62,15 +62,19 @@ class Check:
     expected: float
     actual: float
     tolerance: float
+    comparator: str = "eq"   # "eq": within tolerance; "min": at least expected - tolerance
 
     @property
     def passed(self) -> bool:
+        if self.comparator == "min":
+            return self.actual >= self.expected - self.tolerance
         return abs(self.actual - self.expected) <= self.tolerance
 
     def line(self) -> str:
         mark = "PASS" if self.passed else "FAIL"
+        relation = ">=" if self.comparator == "min" else "  "
         return (f"{mark}  {self.component:<18} {self.metric:<22} "
-                f"expected {self.expected:>7.1f}   actual {self.actual:>7.1f}")
+                f"expected {relation}{self.expected:>7.1f}   actual {self.actual:>7.1f}")
 
 
 def render_states(directory: Path) -> dict[str, dict]:
@@ -91,8 +95,10 @@ def render_states(directory: Path) -> dict[str, dict]:
 def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     checks: list[Check] = []
 
-    def add(component: str, metric: str, expected: float, actual: float, tolerance: float) -> None:
-        checks.append(Check(component, metric, float(expected), float(actual), float(tolerance)))
+    def add(component: str, metric: str, expected: float, actual: float, tolerance: float,
+            comparator: str = "eq") -> None:
+        checks.append(Check(component, metric, float(expected), float(actual), float(tolerance),
+                            comparator))
 
     desktop, start_state = geometry["desktop"], geometry["start"]
 
@@ -179,7 +185,9 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     # the desktop menu has eight commands and two separators; its height must be exactly the
     # Windows 11 stack: items + separators + the 4 px padding at the top and bottom
     expected_height = 8 * menu["item_height"] + 2 * menu["separator_height"] + 2 * menu["padding"]
-    add("context menu", "width", menu["width"], menu_box["width"], menu["tolerance"])
+    # Windows 11 grows a menu to fit its widest row, so this is a floor, not an equality.
+    add("context menu", "min width", menu["min_width"], menu_box["width"], menu["tolerance"],
+        comparator="min")
     add("context menu", "stack height", expected_height, menu_box["height"], menu["tolerance"])
 
     return checks
