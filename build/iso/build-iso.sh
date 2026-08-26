@@ -172,10 +172,27 @@ set -x
 # `sh -c python3 -m zaldros_shell run;` and argparse died on the token "run;". Pass one file path.
 # Run #27: the accelerator daemon must be up before KWin registers "Walk Through Windows",
 # otherwise the registration is silently dropped and Alt+Tab is dead for the whole session.
+# Run #29: the daemon was started before the user's D-Bus socket existed and nothing checked that
+# it survived, so a silent early exit looked exactly like a working session with a dead Alt+Tab.
+# Wait for the bus, then keep the daemon alive and record every exit in this log.
 accel="$(cat /etc/zaldros/accel-path 2>/dev/null)"
 if [ -n "$accel" ] && [ -x "$accel" ]; then
-  "$accel" &
-  sleep 1
+  i=0
+  while [ ! -S "${XDG_RUNTIME_DIR:-/run/user/1000}/bus" ] && [ "$i" -lt 50 ]; do
+    sleep 0.2
+    i=$((i + 1))
+  done
+  echo "session bus after ${i} polls: $(ls -l "${XDG_RUNTIME_DIR:-/run/user/1000}/bus" 2>&1)"
+  (
+    n=0
+    while [ "$n" -lt 5 ]; do
+      "$accel"
+      echo "kglobalacceld exited $? (restart $n)"
+      n=$((n + 1))
+      sleep 2
+    done
+  ) &
+  sleep 2
 else
   echo "no global shortcut daemon on this image: Alt+Tab will not work"
 fi

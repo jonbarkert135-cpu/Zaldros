@@ -75,6 +75,33 @@ def test_the_image_can_interrogate_its_own_shortcut_daemon() -> None:
     )
 
 
+def test_dbus_probes_run_inside_the_session_not_as_root() -> None:
+    """Run #31's probe answered "component absent" only because systemd runs the self-test as
+    root, and root has no session bus: the question was never delivered. Every D-Bus probe must
+    go through the session user with DBUS_SESSION_BUS_ADDRESS set."""
+    selftest = (REPO / "build" / "iso" / "selftest.py").read_text()
+    assert "def user_sh(" in selftest, "the self-test needs a session-user command runner"
+    assert "DBUS_SESSION_BUS_ADDRESS" in selftest.split("def user_sh(")[1].split("def ")[0], (
+        "the runner must point at the session bus"
+    )
+    probe = selftest.split("def switcher(")[1].split("\ndef ")[0]
+    assert not re.search(r'(?<!user_)sh\("gdbus"', probe), (
+        "root gdbus calls answer nothing; use user_sh"
+    )
+    for fact in ("accel_running", "session_bus_socket", "dbus_kde_names"):
+        assert fact in probe, f"the switcher probe must report {fact}"
+
+
+def test_the_shortcut_daemon_waits_for_the_bus_and_is_supervised() -> None:
+    """A daemon started before the user bus exists dies silently, which is indistinguishable from
+    a healthy session with a dead Alt+Tab. Wait for the socket, restart it, log every exit."""
+    session = BUILD.read_text().split("/usr/local/bin/zaldros-session\" <<'EOS'")[1].split("\nEOS")[0]
+    assert "/bus" in session and "while [ ! -S" in session, (
+        "the session must wait for the D-Bus socket before starting the shortcut daemon"
+    )
+    assert "kglobalacceld exited" in session, "an exit of the daemon must be visible in the log"
+
+
 def test_the_switcher_package_is_installed_by_the_theme_installer() -> None:
     theme = THEME.read_text()
     assert "/usr/share/kwin/tabbox/zaldros" in theme, "the layout must be installed where KWin looks"

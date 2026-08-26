@@ -98,6 +98,29 @@ def settled_systemd_state(timeout=120):
 
 
 
+def user_sh(*cmd, timeout=20):
+    """Run a command as the session user, on the session bus.
+
+    Run #29 asked kglobalaccel over D-Bus straight from the self-test, which systemd starts as
+    root: root has no session bus, so every probe came back empty and the diagnosis said
+    "component absent" when it had really said nothing at all. D-Bus questions must be asked
+    from inside the session, exactly like launch_test() already does for applications.
+    """
+    socks = [p for p in wayland_sockets() if not p.name.endswith(".lock")]
+    runtime = socks[0].parent if socks else Path("/run/user/1000")
+    full = ["runuser", "-u", "ubuntu", "--", "env",
+            f"XDG_RUNTIME_DIR={runtime}",
+            f"DBUS_SESSION_BUS_ADDRESS=unix:path={runtime}/bus", *cmd]
+    try:
+        done = subprocess.run(full, capture_output=True, text=True, timeout=timeout)
+        out = done.stdout.strip()
+        if done.returncode != 0:                              # the error text is the evidence
+            out = f"{out}\nEXIT {done.returncode}: {done.stderr.strip()}".strip()
+        return out
+    except Exception as exc:
+        return f"ERROR: {exc}"
+
+
 def visual_layer():
     """Evidence that the installed visual layer is really on disk and picked up.
 
@@ -144,9 +167,13 @@ def switcher():
                 key, _, value = line.partition("=")
                 tabbox[key.strip()] = value.strip()
         layout = tabbox.get("LayoutName", "")
-    shortcut = sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
-                  "--object-path", "/component/kwin",
-                  "--method", "org.kde.kglobalaccel.Component.allShortcutInfos")
+    runtime = ""
+    socks = [q for q in wayland_sockets() if not q.name.endswith(".lock")]
+    if socks:
+        runtime = str(socks[0].parent)
+    shortcut = user_sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
+                       "--object-path", "/component/kwin",
+                       "--method", "org.kde.kglobalaccel.Component.allShortcutInfos")
     walk = ""
     for part in shortcut.split("('"):
         if part.startswith("Walk Through Windows"):
@@ -155,20 +182,34 @@ def switcher():
     # Ask kglobalaccel to fire KWin's own shortcut. If this errors, the key never had a chance and
     # the layout is innocent; if it succeeds while Alt+Tab still does nothing, the input path is
     # the suspect. Either way the answer is recorded, not guessed.
-    invoked = sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
-                 "--object-path", "/component/kwin",
-                 "--method", "org.kde.kglobalaccel.Component.invokeShortcut",
-                 "Walk Through Windows")
+    invoked = user_sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
+                      "--object-path", "/component/kwin",
+                      "--method", "org.kde.kglobalaccel.Component.invokeShortcut",
+                      "Walk Through Windows")
+    names = user_sh("gdbus", "call", "--session", "--dest", "org.freedesktop.DBus",
+                    "--object-path", "/org/freedesktop/DBus",
+                    "--method", "org.freedesktop.DBus.ListNames")
+    kde_names = sorted({n for n in re.findall(r"'([^']+)'", names) if "kde" in n.lower()})
     return {
         "package_installed": package.is_dir(),
-        "invoke_shortcut_reply": invoked[:200],
+        "accel_path": Path("/etc/zaldros/accel-path").read_text().strip()
+                      if Path("/etc/zaldros/accel-path").is_file() else "",
+        "accel_running": sh("pgrep", "-a", "kglobalacceld"),
+        "session_bus_socket": bool(runtime) and Path(runtime, "bus").exists(),
+        "runtime_dir": runtime,
+        "dbus_kde_names": kde_names,
+        "all_components": user_sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
+                                  "--object-path", "/kglobalaccel",
+                                  "--method", "org.kde.KGlobalAccel.allComponents")[:400],
+        "invoke_shortcut_reply": invoked[:300],
         "package_files": sorted(str(f.relative_to(package)) for f in package.rglob("*") if f.is_file())
                          if package.is_dir() else [],
         "installed_layouts": sorted(p.name for p in Path("/usr/share/kwin/tabbox").iterdir())
                              if Path("/usr/share/kwin/tabbox").is_dir() else [],
         "configured_layout": layout,
         "tabbox_config": tabbox,
-        "kglobalaccel_component_present": "org.kde.kglobalaccel" in shortcut or bool(walk),
+        "kglobalaccel_component_present": bool(walk) or "Walk Through Windows" in shortcut,
+        "all_shortcut_infos_error": shortcut[:300] if not walk else "",
         "walk_through_windows": walk,
         "kwin_journal": sh("sh", "-c",
                            "journalctl -b --no-pager | grep -iE 'tabbox|switcher|kwin_tabbox' | tail -n 20"),
