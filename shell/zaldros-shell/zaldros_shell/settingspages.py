@@ -48,6 +48,14 @@ def _dash(value: str) -> str:
     return value if value else "–"
 
 
+def _used_of(used: str, total: str) -> str:
+    """"12,4 ГиБ из 64,0 ГиБ", or a single dash when the filesystem gave us nothing usable —
+    "– из –" is not a measurement, it is noise."""
+    if not used or not total:
+        return "–"
+    return f"{used} из {total}"
+
+
 class _State:
     """Thin reader over system.snapshot(), so the page tree stays readable."""
 
@@ -98,7 +106,7 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None) -> 
         Entry("Уведомления", "Оповещения приложений и системы", "bell", "", "notifications"),
         Entry("Питание и батарея", s.detail("battery"), "power", "", "power"),
         Entry("Память", "Занято на системном диске", "hard-drive",
-              f"{_dash(r['diskUsed'])} из {_dash(r['diskTotal'])}", "storage"),
+              _used_of(r["diskUsed"], r["diskTotal"]), "storage"),
         Entry("Многозадачность", "Привязка окон, переключение задач", "window", "", "multitasking"),
         Entry("Для разработчиков", "Оболочка, журналы, отладка", "document", "", "developer"),
         Entry("Буфер обмена", "Журнал копирования", "copy", "", "clipboard"),
@@ -132,9 +140,9 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None) -> 
     ])
     page("storage", "Память", "hard-drive", "system", [
         Entry("Системный диск", "Занято", "hard-drive",
-              f"{_dash(r['diskUsed'])} из {_dash(r['diskTotal'])}"),
+              _used_of(r["diskUsed"], r["diskTotal"])),
         Entry("Оперативная память", "Используется сейчас", "info",
-              f"{_dash(r['memoryUsed'])} из {_dash(r['memoryTotal'])}"),
+              _used_of(r["memoryUsed"], r["memoryTotal"])),
         Entry("Время работы", "С момента загрузки", "clock", _dash(r["uptime"])),
     ])
     page("multitasking", "Многозадачность", "window", "system", [

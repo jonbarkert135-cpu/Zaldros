@@ -49,32 +49,63 @@ def cpu_cores() -> int:
     return os.cpu_count() or 0
 
 
-def memory_total_mib() -> int:
-    for line in _read_lines("/proc/meminfo"):
-        if line.startswith("MemTotal:"):
-            return int(line.split()[1]) // 1024
-    return 0
+# A filesystem is allowed to report a size; it is not allowed to report a size no disk has. Some
+# overlay and virtual filesystems answer with a sentinel (we have seen 8589934591 GiB, which is
+# 2**63 blocks). Above this ceiling the reading is treated as no reading at all.
+IMPLAUSIBLE_BYTES = 1024 ** 5  # 1 PiB
 
 
-def memory_used_mib() -> int:
+def format_bytes(size: int) -> str:
+    """Human size in the units Windows uses for the same rows: МиБ under a gigabyte, ТиБ over a
+    thousand. Returns "" for a size we do not have, so Settings can show a dash."""
+    if size <= 0:
+        return ""
+    if size >= IMPLAUSIBLE_BYTES:
+        return ""
+    if size < 1024 ** 3:
+        return f"{size / 1024 ** 2:.0f} МиБ"
+    if size < 1024 ** 4:
+        gib = size / 1024 ** 3
+        return _ru(f"{gib:.1f} ГиБ" if gib < 100 else f"{gib:.0f} ГиБ")
+    return _ru(f"{size / 1024 ** 4:.1f} ТиБ")
+
+
+def _ru(text: str) -> str:
+    """Russian writes 8,0 — not 8.0. The interface is Russian, so the numbers are too."""
+    return text.replace(".", ",")
+
+
+def _meminfo_bytes() -> dict[str, int]:
     values = {}
     for line in _read_lines("/proc/meminfo"):
         key, _, rest = line.partition(":")
         parts = rest.split()
         if parts and parts[0].isdigit():
-            values[key] = int(parts[0]) // 1024
+            values[key] = int(parts[0]) * 1024  # /proc/meminfo is in kB
+    return values
+
+
+def memory_total_bytes() -> int:
+    return _meminfo_bytes().get("MemTotal", 0)
+
+
+def memory_used_bytes() -> int:
+    values = _meminfo_bytes()
     if "MemTotal" in values and "MemAvailable" in values:
         return values["MemTotal"] - values["MemAvailable"]
     return 0
 
 
 def disk_usage(path: str = "/") -> tuple[int, int]:
-    """(used GiB, total GiB) for the filesystem holding `path`; (0, 0) when unavailable."""
+    """(used bytes, total bytes) for the filesystem holding `path`; (0, 0) when unavailable or
+    when the filesystem reports a size no real disk has."""
     try:
         usage = shutil.disk_usage(path)
     except OSError:
         return (0, 0)
-    return (usage.used // 1024 ** 3, usage.total // 1024 ** 3)
+    if usage.total <= 0 or usage.total >= IMPLAUSIBLE_BYTES:
+        return (0, 0)
+    return (usage.used, usage.total)
 
 
 def uptime_seconds() -> int:
@@ -117,9 +148,9 @@ def timezone() -> str:
 
 def snapshot() -> dict[str, str]:
     """Everything Settings needs, already formatted for display."""
-    used_gib, total_gib = disk_usage()
-    memory_total = memory_total_mib()
-    memory_used = memory_used_mib()
+    used_bytes, total_bytes = disk_usage()
+    memory_total = memory_total_bytes()
+    memory_used = memory_used_bytes()
     return {
         "deviceName": device_name(),
         "osName": os_name(),
@@ -127,10 +158,10 @@ def snapshot() -> dict[str, str]:
         "architecture": platform.machine(),
         "cpuModel": cpu_model(),
         "cpuCores": str(cpu_cores()) if cpu_cores() else "",
-        "memoryTotal": f"{memory_total / 1024:.1f} ГиБ" if memory_total else "",
-        "memoryUsed": f"{memory_used / 1024:.1f} ГиБ" if memory_used else "",
-        "diskUsed": f"{used_gib} ГиБ" if total_gib else "",
-        "diskTotal": f"{total_gib} ГиБ" if total_gib else "",
+        "memoryTotal": format_bytes(memory_total),
+        "memoryUsed": format_bytes(memory_used),
+        "diskUsed": format_bytes(used_bytes) if total_bytes else "",
+        "diskTotal": format_bytes(total_bytes),
         "uptime": format_uptime(uptime_seconds()),
         "sessionType": session_type(),
         "localTime": local_time(),
