@@ -322,8 +322,54 @@ class FileModel(QAbstractListModel):
 
     @Slot(int)
     def openRow(self, row: int) -> None:  # noqa: N802
-        if 0 <= row < len(self._entries) and self._entries[row].is_dir:
-            self.navigate(self._entries[row].path)
+        """Double-click: a folder is entered, a file is handed to the desktop's default
+        application, exactly as in Explorer."""
+        if not 0 <= row < len(self._entries):
+            return
+        entry = self._entries[row]
+        if entry.is_dir:
+            self.navigate(entry.path)
+            return
+        self._apply(files.open_with_default_application(entry.path), reload=False)
+
+    # --- operations on the real filesystem --------------------------------------------------
+    # Each one reports its outcome in `errorText`; nothing is overwritten and nothing is deleted
+    # outright (see files.move_to_trash).
+
+    def _apply(self, result: files.Result, reload: bool = True) -> str:
+        self._error = "" if result.ok else result.error
+        if result.ok and reload:
+            self.reload()
+        else:
+            self.changed.emit()
+        return result.path if result.ok else ""
+
+    @Slot(result=str)
+    def createFolder(self) -> str:  # noqa: N802
+        """Create "Новая папка" here and return its path so the view can select and rename it."""
+        return self._apply(files.create_folder(self._path))
+
+    @Slot(int, str, result=bool)
+    def renameRow(self, row: int, new_name: str) -> bool:  # noqa: N802
+        if not 0 <= row < len(self._entries):
+            return False
+        return bool(self._apply(files.rename(self._entries[row].path, new_name)))
+
+    @Slot(int, result=bool)
+    def deleteRow(self, row: int) -> bool:  # noqa: N802
+        """Delete to the freedesktop bin, the way Windows deletes to the Recycle Bin."""
+        if not 0 <= row < len(self._entries):
+            return False
+        return bool(self._apply(files.move_to_trash(self._entries[row].path)))
+
+    @Slot(str, result=int)
+    def rowForPath(self, path: str) -> int:  # noqa: N802
+        """Row index of a path in the current listing, or -1. Used to select a folder we just
+        created."""
+        for index, entry in enumerate(self._entries):
+            if entry.path == path:
+                return index
+        return -1
 
     @Slot()
     def goUp(self) -> None:  # noqa: N802

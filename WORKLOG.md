@@ -674,3 +674,26 @@ sentence "местоположение не задано" either; the state stay
 label, with the full explanation in the tooltip.
 
 Tests: 134. Parity: 34/34.
+
+### Explorer stops being a viewer
+
+The file manager listed real files and could do nothing to them: the command bar was decoration.
+Create, rename and delete now work, on the real filesystem, through `zaldros_shell/files.py`.
+
+Three rules the implementation follows, all covered by `tests/test_files.py`:
+
+* **Nothing is overwritten.** "Новая папка" becomes "Новая папка (2)" the way Windows counts, and a
+  rename onto an existing name is refused with a sentence instead of silently replacing a file.
+* **Delete means the bin, not oblivion.** `move_to_trash` writes the freedesktop `.trashinfo`
+  record — encoded original path and deletion date — into `$XDG_DATA_HOME/Trash`, so anything
+  deleted in Zaldros is restorable from Zaldros or from any other Linux file manager. Two files of
+  the same name both survive in the bin.
+* **A failure is a sentence, not a crash.** Every operation returns `files.Result`; the model puts
+  the error into `errorText`, which Explorer already shows.
+
+The UI follows Explorer: F2 or the command-bar button turns the row into a text field with the name
+selected, Enter commits and Escape cancels; Delete removes to the bin; a new folder is created
+selected and in rename mode; right-click opens the Windows 11 context menu with exactly the entries
+that work. Double-clicking a file now hands it to `xdg-open` instead of doing nothing.
+
+Tests: 147.

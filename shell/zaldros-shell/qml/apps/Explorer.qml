@@ -12,6 +12,46 @@ Item {
     id: explorer
     property var model: null
 
+    // Real operations on real files. The commands below call FileModel, which calls
+    // zaldros_shell/files.py: create never overwrites, delete goes to the freedesktop bin.
+    property int renamingRow: -1
+    focus: true
+
+    function newFolder() {
+        var created = explorer.model ? explorer.model.createFolder() : "";
+        if (created === "")
+            return;
+        var row = explorer.model.rowForPath(created);
+        fileList.currentIndex = row;
+        explorer.renamingRow = row;   // Windows drops straight into rename on a new folder
+    }
+    function renameSelected() {
+        if (fileList.currentIndex >= 0)
+            explorer.renamingRow = fileList.currentIndex;
+    }
+    function commitRename(row, name) {
+        explorer.renamingRow = -1;
+        if (explorer.model && name !== "")
+            explorer.model.renameRow(row, name);
+    }
+    function deleteSelected() {
+        if (explorer.model && fileList.currentIndex >= 0)
+            explorer.model.deleteRow(fileList.currentIndex);
+    }
+
+    function openRowMenu(row, point) {
+        rowMenu.row = row;
+        rowMenu.x = Math.min(point.x, explorer.width - rowMenu.width - 8);
+        rowMenu.y = Math.min(point.y, explorer.height - rowMenu.height - 8);
+        rowMenu.shown = true;
+    }
+
+    Keys.onPressed: function (event) {
+        if (event.key === Qt.Key_F2) { explorer.renameSelected(); event.accepted = true; }
+        else if (event.key === Qt.Key_Delete) { explorer.deleteSelected(); event.accepted = true; }
+        else if (event.key === Qt.Key_F5) { explorer.model.reload(); event.accepted = true; }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: Theme.appBackground
@@ -158,14 +198,28 @@ Item {
             anchors.leftMargin: 12
             spacing: 2
 
-            CommandButton { glyph: "add-circle"; label: "Создать"; trailing: "chevron-down" }
+            CommandButton {
+                objectName: "explorerNewButton"
+                glyph: "add-circle"; label: "Создать"; trailing: "chevron-down"
+                onTriggered: explorer.newFolder()
+            }
             Rectangle { width: 1; height: 20; color: Theme.border; anchors.verticalCenter: parent.verticalCenter }
             IconButton { glyph: "cut"; tooltip: "Вырезать" }
             IconButton { glyph: "copy"; tooltip: "Копировать" }
             IconButton { glyph: "paste"; tooltip: "Вставить" }
-            IconButton { glyph: "rename"; tooltip: "Переименовать" }
+            IconButton {
+                objectName: "explorerRenameButton"
+                glyph: "rename"; tooltip: "Переименовать"
+                enabled: fileList.currentIndex >= 0
+                onTriggered: explorer.renameSelected()
+            }
             IconButton { glyph: "share"; tooltip: "Поделиться" }
-            IconButton { glyph: "delete"; tooltip: "Удалить" }
+            IconButton {
+                objectName: "explorerDeleteButton"
+                glyph: "delete"; tooltip: "Удалить"
+                enabled: fileList.currentIndex >= 0
+                onTriggered: explorer.deleteSelected()
+            }
             Rectangle { width: 1; height: 20; color: Theme.border; anchors.verticalCenter: parent.verticalCenter }
             CommandButton { glyph: "sort"; label: "Сортировать"; trailing: "chevron-down" }
             CommandButton { glyph: "view"; label: "Просмотреть"; trailing: "chevron-down" }
@@ -340,9 +394,39 @@ Item {
                             width: parent.width - 32
                             elide: Text.ElideRight
                             text: model.name
+                            visible: explorer.renamingRow !== index
                             color: Theme.textPrimary
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontCaption
+                        }
+                        // Inline rename, the way Explorer does it: the row turns into a field with
+                        // the name selected, Enter commits, Escape and focus loss cancel.
+                        Rectangle {
+                            objectName: explorer.renamingRow === index ? "explorerRenameField" : ""
+                            visible: explorer.renamingRow === index
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - 32
+                            height: 22
+                            radius: Theme.radiusSmall
+                            color: Theme.dark ? "#1f1f1f" : "#ffffff"
+                            border.width: 1
+                            border.color: Theme.accent
+                            TextInput {
+                                id: renameField
+                                anchors.fill: parent
+                                anchors.leftMargin: 6
+                                anchors.rightMargin: 6
+                                verticalAlignment: TextInput.AlignVCenter
+                                text: model.name
+                                color: Theme.textPrimary
+                                selectionColor: Theme.accent
+                                selectedTextColor: "#ffffff"
+                                font.family: Theme.fontFamily
+                                font.pixelSize: Theme.fontCaption
+                                onVisibleChanged: if (visible) { text = model.name; forceActiveFocus(); selectAll(); }
+                                onAccepted: explorer.commitRename(index, text)
+                                Keys.onEscapePressed: explorer.renamingRow = -1
+                            }
                         }
                     }
                     Text {
@@ -372,7 +456,12 @@ Item {
                     id: rowArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    onClicked: fileList.currentIndex = index
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: function (mouse) {
+                        fileList.currentIndex = index;
+                        if (mouse.button === Qt.RightButton)
+                            explorer.openRowMenu(index, mapToItem(explorer, mouse.x, mouse.y));
+                    }
                     onDoubleClicked: explorer.model.openRow(index)
                 }
             }
@@ -409,5 +498,40 @@ Item {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontCaption - 1
         }
+    }
+
+    // --- context menu on a row -------------------------------------------------------------
+    // The same Windows 11 menu component the desktop uses; only the entries that really work are
+    // listed, because a menu item that does nothing is worse than no menu item.
+    ContextMenu {
+        id: rowMenu
+        objectName: "explorerRowMenu"
+        z: 50
+        property int row: -1
+        menuWidth: 240
+        items: [
+            { label: "Открыть", glyph: "folder", action: "open" },
+            { separator: true },
+            { label: "Переименовать", glyph: "rename", shortcut: "F2", action: "rename" },
+            { label: "Удалить", glyph: "delete", shortcut: "Del", action: "delete" },
+            { separator: true },
+            { label: "Создать папку", glyph: "add-circle", action: "new-folder" },
+            { label: "Обновить", glyph: "refresh", shortcut: "F5", action: "refresh" }
+        ]
+        onItemChosen: function (action) {
+            rowMenu.shown = false;
+            if (action === "open") explorer.model.openRow(rowMenu.row);
+            else if (action === "rename") { fileList.currentIndex = rowMenu.row; explorer.renameSelected(); }
+            else if (action === "delete") { fileList.currentIndex = rowMenu.row; explorer.deleteSelected(); }
+            else if (action === "new-folder") explorer.newFolder();
+            else if (action === "refresh") explorer.model.reload();
+        }
+    }
+    MouseArea {
+        anchors.fill: parent
+        z: 49
+        visible: rowMenu.shown
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: rowMenu.shown = false
     }
 }

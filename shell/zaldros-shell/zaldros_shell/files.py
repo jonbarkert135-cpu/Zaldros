@@ -7,7 +7,10 @@ directory reports the error, an empty directory reports that it is empty.
 from __future__ import annotations
 
 import os
+import shutil
+import subprocess
 import time
+import urllib.parse
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -130,3 +133,106 @@ def _walk(root: Path, depth: int):
             yield item
         elif item.is_dir():
             yield from _walk(item, depth - 1)
+
+
+@dataclass(frozen=True)
+class Result:
+    """The outcome of a file operation. `error` is a sentence for the user, empty when it worked."""
+    ok: bool
+    path: str = ""
+    error: str = ""
+
+
+def _failure(exc: OSError, verb: str) -> Result:
+    return Result(False, error=f"{verb}: {exc.strerror or exc}")
+
+
+def unique_name(directory: Path, name: str) -> Path:
+    """Windows Explorer never overwrites on create: "Новая папка", then "Новая папка (2)"."""
+    candidate = directory / name
+    if not candidate.exists():
+        return candidate
+    stem, suffix = (name, "") if candidate.is_dir() or "." not in name else name.rsplit(".", 1)
+    if suffix:
+        suffix = "." + suffix
+    index = 2
+    while True:
+        candidate = directory / f"{stem} ({index}){suffix}"
+        if not candidate.exists():
+            return candidate
+        index += 1
+
+
+def create_folder(directory: str | os.PathLike[str], name: str = "Новая папка") -> Result:
+    try:
+        target = unique_name(Path(directory), name)
+        target.mkdir()
+    except OSError as exc:
+        return _failure(exc, "Не удалось создать папку")
+    return Result(True, str(target))
+
+
+def rename(path: str | os.PathLike[str], new_name: str) -> Result:
+    source = Path(path)
+    new_name = new_name.strip()
+    if not new_name or "/" in new_name:
+        return Result(False, error="Имя не может быть пустым или содержать «/»")
+    target = source.parent / new_name
+    if target == source:
+        return Result(True, str(source))
+    if target.exists():
+        return Result(False, error=f"«{new_name}» уже существует в этой папке")
+    try:
+        source.rename(target)
+    except OSError as exc:
+        return _failure(exc, "Не удалось переименовать")
+    return Result(True, str(target))
+
+
+def trash_directory(home: str | os.PathLike[str] | None = None) -> Path:
+    """$XDG_DATA_HOME/Trash, per the freedesktop trash specification — the same bin every other
+    Linux file manager uses, so a deleted file is restorable from any of them."""
+    if home is not None:
+        return Path(home) / ".local" / "share" / "Trash"
+    data_home = os.environ.get("XDG_DATA_HOME")
+    if data_home:
+        return Path(data_home) / "Trash"
+    return Path.home() / ".local" / "share" / "Trash"
+
+
+def move_to_trash(path: str | os.PathLike[str], home: str | os.PathLike[str] | None = None) -> Result:
+    """Delete the Windows way: into the bin, not into nothing. Writes the .trashinfo record the
+    freedesktop specification requires, so the file can be restored to where it came from."""
+    source = Path(path)
+    if not source.exists():
+        return Result(False, error="Файл уже удалён")
+    trash = trash_directory(home)
+    files_dir, info_dir = trash / "files", trash / "info"
+    try:
+        files_dir.mkdir(parents=True, exist_ok=True)
+        info_dir.mkdir(parents=True, exist_ok=True)
+        target = unique_name(files_dir, source.name)
+        info = info_dir / (target.name + ".trashinfo")
+        info.write_text(
+            "[Trash Info]\n"
+            f"Path={urllib.parse.quote(str(source.resolve()))}\n"
+            f"DeletionDate={time.strftime('%Y-%m-%dT%H:%M:%S')}\n",
+            encoding="utf-8")
+        shutil.move(str(source), str(target))
+    except OSError as exc:
+        return _failure(exc, "Не удалось удалить")
+    return Result(True, str(target))
+
+
+def open_with_default_application(path: str | os.PathLike[str]) -> Result:
+    """Hand a file to the desktop's default application. A directory is the caller's business."""
+    target = Path(path)
+    if not target.exists():
+        return Result(False, error="Файл не найден")
+    try:
+        subprocess.Popen(["xdg-open", str(target)],  # noqa: S603,S607 - the desktop's own opener
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return Result(False, error=f"Не удалось открыть файл: {exc}")
+    return Result(True, str(target))
