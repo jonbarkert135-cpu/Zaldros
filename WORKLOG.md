@@ -814,3 +814,43 @@ content (`TextMetrics`, the same row arithmetic the delegate uses) with 300 px a
 reference records `min_width` instead of `width`, parity gained a `min` comparator, and
 `test_context_menu_fit.py` renders the menu and demands a real background gutter before the
 shortcut column — a pixel gate, not a re-run of the layout maths.
+
+### Run #35: a reference library anyone can check, and a menu that stopped talking over itself
+
+Every geometry token in `win11-reference.json` was measured — but from screenshots that can never
+be published, so nobody outside this machine could verify one of them. This run built the missing
+half: `assets/refs/win11/library.json`, 36 authentic Windows 11 screenshots **published by
+Microsoft** (Microsoft Learn, Microsoft Support, the Windows Insider and Windows Experience blogs,
+the June 2021 press kit), covering all fifteen states we implement — desktop, taskbar, Start,
+search, Settings, Explorer, context menus, Quick Settings, notifications, window decorations,
+dark and light mode, dialogs, multiple windows and snap layouts.
+
+The images stay out of the repository (Microsoft's copyright). `tools/visual/fetch_references.py`
+downloads them into a gitignored cache and verifies the recorded sha256, so a reference that
+changes upstream fails loudly instead of silently rewriting a measurement.
+
+Two of them prove their own display scale, which is what makes a screenshot measurable at all:
+`quick-access-update2.png` puts its caption glyphs 45.5 px apart against a 46 px caption button, so
+it is a 100 % capture; the Quick Settings flyout is 536 px wide against a 360 px panel, so it is at
+150 %. `tools/visual/measure_library.py` re-derives eight numbers from those two and all eight
+agree with the committed reference — caption button width, context menu item height, and the Quick
+Settings panel width, padding, tile width, tile height and gap that had only ever been measured
+from private captures.
+
+The comparison against the seven rendered states then found what geometry parity structurally
+cannot see: the desktop context menu drew "Показать дополнительные параметры" straight through
+"Shift+F10". `ContextMenu.qml` pinned every menu at 300 px whatever the language, while Windows 11
+sizes a menu to its widest row. The menu now measures its rows with `TextMetrics` and treats 300 as
+a floor (`context_menu.min_width`, checked with a `min` comparator instead of equality — the file
+menu in the public 100 % capture is narrower than the desktop menu, so equality was never right).
+The gate is pixel-based, not a second copy of the layout arithmetic:
+`tests/test_context_menu_fit.py` renders the menu and fails when the gutter before a row's trailing
+text drops below 8 px. Pinning the width back to 300 makes it fail, which is the only proof that a
+regression test is worth anything.
+
+Two measurements the library raises and this run deliberately did **not** act on: Explorer's
+navigation pane measures 240 px at 100 % against our 190 token, and the details-view row pitch
+measures 30 against our 32. The pane is user-resizable, so the capture may just show a wider one —
+the maintainer's call, recorded in `docs/WIN11_REFERENCE_LIBRARY.md`.
+
+Tests: 182. Parity: 34/34.

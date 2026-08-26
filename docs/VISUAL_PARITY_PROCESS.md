@@ -29,6 +29,12 @@ Evidence lands in `docs/visual/current/`: the seven frames, one crop per compone
 | --- | --- | --- |
 | Start, taskbar rhythm | `assets/refs/win11_start_reference.png`, 1920x1280 at 125 % | yes |
 | Desktop taskbar, Explorer, Settings, notification centre, context menu | maintainer's own screenshots, 2026-08-26, 125 % | no — they show a personal desktop, so only the measurements were kept |
+| Every state, published by Microsoft | `assets/refs/win11/library.json` — 36 screenshots from Microsoft Learn, Microsoft Support, the Windows blogs and the Windows 11 press kit | no — Microsoft's copyright; `tools/visual/fetch_references.py` re-downloads and checksums them |
+
+Since run #35 the private captures are no longer the only word: `tools/visual/measure_library.py`
+re-derives caption button width, context menu item height and the whole Quick Settings tile grid
+from two public captures whose display scale can be proven (100 % and 150 %), and all eight
+measurements agree with the committed reference. See `docs/WIN11_REFERENCE_LIBRARY.md`.
 
 Every value in `win11-reference.json` is a measurement. Where a capture could not settle a value it
 is absent rather than guessed.
