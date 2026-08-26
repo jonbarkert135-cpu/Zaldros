@@ -14,7 +14,25 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+def _data_dir() -> Path:
+    """Find the shell's data tree (`pinned.json`).
+
+    Run #24: the ISO copied `zaldros_shell/`, `qml/` and `assets/` into /opt/zaldros but never
+    `data/`, so the shell died at startup with FileNotFoundError on /opt/zaldros/data/pinned.json
+    and every variant booted to a black screen. The copy is fixed in build-iso.sh; this resolver
+    also accepts the repo layout, the flat layout and an explicit override, and never invents
+    data when the file is absent.
+    """
+    candidates = [Path(os.environ["ZALDROS_DATA"])] if os.environ.get("ZALDROS_DATA") else []
+    here = Path(__file__).resolve()
+    candidates += [here.parents[1] / "data", Path("/opt/zaldros/data")]
+    for path in candidates:
+        if (path / "pinned.json").is_file():
+            return path
+    return candidates[-1]  # keep a stable path: a missing file must fail loudly, not silently
+
+
+DATA_DIR = _data_dir()
 
 
 @dataclass(frozen=True)

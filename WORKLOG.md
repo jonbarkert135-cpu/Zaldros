@@ -276,3 +276,46 @@ Written and unit-tested locally (44 shell tests + shell render green); CI eviden
 - Причина: kwin_wayland заново разбивает аргумент приложения по пробелам, поэтому
   `sh -c 'python3 -m zaldros_shell run; ...'` пришёл как отдельные слова.
 - Фикс: отдельный однофайловый враппер /usr/local/bin/zaldros-shell-run, kwin получает один путь.
+
+## Run #24 (60e478b) — the wrapper worked, the shell still exits (2026-08-24)
+
+iso run 32675722125: 12/12 jobs green, and green again means nothing. All nine
+`variant x profile` guest verdicts are `boot=FAIL, failed_checks=["shell"]`.
+
+Confirmed working in every combination: kernel 7.0.0-30-generic, systemd with 0 failed units,
+`/run/user/1000/wayland-0`, `kwin_wayland`, the autologin session unit, konsole launch 2.0 s.
+The single-file wrapper from run #23 did its job: `/tmp/zaldros-session.log` now shows
+`exec kwin_wayland --xwayland -- /usr/local/bin/zaldros-shell-run` with no argument splitting.
+
+Root cause, read off the session log, not guessed:
+
+```
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/zaldros/data/pinned.json'
+zaldros-shell exited 1
+```
+
+`build/iso/build-iso.sh` copied `zaldros_shell/`, `qml/`, `assets/` and `theme/` into
+/opt/zaldros and never copied `shell/zaldros-shell/data/`. The shell reads its pinned
+application list at import time, so it died before drawing a pixel — the same class of bug as
+the run #19 asset-path miss, and again invisible to a test suite that imports the shell from the
+repository checkout.
+
+Fixes in this commit:
+
+1. `build-iso.sh` copies `data/` into the image.
+2. `backend.py` resolves the data tree the way `app.py` resolves assets (`$ZALDROS_DATA`, repo
+   layout, flat layout) and keeps a stable path when nothing is found, so a missing file still
+   fails loudly.
+3. `tests/test_flat_layout.py` — the real guard: it parses the `cp` commands out of
+   `build-iso.sh`, stages exactly that tree in a temp directory and renders one frame from it in
+   a subprocess with `PYTHONPATH` pointing only at the staged tree. Removing the `data/` copy
+   makes it fail in under a second instead of after a 13-minute ISO run (verified both ways).
+
+Also recorded from run #24: boot time is finally a measured number — `uptime_at_selftest_s`
+21.6–24.3 s across the nine combinations (`systemd-analyze` still returns nothing while systemd
+reports `starting`). RAM 440–558 MiB at 21–24 processes, but that is a KWin-only session with no
+shell, so it is not architecture evidence.
+
+Known noise in the same log, not yet addressed: KWin cannot find the `ZaldrosDark` colour scheme
+(falls back to BreezeLight), no `default` cursor theme, no `applications.menu`, and the
+`org.kde.kwin.aurorae.v2` decoration plugin is missing. None of these stop the session.

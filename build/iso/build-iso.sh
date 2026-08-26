@@ -105,7 +105,10 @@ step apt-install chroot "$ROOT" env DEBIAN_FRONTEND=noninteractive \
 
 echo "== install the Zaldros shell, theme scripts and self-test"
 mkdir -p "$ROOT/opt/zaldros"
-cp -a "$REPO/shell/zaldros-shell/zaldros_shell" "$REPO/shell/zaldros-shell/qml" "$ROOT/opt/zaldros/"
+# Run #24: `data/` was missing here, so the shell crashed on /opt/zaldros/data/pinned.json.
+# tests/test_flat_layout.py now boots the shell from exactly this copy set.
+cp -a "$REPO/shell/zaldros-shell/zaldros_shell" "$REPO/shell/zaldros-shell/qml" \
+      "$REPO/shell/zaldros-shell/data" "$ROOT/opt/zaldros/"
 cp -a "$REPO/assets" "$ROOT/opt/zaldros/assets"
 cp -a "$REPO/system/theme" "$ROOT/opt/zaldros/theme"
 cp "$(dirname "$0")/selftest.py" "$ROOT/usr/local/bin/zaldros-selftest"

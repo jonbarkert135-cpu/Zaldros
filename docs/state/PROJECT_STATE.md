@@ -3,18 +3,25 @@
 ```
 Base:          Ubuntu 26.04 LTS
 Status:        PROPOSED
-ISO:           BUILT — run #18 (b17846d), all 3 variants
-Boot:          PASS — 9/9 variant x profile combinations, guest self-test green
-               (kernel 7.0.0-30-generic, systemd, Wayland, KWin, Zaldros session,
-               real app launch 2.0 s, 0 failed units). run 32671131899, 2026-08-23.
-Architecture:  NOT ACCEPTED — full ACCEPT (provisional), services/legacy MODIFY:
-               they boot but render a black screen (shell paints nothing).
-Idle RAM (QEMU, low profile): full 883 MiB / 39 proc, services 452 MiB / 22 proc,
-               legacy 468 MiB / 22 proc — comparison data only, not hardware evidence.
-Boot time:     NOT MEASURED (harness ceiling only) — BLOCKED, needs a timestamp probe.
+ISO:           BUILT - run #24 (60e478b), all 3 variants x 3 profiles
+Boot:          FAIL - 9/9 combinations, failed_checks = ["shell"].
+               PASS: kernel 7.0.0-30-generic, systemd, Wayland socket, KWin,
+               autologin session, konsole launch 2.0 s, 0 failed units.
+               FAIL: the Zaldros shell exits at startup.
+               Root cause (from /tmp/zaldros-session.log, not guessed):
+               FileNotFoundError /opt/zaldros/data/pinned.json - build-iso.sh
+               never copied shell/zaldros-shell/data into the image.
+               run 32675722125, 2026-08-24.
+Architecture:  NOT ACCEPTED - no variant has shown the Zaldros shell on screen yet.
+               The RAM figures below are KWin-only sessions, so they do not
+               compare the three architectures.
+Idle RAM (QEMU, low profile): full 479 MiB / 24 proc, services 440 MiB / 21 proc,
+               legacy 462 MiB / 21 proc - comparison data only, not hardware evidence.
+Boot time:     MEASURED (QEMU) - uptime at self-test 21.6-24.3 s across all 9
+               combinations; systemd-analyze still empty while systemd is "starting".
 ```
 
-_Last updated: 2026-08-23_
+_Last updated: 2026-08-24_
 
 | Field | Value |
 | --- | --- |
@@ -57,3 +64,5 @@ _Last updated: 2026-08-23_
 - Is a Linux build host / self-hosted runner available for image builds and VM tests?
 
 - Run #18: all CI jobs green, boot=FAIL on all 9 (systemd/app_launch), root causes fixed in run #19 candidate. Architecture: NOT ACCEPTED. [ci run 32670157459, 2026-08-23]
+- Run #24: iso + CI green, boot=FAIL on all 9 (`shell`) — the ISO never shipped `data/pinned.json`.
+  Fixed in the run #25 candidate together with a flat-layout guard test. [ci run 32675722125, 2026-08-24]
