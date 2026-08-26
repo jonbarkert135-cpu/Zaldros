@@ -12,7 +12,9 @@ import os
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QCoreApplication, QTimer, QUrl
+import json
+
+from PySide6.QtCore import QCoreApplication, QObject, QPointF, QTimer, QUrl
 from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuick import QQuickView
 
@@ -109,6 +111,39 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     return output
 
 
+def hit_boxes(view: QQuickView) -> dict:
+    """Screen coordinates of the widgets an external UI test needs to click.
+
+    The taskbar group is centred and its width depends on how many applications are pinned, so a
+    host-side test cannot compute the Start button position: it has to be told. Run #25 clicked a
+    guessed point on an empty part of the bar and reported FAIL for a shell that was fine.
+    """
+    boxes: dict = {}
+    root = view.rootObject()
+    if root is None:
+        return boxes
+    for name in ("startButton",):
+        item = root.findChild(QObject, name)
+        if item is None:
+            continue
+        width = float(item.property("width") or 0)
+        height = float(item.property("height") or 0)
+        centre = item.mapToItem(root, QPointF(width / 2, height / 2))
+        boxes[name] = {"x": round(centre.x()), "y": round(centre.y()),
+                       "width": round(width), "height": round(height)}
+    return boxes
+
+
+def write_hit_boxes(view: QQuickView, path: str = "/tmp/zaldros-ui-geometry.json") -> None:
+    """Publish the hit boxes for the in-guest UI test. Failure here must never kill the shell."""
+    try:
+        payload = {"screen": {"width": view.width(), "height": view.height()},
+                   "items": hit_boxes(view)}
+        Path(path).write_text(json.dumps(payload, ensure_ascii=False))
+    except Exception as exc:                                    # noqa: BLE001 - diagnostics only
+        print(f"hit-box export failed: {exc}", flush=True)
+
+
 def run() -> int:
     app = QGuiApplication(sys.argv)
     view, backends = build_view()
@@ -123,4 +158,6 @@ def run() -> int:
         view.rootObject().setProperty("height", size.height())
     view.setResizeMode(QQuickView.SizeRootObjectToView)
     view.showFullScreen()
+    # Once the first frame is laid out the taskbar geometry is final; publish it for the UI test.
+    QTimer.singleShot(2000, lambda: write_hit_boxes(view))
     return app.exec()

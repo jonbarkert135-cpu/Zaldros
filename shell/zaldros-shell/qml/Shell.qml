@@ -18,12 +18,48 @@ Item {
     property bool quickOpen: false
     property bool contextOpen: false
     property bool lightMode: false
+    // Which of the two window-layer surfaces holds focus. Alt+Tab flips it, exactly like the
+    // Windows 11 switcher does with two open windows.
+    property int focusedWindow: 1
+
+    // Global shell keys. KWin runs bare here (no plasmashell), so nothing else in the session
+    // owns Meta or Alt+Tab: the shell has to handle them itself or they do nothing at all.
+    // Run #25 proved that: every host-injected keystroke left the frame byte-identical.
+    focus: true
+    Keys.onPressed: function(event) {
+        if (event.key === Qt.Key_Super_L || event.key === Qt.Key_Super_R || event.key === Qt.Key_Meta) {
+            shell.startOpen = !shell.startOpen;
+            shell.quickOpen = false;
+            shell.contextOpen = false;
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.AltModifier)) {
+            shell.focusedWindow = shell.focusedWindow === 0 ? 1 : 0;
+            shell.startOpen = false;
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Escape) {
+            shell.startOpen = false;
+            shell.quickOpen = false;
+            shell.contextOpen = false;
+            event.accepted = true;
+        }
+    }
     property var backendState: shellState
     property var backendApps: appModel
     property var backendInstalled: installedModel
     property var backendSystem: systemState
 
     onLightModeChanged: Theme.dark = !lightMode
+
+    // Tab is consumed by Qt's focus chain before Keys.onPressed sees it, so the switcher binding
+    // has to be a real shortcut rather than a key handler.
+    Shortcut {
+        sequences: ["Alt+Tab"]
+        context: Qt.ApplicationShortcut
+        onActivated: {
+            shell.focusedWindow = shell.focusedWindow === 0 ? 1 : 0;
+            shell.startOpen = false;
+        }
+    }
 
     // --- desktop ---------------------------------------------------------------------------
     Rectangle {
@@ -95,14 +131,15 @@ Item {
     AppWindow {
         id: inactiveWindow
         title: "Параметры"
-        active: false
+        active: shell.focusedWindow === 0
+        z: shell.focusedWindow === 0 ? 11 : 10
         x: 300; y: 150
         width: 520; height: 340
         Item {
             anchors.fill: parent
             Text {
                 anchors.centerIn: parent
-                text: "Неактивное окно"
+                text: inactiveWindow.active ? "Параметры" : "Неактивное окно"
                 color: Theme.textSecondary
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontBody
@@ -113,7 +150,8 @@ Item {
     AppWindow {
         id: activeWindow
         title: "Проводник — Документы"
-        active: true
+        active: shell.focusedWindow === 1
+        z: shell.focusedWindow === 1 ? 11 : 10
         x: 380; y: 210
         width: 620; height: 400
         Item {

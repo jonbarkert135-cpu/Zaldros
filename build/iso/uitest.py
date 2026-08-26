@@ -11,6 +11,8 @@ import json, os, re, subprocess, time
 from pathlib import Path
 
 MARK = "ZALDROS-UITEST "
+# The shell publishes the on-screen hit boxes the host-side driver needs (see app.write_hit_boxes).
+GEOM_MARK = "ZALDROS-GEOMETRY "
 KWIN_SCRIPT = """
 var out = [];
 workspace.windowList().forEach(function (w) {
@@ -79,6 +81,9 @@ class Sampler:
 DIAG = {}
 
 
+SCRIPT_SEQ = [0]
+
+
 def kwin_call(method, *args):
     out = sh("dbus-send", "--session", "--print-reply", "--dest=org.kde.KWin",
              "/Scripting", f"org.kde.kwin.Scripting.{method}", *args)
@@ -86,8 +91,25 @@ def kwin_call(method, *args):
     return out
 
 
+SESSION_LOG = Path("/tmp/zaldros-session.log")
+
+
 def kwin_log():
-    """KWin logs console.info to the journal of whatever started it (a system unit here)."""
+    """Where KWin's console.info actually lands.
+
+    Run #25: the session unit redirects its own stdout/stderr to /tmp/zaldros-session.log, so
+    nothing the compositor printed ever reached the journal. Every window query came back empty
+    and the whole window half of the UI test reported FAIL against a shell that was running fine.
+    The file is checked first now; the journal stays as a fallback for other session layouts.
+    """
+    if SESSION_LOG.is_file():
+        try:
+            text = SESSION_LOG.read_text(errors="replace")[-200000:]
+            if "ZALDROS-WINDOWS" in text:
+                return text
+        except OSError:
+            pass
+    out = ""
     for cmd in (("journalctl", "-n", "200", "--no-pager", "-u", "zaldros-session"),
                 ("journalctl", "--user", "-n", "200", "--no-pager")):
         out = sh(*cmd)
@@ -97,12 +119,17 @@ def kwin_log():
 
 
 def windows():
-    """Ask KWin for its window list; returns [] if the call fails (recorded in DIAG, not hidden)."""
-    script = Path("/tmp/zaldros-windows.js")
+    """Ask KWin for its window list; returns [] if the call fails (recorded in DIAG, not hidden).
+
+    KWin keys loaded scripts by file path and refuses to run the same path twice, so a fresh file
+    name per query is required; without it only the first poll would ever produce output.
+    """
+    SCRIPT_SEQ[0] += 1
+    script = Path(f"/tmp/zaldros-windows-{SCRIPT_SEQ[0]}.js")
     script.write_text(KWIN_SCRIPT)
     kwin_call("loadScript", f"string:{script}")
     kwin_call("start")
-    time.sleep(0.3)
+    time.sleep(0.5)
     hit = [l for l in kwin_log().splitlines() if "ZALDROS-WINDOWS" in l]
     try:
         return json.loads(hit[-1].split("ZALDROS-WINDOWS ", 1)[1])
@@ -162,13 +189,19 @@ def main():
         pid = pid_of(name)
         procs[name] = {"running": bool(pid), "rss_mib": round(rss_mib(pid), 1) if pid else 0}
 
+    try:
+        geometry = json.loads(Path("/tmp/zaldros-ui-geometry.json").read_text())
+    except Exception as exc:                                    # noqa: BLE001 - reported, not hidden
+        geometry = {"error": str(exc)}
+    print(GEOM_MARK + json.dumps(geometry, ensure_ascii=False), flush=True)
     print(MARK + json.dumps({"variant": variant, "steps": results, "processes": procs,
-                         "dbus_diag": DIAG},
+                         "geometry": geometry, "dbus_diag": DIAG},
                             ensure_ascii=False), flush=True)
 
 
 def _kwin_eval(js):
-    script = Path("/tmp/zaldros-op.js")
+    SCRIPT_SEQ[0] += 1
+    script = Path(f"/tmp/zaldros-op-{SCRIPT_SEQ[0]}.js")
     script.write_text(js)
     kwin_call("loadScript", f"string:{script}")
     return kwin_call("start")

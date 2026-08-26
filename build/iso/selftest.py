@@ -158,11 +158,21 @@ def main():
                            "-p", "ActiveState", "-p", "SubState", "-p", "Result", "-p", "ExecMainStatus"),
         "session_journal": sh("journalctl", "-u", "zaldros-session", "--no-pager", "-n", "60")[-4000:],
     }
+    # The host-side UI driver starts as soon as this marker appears, and it needs the shell's
+    # published hit boxes to click anything. Print them first so they are on the serial log by
+    # the time the driver reads it.
+    try:
+        geometry = json.loads(Path("/tmp/zaldros-ui-geometry.json").read_text())
+    except Exception as exc:                                    # noqa: BLE001 - reported, not hidden
+        geometry = {"error": str(exc)}
+    result["ui_geometry"] = geometry
+    geometry_line = "ZALDROS-GEOMETRY " + json.dumps(geometry, ensure_ascii=False)
+    print(geometry_line, flush=True)
     line = MARK + json.dumps(result, ensure_ascii=False)
     print(line, flush=True)
     if args.serial:
         with open(args.serial, "w") as fh:
-            fh.write(line + "\n")
+            fh.write(geometry_line + "\n" + line + "\n")
 
 
 if __name__ == "__main__":

@@ -3,25 +3,27 @@
 ```
 Base:          Ubuntu 26.04 LTS
 Status:        PROPOSED
-ISO:           BUILT - run #24 (60e478b), all 3 variants x 3 profiles
-Boot:          FAIL - 9/9 combinations, failed_checks = ["shell"].
-               PASS: kernel 7.0.0-30-generic, systemd, Wayland socket, KWin,
-               autologin session, konsole launch 2.0 s, 0 failed units.
-               FAIL: the Zaldros shell exits at startup.
-               Root cause (from /tmp/zaldros-session.log, not guessed):
-               FileNotFoundError /opt/zaldros/data/pinned.json - build-iso.sh
-               never copied shell/zaldros-shell/data into the image.
-               run 32675722125, 2026-08-24.
-Architecture:  NOT ACCEPTED - no variant has shown the Zaldros shell on screen yet.
-               The RAM figures below are KWin-only sessions, so they do not
-               compare the three architectures.
-Idle RAM (QEMU, low profile): full 479 MiB / 24 proc, services 440 MiB / 21 proc,
-               legacy 462 MiB / 21 proc - comparison data only, not hardware evidence.
-Boot time:     MEASURED (QEMU) - uptime at self-test 21.6-24.3 s across all 9
+ISO:           BUILT - run #25 (773c1f4), all 3 variants x 3 profiles
+Boot:          PASS - 9/9 combinations, failed_checks = [].
+               Verified per combination: kernel 7.0.0-30-generic, systemd with
+               0 failed units, /run/user/1000/wayland-0, kwin_wayland, autologin
+               session, the Zaldros shell drawing on screen (QMP screenshots),
+               konsole launch 2.0 s.
+               run 32991329542, 2026-08-26.
+Architecture:  NOT ACCEPTED YET - the three variants now boot identically, so the
+               comparison is finally possible, but it needs one run with the UI
+               interaction test believed (see below) before a variant is chosen.
+Idle RAM (QEMU, run #25): full 655 MiB / 26 proc, services 606 MiB / 23 proc,
+               legacy 606 MiB / 23 proc (low profile) - shell + KWin, no plasmashell.
+               Comparison data under emulation, not hardware evidence.
+Boot time:     MEASURED (QEMU) - uptime at self-test 21.3-24.3 s across all 9
                combinations; systemd-analyze still empty while systemd is "starting".
+UI test:       NOT TRUSTWORTHY in run #25 - the window query read the wrong log and
+               the host driver clicked a guessed point, so it reported FAIL against a
+               working shell. Fixed in run #26; verdicts before it are void.
 ```
 
-_Last updated: 2026-08-24_
+_Last updated: 2026-08-26_
 
 | Field | Value |
 | --- | --- |

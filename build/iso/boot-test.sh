@@ -57,7 +57,7 @@ QEMU=$!
 ( for _ in $(seq 1 "${UI_WAIT:-600}"); do
     grep -q 'ZALDROS-SELFTEST {' "$SERIAL" 2>/dev/null && break; sleep 1
   done
-  python3 "$(dirname "$0")/ui-drive.py" "$OUT/$NAME.qmp" --out "$OUT" --name "$NAME" \
+  python3 "$(dirname "$0")/ui-drive.py" "$OUT/$NAME.qmp" --out "$OUT" --name "$NAME" --serial "$SERIAL" \
     >"$OUT/$NAME.ui-drive.log" 2>&1 || echo "UI drive failed, see $OUT/$NAME.ui-drive.log" ) &
 
 wait "$QEMU" && RC=0 || RC=$?

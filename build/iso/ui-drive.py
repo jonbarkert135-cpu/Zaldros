@@ -43,12 +43,28 @@ class QMP:
         self.cmd("screendump", filename=str(Path(path).resolve()))
 
 
-def ppm_signature(path):
-    """Cheap change detector: mean pixel value of a PPM, no image libraries needed."""
+def ppm_pixels(path):
     data = Path(path).read_bytes()
     parts = data.split(b"\n", 3)
-    pixels = parts[3] if len(parts) > 3 else b""
-    return round(sum(pixels[::997]) / max(len(pixels[::997]), 1), 3)
+    return parts[3] if len(parts) > 3 else b""
+
+
+def changed_fraction(before, after):
+    """Fraction of sampled bytes that differ between two frames.
+
+    A mean-brightness comparison (run #25) hides a Start menu that opens and closes again, and it
+    calls a one-pixel difference a change. Counting differing bytes is both stricter and honest
+    about how much of the screen moved.
+    """
+    a, b = ppm_pixels(before), ppm_pixels(after)
+    if not a or not b or len(a) != len(b):
+        return 1.0 if a != b else 0.0
+    sample = range(0, len(a), 101)
+    differing = sum(1 for i in sample if a[i] != b[i])
+    return round(differing / max(len(range(0, len(a), 101)), 1), 5)
+
+
+CHANGE_THRESHOLD = 0.002        # 0.2 % of sampled bytes; larger than PPM/encoder noise
 
 
 def timed_step(qmp, out, name, action, settle=1.5):
@@ -61,11 +77,37 @@ def timed_step(qmp, out, name, action, settle=1.5):
     qmp.screendump(after)
     elapsed = round(time.monotonic() - started, 3)
     try:
-        changed = ppm_signature(before) != ppm_signature(after)
+        fraction = changed_fraction(before, after)
     except Exception as exc:
         return {"status": "FAIL", "error": str(exc)}
+    changed = fraction >= CHANGE_THRESHOLD
     return {"status": "PASS" if changed else "FAIL", "seconds": elapsed,
-            "screen_changed": changed, "screenshot": after.name}
+            "screen_changed": changed, "changed_fraction": fraction,
+            "screenshot": after.name}
+
+
+def hit_boxes(serial_path):
+    """Read the last ZALDROS-GEOMETRY line the guest printed on the serial console."""
+    if not serial_path or not Path(serial_path).is_file():
+        return None
+    text = Path(serial_path).read_text(errors="replace")
+    hits = [line for line in text.splitlines() if "ZALDROS-GEOMETRY {" in line]
+    if not hits:
+        return None
+    try:
+        return json.loads(hits[-1].split("ZALDROS-GEOMETRY ", 1)[1])
+    except Exception:
+        return None
+
+
+def wait_for_hit_boxes(serial_path, timeout=30):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        boxes = hit_boxes(serial_path)
+        if boxes and boxes.get("items"):
+            return boxes
+        time.sleep(1)
+    return hit_boxes(serial_path)
 
 
 def main():
@@ -75,6 +117,7 @@ def main():
     ap.add_argument("--width", type=int, default=1280)
     ap.add_argument("--height", type=int, default=800)
     ap.add_argument("--name", default="ui")
+    ap.add_argument("--serial", help="serial log to read the guest's published hit boxes from")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -84,9 +127,23 @@ def main():
         "start_open": lambda: qmp.key("meta_l"),
         "start_close": lambda: qmp.key("esc"),
         "alt_tab": lambda: qmp.key("alt_l", "tab"),
-        "taskbar_response": lambda: qmp.click(24, args.height - 24, args.width, args.height),
     }
     results = {name: timed_step(qmp, out, name, action) for name, action in steps.items()}
+
+    # The taskbar group is centred and its width depends on the pinned applications, so the click
+    # target comes from the guest itself. No coordinate is ever guessed: without the published
+    # geometry the step reports BLOCKED and says why.
+    start = (wait_for_hit_boxes(args.serial) or {}).get("items", {}).get("startButton")
+    if start:
+        results["taskbar_response"] = timed_step(
+            qmp, out, "taskbar_response",
+            lambda: qmp.click(start["x"], start["y"], args.width, args.height))
+        results["taskbar_response"]["target"] = start
+    else:
+        results["taskbar_response"] = {
+            "status": "BLOCKED",
+            "why": "the guest did not publish /tmp/zaldros-ui-geometry.json, so the Start button "
+                   "position on screen is unknown and clicking a guessed point proves nothing"}
     (out / f"{args.name}-host.json").write_text(json.dumps(results, indent=2, ensure_ascii=False))
     print(json.dumps(results, indent=2, ensure_ascii=False))
 

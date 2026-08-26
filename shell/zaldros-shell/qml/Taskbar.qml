@@ -44,6 +44,7 @@ Item {
 
         TaskbarButton {
             id: startButton
+            objectName: "startButton"
             appName: "Пуск"
             showTile: false
             running: false

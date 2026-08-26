@@ -319,3 +319,62 @@ shell, so it is not architecture evidence.
 Known noise in the same log, not yet addressed: KWin cannot find the `ZaldrosDark` colour scheme
 (falls back to BreezeLight), no `default` cursor theme, no `applications.menu`, and the
 `org.kde.kwin.aurorae.v2` decoration plugin is missing. None of these stop the session.
+
+## Run #25 — first honest BOOT PASS, and the UI test caught lying
+
+iso run 32991329542: 9/9 combinations `boot=PASS, failed_checks=[]`. The shell renders — the
+QMP screenshots show the wallpaper, desktop icons, the taskbar, the Start group and both window
+mockups on all three variants. Shipping `data/` was the last thing between the image and a
+working session.
+
+Measured in this run (guest self-test, not estimated):
+
+| combination | boot | uptime at self-test | RAM used | processes |
+|---|---|---|---|---|
+| full / low | PASS | 23.4 s | 655 MiB | 26 |
+| full / mid | PASS | 24.0 s | 680 MiB | 26 |
+| full / modern | PASS | 24.3 s | 738 MiB | 26 |
+| services / low | PASS | 23.3 s | 606 MiB | 23 |
+| services / mid | PASS | 23.3 s | 632 MiB | 23 |
+| services / modern | PASS | 24.4 s | 687 MiB | 23 |
+| legacy / low | PASS | 22.8 s | 606 MiB | 23 |
+| legacy / mid | PASS | 21.3 s | 633 MiB | 23 |
+| legacy / modern | PASS | 21.9 s | 685 MiB | 23 |
+
+Largest resident processes are the shell (python3, ~319 MiB) and kwin_wayland (~270 MiB).
+
+Every UI step still reported FAIL, and three separate reasons were found, none of them a shell
+defect:
+
+1. **The window query never read anything.** `uitest.py` looked for KWin's `console.info` output
+   in the journal, but the session unit redirects its own output to `/tmp/zaldros-session.log`
+   (run #20). `windows()` therefore always returned `[]`, so `desktop_ready` said "no windows
+   yet", `app_launch_explorer` timed out after 30 s and move/minimize/restore all failed against
+   a session that had the windows open on screen.
+2. **KWin refuses to run the same script path twice.** Every poll wrote `/tmp/zaldros-windows.js`
+   and called `loadScript` on it, so even a fixed log source would only have worked once.
+3. **The host driver clicked an empty spot and pressed keys nobody handled.** The taskbar group
+   is centred and its width depends on the pinned applications, so the hard-coded `(24, h-24)`
+   click landed on bare taskbar. Meta and Alt+Tab reached the shell and did nothing, because
+   with bare `kwin_wayland` and no plasmashell there is no component in the session that owns
+   those keys.
+
+Fixes in this commit:
+
+* `Shell.qml` handles the shell keys itself: Meta toggles Start, Escape closes Start, quick
+  settings and context menus, and an `Alt+Tab` shortcut moves focus between the two window
+  surfaces (Tab alone is eaten by Qt's focus chain, so a key handler is not enough — a real
+  `Shortcut` is). Measured offscreen: Alt+Tab changes 8.6 % of the pixels.
+* `app.py` publishes the on-screen hit boxes (`/tmp/zaldros-ui-geometry.json`, Start button
+  centre in view coordinates) two seconds after the first frame; `selftest.py` prints them on
+  serial as `ZALDROS-GEOMETRY {...}` and `ui-drive.py` clicks that point instead of a guess. If
+  the geometry is missing the step reports BLOCKED with the reason — no guessed coordinates.
+* `uitest.py` reads `/tmp/zaldros-session.log` first and uses a fresh script path per query.
+* `ui-drive.py` compares frames by the fraction of differing bytes (threshold 0.2 %) instead of
+  by mean brightness, which hid a menu that opened and closed again.
+* `tests/test_input.py` presses Meta, Escape and Alt+Tab on a real `QQuickView` and checks the
+  published hit box sits inside the 48 px taskbar band.
+
+Still open after this run: the missing `ZaldrosDark` colour scheme, no `default` cursor theme, no
+`applications.menu`, the absent `org.kde.kwin.aurorae.v2` decoration plugin, and the icon
+provider failing for `soffice`, `zutty` and `gvim` in the pinned grid.
