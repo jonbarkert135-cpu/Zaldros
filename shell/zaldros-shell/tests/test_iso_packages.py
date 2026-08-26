@@ -38,22 +38,18 @@ THEME = REPO / "system" / "theme" / "install-visual-theme.sh"
 
 
 def test_alt_tab_is_wired_end_to_end() -> None:
-    """Run #27: Alt+Tab failed in all nine boot profiles.
+    """Run #27 blamed a missing global accelerator daemon; run #33 proved that diagnosis wrong.
 
-    KWin never grabs Alt+Tab itself. It asks the global accelerator daemon, which is only a
-    *recommend* of kwin-wayland and was therefore absent from an image built with
-    --no-install-recommends. Three things have to be true at once, so all three are asserted.
+    kwin v6.6.0 embeds the daemon: src/main_wayland.cpp does Q_IMPORT_PLUGIN(KGlobalAccelImpl)
+    and src/globalshortcuts.cpp builds a KGlobalAccelD in-process, so kwin_wayland owns
+    org.kde.kglobalaccel. A second kglobalacceld next to it exits 0 at once because the bus name
+    is taken — run #33 logged exactly that, five times. The session must not spawn one.
     """
     build = BUILD.read_text()
     theme = THEME.read_text()
-    assert "kglobalacceld" in build, "the ISO must install a global shortcut daemon"
-    session = build.split("cat > \"$ROOT/usr/local/bin/zaldros-session\"")[1]
-    session = session.split("exec kwin_wayland")[0]
-    assert "accel-path" in session, (
-        "the session must start the daemon from the path dpkg reported, before kwin_wayland"
-    )
-    assert "accel-path" in build.split("apt-accel")[1].split("zaldros-session")[0], (
-        "the build must resolve the daemon path with dpkg instead of guessing"
+    session = build.split('/usr/local/bin/zaldros-session" <<\'EOS\'')[1].split("\nEOS")[0]
+    assert "kglobalacceld exited" not in session, (
+        "kwin_wayland is the accelerator daemon; starting a second one is a no-op loop"
     )
     assert "[TabBox]" in theme, "kwinrc must configure the window switcher"
     assert "Walk Through Windows=Alt+Tab" in theme, (
@@ -92,14 +88,35 @@ def test_dbus_probes_run_inside_the_session_not_as_root() -> None:
         assert fact in probe, f"the switcher probe must report {fact}"
 
 
-def test_the_shortcut_daemon_waits_for_the_bus_and_is_supervised() -> None:
-    """A daemon started before the user bus exists dies silently, which is indistinguishable from
-    a healthy session with a dead Alt+Tab. Wait for the socket, restart it, log every exit."""
-    session = BUILD.read_text().split("/usr/local/bin/zaldros-session\" <<'EOS'")[1].split("\nEOS")[0]
+def test_the_boot_records_what_kwin_says_about_the_switcher() -> None:
+    """The session still waits for the user bus (kwin registers its services on it), and the boot
+    now ends with a late report: KWin logs the switcher failure *while* Alt+Tab is pressed, which
+    is 100 seconds after the boot self-test has already printed its JSON."""
+    build = BUILD.read_text()
+    session = build.split('/usr/local/bin/zaldros-session" <<\'EOS\'')[1].split("\nEOS")[0]
     assert "/bus" in session and "while [ ! -S" in session, (
-        "the session must wait for the D-Bus socket before starting the shortcut daemon"
+        "the session must wait for the D-Bus socket before starting the compositor"
     )
-    assert "kglobalacceld exited" in session, "an exit of the daemon must be visible in the log"
+    assert "kwin_tabbox.debug=true" in session, (
+        "without the tabbox logging category a failed switcher load is silent"
+    )
+    assert "--late" in build, "the boot must dump the session log after the host drives Alt+Tab"
+    selftest = (REPO / "build" / "iso" / "selftest.py").read_text()
+    assert "def late_report(" in selftest and "tabbox_lines" in selftest, (
+        "the late report must carry KWin's own tabbox messages"
+    )
+
+
+def test_the_switcher_qml_modules_are_in_the_image() -> None:
+    """Our tabbox layout imports QtQuick.Window. A missing QML module is one warning in KWin's
+    log and an Alt+Tab that draws nothing."""
+    build = BUILD.read_text()
+    qml = (REPO / "system" / "theme" / "tabbox" / "zaldros" / "contents" / "ui" / "main.qml").read_text()
+    for line in qml.splitlines():
+        if line.startswith("import QtQuick.Window"):
+            assert "qml6-module-qtquick-window" in build, (
+                "the layout imports QtQuick.Window, so the image must ship that QML module"
+            )
 
 
 def test_the_switcher_package_is_installed_by_the_theme_installer() -> None:

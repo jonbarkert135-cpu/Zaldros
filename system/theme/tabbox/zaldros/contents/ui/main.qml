@@ -32,7 +32,10 @@ KWin.TabBoxSwitcher {
     readonly property color accentColour: "@ACCENT@"
     readonly property int cornerRadius: @RADIUS@
 
-    currentIndex: grid.currentIndex
+    // No binding for currentIndex here: `grid` lives inside the Instantiator's delegate, which is
+    // a separate component scope, and KWin writes this property itself before showing the box
+    // (tabboxhandler.cpp: item->setCurrentIndex(indexRow)). The grid pushes its selection back in
+    // onCurrentIndexChanged below, exactly as kwin's own thumbnail_grid layout does.
 
     Instantiator {
         active: tabBox.visible

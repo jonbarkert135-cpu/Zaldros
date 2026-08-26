@@ -717,3 +717,28 @@ presses Alt+Shift only KWin knows which layout is active; the shell reads
 when KWin does not answer. Clicking the badge switches to the next layout, as it does in Windows.
 
 Tests: 153.
+
+### Run #33: the shortcut daemon that was never missing
+
+Three runs blamed `kglobalacceld`. Run #33's log finally showed it plainly: the daemon exits `0`
+the instant it starts, five times, because the D-Bus name it wants is already taken — by
+`kwin_wayland` itself. kwin v6.6.0 embeds it: `src/main_wayland.cpp` has
+`Q_IMPORT_PLUGIN(KGlobalAccelImpl)` and `src/globalshortcuts.cpp` constructs a `KGlobalAccelD`
+in-process. The session no longer spawns a second one, and the probe confirms the component and
+KWin's own `Walk Through Windows` action are registered on the bus.
+
+So the shortcut side is healthy and the switcher still draws nothing, which leaves the drawing
+side: `TabBoxHandlerPrivate::createSwitcherItem()` reports a broken package with a single
+`qCWarning(KWIN_TABBOX)` and then returns quietly. That warning is written *while Alt+Tab is
+pressed* — a hundred seconds after the boot self-test has printed its JSON and gone. Two changes
+make the next boot answer instead of hint: the session exports
+`QT_LOGGING_RULES=kwin_tabbox.debug=true`, and the boot ends with `zaldros-selftest --late`, run
+after the host's Alt+Tab, which dumps the session log, every tabbox line in it, and the switcher
+probe again.
+
+Two suspects were removed on the way: the layout imports `QtQuick.Window`, so the image now
+installs `qml6-module-qtquick-window` (a missing QML module is exactly that one silent warning),
+and the root `currentIndex: grid.currentIndex` binding is gone — `grid` lives in the
+Instantiator's delegate, a different component scope, and kwin sets that property itself.
+
+Tests: 164.

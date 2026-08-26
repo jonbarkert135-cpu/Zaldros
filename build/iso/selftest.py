@@ -6,6 +6,7 @@ import argparse, json, os, re, subprocess, time
 from pathlib import Path
 
 MARK = "ZALDROS-SELFTEST "
+LATE_MARK = "ZALDROS-LATE "
 
 
 def sh(*cmd, timeout=20):
@@ -174,11 +175,16 @@ def switcher():
     shortcut = user_sh("gdbus", "call", "--session", "--dest", "org.kde.kglobalaccel",
                        "--object-path", "/component/kwin",
                        "--method", "org.kde.kglobalaccel.Component.allShortcutInfos")
+    # Two entries start with "Walk Through Windows"; the interesting one is the *exact* name,
+    # because that is the action Alt+Tab is bound to. Run #33 captured the "of Current
+    # Application" entry instead and proved nothing about Alt+Tab.
     walk = ""
+    walk_exact = ""
     for part in shortcut.split("('"):
         if part.startswith("Walk Through Windows"):
-            walk = part[:400]
-            break
+            walk = walk or part[:400]
+            if part.startswith("Walk Through Windows', "):
+                walk_exact = part[:400]
     # Ask kglobalaccel to fire KWin's own shortcut. If this errors, the key never had a chance and
     # the layout is innocent; if it succeeds while Alt+Tab still does nothing, the input path is
     # the suspect. Either way the answer is recorded, not guessed.
@@ -211,6 +217,7 @@ def switcher():
         "kglobalaccel_component_present": bool(walk) or "Walk Through Windows" in shortcut,
         "all_shortcut_infos_error": shortcut[:300] if not walk else "",
         "walk_through_windows": walk,
+        "walk_through_windows_exact": walk_exact,
         "kwin_journal": sh("sh", "-c",
                            "journalctl -b --no-pager | grep -iE 'tabbox|switcher|kwin_tabbox' | tail -n 20"),
     }
@@ -223,13 +230,42 @@ def tail_file(path, n=4000):
     except OSError:
         return None
 
+def late_report():
+    """Everything that only exists *after* the host has pressed Alt+Tab.
+
+    KWin writes one warning when the switcher package will not load and one debug line per tabbox
+    show; both land in the session log, which the boot self-test reads 100 seconds too early.
+    """
+    log = Path("/tmp/zaldros-session.log")
+    text = log.read_text(errors="replace") if log.is_file() else ""
+    interesting = [line for line in text.splitlines()
+                   if re.search(r"tabbox|switcher|TabBox|QQmlComponent|is not installed|"
+                                r"Component failed|module .* not installed", line, re.I)]
+    return {
+        "session_log_tail": text[-6000:],
+        "tabbox_lines": interesting[-40:],
+        "qml_import_paths": sh("sh", "-c",
+                               "ls -d /usr/lib/x86_64-linux-gnu/qt6/qml/QtQuick* 2>&1 | head -n 20"),
+        "switcher": switcher(),
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--serial", default="")
+    ap.add_argument("--late", action="store_true",
+                    help="run after the host UI drive and report what KWin logged then")
     ap.add_argument("--settle", type=float, default=15.0, help="seconds to let the desktop settle")
     ap.add_argument("--wait-kwin", type=float, default=90.0,
                     help="seconds to wait for the compositor before reporting what is there")
     args = ap.parse_args()
+    if args.late:
+        line = LATE_MARK + json.dumps(late_report(), ensure_ascii=False)
+        print(line, flush=True)
+        if args.serial:
+            with open(args.serial, "w") as fh:
+                fh.write(line + "\n")
+        return
     time.sleep(args.settle)
     # The desktop is not up the moment graphical.target is reached; wait for evidence of it,
     # and if it never appears, say so with the session logs attached rather than guessing.

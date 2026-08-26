@@ -61,7 +61,7 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg qml6-module-qtquick-controls"
+BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg qml6-module-qtquick-controls qml6-module-qtquick-window"
 case "$VARIANT" in
   full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland" ;;
   services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
@@ -170,32 +170,22 @@ exec >>/tmp/zaldros-session.log 2>&1
 set -x
 # Run #23: kwin_wayland re-splits its application argument on spaces, so `sh -c '...'` arrived as
 # `sh -c python3 -m zaldros_shell run;` and argparse died on the token "run;". Pass one file path.
-# Run #27: the accelerator daemon must be up before KWin registers "Walk Through Windows",
-# otherwise the registration is silently dropped and Alt+Tab is dead for the whole session.
-# Run #29: the daemon was started before the user's D-Bus socket existed and nothing checked that
-# it survived, so a silent early exit looked exactly like a working session with a dead Alt+Tab.
-# Wait for the bus, then keep the daemon alive and record every exit in this log.
-accel="$(cat /etc/zaldros/accel-path 2>/dev/null)"
-if [ -n "$accel" ] && [ -x "$accel" ]; then
-  i=0
-  while [ ! -S "${XDG_RUNTIME_DIR:-/run/user/1000}/bus" ] && [ "$i" -lt 50 ]; do
-    sleep 0.2
-    i=$((i + 1))
-  done
-  echo "session bus after ${i} polls: $(ls -l "${XDG_RUNTIME_DIR:-/run/user/1000}/bus" 2>&1)"
-  (
-    n=0
-    while [ "$n" -lt 5 ]; do
-      "$accel"
-      echo "kglobalacceld exited $? (restart $n)"
-      n=$((n + 1))
-      sleep 2
-    done
-  ) &
-  sleep 2
-else
-  echo "no global shortcut daemon on this image: Alt+Tab will not work"
-fi
+# Run #27-#33 chased a "dead" global shortcut daemon. It was never dead and never needed:
+# kwin_wayland *is* the daemon. kwin v6.6.0 src/main_wayland.cpp does Q_IMPORT_PLUGIN(KGlobalAccelImpl)
+# and src/globalshortcuts.cpp constructs a KGlobalAccelD in-process, so kwin itself owns the
+# org.kde.kglobalaccel service. Starting /usr/lib/.../kglobalacceld next to it exits 0 immediately
+# because the bus name is taken, and run #33 restarted that no-op five times. Do not spawn it.
+# Wait for the user bus (kwin needs it for its own service registration), then hand over to kwin.
+i=0
+while [ ! -S "${XDG_RUNTIME_DIR:-/run/user/1000}/bus" ] && [ "$i" -lt 50 ]; do
+  sleep 0.2
+  i=$((i + 1))
+done
+echo "session bus after ${i} polls: $(ls -l "${XDG_RUNTIME_DIR:-/run/user/1000}/bus" 2>&1)"
+# Alt+Tab draws nothing when KWin cannot load the switcher package, and that failure is a single
+# qCWarning in this log. Turn the tabbox category on so the next boot says why instead of us
+# guessing for another 20-minute image build.
+export QT_LOGGING_RULES="kwin_tabbox.debug=true;kwin_tabbox.info=true"
 exec kwin_wayland --xwayland -- /usr/local/bin/zaldros-shell-run
 EOS
 chmod +x "$ROOT/usr/local/bin/zaldros-session"
@@ -248,6 +238,11 @@ ExecStart=/usr/local/bin/zaldros-selftest --serial /dev/ttyS0
 # Stage 2: pause so the host can inject input over QMP, then run the UI interaction test.
 ExecStart=/bin/sleep 45
 ExecStart=/bin/sh -c 'runuser -u ubuntu -- env XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland /usr/local/bin/zaldros-uitest > /dev/ttyS0 2>/var/log/zaldros-uitest.err'
+# Stage 3: the host drives Alt+Tab *after* the guest publishes its geometry, which is the last
+# thing stage 2 prints. Powering off right there threw away every message KWin wrote while the
+# switcher was supposed to appear. Wait for the host to finish, then dump the session log.
+ExecStart=/bin/sleep 30
+ExecStart=/usr/local/bin/zaldros-selftest --late --serial /dev/ttyS0
 TimeoutStartSec=600
 ExecStopPost=/usr/bin/systemctl poweroff
 [Install]
