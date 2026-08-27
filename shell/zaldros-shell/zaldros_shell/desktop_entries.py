@@ -27,6 +27,7 @@ class DesktopApp:
     comment: str = ""
     no_display: bool = False
     terminal: bool = False
+    desktop_id: str = ""      # "firefox.desktop" — how mimeapps.list names this application
 
     @property
     def exec_name(self) -> str:
@@ -51,7 +52,7 @@ def application_dirs(env: dict[str, str] | None = None) -> list[Path]:
     return [Path(root) / "applications" for root in roots if root]
 
 
-def parse_desktop_file(text: str, locale: str = "ru") -> DesktopApp | None:
+def parse_desktop_file(text: str, locale: str = "ru", desktop_id: str = "") -> DesktopApp | None:
     """Parse one .desktop file. Only the [Desktop Entry] group; localized Name[xx] wins."""
     # ponytail: configparser is the stdlib INI parser and .desktop is INI; strict=False tolerates
     # the duplicate keys real-world files ship. Swap for a hand parser only if a real file breaks it.
@@ -78,6 +79,7 @@ def parse_desktop_file(text: str, locale: str = "ru") -> DesktopApp | None:
         no_display=values.get("NoDisplay", "false").lower() == "true"
                    or values.get("Hidden", "false").lower() == "true",
         terminal=values.get("Terminal", "false").lower() == "true",
+        desktop_id=desktop_id,
     )
 
 
@@ -91,7 +93,8 @@ def discover(dirs: list[Path] | None = None, locale: str = "ru") -> list[Desktop
             continue
         for path in entries:
             try:
-                app = parse_desktop_file(path.read_text(encoding="utf-8", errors="replace"), locale)
+                app = parse_desktop_file(path.read_text(encoding="utf-8", errors="replace"),
+                                         locale, path.name)
             except OSError:
                 continue
             if app and not app.no_display and app.exec_command:

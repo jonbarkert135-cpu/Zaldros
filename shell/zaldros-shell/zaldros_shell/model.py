@@ -18,7 +18,7 @@ from .backend import (AppEntry, cpu_percent, cpu_times, format_clock, load_pinne
 from .desktop_entries import DesktopApp, discover, launch
 from . import clipboard as clipboard_history
 from . import capture, portal
-from . import files, hostinfo, prefs, settingspages, system, weather
+from . import files, hostinfo, prefs, settingscontrols, settingspages, system, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
@@ -619,9 +619,14 @@ class RecentModel(QAbstractListModel):
 
     changed = Signal()
 
-    def __init__(self, home: str | None = None, limit: int = 6) -> None:
+    def __init__(self, home: str | None = None, limit: int = 6,
+                 switches: dict[str, bool] | None = None) -> None:
         super().__init__()
-        self._entries = files.recent_files(home, limit)
+        # "Журнал действий → Недавние файлы" in Settings is this list. Off means the list is not
+        # built at all — not built and hidden, which would still have walked the home directory.
+        values = switches if switches is not None else prefs.load()
+        self._entries = (files.recent_files(home, limit)
+                         if values.get("privacy.recent_files", True) else [])
 
     def roleNames(self) -> dict:  # noqa: N802
         return {NAME_R: b"name", PATH_R: b"path", GLYPH_R: b"glyph", SUB_R: b"subtitle"}
@@ -706,23 +711,110 @@ class WeatherState(QObject):
         return self._reading.detail
 
 
+class SettingsControls(QObject):
+    """The bridge between a Settings row and the machine (settingscontrols.py).
+
+    QML calls `activate(id)` when a row is clicked and gets back the state that was *read from the
+    system afterwards*. Nothing is cached here: a switch that the service refused stays where the
+    service left it, and the row redraws with the reason.
+    """
+
+    changed = Signal()
+
+    def __init__(self, registry=None, home: Path | None = None) -> None:
+        super().__init__()
+        self._home = home
+        self._registry = registry
+
+    @property
+    def registry(self):
+        if self._registry is None:
+            self._registry = settingscontrols.Registry(home=self._home)
+        return self._registry
+
+    @Slot()
+    def refresh(self) -> None:
+        """Rebuild: monitors, drives and user accounts appear and disappear."""
+        self._registry = settingscontrols.Registry(home=self._home)
+        self.changed.emit()
+
+    @Slot(str, result="QVariantMap")
+    def state(self, control_id: str) -> dict:
+        return self.registry.state(control_id).as_variant()
+
+    @Slot(str, result="QVariantMap")
+    def activate(self, control_id: str) -> dict:
+        """Click on a row: a switch flips, an action runs, anything else is only read back."""
+        registry = self.registry
+        state = registry.state(control_id)
+        if state.kind == settingscontrols.SWITCH:
+            state = registry.toggle(control_id)
+        elif state.kind == settingscontrols.ACTION:
+            state = registry.invoke(control_id)
+        self.changed.emit()
+        return state.as_variant()
+
+    @Slot(str, "QVariant", result="QVariantMap")
+    def set(self, control_id: str, value) -> dict:
+        state = self.registry.set(control_id, value)
+        self.changed.emit()
+        return state.as_variant()
+
+    @Slot(str, result="QVariantList")
+    def choices(self, control_id: str) -> list:
+        return list(self.registry.state(control_id).choices)
+
+
 class SettingsTree(QObject):
     """The Settings information architecture (settingspages.py) as plain data for QML."""
 
     changed = Signal()
 
-    def __init__(self, pages: dict | None = None) -> None:
+    def __init__(self, pages: dict | None = None, controls=None) -> None:
         super().__init__()
-        self._pages = pages if pages is not None else settingspages.to_variant(settingspages.build())
+        self._controls = controls
+        self._pages = (pages if pages is not None
+                       else settingspages.to_variant(settingspages.build(controls=self._registry())))
+
+    def _registry(self):
+        return self._controls.registry if self._controls is not None else None
 
     @Slot()
     def refresh(self) -> None:
-        self._pages = settingspages.to_variant(settingspages.build())
+        self._pages = settingspages.to_variant(settingspages.build(controls=self._registry()))
         self.changed.emit()
 
     @Slot(str, result="QVariantMap")
     def page(self, page_id: str) -> dict:
+        """A page of the tree — or, for `choice:<control>`, the option list built on the spot.
+
+        Windows opens a dropdown here. Zaldros opens a page of the same cards with a mark on the
+        current option: one visual language, no second widget, and every option is a real write.
+        """
+        if page_id.startswith("choice:"):
+            return self._choice_page(page_id.split(":", 1)[1])
         return self._pages.get(page_id, {"id": page_id, "title": "", "parent": "", "entries": []})
+
+    def _choice_page(self, control_id: str) -> dict:
+        registry = self._registry()
+        if registry is None:
+            return {"id": f"choice:{control_id}", "title": "", "parent": "", "entries": []}
+        control = registry.get(control_id)
+        state = registry.state(control_id)
+        entries = [{"title": option.get("title", ""), "subtitle": "", "glyph": "settings",
+                    "value": "выбрано" if str(option.get("id")) == str(state.value) else "",
+                    "group": "", "page": "", "url": "", "hasToggle": False, "toggle": False,
+                    "pref": "", "control": control_id, "kind": "option",
+                    "writable": state.writable, "reason": state.reason,
+                    "option": str(option.get("id", ""))}
+                   for option in state.choices]
+        if not entries:
+            entries = [{"title": state.reason or "нет вариантов", "subtitle": "", "glyph": "info",
+                        "value": "", "group": "", "page": "", "url": "", "hasToggle": False,
+                        "toggle": False, "pref": "", "control": "", "kind": "info",
+                        "writable": False, "reason": state.reason, "option": ""}]
+        return {"id": f"choice:{control_id}", "title": control.title if control else control_id,
+                "glyph": "settings", "parent": "", "entries": entries}
 
     @Property("QVariantList", notify=changed)
     def rail(self) -> list:
@@ -791,6 +883,7 @@ class ClipboardModel(QAbstractListModel):
 
     def __init__(self, home=None, cache: Path | None = None, clipboard=None) -> None:
         super().__init__()
+        self._home = home
         self._history = clipboard_history.History(home=home)
         self._cache = Path(cache) if cache else Path(
             os.environ.get("XDG_CACHE_HOME") or (Path.home() / ".cache")) / "zaldros" / "clipboard"
@@ -821,8 +914,14 @@ class ClipboardModel(QAbstractListModel):
     # --- clipboard --------------------------------------------------------------------------
     @Slot()
     def capture(self) -> bool:
-        """Take whatever is on the clipboard now. Returns True when the history changed."""
+        """Take whatever is on the clipboard now. Returns True when the history changed.
+
+        With «Журнал буфера обмена» off in Settings nothing is recorded — the copy still works,
+        Win+V simply has nothing to show, which is what that switch means.
+        """
         if self._clip is None:
+            return False
+        if not prefs.load(self._home).get("clipboard.history", True):
             return False
         added = False
         text = self._clip.text()

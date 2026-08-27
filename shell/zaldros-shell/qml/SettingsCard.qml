@@ -12,6 +12,7 @@ Item {
     property bool hasToggle: false      // a real switch, not decoration
     property bool toggled: false
     property bool navigable: true       // chevron only when the row opens another page
+    property bool disabled: false       // the system cannot honour this control right now
     signal triggered()
     signal toggledChanged2()
 
@@ -44,7 +45,7 @@ Item {
             spacing: 3
             Text {
                 text: card.title
-                color: Theme.textPrimary
+                color: card.disabled ? Theme.textSecondary : Theme.textPrimary
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontBody
             }
@@ -100,6 +101,7 @@ Item {
         id: area
         anchors.fill: parent
         hoverEnabled: true
+        enabled: !card.disabled
         onClicked: card.triggered()
     }
 }

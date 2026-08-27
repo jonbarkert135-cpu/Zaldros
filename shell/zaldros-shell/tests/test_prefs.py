@@ -48,20 +48,32 @@ def test_a_corrupt_line_falls_back_to_the_default(tmp_path: Path) -> None:
     assert prefs.load(tmp_path)["taskbar.clock"] is True
 
 
-def test_the_settings_tree_shows_the_stored_state_not_a_constant() -> None:
-    switches = dict(prefs.DEFAULTS, **{"taskbar.search": False})
-    tree = settingspages.to_variant(settingspages.build(switches=switches))
+def test_the_settings_tree_shows_the_stored_state_not_a_constant(tmp_path: Path) -> None:
+    """The row's state comes from the store through settingscontrols.py, never from a constant."""
+    from zaldros_backend.testing import offline_backend
+
+    from zaldros_shell import settingscontrols
+
+    prefs.save(dict(prefs.DEFAULTS, **{"taskbar.search": False}), tmp_path)
+    registry = settingscontrols.Registry(backend=offline_backend(), home=tmp_path)
+    tree = settingspages.to_variant(settingspages.build(controls=registry))
     rows = [entry for page in tree.values() for entry in page["entries"]
-            if entry.get("pref") == "taskbar.search"]
+            if entry.get("control") == "pref:taskbar.search"]
     assert rows, "the search switch must be reachable in Settings"
     assert rows[0]["toggle"] is False
     assert rows[0]["hasToggle"] is True
 
 
 def test_every_pref_backed_row_names_a_key_we_implement() -> None:
-    tree = settingspages.to_variant(settingspages.build())
-    keys = {entry["pref"] for page in tree.values() for entry in page["entries"]
-            if entry.get("pref")}
+    """Every `pref:` control in the tree must be a key prefs.py really stores."""
+    from zaldros_backend.testing import offline_backend
+
+    from zaldros_shell import settingscontrols
+
+    registry = settingscontrols.Registry(backend=offline_backend())
+    tree = settingspages.to_variant(settingspages.build(controls=registry))
+    keys = {entry["control"].split(":", 1)[1] for page in tree.values()
+            for entry in page["entries"] if entry.get("control", "").startswith("pref:")}
     assert keys, "the tree must expose the switches that work"
     assert keys <= set(prefs.DEFAULTS), f"unimplemented switch keys: {keys - set(prefs.DEFAULTS)}"
 

@@ -199,7 +199,14 @@ def _output_reading(entry: dict) -> Reading | None:
         rotation=int(entry.get("rotation", 1) or 1),
         modes=sorted({(int((mode.get("size") or {}).get("width", 0)),
                        int((mode.get("size") or {}).get("height", 0)))
-                      for mode in entry.get("modes", [])}, reverse=True))
+                      for mode in entry.get("modes", [])}, reverse=True),
+        # Only the rates this screen can do *at the resolution it is running*: offering 144 Hz
+        # that exists solely at a lower resolution is how a display page sets a mode that fails.
+        refresh_rates=sorted({round(float(mode.get("refreshRate", 0) or 0), 2)
+                              for mode in entry.get("modes", [])
+                              if int((mode.get("size") or {}).get("width", 0)) == width
+                              and int((mode.get("size") or {}).get("height", 0)) == height
+                              and mode.get("refreshRate")}, reverse=True))
 
 
 def _read_int(path: Path) -> int | None:

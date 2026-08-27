@@ -32,6 +32,10 @@ class Entry:
     url: str = ""            # opens in the browser instead of navigating
     pref: str = ""           # key in prefs.py when this switch really changes the desktop
     group: str = ""          # section heading above this row, as Windows groups long pages
+    control: str = ""        # id in settingscontrols.py — the row that really changes something
+    kind: str = ""           # switch / choice / action / info, copied from the control
+    writable: bool = False   # False draws the row disabled instead of pretending
+    reason: str = ""         # why it cannot be changed here, in the interface's language
 
 
 @dataclass(frozen=True)
@@ -77,8 +81,30 @@ class _State:
         return f"{reading.value} %" if reading and reading.available and reading.value is not None else "–"
 
 
+def control_entry(controls, control_id: str, title: str, subtitle: str = "",
+                  glyph: str = "settings", group: str = "") -> Entry:
+    """One row wired to a real control: its value is read from the system, right now.
+
+    Without a registry (a pure tree test) the row still appears, marked unwritable with the
+    reason — the information architecture is the same whether or not a machine is under it.
+    """
+    if controls is None:
+        return Entry(title, subtitle, glyph, "", control=control_id, kind="", reason="нет системы",
+                     group=group)
+    state = controls.state(control_id)
+    value = state.detail
+    if not state.available:
+        value = state.reason or "недоступно"
+    elif state.kind == "switch":
+        value = state.detail
+    return Entry(title, subtitle, glyph, value,
+                 toggle=bool(state.value) if state.kind == "switch" and state.available else None,
+                 control=control_id, kind=state.kind, writable=state.writable,
+                 reason=state.reason, group=group)
+
+
 def build(readings: dict[str, str] | None = None, state: dict | None = None,
-          switches: dict[str, bool] | None = None) -> dict[str, Page]:
+          switches: dict[str, bool] | None = None, controls=None) -> dict[str, Page]:
     """The whole tree, with real values already resolved. Pure function: easy to test.
 
     `switches` are the user preferences that really change the desktop (prefs.py). They are read
@@ -88,6 +114,10 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     s = _State(state if state is not None else system.snapshot())
     switches = dict(prefs.DEFAULTS) | (switches if switches is not None else prefs.load())
     pages: list[Page] = []
+
+    def C(control_id: str, title: str, subtitle: str = "", glyph: str = "settings",  # noqa: N802
+          group: str = "") -> Entry:
+        return control_entry(controls, control_id, title, subtitle, glyph, group)
 
     def page(id_: str, title: str, glyph: str, parent: str, entries: list[Entry]) -> None:
         pages.append(Page(id=id_, title=title, glyph=glyph, parent=parent, entries=entries))
@@ -121,37 +151,58 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
 
     page("display", "Дисплей", "screen", "system", [
+        C("display.brightness", "Яркость", "Подсветка экрана", "brightness"),
+        C("display.resolution", "Разрешение экрана", "Режим основного экрана", "screen"),
+        C("display.refresh", "Частота обновления", "Герц основного экрана", "refresh"),
+        C("display.scale", "Масштаб интерфейса", "Размер элементов и текста", "view"),
+        Entry("Несколько дисплеев", "Какие экраны включены", "window", "", "displays-multiple"),
         Entry("Тип сеанса", "Протокол отображения", "screen", _dash(r["sessionType"])),
         Entry("Композитор", "Оконный менеджер сеанса", "window", "KWin"),
-        Entry("Масштаб интерфейса", "Размер элементов и текста", "brightness", "100 %"),
-        Entry("Ночной свет", "Тёплые цвета вечером", "night", "", toggle=False),
     ])
+    page("displays-multiple", "Несколько дисплеев", "window", "display",
+         [C(control_id, f"Экран {control_id.rsplit('.', 1)[-1]}", "Включить или отключить",
+            "screen")
+          for control_id in (controls.ids() if controls is not None else [])
+          if control_id.startswith("display.output.")]
+         or [Entry("Экраны", "Определяются через kscreen-doctor", "screen", "не определены")])
     page("sound", "Звук", "speaker", "system", [
-        Entry("Устройство вывода", s.detail("volume"), "speaker",
-              "доступно" if s.available("volume") else "не найдено"),
-        Entry("Громкость", "Общий уровень", "volume",
-              s.percent("volume")),
-        Entry("Устройства ввода", "Микрофоны, определённые системой", "phone",
-              "доступно" if s.available("volume") else "не найдено"),
+        C("sound.output", "Устройство вывода", "Куда идёт звук", "speaker"),
+        C("sound.volume", "Громкость", "Общий уровень", "volume"),
+        C("sound.muted", "Отключить звук", "Полная тишина", "volume"),
+        C("sound.microphone_muted", "Микрофон", "Устройство ввода по умолчанию", "phone"),
     ])
     page("notifications", "Уведомления", "bell", "system", [
-        Entry("Уведомления приложений", "Показывать баннеры и звук", "bell", "", toggle=True),
-        Entry("Не беспокоить", "Тихий режим", "night", "", toggle=False),
+        C("pref:notifications.banners", "Уведомления приложений", "Показывать баннеры", "bell"),
+        C("pref:notifications.dnd", "Не беспокоить", "Баннеры скрыты, важные проходят", "night"),
+        C("pref:notifications.sound", "Звук уведомлений", "Звуковой сигнал", "speaker"),
         Entry("Центр уведомлений", "Открывается по часам на панели", "calendar", ""),
     ])
     page("power", "Питание и батарея", "power", "system", [
-        Entry("Состояние батареи", s.detail("battery"), "battery",
-              s.percent("battery")),
-        Entry("Режим питания", "Профиль производительности", "power", "Сбалансированный"),
-        Entry("Экран гаснет через", "Бездействие сеанса", "screen", "10 мин"),
+        C("power.battery", "Состояние батареи", s.detail("battery"), "battery"),
+        C("power.suspend", "Спящий режим", "Перевести компьютер в сон", "power"),
+        C("power.hibernate", "Гибернация", "Сохранить сеанс на диск", "power"),
+        Entry("Восстановление", "Загрузка в UEFI и перезапуск", "refresh", "", "recovery"),
+    ])
+    page("recovery", "Восстановление", "refresh", "power", [
+        C("recovery.firmware_setup", "Параметры UEFI",
+          "Открыть настройки прошивки при следующей перезагрузке", "settings"),
+        C("power.reboot", "Перезагрузить сейчас", "Применит выбранное выше", "refresh"),
+        C("power.power_off", "Выключить", "Завершение работы", "power"),
     ])
     page("storage", "Память", "hard-drive", "system", [
         Entry("Системный диск", "Занято", "hard-drive",
               _used_of(r["diskUsed"], r["diskTotal"])),
         Entry("Оперативная память", "Используется сейчас", "info",
               _used_of(r["memoryUsed"], r["memoryTotal"])),
+        C("storage.volumes", "Тома", "Файловые системы, известные udisks2", "hard-drive"),
+        Entry("Съёмные носители", "Подключение и извлечение", "hard-drive", "", "storage-volumes"),
         Entry("Время работы", "С момента загрузки", "clock", _dash(r["uptime"])),
     ])
+    page("storage-volumes", "Съёмные носители", "hard-drive", "storage",
+         [C(control_id, control_id.split(".", 2)[-1], "Подключить или отключить", "hard-drive")
+          for control_id in (controls.ids() if controls is not None else [])
+          if control_id.startswith("storage.mounted.")]
+         or [Entry("Носители", "Подключённых съёмных дисков нет", "hard-drive", "–")])
     page("multitasking", "Многозадачность", "window", "system", [
         Entry("Привязка окон", "Meta и стрелки раскладывают окна", "window", "", toggle=True),
         Entry("Alt+Tab", "Переключение между окнами", "taskview", "включено"),
@@ -163,8 +214,8 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Исходный код", "Репозиторий системы", "link", "GitHub", url=HELP_URL.rsplit("/", 1)[0]),
     ])
     page("clipboard", "Буфер обмена", "copy", "system", [
-        Entry("Журнал буфера", "Хранить последние элементы", "copy", "", toggle=False),
-        Entry("Очистить буфер", "Удалить содержимое сейчас", "delete", ""),
+        C("pref:clipboard.history", "Журнал буфера", "Хранить последние элементы", "copy"),
+        Entry("Очистить буфер", "Кнопка «Очистить все» в самом окне Win+V", "delete", ""),
     ])
     page("about", "О системе", "info", "system", [
         Entry("Имя устройства", "", "desktop", _dash(r["deviceName"])),
@@ -176,17 +227,19 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
 
     page("devices", "Bluetooth и устройства", "bluetooth", "home", [
-        Entry("Bluetooth", s.detail("bluetooth"), "bluetooth", "",
-              toggle=s.available("bluetooth")),
+        C("bluetooth.power", "Bluetooth", s.detail("bluetooth"), "bluetooth"),
         Entry("Устройства", "Мышь, клавиатура, аудио, дисплеи", "phone", "", "input-devices"),
         Entry("Принтеры и сканеры", "Очереди печати системы", "document", "", "printers"),
         Entry("Камеры", "Подключённые видеоустройства", "video", "", "cameras"),
         Entry("Мышь", "Кнопки, скорость указателя, прокрутка", "computer", "", "mouse"),
+        Entry("Сенсорная панель", "Касания, прокрутка, чувствительность", "computer", "",
+              "touchpad"),
         Entry("Автозапуск", "Действие для съёмных носителей", "hard-drive", "", "autoplay"),
         Entry("USB", "Уведомления при подключении", "hard-drive", "", "usb"),
     ])
     page("input-devices", "Устройства", "phone", "devices", [
-        Entry("Клавиатура", s.detail("keyboard"), "keyboard", s.detail("keyboard").split()[0] if s.detail("keyboard") else ""),
+        C("bluetooth.discovery", "Поиск устройств", "Bluetooth ищет рядом", "bluetooth"),
+        C("keyboard.layout", "Раскладка клавиатуры", s.detail("keyboard"), "keyboard"),
         Entry("Указатель", "Курсор сеанса", "computer", "Fluent"),
     ])
     page("printers", "Принтеры и сканеры", "document", "devices", [
@@ -196,9 +249,17 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Видеоустройства", "Определяются ядром как /dev/video*", "video", ""),
     ])
     page("mouse", "Мышь", "computer", "devices", [
-        Entry("Основная кнопка", "Левая или правая", "computer", "Левая"),
-        Entry("Скорость указателя", "Чувствительность", "computer", "средняя"),
-        Entry("Прокрутка", "Строк за один шаг колеса", "sort", "3"),
+        C("mouse.left_handed", "Основная кнопка — правая", "Для левшей", "computer"),
+        C("mouse.acceleration", "Скорость указателя", "Ускорение libinput", "computer"),
+        C("mouse.natural_scroll", "Обратная прокрутка", "Как на сенсорной панели", "sort"),
+        C("mouse.middle_emulation", "Средняя кнопка", "Обе кнопки сразу = средняя", "computer"),
+    ])
+    page("touchpad", "Сенсорная панель", "computer", "devices", [
+        C("touchpad.enabled", "Сенсорная панель", "Включена", "computer"),
+        C("touchpad.tap_to_click", "Касание = щелчок", "Без нажатия", "computer"),
+        C("touchpad.natural_scroll", "Обратная прокрутка", "Содержимое едет за пальцами", "sort"),
+        C("touchpad.disable_while_typing", "Отключать при наборе", "Чтобы не мешала", "keyboard"),
+        C("touchpad.acceleration", "Скорость указателя", "Ускорение libinput", "computer"),
     ])
     page("autoplay", "Автозапуск", "hard-drive", "devices", [
         Entry("Съёмные носители", "Открывать Проводник при подключении", "folder", "", toggle=True),
@@ -208,22 +269,22 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
 
     page("network", "Сеть и Интернет", "globe", "home", [
-        Entry("Wi-Fi", s.detail("network"), "wifi", "",
-              toggle=s.available("network") and "Wi-Fi" in s.detail("network"), page="wifi"),
-        Entry("Ethernet", "Проводные интерфейсы из /sys/class/net", "ethernet", "", "ethernet"),
+        C("network.wifi", "Wi-Fi", s.detail("network"), "wifi"),
+        Entry("Сети Wi-Fi", "Доступные и сохранённые", "wifi", "", "wifi"),
+        Entry("Ethernet", "Проводные интерфейсы", "ethernet", "", "ethernet"),
         Entry("VPN", "Профили подключения", "vpn", "", "vpn"),
-        Entry("Мобильный хот-спот", "Раздача подключения", "phone", "", toggle=False),
-        Entry("Режим «в самолёте»", "Отключить радиомодули", "airplane", "", toggle=False),
+        C("network.enabled", "Сеть", "Главный выключатель NetworkManager", "globe"),
+        C("network.airplane", "Режим «в самолёте»", "Отключить радиомодули", "airplane"),
         Entry("Прокси-сервер", "Ручная и автоматическая настройка", "globe", "", "proxy"),
         Entry("Дополнительные сетевые параметры", "Все адаптеры, сброс сети", "settings", "", "network-advanced"),
     ])
     page("wifi", "Wi-Fi", "wifi", "network", [
         Entry("Текущее подключение", s.detail("network"), "wifi",
               "подключено" if s.available("network") else "нет сети"),
-        Entry("Известные сети", "Сохранённые профили NetworkManager", "list", ""),
+        C("network.scan", "Искать сети", "Запросить сканирование", "refresh"),
     ])
     page("ethernet", "Ethernet", "ethernet", "network", [
-        Entry("Интерфейсы", "Читаются из /sys/class/net", "ethernet", ""),
+        C("network.ethernet", "Интерфейсы", "Проводные адаптеры NetworkManager", "ethernet"),
     ])
     page("vpn", "VPN", "vpn", "network", [
         Entry("Профили", "Настроенные подключения", "vpn", "не настроено"),
@@ -233,8 +294,8 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Ручная настройка", "Адрес и порт", "settings", "не задано"),
     ])
     page("network-advanced", "Дополнительные сетевые параметры", "settings", "network", [
-        Entry("Все адаптеры", "Список сетевых интерфейсов", "list", ""),
-        Entry("Сброс сети", "Перезапустить NetworkManager", "refresh", ""),
+        C("network.ethernet", "Все адаптеры", "Список сетевых интерфейсов", "list"),
+        C("network.scan", "Обновить список сетей", "Сканирование Wi-Fi", "refresh"),
     ])
 
     page("personalisation", "Персонализация", "paint-brush", "home", [
@@ -253,8 +314,7 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
     page("colours", "Цвета", "paint-brush", "personalisation", [
         Entry("Режим", "Светлое или тёмное оформление", "dark-theme", "Тёмный"),
-        Entry("Эффекты прозрачности", "Материал панелей и меню", "view", "",
-              toggle=switches["visual.transparency"], pref="visual.transparency"),
+        C("pref:visual.transparency", "Эффекты прозрачности", "Материал панелей и меню", "view"),
         Entry("Цвет акцента", "Подсветка активных элементов", "paint-brush", "#0067c0"),
     ])
     page("themes", "Темы", "dark-theme", "personalisation", [
@@ -264,22 +324,17 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
     page("lockscreen", "Экран блокировки", "shield", "personalisation", [
         Entry("Изображение", "Фон экрана блокировки", "image", "как рабочий стол"),
-        Entry("Часы на экране", "Показывать время", "clock", "", toggle=switches["taskbar.clock"],
-              pref="taskbar.clock"),
+        C("pref:taskbar.clock", "Часы на экране", "Показывать время", "clock"),
     ])
     page("start", "Пуск", "grid", "personalisation", [
         Entry("Закреплённые приложения", "Сетка Пуска", "grid", "18"),
-        Entry("Недавние файлы", "Показывать в разделе «Рекомендуем»", "document", "",
-              toggle=switches["start.recent"], pref="start.recent"),
+        C("pref:start.recent", "Недавние файлы", "Показывать в разделе «Рекомендуем»", "document"),
     ])
     page("taskbar", "Панель задач", "taskview", "personalisation", [
         Entry("Выравнивание", "Положение группы значков", "taskview", "По центру"),
-        Entry("Поиск", "Поле поиска на панели", "search", "", toggle=switches["taskbar.search"],
-              pref="taskbar.search"),
-        Entry("Виджеты", "Погода слева на панели", "weather-cloud", "",
-              toggle=switches["taskbar.widgets"], pref="taskbar.widgets"),
-        Entry("Представление задач", "Кнопка переключения окон", "taskview", "",
-              toggle=switches["taskbar.taskview"], pref="taskbar.taskview"),
+        C("pref:taskbar.search", "Поиск", "Поле поиска на панели", "search"),
+        C("pref:taskbar.widgets", "Виджеты", "Погода слева на панели", "weather-cloud"),
+        C("pref:taskbar.taskview", "Представление задач", "Кнопка переключения окон", "taskview"),
     ])
     page("fonts", "Шрифты", "document", "personalisation", [
         Entry("Системный шрифт", "Интерфейс оболочки", "document", "Selawik"),
@@ -292,11 +347,18 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Автозагрузка", "Запуск при входе в сеанс", "power", "", "apps-startup"),
     ])
     page("apps-installed", "Установленные приложения", "apps", "apps", [
-        Entry("Источник списка", "Каталоги applications в системе", "folder", "/usr/share/applications"),
+        C("apps.installed", "Найдено приложений", "Файлы .desktop этой системы", "apps"),
+        Entry("Источник списка", "Каталоги applications в системе", "folder",
+              "/usr/share/applications"),
     ])
     page("apps-default", "Приложения по умолчанию", "add-circle", "apps", [
-        Entry("Браузер", "Открывает ссылки", "globe", "по mimeapps.list"),
-        Entry("Файловый менеджер", "Открывает папки", "folder", "Проводник Raven"),
+        C("apps.default.browser", "Браузер", "Открывает ссылки", "globe"),
+        C("apps.default.mail", "Почта", "Открывает mailto:", "document"),
+        C("apps.default.files", "Файловый менеджер", "Открывает папки", "folder"),
+        C("apps.default.images", "Просмотр фотографий", "Открывает изображения", "image"),
+        C("apps.default.music", "Музыка", "Открывает аудиофайлы", "speaker"),
+        C("apps.default.video", "Видео", "Открывает видеофайлы", "video"),
+        C("apps.default.documents", "Документы", "Открывает PDF", "document"),
     ])
     page("apps-startup", "Автозагрузка", "power", "apps", [
         Entry("Автозапуск сеанса", "Каталог autostart пользователя", "folder", "~/.config/autostart"),
@@ -313,11 +375,17 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
     page("account-signin", "Варианты входа", "shield", "accounts", [
         Entry("Пароль", "Учётная запись системы", "shield", "используется"),
-        Entry("Автоматический вход", "Сеанс запускается без пароля", "power", "", toggle=True),
+        C("accounts.automatic_login", "Автоматический вход", "Сеанс запускается без пароля",
+          "power"),
     ])
-    page("account-others", "Другие пользователи", "user", "accounts", [
-        Entry("Учётные записи", "Пользователи с домашним каталогом", "user", ""),
-    ])
+    page("account-others", "Другие пользователи", "user", "accounts",
+         [C(control_id,
+            f"{control_id.rsplit('.', 1)[-1]} — "
+            + ("администратор" if ".admin." in control_id else "вход запрещён"),
+            "accountsservice", "user")
+          for control_id in (controls.ids() if controls is not None else [])
+          if control_id.startswith(("accounts.admin.", "accounts.locked."))]
+         or [Entry("Учётные записи", "accountsservice не отвечает", "user", "–")])
 
     page("time", "Время и язык", "clock", "home", [
         Entry("Дата и время", _dash(r["timezone"]), "clock", _dash(r["localTime"]), "date-time"),
@@ -327,16 +395,17 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Распознавание голоса", "Голосовой ввод системы", "phone", "не настроено", "speech"),
     ])
     page("date-time", "Дата и время", "clock", "time", [
-        Entry("Часовой пояс", "Системная зона", "globe", _dash(r["timezone"])),
+        C("time.timezone", "Часовой пояс", "Системная зона", "globe"),
         Entry("Текущее время", "По системным часам", "clock", _dash(r["localTime"])),
-        Entry("Синхронизация времени", "Служба NTP", "sync", "", toggle=True),
+        C("time.ntp", "Синхронизация времени", "Служба NTP", "sync"),
+        C("time.local_rtc", "Часы BIOS по местному времени", "Иначе UTC", "clock"),
     ])
     page("language", "Язык и регион", "globe", "time", [
-        Entry("Язык интерфейса", "Язык оболочки", "globe", "Русский"),
+        C("language.lang", "Язык интерфейса", "Переменная LANG системы", "globe"),
         Entry("Формат даты", "Как отображается дата", "calendar", "ДД.ММ.ГГГГ"),
     ])
     page("input", "Ввод", "keyboard", "time", [
-        Entry("Раскладки", s.detail("keyboard"), "keyboard", s.detail("keyboard").split()[0] if s.detail("keyboard") else ""),
+        C("keyboard.layout", "Раскладки", s.detail("keyboard"), "keyboard"),
         Entry("Переключение", "Сочетание клавиш", "keyboard", "Meta+Пробел"),
     ])
 
@@ -383,8 +452,7 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
     page("visual-effects", "Визуальные эффекты", "view", "accessibility", [
         Entry("Эффекты прозрачности", "Материал панелей", "view", "", toggle=True),
-        Entry("Анимация", "Плавные переходы", "refresh", "", toggle=switches["visual.animations"],
-              pref="visual.animations"),
+        C("pref:visual.animations", "Анимация", "Плавные переходы", "refresh"),
     ])
     page("pointer", "Указатель мыши", "computer", "accessibility", [
         Entry("Размер указателя", "Курсор сеанса", "computer", "24 px"),
@@ -412,17 +480,18 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Состояние", "Шифрование системного раздела", "hard-drive", "не настроено"),
     ])
     page("activity", "Журнал действий", "list", "privacy", [
-        Entry("Недавние файлы", "Список в Пуске и Проводнике", "document", "", toggle=True),
-        Entry("Очистить журнал", "Удалить историю недавних файлов", "delete", ""),
+        C("pref:privacy.recent_files", "Недавние файлы", "Список в Пуске и Проводнике",
+          "document"),
+        C("pref:clipboard.history", "Журнал буфера обмена", "Что помнит Win+V", "copy"),
     ])
     page("security", "Безопасность Raven", "shield", "privacy", [
-        Entry("Обновления безопасности", "Источник пакетов системы", "sync", ""),
-        Entry("Брандмауэр", "Фильтрация сетевых подключений", "shield", "не настроен"),
+        C("updates.available", "Обновления безопасности", "Пакеты из репозиториев", "sync"),
+        C("privacy.firewall", "Брандмауэр", "Фильтрация сетевых подключений", "shield"),
     ])
     page("permissions", "Разрешения приложений", "apps", "privacy", [
-        Entry("Микрофон", "Доступ приложений", "phone", "", toggle=True),
-        Entry("Камера", "Доступ приложений", "video", "", toggle=True),
-        Entry("Расположение", "Доступ к местоположению", "globe", "", toggle=False),
+        C("privacy.microphone", "Микрофон", "Доступ приложений через портал", "phone"),
+        C("privacy.camera", "Камера", "Доступ приложений через портал", "video"),
+        C("privacy.location", "Расположение", "Доступ к местоположению", "globe"),
     ])
     page("diagnostics", "Диагностика", "info", "privacy", [
         Entry("Сбор данных", "Телеметрия системы", "info", "выключен", toggle=False),
@@ -445,9 +514,9 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
 
     page("update", "Обновление Raven", "sync", "home", [
-        Entry("Проверить обновления", "Пакеты системы и приложений", "sync", ""),
-        Entry("Журнал обновлений", "Что было установлено", "list", ""),
-        Entry("Параметры установки", "Когда применять обновления", "settings", ""),
+        C("updates.available", "Доступные обновления", "Пакеты системы и приложений", "sync"),
+        C("updates.check", "Проверить обновления", "Обновить список пакетов", "refresh"),
+        Entry("Восстановление", "Загрузка в UEFI и перезапуск", "refresh", "", "recovery"),
     ])
 
     return {p.id: p for p in pages}
@@ -466,7 +535,8 @@ def to_variant(pages: dict[str, Page]) -> dict:
                  "group": e.group,
                  "page": e.page, "url": e.url,
                  "hasToggle": e.toggle is not None, "toggle": bool(e.toggle),
-                 "pref": e.pref}
+                 "pref": e.pref, "control": e.control, "kind": e.kind,
+                 "writable": e.writable, "reason": e.reason}
                 for e in p.entries
             ],
         }

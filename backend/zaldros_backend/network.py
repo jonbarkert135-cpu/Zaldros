@@ -189,6 +189,15 @@ class NetworkFacet:
                                 "аппаратно выключен" if blocked else "", value.source,
                                 enabled=bool(value.value), hardware_blocked=blocked)
 
+    def networking_enabled(self) -> Reading:
+        """The master switch: NetworkManager.NetworkingEnabled. Off means every interface is
+        down, which is a different fact from "Wi-Fi is off"."""
+        value = self._bus.get(NM.SERVICE, NM.PATH, NM.IFACE, "NetworkingEnabled")
+        if not value.ok:
+            return Reading.missing(NO_SERVICE, value.source)
+        return Reading.measured(1 if value.value else 0, "", value.source,
+                                enabled=bool(value.value))
+
     def set_wifi_enabled(self, enabled: bool) -> Result:
         from .wire import Variant
         return self._bus.set(NM.SERVICE, NM.PATH, NM.IFACE, "WirelessEnabled",

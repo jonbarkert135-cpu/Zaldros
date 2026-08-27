@@ -10,7 +10,7 @@ from typing import Any, Callable
 
 from .bus import Bus, Result
 from .catalog import Login1, UPower
-from .reading import NO_DATA, NO_SERVICE, NOT_PRESENT, Reading
+from .reading import NO_DATA, NO_SERVICE, NOT_PRESENT, NOT_SUPPORTED, Reading
 
 # The wording the shell already renders in quick settings. Kept verbatim: the
 # backend replaced where a reading comes from, not a single pixel of what is shown.
@@ -178,6 +178,32 @@ class PowerFacet:
 
     def lock_session(self) -> Result:
         return self._bus.call(Login1.SERVICE, Login1.PATH, Login1.MANAGER, "LockSessions")
+
+    # -- recovery ------------------------------------------------------------------------------
+    def firmware_setup(self) -> Reading:
+        """Windows' "Особые варианты загрузки → Параметры встроенного ПО" has one honest Linux
+        counterpart: logind's flag that makes the *next* reboot land in the UEFI setup.
+
+        Machines booted in legacy BIOS mode cannot do it at all, and logind says so through
+        CanRebootToFirmwareSetup — which is why this is a Reading with an `available` flag and not
+        a bare bool.
+        """
+        can = self._bus.call_one(Login1.SERVICE, Login1.PATH, Login1.MANAGER,
+                                 "CanRebootToFirmwareSetup")
+        if not can.ok:
+            return Reading.missing(NO_SERVICE, Login1.SERVICE)
+        if str(can.value) not in Login1.CAN_YES:
+            return Reading.missing(NOT_SUPPORTED, Login1.PATH)
+        armed = self._bus.get(Login1.SERVICE, Login1.PATH, Login1.MANAGER,
+                              "RebootToFirmwareSetup")
+        return Reading.measured(None,
+                                "будет открыто при перезагрузке" if armed.ok and armed.value
+                                else "обычная загрузка", Login1.PATH,
+                                enabled=bool(armed.ok and armed.value))
+
+    def set_firmware_setup(self, enabled: bool) -> Result:
+        return self._bus.call(Login1.SERVICE, Login1.PATH, Login1.MANAGER,
+                              "SetRebootToFirmwareSetup", "b", [bool(enabled)], timeout=30.0)
 
     # -- change notification -----------------------------------------------------------------
     def watch(self, callback: Callable[[], None]) -> list:

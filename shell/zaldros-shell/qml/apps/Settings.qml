@@ -278,12 +278,30 @@ Item {
                     value: modelData.value
                     hasToggle: modelData.hasToggle
                     toggled: modelData.toggle
+                    // A control the machine cannot honour is drawn dimmed with its reason in the
+                    // value column, the way Windows greys a setting it cannot apply.
+                    disabled: modelData.control !== "" && modelData.kind !== "info"
+                              && !modelData.writable
+                    // A chevron promises "this opens something". A choice we cannot write does
+                    // not open anything, so it does not get one.
                     navigable: modelData.page !== "" || modelData.url !== ""
+                               || (modelData.kind === "choice" && modelData.writable)
                     onTriggered: {
                         if (modelData.page !== "") settings.openPage(modelData.page);
                         else if (modelData.url !== "") Qt.openUrlExternally(modelData.url);
-                        // A switch that is backed by prefs.py really flips, is written to disk and
-                        // the tree is rebuilt so the row shows the stored state, not an assumption.
+                        // A row backed by settingscontrols.py asks the system to change and then
+                        // redraws from what the system answered — never from what was clicked.
+                        else if (modelData.control !== "" && typeof settingsControls !== "undefined") {
+                            if (modelData.kind === "option") {
+                                settingsControls.set(modelData.control, modelData.option);
+                                settings.goBack();
+                            } else if (modelData.kind === "choice") {
+                                settings.openPage("choice:" + modelData.control);
+                            } else {
+                                settingsControls.activate(modelData.control);
+                            }
+                            settings.reloadTree();
+                        }
                         else if (modelData.pref !== "" && typeof prefs !== "undefined") {
                             prefs.toggle(modelData.pref);
                             settings.reloadTree();

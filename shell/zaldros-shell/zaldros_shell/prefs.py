@@ -24,6 +24,17 @@ DEFAULTS: dict[str, bool] = {
     "visual.transparency": True,   # translucent panels and menus
     "visual.animations": True,     # transitions in the shell
     "start.recent": True,          # the "Рекомендуем" section in the Start panel
+    # Notifications. Enforced by zaldros_backend.notifications.policy_from, which the shell's
+    # notification server consults for every incoming notification: banners off keeps the
+    # notification in the centre and shows no banner, "не беспокоить" does the same and also
+    # silences it, and a critical notification is always shown (the spec's urgency 2 is what a
+    # battery-about-to-die message uses).
+    "notifications.banners": True,
+    "notifications.dnd": False,
+    "notifications.sound": True,
+    # Privacy. Both are enforced where the data is collected, not where it is displayed.
+    "privacy.recent_files": True,  # the recent-files list in Start and Explorer
+    "clipboard.history": True,     # whether Win+V records anything at all
 }
 
 

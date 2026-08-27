@@ -346,6 +346,178 @@ class MockSystem:
                 "ActiveState": Variant("s", "active"), "SubState": Variant("s", "running"),
                 "LoadState": Variant("s", "loaded")}))
 
+    # -- systemd-timedated / systemd-localed ---------------------------------------------------
+    def add_timedated(self, timezone: str = "Europe/Moscow", ntp: bool = True) -> None:
+        """timedated with working setters: SetTimezone/SetNTP really change the properties, so a
+        test can prove the round trip instead of only that a call was made."""
+        server = self.service("org.freedesktop.timedate1")
+        iface = Interface("org.freedesktop.timedate1", {
+            "Timezone": Variant("s", timezone), "LocalRTC": Variant("b", False),
+            "CanNTP": Variant("b", True), "NTP": Variant("b", ntp),
+            "NTPSynchronized": Variant("b", ntp), "TimeUSec": Variant("t", 1770000000000000),
+            "RTCTimeUSec": Variant("t", 1770000000000000)})
+        path = "/org/freedesktop/timedate1"
+
+        def set_timezone(zone, _interactive):
+            server.set_property(path, "org.freedesktop.timedate1", "Timezone", Variant("s", zone))
+
+        def set_ntp(enabled, _interactive):
+            for name in ("NTP", "NTPSynchronized"):
+                server.set_property(path, "org.freedesktop.timedate1", name,
+                                    Variant("b", bool(enabled)))
+
+        def set_local_rtc(local, _adjust, _interactive):
+            server.set_property(path, "org.freedesktop.timedate1", "LocalRTC",
+                                Variant("b", bool(local)))
+
+        iface.add_method("SetTimezone", "sb", "", set_timezone)
+        iface.add_method("SetNTP", "bb", "", set_ntp)
+        iface.add_method("SetLocalRTC", "bbb", "", set_local_rtc)
+        iface.add_method("ListTimezones", "", "as",
+                         lambda: ["Europe/Moscow", "Europe/Berlin", "Asia/Jerusalem", "UTC"])
+        server.add(path, iface)
+
+    def add_localed(self, lang: str = "ru_RU.UTF-8", layout: str = "us,ru") -> None:
+        server = self.service("org.freedesktop.locale1")
+        path = "/org/freedesktop/locale1"
+        iface = Interface("org.freedesktop.locale1", {
+            "Locale": Variant("as", [f"LANG={lang}"]), "X11Layout": Variant("s", layout),
+            "X11Model": Variant("s", "pc105"), "X11Variant": Variant("s", ""),
+            "X11Options": Variant("s", "grp:alt_shift_toggle"),
+            "VConsoleKeymap": Variant("s", "us"),
+            "VConsoleKeymapToggle": Variant("s", "")})
+
+        def set_locale(values, _interactive):
+            server.set_property(path, "org.freedesktop.locale1", "Locale",
+                                Variant("as", [str(value) for value in values]))
+
+        def set_x11(layout, model, variant, options, _convert, _interactive):
+            for name, value in (("X11Layout", layout), ("X11Model", model),
+                                ("X11Variant", variant), ("X11Options", options)):
+                server.set_property(path, "org.freedesktop.locale1", name, Variant("s", value))
+
+        iface.add_method("SetLocale", "asb", "", set_locale)
+        iface.add_method("SetX11Keyboard", "ssssbb", "", set_x11)
+        server.add(path, iface)
+
+    # -- KWin input devices ---------------------------------------------------------------------
+    def add_kwin_input(self) -> None:
+        """A mouse and a touchpad, with the same property names KWin publishes."""
+        server = self.service("org.kde.KWin")
+        manager = Interface("org.kde.KWin.InputDeviceManager",
+                            {"devicesSysNames": Variant("as", ["event3", "event5"])})
+        server.add("/org/kde/KWin/InputDevice", manager)
+        server.add("/org/kde/KWin/InputDevice/event3", Interface("org.kde.KWin.InputDevice", {
+            "name": Variant("s", "Logitech MX Master 3"), "sysName": Variant("s", "event3"),
+            "keyboard": Variant("b", False), "pointer": Variant("b", True),
+            "touchpad": Variant("b", False), "touch": Variant("b", False),
+            "tabletTool": Variant("b", False),
+            "enabled": Variant("b", True), "supportsDisableEvents": Variant("b", False),
+            "leftHanded": Variant("b", False), "supportsLeftHanded": Variant("b", True),
+            "naturalScroll": Variant("b", False), "supportsNaturalScroll": Variant("b", True),
+            "middleEmulation": Variant("b", False), "supportsMiddleEmulation": Variant("b", True),
+            "pointerAcceleration": Variant("d", 0.0),
+            "supportsPointerAcceleration": Variant("b", True)}))
+        server.add("/org/kde/KWin/InputDevice/event5", Interface("org.kde.KWin.InputDevice", {
+            "name": Variant("s", "SynPS/2 Synaptics TouchPad"), "sysName": Variant("s", "event5"),
+            "keyboard": Variant("b", False), "pointer": Variant("b", True),
+            "touchpad": Variant("b", True), "touch": Variant("b", False),
+            "tabletTool": Variant("b", False),
+            "enabled": Variant("b", True), "supportsDisableEvents": Variant("b", True),
+            "tapToClick": Variant("b", False), "tapAndDrag": Variant("b", True),
+            "disableWhileTyping": Variant("b", True),
+            "supportsDisableWhileTyping": Variant("b", True),
+            "naturalScroll": Variant("b", True), "supportsNaturalScroll": Variant("b", True),
+            "pointerAcceleration": Variant("d", 0.2),
+            "supportsPointerAcceleration": Variant("b", True)}))
+
+    # -- accountsservice --------------------------------------------------------------------------
+    def add_accounts(self, user: str = "zaldros", admin: bool = True) -> None:
+        server = self.service("org.freedesktop.Accounts")
+        manager = Interface("org.freedesktop.Accounts", {
+            "DaemonVersion": Variant("s", "23.13.9"),
+            "HasMultipleUsers": Variant("b", True)})
+        users = {user: "/org/freedesktop/Accounts/User1000",
+                 "guest": "/org/freedesktop/Accounts/User1001"}
+        manager.add_method("ListCachedUsers", "", "ao", lambda: list(users.values()))
+        manager.add_method("FindUserByName", "s", "o",
+                           lambda name: users.get(name, "/org/freedesktop/Accounts/UserNone"))
+        server.add("/org/freedesktop/Accounts", manager)
+        for path, name, uid, is_admin in ((users[user], user, 1000, admin),
+                                          (users["guest"], "guest", 1001, False)):
+            iface = Interface("org.freedesktop.Accounts.User", {
+                "Uid": Variant("t", uid), "UserName": Variant("s", name),
+                "RealName": Variant("s", name.title()),
+                "AccountType": Variant("i", 1 if is_admin else 0),
+                "HomeDirectory": Variant("s", f"/home/{name}"),
+                "Shell": Variant("s", "/bin/bash"), "Locked": Variant("b", False),
+                "AutomaticLogin": Variant("b", False), "SystemAccount": Variant("b", False)})
+            for method, signature, property_name, kind in (
+                    ("SetAutomaticLogin", "b", "AutomaticLogin", "b"),
+                    ("SetLocked", "b", "Locked", "b"),
+                    ("SetAccountType", "i", "AccountType", "i"),
+                    ("SetRealName", "s", "RealName", "s")):
+                iface.add_method(
+                    method, signature, "",
+                    lambda value, path=path, property_name=property_name, kind=kind:
+                        server.set_property(path, "org.freedesktop.Accounts.User", property_name,
+                                            Variant(kind, value)))
+            server.add(path, iface)
+
+    # -- xdg-desktop-portal permission store -------------------------------------------------------
+    def add_permission_store(self) -> None:
+        server = self.service("org.freedesktop.impl.portal.PermissionStore")
+        tables: dict[tuple[str, str], dict[str, list[str]]] = {
+            ("devices", "camera"): {"org.chromium.Chromium": ["yes"], "im.riot.Riot": ["no"]},
+            ("devices", "microphone"): {"org.chromium.Chromium": ["yes"]},
+            ("location", "location"): {}}
+        iface = Interface("org.freedesktop.impl.portal.PermissionStore")
+        iface.add_method("Lookup", "ss", "a{sas}v",
+                         lambda table, entry: (dict(tables.get((table, entry), {})),
+                                               Variant("s", "")))
+        iface.add_method("GetPermission", "sss", "as",
+                         lambda table, entry, app: tables.get((table, entry), {}).get(app, []))
+        iface.add_method(
+            "SetPermission", "sbssas", "",
+            lambda table, _create, entry, app, permissions: tables.setdefault(
+                (table, entry), {}).__setitem__(app, [str(value) for value in permissions]))
+        iface.add_method("List", "s", "as",
+                         lambda table: [entry for (name, entry) in tables if name == table])
+        server.add("/org/freedesktop/impl/portal/PermissionStore", iface)
+
+    # -- PackageKit ---------------------------------------------------------------------------------
+    def add_packagekit(self, updates: int = 2) -> None:
+        """The daemon plus a transaction that answers with Package signals and Finished, which is
+        the shape the real one has and the reason UpdatesFacet pumps the bus."""
+        server = self.service("org.freedesktop.PackageKit")
+        path = "/org/freedesktop/PackageKit/Transaction/1"
+        daemon = Interface("org.freedesktop.PackageKit", {
+            "VersionMajor": Variant("u", 1), "VersionMinor": Variant("u", 3),
+            "VersionMicro": Variant("u", 0), "BackendName": Variant("s", "aptcc"),
+            "DistroId": Variant("s", "ubuntu;26.04;x86_64"),
+            "NetworkState": Variant("u", 2), "Locked": Variant("b", False)})
+        daemon.add_method("CreateTransaction", "", "o", lambda: path)
+        server.add("/org/freedesktop/PackageKit", daemon)
+
+        transaction = Interface("org.freedesktop.PackageKit.Transaction",
+                                {"Percentage": Variant("u", 0)})
+
+        def get_updates(_filter):
+            for index in range(updates):
+                server.emit_signal(path, "org.freedesktop.PackageKit.Transaction", "Package",
+                                   "uss", [8 if index == 0 else 9,
+                                           f"zaldros-package{index};1.{index};amd64;ubuntu",
+                                           f"Package {index}"])
+            server.emit_signal(path, "org.freedesktop.PackageKit.Transaction", "Finished", "uu",
+                               [1, 42])
+
+        transaction.add_method("GetUpdates", "t", "", get_updates)
+        transaction.add_method(
+            "RefreshCache", "b", "",
+            lambda _force: server.emit_signal(path, "org.freedesktop.PackageKit.Transaction",
+                                              "Finished", "uu", [1, 7]))
+        server.add(path, transaction)
+
     def add_all(self) -> None:
         self.add_upower()
         self.add_logind()
@@ -353,6 +525,26 @@ class MockSystem:
         self.add_bluez()
         self.add_udisks()
         self.add_systemd()
+        self.add_timedated()
+        self.add_localed()
+        self.add_kwin_input()
+        self.add_accounts()
+        self.add_permission_store()
+        self.add_packagekit()
+
+
+def offline_backend():
+    """A backend whose buses can never connect — a machine where nothing is running.
+
+    Used by tests that must prove the *absence* path: every reading unavailable, every control
+    disabled with a reason, and not one invented value. Faster and more honest than skipping.
+    """
+    from .facade import ZaldrosBackend
+    system, session = Bus("system"), Bus("session")
+    for bus in (system, session):
+        bus._failure = "offline test bus"          # noqa: SLF001 - this module is the test rig
+        bus._next_attempt = float("inf")           # noqa: SLF001 - never retry the connection
+    return ZaldrosBackend(system_bus=system, session_bus=session)
 
 
 def backend_on(address: str):

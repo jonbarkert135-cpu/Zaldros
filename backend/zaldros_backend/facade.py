@@ -20,20 +20,27 @@ from __future__ import annotations
 from typing import Callable
 
 from . import hardware
+from .accounts import AccountsFacet
 from .audio import AudioFacet
 from .bluetooth import BluetoothFacet
 from .bus import Bus
+from .defaultapps import DefaultAppsFacet
 from .display import DisplayFacet
+from .firewall import FirewallFacet
+from .inputdevices import InputFacet
+from .localetime import LocaleTimeFacet
 from .network import NetworkFacet
 from .notifications import NotificationClient, NotificationServer
+from .permissions import PermissionsFacet
 from .power import PowerFacet
 from .reading import Reading
 from .services import ServicesFacet
 from .session import SessionFacet
 from .storage import StorageFacet
+from .updates import UpdatesFacet
 
 DOMAINS = ("power", "network", "bluetooth", "audio", "storage", "display", "services",
-           "session")
+           "session", "localetime", "input", "accounts", "permissions")
 
 
 class ZaldrosBackend:
@@ -54,6 +61,16 @@ class ZaldrosBackend:
         self.session = SessionFacet(self.system_bus, self.session_bus)
         self.notify = NotificationClient(self.session_bus)
         self.hardware = hardware
+
+        # The facets Settings needs beyond the tray: they are constructed here too, because a
+        # second construction site is a second place to get a bus wrong.
+        self.localetime = LocaleTimeFacet(self.system_bus)
+        self.input = InputFacet(self.session_bus)
+        self.accounts = AccountsFacet(self.system_bus, self.session)
+        self.permissions = PermissionsFacet(self.session_bus)
+        self.firewall = FirewallFacet(self.system_bus)
+        self.updates = UpdatesFacet(self.system_bus)
+        self.apps = DefaultAppsFacet()
 
         self._listeners: dict[str, list[Callable[[], None]]] = {name: [] for name in DOMAINS}
         self._watching: dict[str, list] = {}

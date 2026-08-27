@@ -20,7 +20,8 @@ from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
 from .model import (AppModel, ClipboardModel, FileModel, GameBarModel, HostInfo, InstalledAppModel,
-                    Prefs, RecentModel, SettingsTree, WeatherState, ShellState, SystemState)
+                    Prefs, RecentModel, SettingsControls, SettingsTree, WeatherState,
+                    ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
 def _assets_dir() -> Path:
@@ -87,7 +88,8 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     recent_model = RecentModel()
     host_info = HostInfo()
     weather_state = WeatherState(fetch=tick)
-    settings_tree = SettingsTree()
+    settings_controls = SettingsControls()
+    settings_tree = SettingsTree(controls=settings_controls)
     user_prefs = Prefs()
     clipboard_model = ClipboardModel()
     game_bar_model = GameBarModel()
@@ -101,6 +103,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("hostInfo", host_info)
     context.setContextProperty("weatherState", weather_state)
     context.setContextProperty("settingsTree", settings_tree)
+    context.setContextProperty("settingsControls", settings_controls)
     context.setContextProperty("prefs", user_prefs)
     context.setContextProperty("clipboardModel", clipboard_model)
     context.setContextProperty("gameBarModel", game_bar_model)
@@ -113,7 +116,8 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
         errors = "\n".join(str(error.toString()) for error in view.errors())
         raise RuntimeError(f"QML failed to load:\n{errors}")
     return view, [model, installed, state, system_state, file_model, recent_model, host_info,
-                  weather_state, settings_tree, user_prefs, clipboard_model, game_bar_model]
+                  weather_state, settings_tree, settings_controls, user_prefs, clipboard_model,
+                  game_bar_model]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference

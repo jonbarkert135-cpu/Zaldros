@@ -42,6 +42,8 @@ class Notification:
     resident: bool = False
     desktop_entry: str = ""
     received_at: float = 0.0
+    banner: bool = True        # show a pop-up, or only file it in the notification centre
+    silent: bool = False       # no sound
 
     @property
     def critical(self) -> bool:
@@ -98,10 +100,15 @@ class NotificationServer:
 
     def __init__(self, on_notify: Callable[[Notification], None],
                  on_close: Callable[[int, int], None] | None = None,
-                 clock: Callable[[], float] = time.time) -> None:
+                 clock: Callable[[], float] = time.time,
+                 policy: Callable[[Notification], tuple[bool, bool]] | None = None) -> None:
         self._on_notify = on_notify
         self._on_close = on_close
         self._clock = clock
+        # policy(notification) -> (show a banner, keep it silent). This is where the Settings
+        # switches land: the server decides, so the decision is the same for every surface and
+        # is made once, before anything is drawn.
+        self._policy = policy
         self._next_id = 1
         self.live: dict[int, Notification] = {}
 
@@ -159,6 +166,10 @@ class NotificationServer:
             resident=bool(hints.get("resident", False)),
             desktop_entry=str(hints.get("desktop-entry", "") or ""),
             received_at=self._clock())
+        if self._policy is not None:
+            banner, silent = self._policy(notification)
+            notification.banner = bool(banner)
+            notification.silent = bool(silent)
         self.live[identifier] = notification
         self._on_notify(notification)
         return identifier
@@ -182,3 +193,23 @@ class NotificationServer:
     def _reply(message: Message, signature: str, body: list[Any]) -> Message:
         return Message(type=METHOD_RETURN, reply_serial=message.serial,
                        destination=message.sender, signature=signature, body=body)
+
+
+def policy_from(switches: Callable[[], dict[str, bool]]) -> Callable[[Notification],
+                                                                     tuple[bool, bool]]:
+    """Turn the three Settings switches into the server's decision.
+
+    Read through a callable, not copied once: the user flips "Не беспокоить" while applications
+    keep sending, and a policy captured at start-up would ignore the change until the next login.
+    A critical notification (urgency 2) is always shown — Windows lets priority alarms through
+    Focus assist too, and a low battery that is silently filed is a broken promise.
+    """
+    def decide(notification: Notification) -> tuple[bool, bool]:
+        values = switches() or {}
+        if notification.critical:
+            return True, False
+        dnd = bool(values.get("notifications.dnd", False))
+        banners = bool(values.get("notifications.banners", True))
+        sound = bool(values.get("notifications.sound", True))
+        return (banners and not dnd), (dnd or not sound)
+    return decide

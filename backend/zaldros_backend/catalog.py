@@ -226,3 +226,121 @@ class Audio:
     PACTL = "pactl"
     DEFAULT_SINK = "@DEFAULT_AUDIO_SINK@"
     DEFAULT_SOURCE = "@DEFAULT_AUDIO_SOURCE@"
+
+
+# --------------------------------------------------------------------------------------------
+# systemd-timedated — clock, timezone, NTP
+# (https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.timedate1.html,
+#  fetched 2026-08-28)
+# --------------------------------------------------------------------------------------------
+class TimeDate1:
+    SERVICE = "org.freedesktop.timedate1"
+    PATH = "/org/freedesktop/timedate1"
+    IFACE = "org.freedesktop.timedate1"
+    # readonly: Timezone s, LocalRTC b, CanNTP b, NTP b, NTPSynchronized b, TimeUSec t,
+    #           RTCTimeUSec t
+    # SetTime(xbb), SetTimezone(sb), SetLocalRTC(bbb), SetNTP(bb), ListTimezones() -> as
+    # Every setter's last argument is `interactive`: true lets polkit ask the user for a password
+    # instead of failing outright, which is what a Settings page wants.
+
+
+# --------------------------------------------------------------------------------------------
+# systemd-localed — system language and X11/Wayland keyboard defaults
+# (https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.locale1.html,
+#  fetched 2026-08-28)
+# --------------------------------------------------------------------------------------------
+class Locale1:
+    SERVICE = "org.freedesktop.locale1"
+    PATH = "/org/freedesktop/locale1"
+    IFACE = "org.freedesktop.locale1"
+    # readonly: Locale as ("LANG=ru_RU.UTF-8", ...), X11Layout s, X11Model s, X11Variant s,
+    #           X11Options s, VConsoleKeymap s, VConsoleKeymapToggle s
+    # SetLocale(asb), SetVConsoleKeyboard(ssbb), SetX11Keyboard(ssssbb)
+    # SetX11Keyboard only sets the *default*; the running Wayland session's layout belongs to
+    # KWin (see KWinKeyboard), so the two are written together, never one instead of the other.
+
+
+# --------------------------------------------------------------------------------------------
+# KWin input devices — mouse, touchpad, keyboards, live on the running compositor
+# (KDE/kwin src/backends/libinput/connection.cpp + device.h, fetched 2026-08-28)
+# --------------------------------------------------------------------------------------------
+class KWinInput:
+    SERVICE = "org.kde.KWin"
+    MANAGER_PATH = "/org/kde/KWin/InputDevice"
+    MANAGER = "org.kde.KWin.InputDeviceManager"          # property devicesSysNames as
+    DEVICE = "org.kde.KWin.InputDevice"                  # /org/kde/KWin/InputDevice/<sysName>
+    # Writable device properties used by Settings, each paired with a `supports*` flag that says
+    # whether this hardware has it at all: enabled b, leftHanded b, naturalScroll b,
+    # tapToClick b, disableWhileTyping b, middleEmulation b, pointerAcceleration d,
+    # scrollFactor d. Read-only kind flags: keyboard b, pointer b, touchpad b, touch b.
+    KINDS = ("keyboard", "pointer", "touchpad", "touch", "tabletTool")
+
+
+# --------------------------------------------------------------------------------------------
+# accountsservice — the other people who can log in
+# (accountsservice data/org.freedesktop.Accounts{,.User}.xml, fetched 2026-08-28)
+# --------------------------------------------------------------------------------------------
+class Accounts:
+    SERVICE = "org.freedesktop.Accounts"
+    PATH = "/org/freedesktop/Accounts"
+    IFACE = "org.freedesktop.Accounts"
+    USER = "org.freedesktop.Accounts.User"
+    # Manager: ListCachedUsers() -> ao, FindUserByName(s) -> o, CreateUser(ssi) -> o,
+    #          DeleteUser(xb); properties HasMultipleUsers b, AutomaticLoginUsers ao
+    # User: properties Uid t, UserName s, RealName s, AccountType i (0 standard, 1 admin),
+    #       HomeDirectory s, Shell s, Locked b, AutomaticLogin b, SystemAccount b
+    #       methods SetRealName(s), SetAccountType(i), SetLocked(b), SetAutomaticLogin(b)
+    ACCOUNT_TYPE = {0: "обычная", 1: "администратор"}
+
+
+# --------------------------------------------------------------------------------------------
+# xdg-desktop-portal permission store — which applications may use the camera, the microphone
+# and the location. (xdg-desktop-portal data/org.freedesktop.impl.portal.PermissionStore.xml and
+# src/device.c, src/location.c at 1.18.4, fetched 2026-08-28)
+# --------------------------------------------------------------------------------------------
+class PermissionStore:
+    SERVICE = "org.freedesktop.impl.portal.PermissionStore"
+    PATH = "/org/freedesktop/impl/portal/PermissionStore"
+    IFACE = "org.freedesktop.impl.portal.PermissionStore"
+    # Lookup(ss) -> (a{sas} permissions, v data), List(s) -> as,
+    # SetPermission(s table, b create, s id, s app, as permissions),
+    # GetPermission(sss) -> as, DeletePermission(sss)
+    DEVICES_TABLE = "devices"                 # ids: "camera", "microphone", "speakers"
+    LOCATION_TABLE = "location"
+    LOCATION_ID = "location"
+    YES, NO, ASK = "yes", "no", "ask"
+
+
+# --------------------------------------------------------------------------------------------
+# PackageKit — updates, whatever the distribution's package manager is underneath
+# (PackageKit src/org.freedesktop.PackageKit{,.Transaction}.xml, fetched 2026-08-28)
+# --------------------------------------------------------------------------------------------
+class PackageKit:
+    SERVICE = "org.freedesktop.PackageKit"
+    PATH = "/org/freedesktop/PackageKit"
+    IFACE = "org.freedesktop.PackageKit"
+    TRANSACTION = "org.freedesktop.PackageKit.Transaction"
+    # Daemon: CreateTransaction() -> o; properties BackendName s, DistroId s, NetworkState u
+    # Transaction: GetUpdates(t filter), RefreshCache(b force);
+    #   signals Package(u info, s package_id, s summary), Finished(u exit, u runtime),
+    #           ErrorCode(u code, s details)
+    FILTER_NONE = 1                            # PK_FILTER_ENUM_NONE
+    EXIT = {1: "success", 2: "failed", 4: "cancelled", 5: "key-required", 6: "eula-required",
+            11: "need-untrusted"}
+    # PkInfoEnum values a "what will be updated" list cares about.
+    INFO = {8: "security", 9: "normal", 10: "blocked", 11: "download", 12: "installing",
+            2: "available", 1: "installed", 4: "low", 5: "enhancement", 6: "bugfix",
+            7: "important"}
+
+
+# --------------------------------------------------------------------------------------------
+# Firewalls. Ubuntu ships ufw (a CLI over nftables, no D-Bus); firewalld does have a bus API and
+# is what a Fedora-shaped machine runs. Both are read here, neither is invented.
+# (ufw 0.36 /etc/ufw/ufw.conf; firewalld D-Bus API docs, fetched 2026-08-28)
+# --------------------------------------------------------------------------------------------
+class Firewall:
+    FIREWALLD_SERVICE = "org.fedoraproject.FirewallD1"
+    FIREWALLD_PATH = "/org/fedoraproject/FirewallD1"
+    FIREWALLD_IFACE = "org.fedoraproject.FirewallD1"
+    UFW_CONF = "/etc/ufw/ufw.conf"              # ENABLED=yes|no, written by `ufw enable`
+    UFW_UNIT = "ufw.service"

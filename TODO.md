@@ -57,7 +57,14 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
-- [ ] Settings (display, network, sound, accounts)
+- [x] Settings: every row backed by a real control with read + write (ADR-0015) — display,
+      resolution, refresh, scale, multiple monitors, sound, microphone, Wi-Fi, Ethernet,
+      Bluetooth, power, battery, keyboard, mouse, touchpad, language, timezone, notifications,
+      privacy, firewall, users, applications, default apps, storage, updates, recovery
+- [ ] Settings on real hardware: none of the controls has been exercised on a machine that has
+      kscreen-doctor, a portal, accountsservice or PackageKit — the ISO boot report is the proof
+- [ ] Settings still missing: night light, PowerDevil power profiles, creating and deleting users
+      (needs a confirmation flow), VPN and proxy profiles
 - [ ] **FIRST ISO BUILD PASS** — nothing else in this cycle; then first QEMU boot PASS
 - [ ] Installer, then recovery/rollback tested by deliberately breaking a VM
 - [ ] **Re-earn what the bootc base gave us** (ADR-0009): atomic updates, rollback, read-only `/usr`,
