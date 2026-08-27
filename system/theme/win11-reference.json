@@ -34,7 +34,7 @@
     "game_bar": {
       "file": "private capture supplied by the maintainer on 2026-08-26 (Win+G «Записать» widget)",
       "display_scale": 1.25,
-      "note": "measured off the maintainer's own screenshot: the widget is 383 px wide and 274 px tall, its four tiles are 70 px squares on a 90 px pitch, the first tile starts 21 px from the panel edge, the tile row starts 66 px below the panel top and the footer row is 82 px tall. Divided by 1.25: 306 x 219, tile 56, pitch 72, padding 17, header 53, footer 66. The file is deliberately NOT committed; only these numbers are."
+      "note": "measured off the maintainer's own screenshot: the widget is 383 px wide and 274 px tall, its four tiles are 70 px squares on a 90 px pitch, the first tile starts 21 px from the panel edge, the tile row starts 66 px below the panel top and the footer row is 82 px tall. Divided by 1.25: 306 x 219, tile 56, pitch 72, padding 17, header 53, footer 66. The file is deliberately NOT committed; only these numbers are. The floating bar in the same shot is 654 x 67 px = 523 x 54 logical."
     }
   },
   "taskbar": {
@@ -155,6 +155,16 @@
     "gap_from_edge": 12,
     "tiles": 4,
     "tolerance": 2,
-    "gap_from_edge_note": "ours, not Windows': the game bar widget is draggable, so its position in the capture says nothing. The panel sits Theme.flyoutGap (12) from the top-left corner like every other Zaldros flyout."
+    "gap_from_edge_note": "ours, not Windows': the game bar widget is draggable, so its position in the capture says nothing. The panel sits Theme.flyoutGap (12) from the top-left corner like every other Zaldros flyout.",
+    "bar": {
+      "width": 523,
+      "height": 54,
+      "radius": 8,
+      "button": 40,
+      "tile": 42,
+      "glyph": 20,
+      "group_padding": 24,
+      "note": "the floating bar measured from the same capture: 654 x 67 px at 125 % = 523 x 54, the widget field 279 px = 223 wide with five buttons, buttons on a 50 px = 40 pitch. Our field holds three buttons (no Xbox friends, no Edge) and is sized to them, like Windows sizes it to its own."
+    }
   }
 }

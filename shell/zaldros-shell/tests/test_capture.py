@@ -209,3 +209,51 @@ def test_the_boot_test_really_takes_a_screenshot_in_the_guest():
 def test_the_image_ships_a_grabber_so_the_tile_is_not_dead_on_arrival():
     build = (REPO / "build" / "iso" / "build-iso.sh").read_text()
     assert "kde-spectacle" in build and "xdg-desktop-portal" in build and "ffmpeg" in build
+
+
+# --- the bar itself (the part that was missing entirely) ---------------------------------------
+BAR_QML = (REPO / "shell" / "zaldros-shell" / "qml" / "GameBarToolbar.qml").read_text()
+PERF_QML = (REPO / "shell" / "zaldros-shell" / "qml" / "GameBarPerformance.qml").read_text()
+
+
+def test_win_g_shows_the_floating_bar_not_only_one_widget():
+    """The first cut drew the capture widget alone; Windows shows the bar that owns the widgets."""
+    assert "GameBarToolbar {" in SHELL_QML
+    assert "shown: shell.gameBarOpen" in BAR_QML or "shown: shell.gameBarOpen" in SHELL_QML
+    assert 'objectName: "gameBarToolbar"' in BAR_QML
+
+
+def test_the_bar_keeps_the_measured_geometry():
+    import json
+    reference = json.loads((REPO / "system" / "theme" / "win11-reference.json").read_text())
+    theme = (REPO / "shell" / "zaldros-shell" / "qml" / "ZaldrosTheme" / "Theme.qml").read_text()
+    bar = reference["game_bar"]["bar"]
+    assert f"gameBarBarWidth:   {bar['width']}" in theme
+    assert f"gameBarBarHeight:   {bar['height']}" in theme
+    assert f"gameBarBarButton:   {bar['button']}" in theme
+
+
+def test_the_bar_reads_the_real_clock_and_battery():
+    assert "bar.state.timeText" in BAR_QML
+    assert "bar.system.batteryPercent" in BAR_QML
+    assert "bar.system.batteryDetail" in BAR_QML       # no reading -> the reason, not a number
+
+
+def test_the_camera_button_lights_up_while_the_widget_is_open():
+    assert "captureActive: shell.gameBarCaptureOpen" in SHELL_QML
+    assert "active: bar.captureActive" in BAR_QML
+
+
+def test_the_performance_widget_shows_measured_load_or_a_dash():
+    assert "widget.state.cpuPercent" in PERF_QML and "widget.state.memoryPercent" in PERF_QML
+    assert '"—"' in PERF_QML                       # -1 means unmeasurable, never a made-up number
+    assert "не измеряет" in PERF_QML               # GPU/FPS are named as missing, not faked
+
+
+def test_cpu_load_needs_two_samples_and_says_so():
+    from zaldros_shell.backend import cpu_percent, cpu_times
+    assert cpu_percent(None, (10, 100)) is None
+    assert cpu_percent((10, 100), (10, 100)) is None          # no time passed
+    assert cpu_percent((10, 100), (60, 200)) == 50
+    reading = cpu_times()
+    assert reading is None or (len(reading) == 2 and reading[1] >= reading[0])

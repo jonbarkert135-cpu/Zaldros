@@ -13,7 +13,8 @@ from PySide6.QtCore import (
 )
 from PySide6.QtGui import QGuiApplication, QImage
 
-from .backend import AppEntry, format_clock, load_pinned, memory_percent, read_running_commands
+from .backend import (AppEntry, cpu_percent, cpu_times, format_clock, load_pinned,
+                      memory_percent, read_running_commands)
 from .desktop_entries import DesktopApp, discover, launch
 from . import clipboard as clipboard_history
 from . import capture, portal
@@ -243,6 +244,9 @@ class ShellState(QObject):
         self._proc_root = proc_root
         self._time = ""
         self._date = ""
+        self._cpu_previous = None
+        self._cpu_current = cpu_times(proc_root)
+        self._cpu = -1
         self.update()
         if tick:
             self._timer = QTimer(self)
@@ -252,6 +256,9 @@ class ShellState(QObject):
     @Slot()
     def update(self) -> None:
         self._time, self._date = format_clock(time.localtime(), self._locale)
+        self._cpu_previous, self._cpu_current = self._cpu_current, cpu_times(self._proc_root)
+        measured = cpu_percent(self._cpu_previous, self._cpu_current)
+        self._cpu = -1 if measured is None else measured
         self.changed.emit()
 
     @Property(str, notify=changed)
@@ -265,6 +272,11 @@ class ShellState(QObject):
     @Property(str, constant=True)
     def locale(self) -> str:
         return self._locale
+
+    @Property(int, notify=changed)
+    def cpuPercent(self) -> int:  # noqa: N802
+        """Load between the last two ticks. -1 until two readings exist, or if /proc is unreadable."""
+        return self._cpu
 
     @Property(int, notify=changed)
     def memoryPercent(self) -> int:  # noqa: N802

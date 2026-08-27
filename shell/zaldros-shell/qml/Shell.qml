@@ -23,6 +23,8 @@ Item {
     property bool notificationsOpen: false
     property bool clipboardOpen: false
     property bool gameBarOpen: false
+    property bool gameBarCaptureOpen: true       // the capture widget is the one Windows pins by default
+    property bool gameBarPerformanceOpen: false
     property bool contextOpen: false
     property bool lightMode: false
 
@@ -345,13 +347,43 @@ Item {
     }
 
     // --- game bar (Win+G) -------------------------------------------------------------------------
+    // Windows shows two things at once: the floating bar at the top of the screen, and whichever
+    // widgets are pinned under it. Ours does the same — the bar owns the widgets, the capture
+    // widget is one of them, and the camera button on the bar lights up while it is open.
+    GameBarToolbar {
+        id: gameBarToolbar
+        z: 31
+        shown: shell.gameBarOpen
+        state: shell.backendState
+        system: shell.backendSystem
+        capture: shell.backendCapture
+        captureActive: shell.gameBarCaptureOpen
+        performanceActive: shell.gameBarPerformanceOpen
+        x: (shell.width - width) / 2
+        y: Theme.flyoutGap
+        onCaptureToggled: shell.gameBarCaptureOpen = !shell.gameBarCaptureOpen
+        onPerformanceToggled: shell.gameBarPerformanceOpen = !shell.gameBarPerformanceOpen
+        onSettingsRequested: shell.focusWindow("settings")
+    }
+
     GameBarFlyout {
         id: gameBarFlyout
         z: 30
-        shown: shell.gameBarOpen
+        shown: shell.gameBarOpen && shell.gameBarCaptureOpen
         capture: shell.backendCapture
         x: Theme.flyoutGap
         y: Theme.flyoutGap
+        onCloseRequested: shell.gameBarCaptureOpen = false
+    }
+
+    GameBarPerformance {
+        id: gameBarPerformance
+        z: 30
+        shown: shell.gameBarOpen && shell.gameBarPerformanceOpen
+        state: shell.backendState
+        x: shell.width - width - Theme.flyoutGap
+        y: Theme.flyoutGap + Theme.gameBarBarHeight + Theme.flyoutGap
+        onCloseRequested: shell.gameBarPerformanceOpen = false
     }
 
     // --- context menus ----------------------------------------------------------------------------------

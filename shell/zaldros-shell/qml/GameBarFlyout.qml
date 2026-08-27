@@ -17,7 +17,9 @@ Item {
     objectName: "gameBarFlyout"
 
     property bool shown: false
+    property bool pinned: true
     property var capture: null
+    signal closeRequested()
 
     width: Theme.gameBarWidth
     height: body.implicitHeight + 2 * Theme.gameBarPadding
@@ -63,12 +65,21 @@ Item {
                     color: Theme.textPrimary
                 }
             }
-            IconButton {
-                glyph: "close"
-                tooltip: "Закрыть"
+            Row {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                onTriggered: flyout.shown = false
+                spacing: 2
+                IconButton {
+                    glyph: "pin"
+                    tooltip: flyout.pinned ? "Открепить" : "Закрепить"
+                    opacity: flyout.pinned ? 1.0 : 0.55
+                    onTriggered: flyout.pinned = !flyout.pinned
+                }
+                IconButton {
+                    glyph: "close"
+                    tooltip: "Закрыть"
+                    onTriggered: flyout.closeRequested()
+                }
             }
         }
 
@@ -88,13 +99,13 @@ Item {
                 width: Theme.gameBarTile
                 height: Theme.gameBarTile
                 radius: Theme.radiusSmall
-                color: !available ? Theme.surface
-                       : (active ? Theme.accent
-                                 : (tileArea.pressed ? Theme.pressed
-                                    : (tileArea.containsMouse ? Theme.hover : Theme.surface)))
-                border.width: 1
-                border.color: active ? Theme.accent : Theme.border
-                opacity: available ? 1.0 : 0.45
+                // Windows draws these as flat filled squares with no outline; the outline was the
+                // loudest thing wrong with the first cut of this widget.
+                color: active ? Theme.accent
+                       : (tileArea.pressed ? Theme.pressed
+                          : (tileArea.containsMouse ? Theme.surfaceElevated : Theme.surfaceCard))
+                border.width: 0
+                opacity: available ? 1.0 : 0.4
                 Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
                 SysIcon {

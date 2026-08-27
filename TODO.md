@@ -16,7 +16,7 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Wire quick-settings toggles to NetworkManager / BlueZ / PipeWire / UPower
 - [x] Vendor Fluent UI System Icons (MIT) and PT Sans (OFL) — done, in use (Selawik dropped: no Cyrillic)
 - [x] Install the Fluent cursor theme (GPL-3) — the only borrowed pack (ADR-0010)
-- [ ] Draw our own Aurorae decoration theme so real app titlebars stop being Breeze
+- [x] Draw our own Aurorae decoration theme (`tools/theme/make_aurorae.py`) — awaiting the first boot screenshot of a real app titlebar
 - [ ] Replace the vendored GPL-3 app/place SVGs with our own artwork (last borrowed pixels besides the cursors)
 - [ ] Extend the `Zaldros` icon theme to mime and device names (currently apps/places/actions only)
 - [ ] Ship Win11-gtk-theme (GPL-3) so GTK applications match the shell
@@ -32,6 +32,8 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Win+G — capture widget: screenshot through the first grabber that really exists, recording
       through the portal's ScreenCast node + ffmpeg, every missing tool named on screen
 - [ ] Win+G — the «last 30 seconds» ring buffer (needs a continuous encode we do not run yet)
+- [ ] Part-by-part visual audit against public Windows 11 screenshots: one reference per component,
+      measured and diffed, not eyeballed (the maintainer asked for this after the first game bar)
 - [ ] Notifications + quick settings backed by real NetworkManager / PipeWire / UPower
 
 ## After the desktop stands up

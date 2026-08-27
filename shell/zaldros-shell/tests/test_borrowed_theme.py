@@ -1,10 +1,11 @@
 """Guard: the borrowed Plasma-store assets stay wired, licensed and inside our architecture.
 
 Run #29 audited two "windows-eleven" Plasma global themes (docs/PLASMA_THEME_AUDIT.md). Almost all
-of their content needs plasmashell, which Zaldros does not run — but the Aurorae window decoration
-and the icon pack do not, so those two are vendored and used. These tests fail if the wiring, the
-ISO package that provides the Aurorae engine, or the licence notice goes missing, and if anyone
-quietly pulls in a part that would drag plasmashell into the image.
+of their content needs plasmashell, which Zaldros does not run. The Aurorae decoration was vendored
+from them until 2026-08-27 and is now ours (tests/test_aurorae_theme.py); what remains borrowed is
+the icon pack and the Kvantum style. These tests fail if that wiring, the ISO package that provides
+the Aurorae engine, or a licence notice goes missing, and if anyone quietly pulls in a part that
+would drag plasmashell into the image.
 """
 
 from pathlib import Path
@@ -14,30 +15,19 @@ THEME = REPO / "system" / "theme" / "install-visual-theme.sh"
 BUILD = REPO / "build" / "iso" / "build-iso.sh"
 ASSETS = REPO / "assets" / "themes"
 
-AURORAE_FILES = ("decoration.svg", "close.svg", "maximize.svg", "minimize.svg", "restore.svg",
-                 "metadata.desktop")
-
-
-def test_both_aurorae_variants_are_vendored_complete() -> None:
-    for variant, rc in (("Windows-Eleven", "Windows-Elevenrc"),
-                        ("Windows-Eleven-Dark", "Windows-Eleven-Darkrc")):
-        directory = ASSETS / "aurorae" / variant
-        assert directory.is_dir(), f"missing Aurorae theme {variant}"
-        missing = [name for name in (*AURORAE_FILES, rc) if not (directory / name).exists()]
-        assert not missing, f"{variant} is incomplete: {missing}"
-
-
 def test_borrowed_assets_carry_their_notice() -> None:
     notice = (ASSETS / "NOTICE.md").read_text()
-    for source in ("store.kde.org/p/1977804", "store.kde.org/p/1984455", "store.kde.org/p/1977340"):
+    # the two Aurorae decorations left the tree on 2026-08-27 (ours replaced them); the icon pack
+    # and the Kvantum style are still borrowed and still have to be named.
+    for source in ("store.kde.org/p/1977340", "github.com/Jeysef/KDE-Windows-Modern"):
         assert source in notice, f"{source} is not recorded in the notice"
     assert "GPL-3.0" in notice
     assert "theme-assets-NOTICE.md" in THEME.read_text(), "notice must be installed into the image"
 
 
-def test_kwin_uses_the_aurorae_decoration() -> None:
+def test_kwin_uses_our_own_aurorae_decoration() -> None:
     theme = THEME.read_text()
-    assert 'AURORAE_THEME="Windows-Eleven-Dark"' in theme, "dark variant is the default decoration"
+    assert 'AURORAE_THEME="Zaldros-Dark"' in theme, "our dark decoration is the default"
     assert "/usr/share/aurorae/themes" in theme, "themes must be installed where KWin looks"
     assert "library=$decoration_library" in theme and "theme=$decoration_theme" in theme, \
         "kwinrc must name the decoration it installed"

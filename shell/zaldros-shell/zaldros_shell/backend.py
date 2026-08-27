@@ -78,6 +78,42 @@ def format_clock(moment: time.struct_time, locale: str = "ru") -> tuple[str, str
     return time.strftime("%H:%M", moment), time.strftime("%d/%m/%Y", moment)
 
 
+def cpu_times(proc_root: str = "/proc") -> tuple[int, int] | None:
+    """(busy, total) jiffies from /proc/stat. None when unreadable — never guessed.
+
+    A single reading says nothing about load; the caller keeps the previous one and reports the
+    difference, which is what every honest CPU meter does.
+    """
+    try:
+        with open(os.path.join(proc_root, "stat"), encoding="utf-8") as handle:
+            first = handle.readline()
+    except OSError:
+        return None
+    parts = first.split()
+    if not parts or parts[0] != "cpu":
+        return None
+    try:
+        values = [int(value) for value in parts[1:]]
+    except ValueError:
+        return None
+    if len(values) < 4:
+        return None
+    idle = values[3] + (values[4] if len(values) > 4 else 0)
+    total = sum(values)
+    return total - idle, total
+
+
+def cpu_percent(previous, current) -> int | None:
+    """Load between two `cpu_times` readings. None until there are two of them."""
+    if not previous or not current:
+        return None
+    busy = current[0] - previous[0]
+    total = current[1] - previous[1]
+    if total <= 0:
+        return None
+    return max(0, min(100, round(busy / total * 100)))
+
+
 def memory_percent(proc_root: str = "/proc") -> int | None:
     """Real memory pressure for the Start menu footer. None when unreadable — never guessed."""
     try:

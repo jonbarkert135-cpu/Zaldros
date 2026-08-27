@@ -177,7 +177,7 @@ NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskV
                "widgetsButton", "weatherIcon", "weatherTemperature", "weatherCondition",
                "trayGroup", "trayQuickButton", "clock", "notificationButton",
                "startPanel", "startSearch", "startPinnedGrid", "startFooter",
-               "searchFlyout", "notificationCentre", "quickPanel", "clipboardFlyout", "gameBarFlyout", "contextMenu",
+               "searchFlyout", "notificationCentre", "quickPanel", "clipboardFlyout", "gameBarFlyout", "gameBarToolbar", "contextMenu",
                "explorerWindow", "explorerTabStrip", "explorerNavBar", "explorerCommandBar",
                "explorerSidebar", "explorerFileList", "settingsWindow", "settingsRail",
                "settingsBody", "titleBar", "captionButtons")

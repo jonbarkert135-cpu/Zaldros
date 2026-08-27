@@ -326,6 +326,33 @@
       "passed": true
     },
     {
+      "component": "game bar",
+      "metric": "bar width",
+      "expected": 523.0,
+      "actual": 523.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "game bar",
+      "metric": "bar height",
+      "expected": 54.0,
+      "actual": 54.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "game bar",
+      "metric": "bar centred",
+      "expected": 800.0,
+      "actual": 799.5,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
       "component": "context menu",
       "metric": "min width",
       "expected": 300.0,
@@ -345,7 +372,7 @@
     }
   ],
   "failed": 0,
-  "total": 38,
+  "total": 41,
   "components": [
     "taskbar.png",
     "startPanel.png",

@@ -993,3 +993,36 @@ licence tables were also corrected — they still claimed 26 vendored glyphs whe
 90.
 
 Tests: 230. Parity: 38/38.
+
+### The game bar was a widget without its bar — and the decoration is ours now
+
+The maintainer's verdict on the first Win+G cut was blunt and correct: «это и близко не как на
+скрине». Two things were wrong. The floating **bar** — the pill at the top of the screen that owns
+the widgets — was not drawn at all, and the capture widget's tiles had outlines Windows does not
+draw.
+
+`GameBarToolbar.qml` is that bar, measured from the same capture: 654 × 67 px at 125 % = **523 × 54**
+logical, buttons on a 50 px = 40 pitch, the active widget button a filled light tile with a dark
+glyph. Three groups, as Windows lays them out: what is running on the left, the widget buttons on
+their own lighter field in the middle, clock/battery/settings on the right. Xbox friends and Edge
+are not drawn — they are not ours to fake — and the field is sized to the buttons it holds, the way
+Windows sizes it to five. Parity now checks the bar's width, height and that it is centred: **41/41**.
+
+Its readings are the same real ones the taskbar uses (`ShellState.timeText`, `SystemState.battery*`),
+and the camera button lights up exactly while the capture widget is open.
+
+`GameBarPerformance.qml` is the second widget, so the performance button opens something rather than
+nothing: CPU load from the difference between two `/proc/stat` samples (`backend.cpu_times` +
+`cpu_percent`, `-1` until two exist), memory from `/proc/meminfo`. GPU and FPS are named as *not
+measured* instead of drawn.
+
+**The window decoration is ours.** `tools/theme/make_aurorae.py` generates
+`assets/themes/aurorae/Zaldros{,-Dark}` — nine slices plus their inactive twins, five states for
+each of seven buttons, all from `win11-reference.json → window` (title bar 32, caption buttons
+46 × 32, corners 8). The borrowed GPL-3 `Windows-Eleven` decorations are deleted from the tree and
+from the notices; after this the cursor pack is again the only borrowed thing, as ADR-0010 says.
+`tests/test_aurorae_theme.py` regenerates both variants and fails if a committed file differs, so a
+hand-edited SVG cannot drift away from the measurements. Whether KWin renders it as intended is a
+question for the next boot's screenshot, not for this paragraph.
+
+Tests: 251. Parity: 41/41.

@@ -194,6 +194,13 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     bar = geometry["gamebar"]["gameBarFlyout"]
     add("game bar", "width", game_bar["width"], bar["width"], game_bar["tolerance"])
     add("game bar", "gap from edge", game_bar["gap_from_edge"], bar["left"], game_bar["tolerance"])
+    toolbar = geometry["gamebar"]["gameBarToolbar"]
+    add("game bar", "bar width", game_bar["bar"]["width"], toolbar["width"], game_bar["tolerance"])
+    add("game bar", "bar height", game_bar["bar"]["height"], toolbar["height"],
+        game_bar["tolerance"])
+    # Windows centres the bar on the screen; so do we, and the render proves it rather than the code
+    add("game bar", "bar centred", WIDTH / 2, toolbar["left"] + toolbar["width"] / 2,
+        game_bar["tolerance"])
 
     menu = reference["context_menu"]
     menu_box = geometry["menu"]["contextMenu"]

@@ -224,15 +224,19 @@ EOF
 # plasmashell, which is why this is the one part of the "windows-eleven" Plasma global themes that
 # fits our architecture. Breeze drew KDE-style title bars on every non-shell window (Dolphin,
 # Konsole); these draw Windows 11 ones with the caption buttons on the right.
-AURORAE_THEME="Windows-Eleven-Dark"
-[[ "$VARIANT" == "light" ]] && AURORAE_THEME="Windows-Eleven"
+# Ours now, not the store's: tools/theme/make_aurorae.py draws these nine slices and five button
+# states from system/theme/win11-reference.json (title bar 32, caption buttons 46 x 32, corners 8).
+# The borrowed GPL-3 "Windows-Eleven" decoration it replaces is gone from the tree — ADR-0010 says
+# the cursor pack is the only thing we borrow, and this was the last theme that broke that rule.
+AURORAE_THEME="Zaldros-Dark"
+[[ "$VARIANT" == "light" ]] && AURORAE_THEME="Zaldros"
 AURORAE_SRC="$ASSETS/themes/aurorae"
 if [[ -d "$AURORAE_SRC/$AURORAE_THEME" ]]; then
   install -d "$DEST/usr/share/aurorae/themes"
-  rm -rf "$DEST/usr/share/aurorae/themes/Windows-Eleven" \
+  rm -rf "$DEST/usr/share/aurorae/themes/Zaldros" "$DEST/usr/share/aurorae/themes/Zaldros-Dark" \
+         "$DEST/usr/share/aurorae/themes/Windows-Eleven" \
          "$DEST/usr/share/aurorae/themes/Windows-Eleven-Dark"
-  cp -r "$AURORAE_SRC/Windows-Eleven" "$AURORAE_SRC/Windows-Eleven-Dark" \
-        "$DEST/usr/share/aurorae/themes/"
+  cp -r "$AURORAE_SRC/Zaldros" "$AURORAE_SRC/Zaldros-Dark" "$DEST/usr/share/aurorae/themes/"
   decoration_library="org.kde.kwin.aurorae"
   decoration_theme="__aurorae__svg__$AURORAE_THEME"
 else

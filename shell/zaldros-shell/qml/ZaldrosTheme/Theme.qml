@@ -78,6 +78,18 @@ QtObject {
     readonly property int gameBarTileGap:     16
     readonly property int gameBarHeader:      53
     readonly property int gameBarFooter:      66
+    // the floating bar itself: 654 x 67 px in the same capture = 523 x 54 logical,
+    // middle group 279 px = 223, buttons on a 50 px = 40 pitch, active tile 40 px = 32
+    readonly property int gameBarBarWidth:   523
+    readonly property int gameBarBarHeight:   54
+    readonly property int gameBarBarRadius:    8
+    readonly property int gameBarBarButton:   40
+    readonly property int gameBarBarGlyph:    20
+    readonly property int gameBarBarPadding:   8
+    readonly property int gameBarBarTile:     42
+    readonly property int gameBarBarGap:       8
+    readonly property int gameBarBarGroup:   223
+    readonly property int gameBarBarGroupPadding: 24
     readonly property int flyoutGap:          12
     readonly property int menuItemHeight:     32
     readonly property int menuPadding:         4
