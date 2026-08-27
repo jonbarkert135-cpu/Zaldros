@@ -92,3 +92,46 @@ def test_corners_are_rounded_on_every_window():
     assert "BorderlessMaximizedWindows=false" in THEME_SH
     window = gen.reference()
     assert window["corner_radius"] == 8
+
+
+def _bounds(path, element):
+    from PySide6.QtSvg import QSvgRenderer
+    rect = QSvgRenderer(str(path)).boundsOnElement(element)
+    return (rect.x(), rect.y(), rect.width(), rect.height())
+
+
+def test_every_button_state_is_exactly_one_button_big():
+    """Boot run 33113315031 drew a 10 px X stretched over the whole 46 x 32 button.
+
+    Aurorae scales an element to the bounding box of its SVG id, so a group holding only the
+    glyph is blown up to button size. Every state therefore carries an invisible full-size frame,
+    and this test measures it instead of trusting the source.
+    """
+    window = gen.reference()
+    size = (window["caption_button_width"], window["caption_button_height"])
+    for variant in ("Zaldros", "Zaldros-Dark"):
+        for kind in gen.BUTTONS:
+            path = AURORAE / variant / f"{kind}.svg"
+            for state in BUTTON_STATES:
+                _, _, w, h = _bounds(path, state)
+                assert (w, h) == size, f"{variant}/{kind}.svg {state} is {w}x{h}, want {size}"
+
+
+def test_every_decoration_slice_measures_its_own_slot():
+    """A stroked outline inflates the bounding box by half a pixel and shifts the whole frame."""
+    window = gen.reference()
+    title = window["title_bar_height"]
+    corner = max(window["corner_radius"] + 4, 12)
+    edge = gen.EDGE
+    expected = {
+        "topleft": (0, 0, corner, title), "top": (corner, 0, edge, title),
+        "topright": (corner + edge, 0, corner, title),
+        "left": (0, title, corner, edge), "center": (corner, title, edge, edge),
+        "right": (corner + edge, title, corner, edge),
+        "bottomleft": (0, title + edge, corner, corner),
+        "bottom": (corner, title + edge, edge, corner),
+        "bottomright": (corner + edge, title + edge, corner, corner),
+    }
+    path = AURORAE / "Zaldros-Dark" / "decoration.svg"
+    for name, box in expected.items():
+        assert _bounds(path, f"decoration-{name}") == box, f"decoration-{name} is misplaced"

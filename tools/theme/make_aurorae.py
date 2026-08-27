@@ -83,39 +83,54 @@ def _corner(name: str, x: int, y: int, w: int, h: int, radius: int, fill: str, c
             border: str | None = None) -> str:
     """A corner slice whose outer angle is rounded.
 
-    Each slice is one group: the filled shape, plus — when the slice touches the window frame
-    rather than the title bar — a 1 px stroke along the *outer* contour only. Stroking the whole
-    path would draw a hairline inside the window where the next slice begins.
+    Drawn as two filled paths, never as a stroke: Aurorae scales each slice to the *bounding box*
+    of its SVG element, and a stroke inflates that box by half its width, which shifts the whole
+    decoration by half a pixel. Filled shapes keep the box exactly one slot big — the outer path
+    is the frame colour, the inner path (inset by 1 px on the outer sides) is the fill.
     """
     r = radius
-    if corner == "topleft":
-        d = f"M{x},{y + h} L{x},{y + r} Q{x},{y} {x + r},{y} L{x + w},{y} L{x + w},{y + h} Z"
-        edge = f"M{x + 0.5},{y + h} L{x + 0.5},{y + r} Q{x + 0.5},{y + 0.5} {x + r},{y + 0.5} L{x + w},{y + 0.5}"
-    elif corner == "topright":
-        d = f"M{x},{y} L{x + w - r},{y} Q{x + w},{y} {x + w},{y + r} L{x + w},{y + h} L{x},{y + h} Z"
-        edge = f"M{x},{y + 0.5} L{x + w - r},{y + 0.5} Q{x + w - 0.5},{y + 0.5} {x + w - 0.5},{y + r} L{x + w - 0.5},{y + h}"
-    elif corner == "bottomleft":
-        d = f"M{x},{y} L{x + w},{y} L{x + w},{y + h} L{x + r},{y + h} Q{x},{y + h} {x},{y + h - r} Z"
-        edge = f"M{x + 0.5},{y} L{x + 0.5},{y + h - r} Q{x + 0.5},{y + h - 0.5} {x + r},{y + h - 0.5} L{x + w},{y + h - 0.5}"
-    else:
-        d = f"M{x},{y} L{x + w},{y} L{x + w},{y + h - r} Q{x + w},{y + h} {x + w - r},{y + h} L{x},{y + h} Z"
-        edge = f"M{x + w - 0.5},{y} L{x + w - 0.5},{y + h - r} Q{x + w - 0.5},{y + h - 0.5} {x + w - r},{y + h - 0.5} L{x},{y + h - 0.5}"
-    body = f'    <path d="{d}" fill="{fill}"/>\n'
-    stroke = ("" if border is None else
-              f'    <path d="{edge}" fill="none" stroke="{border}" stroke-width="1"/>\n')
-    return f'  <g id="{name}">\n{body}{stroke}  </g>\n'
+    b = 1 if border else 0
+
+    def shape(ox: float, oy: float, ow: float, oh: float, rr: float) -> str:
+        if corner == "topleft":
+            return (f"M{ox},{oy + oh} L{ox},{oy + rr} Q{ox},{oy} {ox + rr},{oy} "
+                    f"L{ox + ow},{oy} L{ox + ow},{oy + oh} Z")
+        if corner == "topright":
+            return (f"M{ox},{oy} L{ox + ow - rr},{oy} Q{ox + ow},{oy} {ox + ow},{oy + rr} "
+                    f"L{ox + ow},{oy + oh} L{ox},{oy + oh} Z")
+        if corner == "bottomleft":
+            return (f"M{ox},{oy} L{ox + ow},{oy} L{ox + ow},{oy + oh} L{ox + rr},{oy + oh} "
+                    f"Q{ox},{oy + oh} {ox},{oy + oh - rr} Z")
+        return (f"M{ox},{oy} L{ox + ow},{oy} L{ox + ow},{oy + oh - rr} "
+                f"Q{ox + ow},{oy + oh} {ox + ow - rr},{oy + oh} L{ox},{oy + oh} Z")
+
+    outer = shape(x, y, w, h, r)
+    if not border:
+        return f'  <g id="{name}">\n    <path d="{outer}" fill="{fill}"/>\n  </g>\n'
+    # the inner shape: pulled in by 1 px on the two outer sides of this corner
+    dx = b if corner in ("topleft", "bottomleft") else 0
+    dy = b if corner in ("topleft", "topright") else 0
+    inner = shape(x + dx, y + dy, w - b if dx == 0 else w - b, h - b if dy == 0 else h - b,
+                  max(r - b, 0))
+    return (f'  <g id="{name}">\n'
+            f'    <path d="{outer}" fill="{border}"/>\n'
+            f'    <path d="{inner}" fill="{fill}"/>\n'
+            f'  </g>\n')
 
 
 def _edge_slice(name: str, x: int, y: int, w: int, h: int, fill: str, border: str,
                 side: str) -> str:
-    """A stretched edge slice: the window body plus the 1 px frame line on its outer side."""
-    lines = {"left": (x + 0.5, y, x + 0.5, y + h),
-             "right": (x + w - 0.5, y, x + w - 0.5, y + h),
-             "bottom": (x, y + h - 0.5, x + w, y + h - 0.5)}[side]
+    """A stretched edge slice: the window body plus the 1 px frame line on its outer side.
+
+    The line is a filled 1 px rect, not a stroke, so the slice's bounding box stays exact.
+    """
+    line = {"left": (x, y, 1, h),
+            "right": (x + w - 1, y, 1, h),
+            "bottom": (x, y + h - 1, w, 1)}[side]
     return (f'  <g id="{name}">\n'
             f'    <rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}"/>\n'
-            f'    <line x1="{lines[0]}" y1="{lines[1]}" x2="{lines[2]}" y2="{lines[3]}" '
-            f'stroke="{border}" stroke-width="1"/>\n'
+            f'    <rect x="{line[0]}" y="{line[1]}" width="{line[2]}" height="{line[3]}" '
+            f'fill="{border}"/>\n'
             f'  </g>\n')
 
 
@@ -239,6 +254,12 @@ def button_svg(kind: str, palette: dict, window: dict) -> str:
         elif state in ("inactive", "deactivated"):
             colour = palette["glyph_inactive"]
         out.append(f'  <g id="{state}-center" transform="translate(0,{y})">\n')
+        # Aurorae scales each state to the *bounding box* of its element. Without a full-size
+        # frame the box collapses to the glyph itself and a 10 px X is stretched over the whole
+        # 46 × 32 button — which is exactly what boot run 33113315031 showed. This invisible
+        # rect keeps every state exactly one button big.
+        out.append(f'    <rect x="0" y="0" width="{w}" height="{h}" fill="#000000" '
+                   'fill-opacity="0"/>\n')
         out.append(background)
         out.append(_glyph(kind, w, h, size, colour))
         out.append("  </g>\n")

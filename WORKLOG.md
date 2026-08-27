@@ -1026,3 +1026,31 @@ hand-edited SVG cannot drift away from the measurements. Whether KWin renders it
 question for the next boot's screenshot, not for this paragraph.
 
 Tests: 251. Parity: 41/41.
+
+## 2026-08-27 — the decoration, as KWin actually drew it
+
+The first boot with our own Aurorae theme (iso run `33113315031`, commit `74ed6d7`) answered the
+question the previous entry left open: KWin rendered the title bar, and the caption buttons came out
+as two white blocks and an X the size of a fist. The cause is in Aurorae, not in the SVG source —
+it paints an element by id and scales it to that element's **bounding box**. Our states held only
+the glyph, so a 10 px cross was stretched over the whole 46 × 32 button. The nine decoration slices
+had the milder version of the same bug: their 1 px frame was a *stroke*, which inflates the box by
+half a pixel, so every slice was drawn 0.5 px off its slot.
+
+Both are fixed by geometry, not by fudge factors. Each button state now carries an invisible
+full-size rect, and the frame lines are filled 1 px rects and filled corner paths instead of
+strokes. Measured with `QSvgRenderer.boundsOnElement`: all five states of all seven buttons are
+exactly 46 × 32, and each of the nine slices reports exactly its own slot — two new tests assert
+precisely that, so this cannot come back silently.
+
+`tools/theme/preview_aurorae.py` composes the theme the way Aurorae does (fixed corners, stretched
+middles, buttons in their slots) and writes a PNG. That is the point of it: this class of mistake is
+invisible in SVG text and obvious in a picture, and a picture costs a second instead of an hour-long
+ISO build.
+
+Boot evidence from the same run, all PASS: alt_tab (switcher visible, `switched: true`, 47.5 % of
+the frame changed, second window `Home — Dolphin` after 44 s), start_open/start_close (45.4 %),
+taskbar_response, and the in-guest `screenshot` step via `spectacle` (312 186 bytes). `qmp_errors:
+[]`.
+
+Tests: 253. Parity: 41/41.
