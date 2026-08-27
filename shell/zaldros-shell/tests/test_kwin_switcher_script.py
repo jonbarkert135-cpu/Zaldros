@@ -32,7 +32,8 @@ def test_the_script_package_is_a_valid_kwin_script():
 def test_the_script_registers_both_directions_on_alt_tab():
     js = MAIN_JS.read_text()
     registered = dict(re.findall(r'registerShortcut\("([^"]+)",\s*"[^"]*",\s*"([^"]+)"', js))
-    assert registered == {
+    switching = {name: keys for name, keys in registered.items() if "Probe" not in name}
+    assert switching == {
         "Zaldros Walk Through Windows": "Alt+Tab",
         "Zaldros Walk Through Windows (Reverse)": "Alt+Shift+Tab",
     }

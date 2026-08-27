@@ -9,21 +9,40 @@ import argparse, json, socket, struct, subprocess, time
 from pathlib import Path
 
 
+class QMPError(RuntimeError):
+    """QEMU refused a command. Runs #29-#36 never saw one of these because the reply was dropped."""
+
+
 class QMP:
     def __init__(self, path):
         self.sock = socket.socket(socket.AF_UNIX)
         self.sock.connect(path)
         self.file = self.sock.makefile("rw")
         self.file.readline()                                   # greeting
+        self.errors = []
         self.cmd("qmp_capabilities")
 
     def cmd(self, name, **args):
+        """Send one QMP command and *check the reply*.
+
+        Run #36 spent four image builds on a dead Alt+Tab. The cause was here: QKeyCode has no
+        `alt_l` (the modifiers are `alt`, `alt_r`, `ctrl`, `ctrl_r`, `shift`, `shift_r`,
+        `meta_l`, `meta_r`), so every attempt to hold Alt came back
+        `GenericError: Invalid parameter 'alt_l'` — and this method threw the reply away. The
+        guest only ever received a bare Tab, and the boot report blamed KWin, kglobalaccel and
+        the keyboard layout in turn. An error is now raised, recorded, and reported.
+        """
         self.file.write(json.dumps({"execute": name, "arguments": args or {}}) + "\n")
         self.file.flush()
         while True:
             reply = json.loads(self.file.readline())
-            if "event" not in reply:
-                return reply
+            if "event" in reply:
+                continue
+            if "error" in reply:
+                message = f"{name}: {reply['error'].get('class')}: {reply['error'].get('desc')}"
+                self.errors.append(message)
+                raise QMPError(message)
+            return reply
 
     def key(self, *keys):
         events = [{"type": "key", "data": {"down": d, "key": {"type": "qcode", "data": k}}}
@@ -77,7 +96,10 @@ def timed_step(qmp, out, name, action, settle=1.5):
     after = out / f"{name}-after.ppm"
     qmp.screendump(before)
     started = time.monotonic()
-    action()
+    try:
+        action()
+    except QMPError as exc:                      # never silent: a refused key is a failed step
+        return {"status": "FAIL", "qmp_error": str(exc)}
     time.sleep(settle)
     qmp.screendump(after)
     elapsed = round(time.monotonic() - started, 3)
@@ -104,13 +126,19 @@ def alt_tab_step(qmp, out, settle=1.2):
     after = out / "alt_tab-after.ppm"
     qmp.screendump(before)
     started = time.monotonic()
-    qmp.key_state("alt_l", True)
-    time.sleep(0.2)
-    qmp.key_state("tab", True)
-    qmp.key_state("tab", False)
-    time.sleep(settle)
-    qmp.screendump(held)
-    qmp.key_state("alt_l", False)
+    try:
+        # `alt`, not `alt_l`: QKeyCode names the left Alt `alt`, and QEMU rejected every
+        # `alt_l` event for six runs while this driver ignored the error reply (run #36).
+        qmp.key_state("alt", True)
+        time.sleep(0.2)
+        qmp.key_state("tab", True)
+        qmp.key_state("tab", False)
+        time.sleep(settle)
+        qmp.screendump(held)
+        qmp.key_state("alt", False)
+    except QMPError as exc:
+        return {"status": "FAIL", "qmp_error": str(exc),
+                "why": "the key was never delivered to the guest, so this says nothing about KWin"}
     time.sleep(settle)
     qmp.screendump(after)
     elapsed = round(time.monotonic() - started, 3)
@@ -132,6 +160,34 @@ def alt_tab_step(qmp, out, settle=1.2):
         "note": ("measured with the guest's Dolphin window open. The held frame shows the switcher "
                  "itself; the after frame shows whether the window really changed."),
     }
+
+
+# Four shortcuts the KWin script registers purely so this driver can ask the session one question
+# it could never answer before: *which* key presses reach a global shortcut. Each one only prints
+# a ZALDROS-PROBE line, and the guest's late report says which lines appeared. If none fire, the
+# whole keyboard→kglobalaccel path is dead; if Meta+F9 fires and Alt+F9 does not, the Alt modifier
+# is being eaten; if Alt+F9 fires and Meta+Tab does not, Tab is the problem. No more guessing.
+PROBE_KEYS = {
+    "meta_f9": ("meta_l", "f9"),
+    "alt_f9": ("alt", "f9"),
+    "ctrl_shift_f9": ("ctrl", "shift", "f9"),
+    "meta_tab": ("meta_l", "tab"),
+}
+
+
+def probe_step(qmp):
+    """Press each probe combination once and record that it was really sent."""
+    sent = {}
+    for name, keys in PROBE_KEYS.items():
+        try:
+            qmp.key(*keys)
+            sent[name] = {"keys": list(keys), "sent": True}
+        except QMPError as exc:
+            sent[name] = {"keys": list(keys), "sent": False, "qmp_error": str(exc)}
+        time.sleep(1.0)
+    return {"status": "INFO", "pressed": sent,
+            "note": "the verdict is in the guest's late report: each ZALDROS-PROBE line means "
+                    "that combination reached a global shortcut"}
 
 
 def hit_boxes(serial_path):
@@ -200,11 +256,13 @@ def main():
     # BLOCKED, not FAIL.
     if start:
         results["alt_tab"] = alt_tab_step(qmp, out)
+        results["shortcut_probes"] = probe_step(qmp)
     else:
         results["alt_tab"] = {
             "status": "BLOCKED",
             "why": "the guest never came up far enough to open a second window, and Alt+Tab with "
                    "one toplevel window cannot change the screen either way"}
+    results["qmp_errors"] = qmp.errors            # empty is the only acceptable value
     (out / f"{args.name}-host.json").write_text(json.dumps(results, indent=2, ensure_ascii=False))
     print(json.dumps(results, indent=2, ensure_ascii=False))
 

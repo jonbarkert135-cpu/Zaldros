@@ -854,3 +854,43 @@ measures 30 against our 32. The pane is user-resizable, so the capture may just 
 the maintainer's call, recorded in `docs/WIN11_REFERENCE_LIBRARY.md`.
 
 Tests: 182. Parity: 34/34.
+
+### Run #36: Alt+Tab was never pressed — the key name did not exist
+
+Run #36's ISO built and booted 9/9, and `alt_tab` failed for the sixth consecutive time:
+`switcher_fraction` 0.0, `switched_fraction` 0.0. Everything the boot could say about the system
+said the system was fine — kglobalaccel reported our action `Zaldros Walk Through Windows` bound
+to `150994945` (Alt+Tab) in the `kwin` component, KWin's own `Walk Through Windows` was finally
+key-less, and firing the action over D-Bus produced `ZALDROS-SWITCHER cycle candidates=2` followed
+by `activating Home — Dolphin`, restoring the minimised window exactly as intended. The switcher
+worked. Only the key did nothing.
+
+The key did nothing because it was never sent. `build/iso/ui-drive.py` held the modifier with
+`key_state("alt_l", True)`, and **QKeyCode has no `alt_l`**: QEMU names the left Alt `alt`
+(`qapi/ui.json`: `shift`, `shift_r`, `alt`, `alt_r`, `ctrl`, `ctrl_r`, … `meta_l`, `meta_r` — only
+Meta and Shift/Ctrl carry an `_r` sibling, and none carries an `_l`). QEMU answered every one of
+those events with `GenericError: Invalid parameter 'alt_l'`, and `QMP.cmd` read the reply and
+threw it away. The guest received a bare Tab. Six runs, four of them full 20-minute image builds,
+were spent auditing KWin's tabbox, kglobalacceld, the shortcut config, the layout list and the
+QML switcher package — every one of those audits was answering a question about a key press that
+never happened. Meta+Tab-style steps passed throughout because `meta_l` is a real name.
+
+Three changes, in the order that matters:
+
+* **A refused command is now an exception.** `QMP.cmd` raises `QMPError` on an `error` reply,
+  records it, and every step reports `qmp_error` instead of measuring pixels after an input that
+  was never delivered; the host report ends with `qmp_errors`, whose only acceptable value is
+  empty. This is the actual defect — a driver that cannot fail is a driver that cannot measure.
+* **`alt`, not `alt_l`.** `tests/test_ui_drive_keys.py` parses every key literal out of the driver
+  and fails on any name outside the QKeyCode enum, so the next invented key name dies in CI in
+  0.1 s instead of in a 20-minute build.
+* **Four probe shortcuts**, in case the honest Alt+Tab still fails: the KWin script registers
+  `Meta+F9`, `Alt+F9`, `Ctrl+Shift+F9` and `Meta+Tab`, each printing one `ZALDROS-PROBE` line, the
+  host presses all four, and the late report lists which appeared (`probe_lines`) plus
+  `shortcut_fired_by_key`, read before the D-Bus invocation so it can only reflect a real key.
+  If none fire, the keyboard→kglobalaccel path is dead; if Meta+F9 fires and Alt+F9 does not, the
+  Alt modifier is eaten; if Alt+F9 fires and Meta+Tab does not, Tab is. One boot, three answers.
+  The probes are seeded in `kglobalshortcutsrc` because an unseeded action is autoloaded as
+  `,none,` (run #35) and would look exactly like a probe that failed to fire.
+
+Tests: 188. Parity: 34/34.

@@ -68,4 +68,18 @@ registerShortcut("Zaldros Walk Through Windows", "Zaldros: следующее о
 registerShortcut("Zaldros Walk Through Windows (Reverse)", "Zaldros: предыдущее окно",
                  "Alt+Shift+Tab", function () { cycle(true); });
 
+// Diagnostic probes. They do nothing but print, and they exist so one boot can say *which* key
+// presses reach a global shortcut instead of only whether Alt+Tab did. The host driver presses
+// all four (build/iso/ui-drive.py, PROBE_KEYS) and the late report lists the lines that appeared.
+function probe(name) {
+    return function () { print("ZALDROS-PROBE " + name); };
+}
+
+registerShortcut("Zaldros Probe Meta F9", "Zaldros: проверка Meta+F9", "Meta+F9", probe("meta_f9"));
+registerShortcut("Zaldros Probe Alt F9", "Zaldros: проверка Alt+F9", "Alt+F9", probe("alt_f9"));
+registerShortcut("Zaldros Probe Ctrl Shift F9", "Zaldros: проверка Ctrl+Shift+F9", "Ctrl+Shift+F9",
+                 probe("ctrl_shift_f9"));
+registerShortcut("Zaldros Probe Meta Tab", "Zaldros: проверка Meta+Tab", "Meta+Tab",
+                 probe("meta_tab"));
+
 log("loaded, windows=" + switchable().length);

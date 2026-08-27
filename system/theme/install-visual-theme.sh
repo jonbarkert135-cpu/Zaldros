@@ -472,6 +472,12 @@ Walk Through Windows=none,none,Walk Through Windows
 Walk Through Windows (Reverse)=none,none,Walk Through Windows (Reverse)
 Zaldros Walk Through Windows=Alt+Tab,Alt+Tab,Zaldros: следующее окно
 Zaldros Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Zaldros: предыдущее окно
+# Diagnostic probes (see kwin-scripts/zaldros-switcher/contents/code/main.js). They only print, and
+# an unseeded action is autoloaded as ",none," — so they must be listed here to be pressable.
+Zaldros Probe Meta F9=Meta+F9,Meta+F9,Zaldros: проверка Meta+F9
+Zaldros Probe Alt F9=Alt+F9,Alt+F9,Zaldros: проверка Alt+F9
+Zaldros Probe Ctrl Shift F9=Ctrl+Shift+F9,Ctrl+Shift+F9,Zaldros: проверка Ctrl+Shift+F9
+Zaldros Probe Meta Tab=Meta+Tab,Meta+Tab,Zaldros: проверка Meta+Tab
 Walk Through Windows of Current Application=Alt+`,Alt+`,Walk Through Windows of Current Application
 Show Desktop=Meta+D,Meta+D,Peek at Desktop
 Window Close=Alt+F4,Alt+F4,Close Window

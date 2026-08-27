@@ -328,6 +328,12 @@ def late_report():
         "tabbox_lines": interesting[-40:],
         "switcher_script_lines": [line for line in text.splitlines()
                                   if "ZALDROS_SWITCHER" in line or "ZALDROS-SWITCHER" in line][-40:],
+        # Which key presses reached a global shortcut at all. Read *before* invoke_and_watch fires
+        # one over D-Bus, so every line here was produced by a real key from the host.
+        "probe_lines": [line.split("ZALDROS")[1] for line in text.splitlines()
+                        if "ZALDROS-PROBE" in line or "ZALDROS_PROBE" in line][-20:],
+        "shortcut_fired_by_key": any(("ZALDROS-SWITCHER" in line or "ZALDROS_SWITCHER" in line)
+                                     and "cycle reverse" in line for line in text.splitlines()),
         "kwin_logging_rules": kwin_environ("QT_LOGGING_RULES"),
         "invoke_delta": invoke_and_watch(),
         "qml_import_paths": sh("sh", "-c",

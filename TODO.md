@@ -21,7 +21,8 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Extend the `Zaldros` icon theme to mime and device names (currently apps/places/actions only)
 - [ ] Ship Win11-gtk-theme (GPL-3) so GTK applications match the shell
 - [ ] Build the ISO the AnduinOS way (debootstrap + squashfs + xorriso) — no container runtime needed
-- [ ] Window management: Alt+Tab, snap layouts, minimise/maximise/close on real windows
+- [ ] Window management: Alt+Tab (own KWin script; the boot test now really presses Alt — awaiting
+      the first verdict from a key that exists), snap layouts, minimise/maximise/close on real windows
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files
 - [ ] Right-click context menus (Windows 11 rounded style)
