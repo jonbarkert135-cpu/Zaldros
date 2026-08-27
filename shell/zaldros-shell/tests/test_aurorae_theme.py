@@ -135,3 +135,50 @@ def test_every_decoration_slice_measures_its_own_slot():
     path = AURORAE / "Zaldros-Dark" / "decoration.svg"
     for name, box in expected.items():
         assert _bounds(path, f"decoration-{name}") == box, f"decoration-{name} is misplaced"
+
+
+def _render_button(path, element, size):
+    from PySide6.QtCore import QRectF
+    from PySide6.QtGui import QColor, QImage, QPainter
+    from PySide6.QtSvg import QSvgRenderer
+
+    image = QImage(size[0], size[1], QImage.Format.Format_ARGB32)
+    image.fill(QColor("#202020"))
+    painter = QPainter(image)
+    QSvgRenderer(str(path)).render(painter, element, QRectF(0, 0, size[0], size[1]))
+    painter.end()
+    return image
+
+
+def test_glyph_hairlines_land_on_whole_pixels():
+    """A 1 px stroke centred on an integer coordinate renders as two half-lit rows.
+
+    The reference title bar maks sent has crisp white hairlines; our first generator produced
+    grey mush because every glyph sat on the integer grid. Measure the rendered pixels: the
+    minimize bar must be one fully-lit row, and the maximize outline four fully-lit edges.
+    """
+    import sys
+
+    from PySide6.QtGui import QGuiApplication
+
+    QGuiApplication.instance() or QGuiApplication(sys.argv[:1])
+    window = gen.reference()
+    size = (window["caption_button_width"], window["caption_button_height"])
+
+    def lit_rows(image, threshold):
+        rows = []
+        for y in range(image.height()):
+            count = sum(1 for x in range(image.width())
+                        if image.pixelColor(x, y).lightness() >= threshold)
+            if count:
+                rows.append((y, count))
+        return rows
+
+    minimize = _render_button(AURORAE / "Zaldros-Dark" / "minimize.svg", "active-center", size)
+    full = [row for row in lit_rows(minimize, 240) if row[1] >= window["caption_glyph"] - 1]
+    assert len(full) == 1, f"minimize hairline spans {len(full)} fully-lit rows, want 1"
+
+    maximize = _render_button(AURORAE / "Zaldros-Dark" / "maximize.svg", "active-center", size)
+    edges = [row for row in lit_rows(maximize, 240)
+             if row[1] >= window["caption_glyph"] // 2]
+    assert len(edges) == 2, f"maximize outline has {len(edges)} solid horizontal edges, want 2"

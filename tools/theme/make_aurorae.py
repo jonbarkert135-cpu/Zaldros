@@ -193,32 +193,47 @@ def decoration_svg(palette: dict, window: dict) -> str:
 
 # --- the caption buttons -------------------------------------------------------------------------
 def _glyph(kind: str, w: int, h: int, size: int, colour: str) -> str:
-    """Our own geometry: a line, a square, two squares, an X. Nothing traced from anywhere."""
-    cx, cy = w / 2, h / 2
-    half = size / 2
-    stroke = f'stroke="{colour}" stroke-width="1" fill="none" stroke-linecap="square"'
+    """Our own geometry: a line, a square, two squares, an X.
+
+    Every stroke is snapped to a half-pixel grid.  A 1 px stroke whose centre sits on an integer
+    coordinate is rendered as two 50 % rows, which is why the first version of these glyphs came
+    out grey and fuzzy instead of the crisp white hairlines the reference shows.  Centres on
+    ``*.5`` land inside exactly one device pixel.
+    """
+    # glyph box: `size` wide, snapped so the box edges fall on integer pixel boundaries
+    left = round(w / 2 - size / 2)
+    top = round(h / 2 - size / 2)
+    right, bottom = left + size, top + size
+    stroke = (f'stroke="{colour}" stroke-width="1" fill="none" '
+              'stroke-linecap="butt" stroke-linejoin="miter"')
     if kind == "minimize":
-        return f'    <line x1="{cx - half}" y1="{cy}" x2="{cx + half}" y2="{cy}" {stroke}/>\n'
+        y = round(h / 2) - 0.5
+        return f'    <line x1="{left}" y1="{y}" x2="{right}" y2="{y}" {stroke}/>\n'
     if kind == "maximize":
-        return (f'    <rect x="{cx - half}" y="{cy - half}" width="{size}" height="{size}" '
-                f'rx="1" {stroke}/>\n')
+        return (f'    <rect x="{left + 0.5}" y="{top + 0.5}" width="{size - 1}" '
+                f'height="{size - 1}" rx="1" {stroke}/>\n')
     if kind == "restore":
-        return (f'    <rect x="{cx - half}" y="{cy - half + 2}" width="{size - 2}" '
-                f'height="{size - 2}" rx="1" {stroke}/>\n'
-                f'    <path d="M{cx - half + 2},{cy - half} L{cx + half},{cy - half} '
-                f'L{cx + half},{cy + half - 2}" {stroke}/>\n')
+        off = 2                      # how far the back window peeks out; reference ≈ 2 px at 100 %
+        fx, fy = left + 0.5, top + off + 0.5
+        fw = size - 1 - off
+        return (f'    <rect x="{fx}" y="{fy}" width="{fw}" height="{fw}" rx="1" {stroke}/>\n'
+                f'    <path d="M{fx + off},{fy} V{fy - off + 1} '
+                f'Q{fx + off},{fy - off} {fx + off + 1},{fy - off} '
+                f'H{fx + fw + off - 1} Q{fx + fw + off},{fy - off} {fx + fw + off},{fy - off + 1} '
+                f'V{fy + fw - off} H{fx + fw}" {stroke}/>\n')
     if kind == "close":
-        return (f'    <line x1="{cx - half}" y1="{cy - half}" x2="{cx + half}" y2="{cy + half}" '
-                f'{stroke}/>\n'
-                f'    <line x1="{cx + half}" y1="{cy - half}" x2="{cx - half}" y2="{cy + half}" '
-                f'{stroke}/>\n')
+        a, b = left + 0.5, top + 0.5
+        c, d = right - 0.5, bottom - 0.5
+        return (f'    <line x1="{a}" y1="{b}" x2="{c}" y2="{d}" {stroke}/>\n'
+                f'    <line x1="{c}" y1="{b}" x2="{a}" y2="{d}" {stroke}/>\n')
     if kind == "alldesktops":
-        return (f'    <circle cx="{cx}" cy="{cy}" r="{half}" {stroke}/>\n')
+        return (f'    <circle cx="{left + size / 2}" cy="{top + size / 2}" r="{size / 2 - 0.5}" '
+                f'{stroke}/>\n')
     if kind == "keepabove":
-        return (f'    <path d="M{cx - half},{cy + half * 0.4} L{cx},{cy - half} '
-                f'L{cx + half},{cy + half * 0.4}" {stroke}/>\n')
-    return (f'    <path d="M{cx - half},{cy - half * 0.4} L{cx},{cy + half} '
-            f'L{cx + half},{cy - half * 0.4}" {stroke}/>\n')
+        return (f'    <path d="M{left + 0.5},{bottom - 3.5} L{left + size / 2},{top + 2.5} '
+                f'L{right - 0.5},{bottom - 3.5}" {stroke}/>\n')
+    return (f'    <path d="M{left + 0.5},{top + 3.5} L{left + size / 2},{bottom - 2.5} '
+            f'L{right - 0.5},{top + 3.5}" {stroke}/>\n')
 
 
 def button_svg(kind: str, palette: dict, window: dict) -> str:
