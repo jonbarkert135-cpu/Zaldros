@@ -101,6 +101,24 @@ was changed):
   is 190. The pane is user-resizable, so the capture may simply show a widened pane.
 - The Explorer details-view row pitch measures **30 px at 100 %**; the token is 32.
 
+## Caption button glyphs — measured, 2026-08-28
+
+A magnified real Windows 11 title-bar capture (Wikimedia Commons,
+`20231209 18 08 05-Greenshot Titlebar buttons.png`, 706 x 224, CC licence on the file page) gives
+the glyphs at a size where a pixel grid cannot hide anything. Measured with PIL:
+
+| what | in the capture | button = 46 px | our theme |
+| --- | --- | --- | --- |
+| button pitch | 239 px | 46.0 | 46 |
+| minimize bar width | 52 px | 10.0 | 10 |
+| minimize bar thickness | 5 px | 0.96 | 1 |
+| maximize square | 52 x 53 px | 10.0 x 10.2 | 10 x 10 |
+| maximize corner radius | ~8 px | ~1.5 | 1.5 |
+| close X box | 52 x 52 px | 10.0 | 10 |
+
+All three glyphs are the same 52 px wide: the minimize bar is exactly as long as the X is wide.
+That is the number to quote when the bar looks "too short" — it is not, it is 10 px like the rest.
+
 ## Adding an entry
 
 1. Find the screenshot on a Microsoft page. Prefer the un-resized original: WordPress serves

@@ -210,13 +210,15 @@ def _glyph(kind: str, w: int, h: int, size: int, colour: str) -> str:
         y = round(h / 2) - 0.5
         return f'    <line x1="{left}" y1="{y}" x2="{right}" y2="{y}" {stroke}/>\n'
     if kind == "maximize":
+        # corner radius measured off a real Windows 11 capture: 8 px on a 239 px button
+        # (Wikimedia Commons "Titlebar buttons"), i.e. ~1.5 px at a 46 px button
         return (f'    <rect x="{left + 0.5}" y="{top + 0.5}" width="{size - 1}" '
-                f'height="{size - 1}" rx="1" {stroke}/>\n')
+                f'height="{size - 1}" rx="1.5" {stroke}/>\n')
     if kind == "restore":
         off = 2                      # how far the back window peeks out; reference ≈ 2 px at 100 %
         fx, fy = left + 0.5, top + off + 0.5
         fw = size - 1 - off
-        return (f'    <rect x="{fx}" y="{fy}" width="{fw}" height="{fw}" rx="1" {stroke}/>\n'
+        return (f'    <rect x="{fx}" y="{fy}" width="{fw}" height="{fw}" rx="1.5" {stroke}/>\n'
                 f'    <path d="M{fx + off},{fy} V{fy - off + 1} '
                 f'Q{fx + off},{fy - off} {fx + off + 1},{fy - off} '
                 f'H{fx + fw + off - 1} Q{fx + fw + off},{fy - off} {fx + fw + off},{fy - off + 1} '
