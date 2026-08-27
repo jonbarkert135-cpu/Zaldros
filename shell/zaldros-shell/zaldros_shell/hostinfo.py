@@ -1,18 +1,22 @@
-"""Real facts about this machine, for the Settings application.
+"""Machine facts, formatted for the Settings application.
 
-Every reading comes from the running system (/proc, /etc/os-release, os.statvfs). A reading that
-cannot be taken returns an empty string and Settings shows a dash, never a plausible-looking
-placeholder.
+The *measuring* moved to `zaldros_backend.hardware`, which is the one place that reads /proc,
+/sys and DMI; this file is what turns those numbers into the strings Settings shows — Russian
+decimal commas, «ГиБ», «2 ч 15 мин», and a dash for anything the machine did not report.
+
+Keeping the split matters: the backend must stay usable from a tool or a test that wants bytes,
+and Settings must stay free to change wording without touching a reader.
 """
 
 from __future__ import annotations
 
 import os
 import platform
-import shutil
 import socket
 import time
 from pathlib import Path
+
+from zaldros_backend import hardware
 
 
 def _first_line(path: str) -> str:
@@ -23,11 +27,7 @@ def _first_line(path: str) -> str:
 
 
 def os_name() -> str:
-    for line in _read_lines("/etc/os-release"):
-        key, _, value = line.partition("=")
-        if key == "PRETTY_NAME":
-            return value.strip().strip('"')
-    return ""
+    return hardware.os_name()
 
 
 def _read_lines(path: str) -> list[str]:
@@ -38,21 +38,17 @@ def _read_lines(path: str) -> list[str]:
 
 
 def cpu_model() -> str:
-    for line in _read_lines("/proc/cpuinfo"):
-        key, _, value = line.partition(":")
-        if key.strip() in ("model name", "Model", "Processor"):
-            return value.strip()
-    return platform.processor() or ""
+    return hardware.cpu_model()
 
 
 def cpu_cores() -> int:
-    return os.cpu_count() or 0
+    return hardware.cpu_cores()
 
 
 # A filesystem is allowed to report a size; it is not allowed to report a size no disk has. Some
 # overlay and virtual filesystems answer with a sentinel (we have seen 8589934591 GiB, which is
 # 2**63 blocks). Above this ceiling the reading is treated as no reading at all.
-IMPLAUSIBLE_BYTES = 1024 ** 5  # 1 PiB
+IMPLAUSIBLE_BYTES = hardware.IMPLAUSIBLE_BYTES  # 1 PiB
 
 
 def format_bytes(size: int) -> str:
@@ -76,13 +72,7 @@ def _ru(text: str) -> str:
 
 
 def _meminfo_bytes() -> dict[str, int]:
-    values = {}
-    for line in _read_lines("/proc/meminfo"):
-        key, _, rest = line.partition(":")
-        parts = rest.split()
-        if parts and parts[0].isdigit():
-            values[key] = int(parts[0]) * 1024  # /proc/meminfo is in kB
-    return values
+    return hardware.meminfo_bytes()
 
 
 def memory_total_bytes() -> int:
@@ -97,23 +87,12 @@ def memory_used_bytes() -> int:
 
 
 def disk_usage(path: str = "/") -> tuple[int, int]:
-    """(used bytes, total bytes) for the filesystem holding `path`; (0, 0) when unavailable or
-    when the filesystem reports a size no real disk has."""
-    try:
-        usage = shutil.disk_usage(path)
-    except OSError:
-        return (0, 0)
-    if usage.total <= 0 or usage.total >= IMPLAUSIBLE_BYTES:
-        return (0, 0)
-    return (usage.used, usage.total)
+    """(used bytes, total bytes), or (0, 0) when the filesystem reports a size no real disk has."""
+    return hardware.disk_usage(path)
 
 
 def uptime_seconds() -> int:
-    first = _first_line("/proc/uptime")
-    try:
-        return int(float(first.split()[0]))
-    except (ValueError, IndexError):
-        return 0
+    return hardware.uptime_seconds()
 
 
 def format_uptime(seconds: int) -> str:
@@ -128,6 +107,12 @@ def format_uptime(seconds: int) -> str:
 
 def device_name() -> str:
     return socket.gethostname()
+
+
+def virtualization() -> str:
+    """"qemu", "kvm", "vmware"... or "" on real hardware. Settings shows it so a screenshot from
+    a virtual machine cannot be mistaken for one from a laptop."""
+    return hardware.virtualization()
 
 
 def kernel() -> str:

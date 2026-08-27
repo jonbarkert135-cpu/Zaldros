@@ -10,12 +10,20 @@ Derived from spec PART 1 §5 and PART 2. Layer names use the official project na
 │                                Screenshot, Text Editor, Archive Manager
 ├─ Zaldros Desktop Shell ─────── Taskbar, Start, Search, Quick Settings, Notification Centre,
 │                                Desktop/Icons, Run, Clipboard History, Recycle Bin
+├─ Zaldros Backend ───────────── one API over the services below: power, network, bluetooth,
+│                                audio, storage, display, services, session, notifications,
+│                                privilege, hardware  (ADR-0014, backend/README.md)
 ├─ Display / Compositor ──────── KWin (Wayland) + xwayland, layer-shell, xdg-desktop-portal
 ├─ Hardware / System Services ── systemd, NetworkManager, PipeWire/WirePlumber, BlueZ,
 │                                UPower, iwd/wpa, fwupd, udisks2, CUPS (opt), AppArmor
 ├─ Core System ───────────────── glibc, systemd, apt/dpkg, Flatpak, dbus
 └─ Linux Kernel ──────────────── Fedora kernel + firmware, btrfs, zram, io_uring
 ```
+
+Rule (ADR-0014): the shell and the system applications talk to the **Zaldros Backend** and to
+nothing below it. No panel opens a D-Bus connection, reads /sys or runs a helper binary of its
+own — the backend is where a Linux API is allowed to be known, and where "this machine cannot
+answer that" is allowed to be phrased.
 
 Rule (§5): the core system must boot, update, network and log with the entire shell layer removed.
 CI enforces this: the `core` image target is built and booted headless without any Zaldros shell package.

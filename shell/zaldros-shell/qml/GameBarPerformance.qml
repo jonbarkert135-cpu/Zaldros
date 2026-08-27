@@ -16,6 +16,10 @@ Item {
     property var state: null
     signal closeRequested()
 
+    // Sample /proc only while the widget is open (see ShellState.setMetersActive). Behaviour
+    // only — the layout, the colours and the strings are untouched.
+    onShownChanged: if (widget.state && widget.state.setMetersActive) widget.state.setMetersActive(shown)
+
     width: Theme.gameBarWidth
     height: body.implicitHeight + 2 * Theme.gameBarPadding
     visible: opacity > 0.01

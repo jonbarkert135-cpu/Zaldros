@@ -1,0 +1,31 @@
+[
+  {
+    "mode": "legacy",
+    "meters_open": false,
+    "elapsed_seconds": 299.94,
+    "cpu_seconds": 0.11,
+    "voluntary_ctx": 0,
+    "involuntary_ctx": 0,
+    "proc_reads": 1200,
+    "signals": 300,
+    "cpu_per_minute_ms": 22.0,
+    "notes": [
+      "voluntary_ctx stayed 0: this kernel does not increment voluntary_ctxt_switches (seen under gVisor) \u2014 the figure is unusable here, use proc_reads and signals instead"
+    ]
+  },
+  {
+    "mode": "backend",
+    "meters_open": false,
+    "elapsed_seconds": 299.8,
+    "cpu_seconds": 0.0,
+    "voluntary_ctx": 0,
+    "involuntary_ctx": 0,
+    "proc_reads": 0,
+    "signals": 5,
+    "cpu_per_minute_ms": 0.0,
+    "notes": [
+      "cpu_seconds is below this kernel's accounting resolution (10 ms): read it as '< 10 ms', not as zero",
+      "voluntary_ctx stayed 0: this kernel does not increment voluntary_ctxt_switches (seen under gVisor) \u2014 the figure is unusable here, use proc_reads and signals instead"
+    ]
+  }
+]

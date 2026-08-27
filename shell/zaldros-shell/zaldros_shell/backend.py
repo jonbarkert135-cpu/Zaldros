@@ -1,4 +1,7 @@
-"""Backend for the Zaldros Shell prototype.
+"""Application data for the Zaldros Shell: the pin set, the process table and the clock.
+
+The system readings this file used to hold moved to `zaldros_backend` (see `system.py`); what
+stays is what belongs to the shell itself.
 
 Everything exposed to QML here is either real system data (clock, locale, uptime, memory, running
 processes read from /proc) or explicitly declared placeholder data (the pinned application list, which
@@ -78,55 +81,8 @@ def format_clock(moment: time.struct_time, locale: str = "ru") -> tuple[str, str
     return time.strftime("%H:%M", moment), time.strftime("%d/%m/%Y", moment)
 
 
-def cpu_times(proc_root: str = "/proc") -> tuple[int, int] | None:
-    """(busy, total) jiffies from /proc/stat. None when unreadable — never guessed.
-
-    A single reading says nothing about load; the caller keeps the previous one and reports the
-    difference, which is what every honest CPU meter does.
-    """
-    try:
-        with open(os.path.join(proc_root, "stat"), encoding="utf-8") as handle:
-            first = handle.readline()
-    except OSError:
-        return None
-    parts = first.split()
-    if not parts or parts[0] != "cpu":
-        return None
-    try:
-        values = [int(value) for value in parts[1:]]
-    except ValueError:
-        return None
-    if len(values) < 4:
-        return None
-    idle = values[3] + (values[4] if len(values) > 4 else 0)
-    total = sum(values)
-    return total - idle, total
-
-
-def cpu_percent(previous, current) -> int | None:
-    """Load between two `cpu_times` readings. None until there are two of them."""
-    if not previous or not current:
-        return None
-    busy = current[0] - previous[0]
-    total = current[1] - previous[1]
-    if total <= 0:
-        return None
-    return max(0, min(100, round(busy / total * 100)))
-
-
-def memory_percent(proc_root: str = "/proc") -> int | None:
-    """Real memory pressure for the Start menu footer. None when unreadable — never guessed."""
-    try:
-        with open(os.path.join(proc_root, "meminfo"), encoding="utf-8") as handle:
-            values = {}
-            for line in handle:
-                key, _, rest = line.partition(":")
-                parts = rest.split()
-                if parts and parts[0].isdigit():
-                    values[key] = int(parts[0])
-    except OSError:
-        return None
-    total, available = values.get("MemTotal"), values.get("MemAvailable")
-    if not total or available is None:
-        return None
-    return round((total - available) / total * 100)
+# CPU and memory now come from the backend's hardware facet: one implementation of
+# "difference between two /proc/stat samples", shared with the Settings pages and with
+# tools/zaldros-bench, instead of the copy that used to live here. Re-exported so the shell's
+# own imports and tests keep one obvious name.
+from zaldros_backend.hardware import cpu_percent, cpu_times, memory_percent  # noqa: E402,F401

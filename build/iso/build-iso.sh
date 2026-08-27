@@ -131,8 +131,10 @@ echo "== install the Zaldros shell, theme scripts and self-test"
 mkdir -p "$ROOT/opt/zaldros"
 # Run #24: `data/` was missing here, so the shell crashed on /opt/zaldros/data/pinned.json.
 # tests/test_flat_layout.py now boots the shell from exactly this copy set.
+# `zaldros_backend` is a sibling package, not part of the shell: Settings, Sheets and the shell
+# all import it, and PYTHONPATH is already /opt/zaldros, so it goes next to zaldros_shell.
 cp -a "$REPO/shell/zaldros-shell/zaldros_shell" "$REPO/shell/zaldros-shell/qml" \
-      "$REPO/shell/zaldros-shell/data" "$ROOT/opt/zaldros/"
+      "$REPO/shell/zaldros-shell/data" "$REPO/backend/zaldros_backend" "$ROOT/opt/zaldros/"
 cp -a "$REPO/assets" "$ROOT/opt/zaldros/assets"
 cp -a "$REPO/system/theme" "$ROOT/opt/zaldros/theme"
 cp "$(dirname "$0")/selftest.py" "$ROOT/usr/local/bin/zaldros-selftest"

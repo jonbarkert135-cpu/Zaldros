@@ -13,7 +13,9 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Parse `.desktop` files; pins now cross-checked against the real application database
 - [x] Launch applications from Start and from the taskbar
 - [ ] Track real windows from the compositor; group them in the taskbar
-- [ ] Wire quick-settings toggles to NetworkManager / BlueZ / PipeWire / UPower
+- [x] Wire quick-settings toggles to NetworkManager / BlueZ / PipeWire / UPower — through the one
+      backend layer (ADR-0014); slots exist and are tested against mock services, still unproven on
+      real hardware
 - [x] Vendor Fluent UI System Icons (MIT) and PT Sans (OFL) — done, in use (Selawik dropped: no Cyrillic)
 - [x] Install the Fluent cursor theme (GPL-3) — the only borrowed pack (ADR-0010)
 - [x] Draw our own Aurorae decoration theme (`tools/theme/make_aurorae.py`) — awaiting the first boot screenshot of a real app titlebar
@@ -34,7 +36,12 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Win+G — the «last 30 seconds» ring buffer (needs a continuous encode we do not run yet)
 - [ ] Part-by-part visual audit against public Windows 11 screenshots: one reference per component,
       measured and diffed, not eyeballed (the maintainer asked for this after the first game bar)
-- [ ] Notifications + quick settings backed by real NetworkManager / PipeWire / UPower
+- [x] Quick settings backed by real NetworkManager / PipeWire / UPower / BlueZ / udisks2 / logind
+      via `backend/zaldros_backend` (ADR-0014)
+- [ ] Claim `org.freedesktop.Notifications` at runtime — the server is written and tested, but the
+      shell does not own the name yet (KDE's daemon would collide)
+- [ ] Publish the backend as `org.zaldros.Backend1` on the session bus — today apps import the
+      Python package instead
 
 ## Zaldros Sheets (ADR-0013)
 - [x] Исследовать LOK / UNO / форк / тему VCL и выбрать шов — выбран UNO сейчас, LOK потом

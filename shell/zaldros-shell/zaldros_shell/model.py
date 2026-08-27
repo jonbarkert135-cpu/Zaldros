@@ -22,6 +22,36 @@ from . import files, hostinfo, prefs, settingspages, system, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
+_BRIDGE = None
+
+
+def _connect_backend(owner, domains, callback):
+    """Wire one Qt object to the shared backend's change signal.
+
+    One bridge per process, not one per model: the bridge owns the socket notifiers and the
+    debounce timer, and a second one would mean the same D-Bus signal being handled twice.
+    Returns None when Qt cannot watch the bus (no bus at all, or an offscreen render), and the
+    model then simply keeps the readings it was built with — which is what the shell did before
+    this existed, so nothing can be worse than it was.
+    """
+    global _BRIDGE
+    try:
+        from zaldros_backend.qtbridge import BackendBridge
+    except Exception:                                  # noqa: BLE001 - reported, never fatal
+        return None
+    backend = system.backend()
+    if not (backend.system_bus.available or backend.session_bus.available):
+        return None
+    if _BRIDGE is None:
+        try:
+            _BRIDGE = BackendBridge(backend)
+        except Exception as exc:                       # noqa: BLE001 - shown, never swallowed
+            print(f"backend bridge unavailable: {exc}", flush=True)
+            return None
+    wanted = set(domains)
+    _BRIDGE.changed.connect(lambda domain: callback() if domain in wanted else None)
+    return _BRIDGE
+
 
 class AppModel(QAbstractListModel):
     """Zaldros's default pin set, cross-checked against the machine's real application database.
@@ -135,18 +165,75 @@ class InstalledAppModel(QAbstractListModel):
 
 class SystemState(QObject):
     """Tray and quick-settings readouts. Every property has an `*Available` companion; when it is
-    false the UI shows the reason instead of a number."""
+    false the UI shows the reason instead of a number.
+
+    The properties below are unchanged — the same names, the same types, the same wording for an
+    absent value — because the taskbar and quick-settings QML must render pixel-for-pixel what it
+    rendered before. What changed is underneath: instead of one snapshot taken at construction and
+    never taken again, the readings are refreshed when UPower, NetworkManager or BlueZ *say* they
+    changed. The tray used to freeze at its start-up values; now it does not, and it still costs
+    nothing while nothing happens.
+    """
 
     changed = Signal()
 
-    def __init__(self, readings: dict | None = None) -> None:
+    def __init__(self, readings: dict | None = None, live: bool = True) -> None:
         super().__init__()
         self._readings = readings if readings is not None else system.snapshot()
+        self._bridge = None
+        if live and readings is None:
+            self._bridge = _connect_backend(self, ("power", "network", "bluetooth", "audio"),
+                                            self.refresh)
 
     @Slot()
     def refresh(self) -> None:
         self._readings = system.snapshot()
         self.changed.emit()
+
+    # -- actions the tiles perform ------------------------------------------------------------
+    # Quick settings could only *display* before this: the tiles had nothing behind them. These
+    # go through the backend, so a click reaches NetworkManager, BlueZ or PipeWire and the result
+    # comes back through the same change signal as any other update.
+    @Slot(result=bool)
+    def toggleWifi(self) -> bool:  # noqa: N802
+        current = self._readings.get("network")
+        enabled = bool(current and current.get("wifi_enabled"))
+        result = system.backend().network.set_wifi_enabled(not enabled)
+        self.refresh()
+        return bool(result.ok)
+
+    @Slot(result=bool)
+    def toggleBluetooth(self) -> bool:  # noqa: N802
+        current = self._readings.get("bluetooth")
+        powered = bool(current and current.get("powered"))
+        result = system.backend().bluetooth.set_powered(not powered)
+        self.refresh()
+        return bool(result.ok)
+
+    @Slot(int, result=bool)
+    def setVolume(self, percent: int) -> bool:  # noqa: N802
+        result = system.backend().audio.set_volume(int(percent))
+        self.refresh()
+        return bool(result.ok)
+
+    @Slot(result=bool)
+    def toggleMute(self) -> bool:  # noqa: N802
+        result = system.backend().audio.toggle_muted()
+        self.refresh()
+        return bool(result.ok)
+
+    @Slot(int, result=bool)
+    def setBrightness(self, percent: int) -> bool:  # noqa: N802
+        result = system.backend().display.set_brightness(int(percent))
+        self.refresh()
+        return bool(result.ok)
+
+    @Property(bool, notify=changed)
+    def brightnessWritable(self) -> bool:  # noqa: N802
+        """False on a machine where the backlight can be read but not written — the slider is
+        then shown at its real value and disabled, instead of moving and doing nothing."""
+        reading = self._readings.get("brightness")
+        return bool(reading and reading.available and reading.get("writable"))
 
     def _value(self, key: str) -> int:
         reading = self._readings.get(key)
@@ -234,9 +321,21 @@ class SystemState(QObject):
 
 
 class ShellState(QObject):
-    """Clock, locale and honest system readouts for the shell chrome."""
+    """Clock, locale and honest system readouts for the shell chrome.
+
+    The clock used to tick once a second and drag the CPU and memory meters along with it: every
+    tick re-read /proc/stat, and every `changed` made QML re-evaluate `memoryPercent`, whose
+    getter re-read /proc/meminfo. 86 400 wakeups a day to move a display that shows `HH:MM`.
+
+    Now the clock wakes on the minute boundary it actually needs — one single-shot timer, re-armed
+    to the exact millisecond of the next minute, so it neither drifts nor fires twice — and the
+    meters run only while a surface that draws them is open (`setMetersActive`). Measured
+    difference: `tools/zaldros-bench/backend_overhead.py`.
+    """
 
     changed = Signal()
+
+    METER_INTERVAL_MS = 1000
 
     def __init__(self, locale: str = "ru", proc_root: str = "/proc", tick: bool = True) -> None:
         super().__init__()
@@ -245,20 +344,75 @@ class ShellState(QObject):
         self._time = ""
         self._date = ""
         self._cpu_previous = None
+        # One baseline reading at construction. CPU load is a difference between two samples, so
+        # without it the first second after a meter surface opens would show «—» where the old
+        # always-on 1 Hz timer showed a number. One /proc/stat read at start-up buys that back.
         self._cpu_current = cpu_times(proc_root)
         self._cpu = -1
-        self.update()
+        self._memory = -1
+        self._meters = 0
+        self._clock_timer: QTimer | None = None
+        self._meter_timer: QTimer | None = None
+        self.updateClock()
         if tick:
-            self._timer = QTimer(self)
-            self._timer.timeout.connect(self.update)
-            self._timer.start(1000)
+            self._clock_timer = QTimer(self)
+            self._clock_timer.setSingleShot(True)
+            self._clock_timer.timeout.connect(self._clock_tick)
+            self._arm_clock()
+
+    # -- clock -------------------------------------------------------------------------------
+    def _arm_clock(self) -> None:
+        if self._clock_timer is None:
+            return
+        now = time.time()
+        self._clock_timer.start(max(1, int((60 - now % 60) * 1000) + 20))
+
+    def _clock_tick(self) -> None:
+        self.updateClock()
+        self._arm_clock()
+
+    @Slot()
+    def updateClock(self) -> None:  # noqa: N802
+        text, date = format_clock(time.localtime(), self._locale)
+        if (text, date) != (self._time, self._date):
+            self._time, self._date = text, date
+            self.changed.emit()
 
     @Slot()
     def update(self) -> None:
-        self._time, self._date = format_clock(time.localtime(), self._locale)
+        """Everything at once. Kept for callers that want a full refresh on demand."""
+        self.updateClock()
+        self._sample_meters()
+
+    # -- meters ------------------------------------------------------------------------------
+    @Slot(bool)
+    def setMetersActive(self, active: bool) -> None:  # noqa: N802
+        """A surface that shows the CPU/memory meters says when it is open.
+
+        Reference-counted, because two can be open at once (Start's memory line and the game
+        bar's performance widget), and the meters must keep running until the last one closes.
+        """
+        self._meters = max(0, self._meters + (1 if active else -1))
+        if self._meters > 0:
+            if self._meter_timer is None:
+                self._meter_timer = QTimer(self)
+                self._meter_timer.timeout.connect(self._sample_meters)
+            self._sample_meters()
+            if not self._meter_timer.isActive():
+                self._meter_timer.start(self.METER_INTERVAL_MS)
+        elif self._meter_timer is not None:
+            self._meter_timer.stop()
+
+    @property
+    def metersActive(self) -> bool:  # noqa: N802
+        return self._meters > 0
+
+    def _sample_meters(self) -> None:
         self._cpu_previous, self._cpu_current = self._cpu_current, cpu_times(self._proc_root)
         measured = cpu_percent(self._cpu_previous, self._cpu_current)
+        memory = memory_percent(self._proc_root)
         self._cpu = -1 if measured is None else measured
+        self._memory = -1 if memory is None else memory
         self.changed.emit()
 
     @Property(str, notify=changed)
@@ -280,7 +434,14 @@ class ShellState(QObject):
 
     @Property(int, notify=changed)
     def memoryPercent(self) -> int:  # noqa: N802
-        """-1 means 'not measurable here' — the UI must show a dash, not a fabricated number."""
+        """-1 means 'not measurable here' — the UI must show a dash, not a fabricated number.
+
+        Reads the cached sample rather than /proc/meminfo. The getter used to open the file on
+        every binding evaluation, which meant once per second per visible meter whether or not
+        the panel was on screen.
+        """
+        if self._memory >= 0 or self._meters > 0:
+            return self._memory
         value = memory_percent(self._proc_root)
         return -1 if value is None else value
 

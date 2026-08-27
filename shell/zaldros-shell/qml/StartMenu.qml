@@ -35,7 +35,12 @@ Item {
     function shown_(key) { return prefValues[key] !== false }
 
     property bool allApps: false
-    onShownChanged: { if (!shown) { allApps = false; selectedIndex = -1 } }
+    // The memory line below is the only live meter in this panel: tell the backend to sample
+    // while it is on screen and to stop when it is not. Nothing here changes what is drawn.
+    onShownChanged: {
+        if (!shown) { allApps = false; selectedIndex = -1 }
+        if (start.state && start.state.setMetersActive) start.state.setMetersActive(shown)
+    }
 
     // Keyboard navigation (brief §5): arrows move the selection across the 6-column grid,
     // Enter launches, Escape closes. Focus follows the panel when Start opens.

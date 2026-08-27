@@ -1,211 +1,56 @@
-"""Real system readouts for the tray and quick settings.
+"""The shell's seam to the Zaldros backend.
 
-Rule for this file (spec PART 3 §25, PART 4): every function returns `None` when the value cannot be
-measured on this machine. The UI must then show "нет данных" / a disabled control. We never invent a
-battery level, a Wi-Fi signal or a volume percentage to make a screenshot look complete.
+This file used to *be* the system layer: it read /sys/class/power_supply, ran `wpctl`, ran `gdbus`,
+ran `localectl` and parsed each of their outputs. All of that now lives in `zaldros_backend`, where
+it is one D-Bus layer instead of five one-off readers, it is event-driven, and it is tested against
+mock UPower / NetworkManager / BlueZ / udisks2 services standing on a real bus.
+
+What is left here is the seam and nothing else: one shared backend instance for the process, and
+the handful of names the shell's models and Settings pages already import. `Reading` is
+re-exported from the backend so the honesty contract has exactly one definition.
 """
 
 from __future__ import annotations
 
-import os
-import re
-import shutil
-import subprocess
-from dataclasses import dataclass
-from pathlib import Path
+from zaldros_backend import Reading, ZaldrosBackend
+from zaldros_backend.session import LAYOUT_BADGES, layout_badge   # noqa: F401 - re-exported
+
+__all__ = ["Reading", "LAYOUT_BADGES", "backend", "keyboard_layout", "layout_badge",
+           "snapshot", "switch_layout", "user_name"]
+
+_BACKEND: ZaldrosBackend | None = None
 
 
-@dataclass(frozen=True)
-class Reading:
-    """A value plus how it was obtained. `available=False` means: show as unavailable."""
+def backend() -> ZaldrosBackend:
+    """The one backend this process talks to.
 
-    available: bool
-    value: int | None = None
-    detail: str = ""
-    source: str = ""
-
-
-def _read_int(path: Path) -> int | None:
-    try:
-        return int(path.read_text().strip())
-    except (OSError, ValueError):
-        return None
-
-
-def battery(sys_root: str = "/sys/class/power_supply") -> Reading:
-    root = Path(sys_root)
-    try:
-        candidates = sorted(p for p in root.iterdir() if p.name.startswith("BAT"))
-    except OSError:
-        return Reading(False, detail="нет данных", source=sys_root)
-    for path in candidates:
-        percent = _read_int(path / "capacity")
-        if percent is None:
-            continue
-        status = ""
-        try:
-            status = (path / "status").read_text().strip()
-        except OSError:
-            pass
-        return Reading(True, percent, status, source=str(path))
-    return Reading(False, detail="батарея не обнаружена", source=sys_root)
-
-
-def backlight(sys_root: str = "/sys/class/backlight") -> Reading:
-    root = Path(sys_root)
-    try:
-        devices = sorted(root.iterdir())
-    except OSError:
-        return Reading(False, detail="нет данных", source=sys_root)
-    for device in devices:
-        current, maximum = _read_int(device / "brightness"), _read_int(device / "max_brightness")
-        if current is not None and maximum:
-            return Reading(True, round(current / maximum * 100), source=str(device))
-    return Reading(False, detail="регулировка недоступна", source=sys_root)
-
-
-def network(sys_root: str = "/sys/class/net") -> Reading:
-    """Reports the first non-loopback interface that is actually up."""
-    root = Path(sys_root)
-    try:
-        interfaces = sorted(p for p in root.iterdir() if p.name != "lo")
-    except OSError:
-        return Reading(False, detail="нет данных", source=sys_root)
-    for path in interfaces:
-        try:
-            state = (path / "operstate").read_text().strip()
-        except OSError:
-            continue
-        if state == "up":
-            wireless = (path / "wireless").exists()
-            return Reading(True, None, f"{path.name} · {'Wi-Fi' if wireless else 'Ethernet'}",
-                           source=str(path))
-    return Reading(False, detail="нет подключения", source=sys_root)
-
-
-def volume(runner=subprocess.run) -> Reading:
-    """PipeWire (wpctl) or PulseAudio (pactl). Absent tooling means unavailable, not zero."""
-    if shutil.which("wpctl"):
-        try:
-            out = runner(["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"], capture_output=True,
-                         text=True, timeout=2)
-            token = out.stdout.split()[1]
-            return Reading(True, round(float(token) * 100), source="wpctl")
-        except (OSError, IndexError, ValueError, subprocess.SubprocessError):
-            return Reading(False, detail="звук недоступен", source="wpctl")
-    if shutil.which("pactl"):
-        return Reading(False, detail="не опрошено", source="pactl")
-    return Reading(False, detail="аудиосервер не найден", source="none")
-
-
-def bluetooth(sys_root: str = "/sys/class/bluetooth") -> Reading:
-    try:
-        adapters = [p.name for p in Path(sys_root).iterdir()]
-    except OSError:
-        return Reading(False, detail="адаптер не найден", source=sys_root)
-    if adapters:
-        return Reading(True, None, adapters[0], source=sys_root)
-    return Reading(False, detail="адаптер не найден", source=sys_root)
-
-
-# Windows 11 shows the layout as a three-letter badge in the UI language: РУС, ENG, УКР. Layouts
-# we have no name for keep their own code rather than getting an invented translation.
-LAYOUT_BADGES = {"ru": "РУС", "us": "ENG", "en": "ENG", "gb": "ENG", "ua": "УКР", "uk": "УКР",
-                 "de": "DEU", "fr": "FRA", "es": "ESP", "it": "ITA", "pl": "POL", "he": "ИВР",
-                 "tr": "TUR", "pt": "POR", "cz": "ČES", "kk": "ҚАЗ"}
-
-
-def layout_badge(code: str) -> str:
-    """Tray badge for a keyboard layout code such as "ru", "us" or "ru,us"."""
-    first = code.split(",")[0].strip().lower()
-    return LAYOUT_BADGES.get(first, first.upper()[:3])
-
-
-# Verified against kwin v6.6.0 src/keyboard_layout.cpp: the service is org.kde.keyboard (not
-# org.kde.KWin), the object /Layouts, the interface org.kde.KeyboardLayouts.
-KWIN_LAYOUTS = ("gdbus", "call", "--session", "--dest", "org.kde.keyboard",
-                "--object-path", "/Layouts", "--method")
-
-
-def _gdbus(runner, method: str, *args: str) -> str:
-    """One call to KWin's keyboard-layout interface. Empty string when it cannot be reached."""
-    if not shutil.which("gdbus"):
-        return ""
-    try:
-        result = runner([*KWIN_LAYOUTS, f"org.kde.KeyboardLayouts.{method}", *args],
-                        capture_output=True, text=True, timeout=2)
-    except (OSError, subprocess.SubprocessError):
-        return ""
-    return result.stdout.strip() if result.returncode == 0 else ""
-
-
-def _parse_gvariant_uint(text: str) -> int | None:
-    """gdbus prints "(uint32 1,)" — and "uint32" is full of digits, so match the type explicitly."""
-    match = re.search(r"uint32\s+(\d+)", text) or re.search(r"\((\d+)", text)
-    return int(match.group(1)) if match else None
-
-
-def _parse_gvariant_layouts(text: str) -> list[tuple[str, str, str]]:
-    """gdbus prints "([('us', 'English (US)', 'us'), ('ru', 'Russian', 'ru')],)"."""
-    return [(a, b, c) for a, b, c in
-            re.findall(r"\('([^']*)',\s*'([^']*)',\s*'([^']*)'\)", text)]
-
-
-def kwin_layouts(runner=subprocess.run) -> tuple[list[tuple[str, str, str]], int | None]:
-    """(layouts, active index) as KWin reports them, or ([], None) when KWin is not answering.
-
-    KWin owns the keyboard on Wayland: when the user switches layout, this is the only place that
-    knows. localectl only ever reports what the image was configured with.
+    A single instance on purpose: two would mean two D-Bus connections, two sets of match rules
+    and two copies of every signal. The shell, its Settings pages and its flyouts all share this.
     """
-    listed = _parse_gvariant_layouts(_gdbus(runner, "getLayoutsList"))
-    if not listed:
-        return ([], None)
-    return (listed, _parse_gvariant_uint(_gdbus(runner, "getLayout")))
+    global _BACKEND
+    if _BACKEND is None:
+        _BACKEND = ZaldrosBackend()
+    return _BACKEND
 
 
-def switch_layout(runner=subprocess.run) -> bool:
-    """Move to the next layout, the way clicking the Windows tray badge does."""
-    layouts, current = kwin_layouts(runner)
-    if not layouts or current is None:
-        return False
-    nxt = (current + 1) % len(layouts)
-    return _gdbus(runner, "setLayout", f"uint32 {nxt}") != ""
-
-
-def keyboard_layout(runner=subprocess.run) -> Reading:
-    """Active keyboard layout, read from the session. Windows shows it in the tray, so we do too —
-    but only when something really reports one."""
-    layouts, current = kwin_layouts(runner)
-    if layouts and current is not None and current < len(layouts):
-        return Reading(True, current, layout_badge(layouts[current][0]),
-                       source="kwin")
-    if shutil.which("localectl"):
-        try:
-            result = runner(["localectl", "status"], capture_output=True, text=True, timeout=2)
-        except (OSError, subprocess.SubprocessError):
-            result = None
-        if result is not None and result.returncode == 0:
-            for line in result.stdout.splitlines():
-                key, _, value = line.partition(":")
-                if key.strip() not in ("X11 Layout", "VC Keymap"):
-                    continue
-                code = value.strip()
-                # localectl answers "(unset)" on an image where nothing configured a keymap. Run
-                # #29 shipped that straight to the tray, which read "(UN": a real value in the
-                # protocol, no value to a human.
-                if code.lower() in ("", "n/a", "unset", "(unset)"):
-                    continue
-                return Reading(True, None, layout_badge(code), source="localectl")
-    language = os.environ.get("LANG", "").split(".")[0].split("_")[0]
-    if len(language) == 2 and language.isalpha():
-        return Reading(True, None, layout_badge(language), source="LANG")
-    return Reading(False, detail="раскладка не определена", source="localectl")
-
-
-def user_name() -> str:
-    return os.environ.get("USER") or os.environ.get("LOGNAME") or "пользователь"
+def set_backend(instance: ZaldrosBackend | None) -> None:
+    """Point the shell at another backend — a test bus, or none at all."""
+    global _BACKEND
+    _BACKEND = instance
 
 
 def snapshot() -> dict[str, Reading]:
-    return {"battery": battery(), "brightness": backlight(), "network": network(),
-            "volume": volume(), "bluetooth": bluetooth(), "keyboard": keyboard_layout()}
+    """Every tray and quick-settings reading, in one pass."""
+    return backend().tray()
+
+
+def user_name() -> str:
+    return backend().session.user_name()
+
+
+def keyboard_layout() -> Reading:
+    return backend().session.keyboard_layout()
+
+
+def switch_layout() -> bool:
+    return backend().session.switch_layout()

@@ -1,0 +1,363 @@
+"""Mock UPower, NetworkManager, BlueZ, udisks2, logind and systemd, on a real bus.
+
+These are not stubs of our own code: they are D-Bus services with the real names, the real object
+paths and the real property names, standing on a real `dbus-daemon`. A facet test therefore
+exercises the whole path — marshalling, the socket, the daemon's routing, unmarshalling — and a
+mistake in any of it fails the test instead of hiding behind a fake.
+
+Every property value below is shaped like the real thing: UPower's percentage is a double,
+NetworkManager's SSID is a byte array, udisks2's device name is a NUL-terminated byte string,
+BlueZ's battery is a byte. Those are exactly the details a hand-written fake gets wrong.
+
+Not shipped to a user's machine by accident — it is only imported by tests and by
+`tools/zaldros-sysprobe`.
+"""
+
+from __future__ import annotations
+
+import os
+import shutil
+import subprocess
+import tempfile
+import time
+from typing import Any
+
+from .bus import Bus
+from .connection import Connection
+from .service import Interface, ObjectServer
+from .wire import Variant
+
+
+class SessionDaemon:
+    """A private `dbus-daemon`, started and stopped by us.
+
+    Used instead of `dbus-run-session` so a test can hold the address and open several
+    connections to it — the mock services on one, the backend under test on another, which is how
+    the real system is arranged.
+    """
+
+    def __init__(self) -> None:
+        self.address = ""
+        self._process: subprocess.Popen | None = None
+        self._directory = ""
+
+    @staticmethod
+    def available() -> bool:
+        return shutil.which("dbus-daemon") is not None
+
+    def start(self) -> str:
+        if not self.available():
+            raise RuntimeError("dbus-daemon is not installed")
+        self._directory = tempfile.mkdtemp(prefix="zaldros-bus-")
+        config = os.path.join(self._directory, "bus.conf")
+        socket_path = os.path.join(self._directory, "socket")
+        with open(config, "w", encoding="utf-8") as handle:
+            handle.write(f"""<!DOCTYPE busconfig PUBLIC
+ "-//freedesktop//DTD D-Bus Bus Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+<busconfig>
+  <type>session</type>
+  <listen>unix:path={socket_path}</listen>
+  <auth>EXTERNAL</auth>
+  <policy context="default">
+    <allow send_destination="*" eavesdrop="true"/>
+    <allow eavesdrop="true"/>
+    <allow own="*"/>
+  </policy>
+</busconfig>
+""")
+        self._process = subprocess.Popen(
+            ["dbus-daemon", f"--config-file={config}", "--nofork", "--print-address"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        line = self._process.stdout.readline().strip() if self._process.stdout else ""
+        if not line:
+            self.stop()
+            raise RuntimeError("dbus-daemon did not print an address")
+        self.address = line
+        return self.address
+
+    def stop(self) -> None:
+        if self._process is not None:
+            self._process.terminate()
+            try:
+                self._process.wait(timeout=5)
+            except subprocess.TimeoutExpired:      # pragma: no cover - a wedged daemon
+                self._process.kill()
+            self._process = None
+        if self._directory:
+            shutil.rmtree(self._directory, ignore_errors=True)
+            self._directory = ""
+
+    def __enter__(self) -> "SessionDaemon":
+        self.start()
+        return self
+
+    def __exit__(self, *_exception: Any) -> None:
+        self.stop()
+
+
+class MockSystem:
+    """Every mock service on `address` — each on its own connection, as on a real machine.
+
+    One connection per service is not decoration. Signal match rules are filtered by sender, and a
+    signal carries the *unique* name of the connection that sent it; if every mock shared one
+    connection, every rule would appear to match every mock and a routing bug would be invisible.
+    That is exactly the bug this harness caught.
+    """
+
+    def __init__(self, address: str) -> None:
+        self.address = address
+        self.servers: dict[str, ObjectServer] = {}
+        self._connections: list[Connection] = []
+
+    def service(self, name: str) -> ObjectServer:
+        """The server that owns `name`, created on its own connection the first time."""
+        if name not in self.servers:
+            connection = Connection.connect(self.address)
+            self._connections.append(connection)
+            server = ObjectServer(connection)
+            server.request_name(name)
+            self.servers[name] = server
+        return self.servers[name]
+
+    @property
+    def server(self) -> ObjectServer:
+        """The first service registered. Convenience for a test that only stood up one."""
+        return next(iter(self.servers.values()))
+
+    def close(self) -> None:
+        for connection in self._connections:
+            connection.close()
+
+    def process(self, timeout: float = 0.0) -> int:
+        return sum(server.process(timeout) for server in list(self.servers.values()))
+
+    def pump(self, seconds: float = 0.2) -> int:
+        """Answer calls for a while. Tests run this in a thread while the client asks."""
+        deadline = time.monotonic() + seconds
+        handled = 0
+        while time.monotonic() < deadline:
+            handled += self.process(0.01)
+        return handled
+
+    # -- UPower ------------------------------------------------------------------------------
+    def add_upower(self, percentage: float = 87.0, state: int = 2, on_battery: bool = True,
+                   time_to_empty: int = 8100) -> None:
+        server = self.service("org.freedesktop.UPower")
+        manager = Interface("org.freedesktop.UPower", {
+            "DaemonVersion": Variant("s", "1.91.1"),
+            "OnBattery": Variant("b", on_battery),
+            "LidIsClosed": Variant("b", False),
+            "LidIsPresent": Variant("b", True)})
+        manager.add_method(
+            "EnumerateDevices", "", "ao",
+            lambda: ["/org/freedesktop/UPower/devices/battery_BAT0",
+                     "/org/freedesktop/UPower/devices/mouse_dev_00"])
+        manager.add_method("GetDisplayDevice", "", "o",
+                           lambda: "/org/freedesktop/UPower/devices/DisplayDevice")
+        server.add("/org/freedesktop/UPower", manager)
+
+        for path, kind, model in (("DisplayDevice", 2, ""), ("battery_BAT0", 2, "DELL X7YR1"),
+                                  ("mouse_dev_00", 5, "MX Master 3")):
+            server.add(f"/org/freedesktop/UPower/devices/{path}", Interface(
+                "org.freedesktop.UPower.Device", {
+                    "Type": Variant("u", kind),
+                    "IsPresent": Variant("b", True),
+                    "Percentage": Variant("d", percentage if kind == 2 else 55.0),
+                    "State": Variant("u", state),
+                    "TimeToEmpty": Variant("x", time_to_empty),
+                    "TimeToFull": Variant("x", 0),
+                    "EnergyRate": Variant("d", 9.4),
+                    "WarningLevel": Variant("u", 1),
+                    "IconName": Variant("s", "battery-good-symbolic"),
+                    "Model": Variant("s", model),
+                    "Vendor": Variant("s", "Zaldros Test"),
+                    "NativePath": Variant("s", path)}))
+
+    # -- logind ------------------------------------------------------------------------------
+    def add_logind(self, can_suspend: str = "yes", can_hibernate: str = "no") -> None:
+        server = self.service("org.freedesktop.login1")
+        manager = Interface("org.freedesktop.login1.Manager")
+        for method, answer in (("CanPowerOff", "yes"), ("CanReboot", "yes"),
+                               ("CanSuspend", can_suspend), ("CanHibernate", can_hibernate),
+                               ("CanHybridSleep", "challenge")):
+            manager.add_method(method, "", "s", lambda answer=answer: answer)
+        self.actions: list[str] = []
+        for method in ("PowerOff", "Reboot", "Suspend", "Hibernate"):
+            manager.add_method(method, "b", "",
+                               lambda _interactive, method=method: self.actions.append(method))
+        manager.add_method("LockSessions", "", "",
+                           lambda: self.actions.append("LockSessions"))
+        server.add("/org/freedesktop/login1", manager)
+        server.add("/org/freedesktop/login1/session/self", Interface(
+            "org.freedesktop.login1.Session", {
+                "Id": Variant("s", "2"), "Type": Variant("s", "wayland"),
+                "Active": Variant("b", True), "LockedHint": Variant("b", False),
+                "Remote": Variant("b", False), "Desktop": Variant("s", "Zaldros"),
+                "Seat": Variant("(so)", ("seat0", "/org/freedesktop/login1/seat/seat0"))}))
+
+    # -- NetworkManager ----------------------------------------------------------------------
+    def add_network_manager(self, connected: bool = True, strength: int = 74,
+                            wifi_enabled: bool = True) -> None:
+        server = self.service("org.freedesktop.NetworkManager")
+        device = "/org/freedesktop/NetworkManager/Devices/2"
+        active = "/org/freedesktop/NetworkManager/ActiveConnection/1"
+        manager = Interface("org.freedesktop.NetworkManager", {
+            "State": Variant("u", 70 if connected else 20),
+            "Connectivity": Variant("u", 4 if connected else 1),
+            "PrimaryConnection": Variant("o", active if connected else "/"),
+            "PrimaryConnectionType": Variant("s", "802-11-wireless" if connected else ""),
+            "WirelessEnabled": Variant("b", wifi_enabled),
+            "WirelessHardwareEnabled": Variant("b", True),
+            "NetworkingEnabled": Variant("b", True),
+            "Metered": Variant("u", 4),
+            "Version": Variant("s", "1.54.0")})
+        manager.add_method("GetDevices", "", "ao",
+                           lambda: [device, "/org/freedesktop/NetworkManager/Devices/1"])
+        manager.add_method("Enable", "b", "", lambda _enable: None)
+        server.add("/org/freedesktop/NetworkManager", manager)
+
+        server.add(active, Interface(
+            "org.freedesktop.NetworkManager.Connection.Active", {
+                "Id": Variant("s", "Zaldros-Guest"), "Type": Variant("s", "802-11-wireless"),
+                "State": Variant("u", 2), "Devices": Variant("ao", [device])}))
+        server.add(device, Interface("org.freedesktop.NetworkManager.Device", {
+            "Interface": Variant("s", "wlan0"), "DeviceType": Variant("u", 2),
+            "State": Variant("u", 100), "Driver": Variant("s", "iwlwifi"),
+            "HwAddress": Variant("s", "AA:BB:CC:DD:EE:FF"), "Managed": Variant("b", True)}))
+        server.add("/org/freedesktop/NetworkManager/Devices/1", Interface(
+            "org.freedesktop.NetworkManager.Device", {
+                "Interface": Variant("s", "enp3s0"), "DeviceType": Variant("u", 1),
+                "State": Variant("u", 30), "Driver": Variant("s", "e1000e"),
+                "HwAddress": Variant("s", "11:22:33:44:55:66"), "Managed": Variant("b", True)}))
+
+        wireless = Interface("org.freedesktop.NetworkManager.Device.Wireless", {
+            "ActiveAccessPoint": Variant("o", "/org/freedesktop/NetworkManager/AccessPoint/1"),
+            "LastScan": Variant("x", 1000)})
+        wireless.add_method("GetAllAccessPoints", "", "ao", lambda: [
+            "/org/freedesktop/NetworkManager/AccessPoint/1",
+            "/org/freedesktop/NetworkManager/AccessPoint/2",
+            "/org/freedesktop/NetworkManager/AccessPoint/3"])
+        wireless.add_method("RequestScan", "a{sv}", "", lambda _options: None)
+        server.add(device, wireless)
+
+        # Two of these share an SSID: a mesh publishes one AccessPoint per radio, and the panel
+        # must show one network.
+        for path, ssid, ap_strength, flags in (
+                ("1", b"Zaldros-Guest", strength, 1),
+                ("2", b"Zaldros-Guest", 41, 1),
+                ("3", b"\xd0\x9e\xd1\x84\xd0\xb8\xd1\x81", 63, 0)):
+            server.add(f"/org/freedesktop/NetworkManager/AccessPoint/{path}", Interface(
+                "org.freedesktop.NetworkManager.AccessPoint", {
+                    "Ssid": Variant("ay", ssid), "Strength": Variant("y", ap_strength),
+                    "Flags": Variant("u", flags), "WpaFlags": Variant("u", 0),
+                    "RsnFlags": Variant("u", 0x100 if flags else 0),
+                    "Frequency": Variant("u", 5180)}))
+
+    # -- BlueZ -------------------------------------------------------------------------------
+    def add_bluez(self, powered: bool = True) -> None:
+        server = self.service("org.bluez")
+        server.add("/org/bluez/hci0", Interface("org.bluez.Adapter1", {
+            "Address": Variant("s", "00:11:22:33:44:55"), "Name": Variant("s", "zaldros"),
+            "Alias": Variant("s", "Zaldros"), "Powered": Variant("b", powered),
+            "Discoverable": Variant("b", False), "Pairable": Variant("b", True),
+            "Discovering": Variant("b", False)}))
+        headset = Interface("org.bluez.Device1", {
+            "Address": Variant("s", "AA:00:11:22:33:44"), "Name": Variant("s", "WH-1000XM4"),
+            "Alias": Variant("s", "WH-1000XM4"), "Icon": Variant("s", "audio-headset"),
+            "Paired": Variant("b", True), "Connected": Variant("b", True),
+            "Trusted": Variant("b", True), "RSSI": Variant("n", -54),
+            "Adapter": Variant("o", "/org/bluez/hci0")})
+        headset.add_method("Connect", "", "", lambda: None)
+        headset.add_method("Disconnect", "", "", lambda: None)
+        server.add("/org/bluez/hci0/dev_AA_00_11_22_33_44", headset)
+        server.add("/org/bluez/hci0/dev_AA_00_11_22_33_44",
+                        Interface("org.bluez.Battery1", {"Percentage": Variant("y", 65)}))
+        server.add("/org/bluez/hci0/dev_BB_00_11_22_33_44", Interface(
+            "org.bluez.Device1", {
+                "Address": Variant("s", "BB:00:11:22:33:44"),
+                "Alias": Variant("s", "Клавиатура"), "Icon": Variant("s", "input-keyboard"),
+                "Paired": Variant("b", False), "Connected": Variant("b", False),
+                "Trusted": Variant("b", False), "Adapter": Variant("o", "/org/bluez/hci0")}))
+
+    # -- udisks2 -----------------------------------------------------------------------------
+    def add_udisks(self, mounted: bool = True) -> None:
+        server = self.service("org.freedesktop.UDisks2")
+        drive = "/org/freedesktop/UDisks2/drives/Samsung_SSD"
+        server.add(drive, Interface("org.freedesktop.UDisks2.Drive", {
+            "Vendor": Variant("s", "Samsung"), "Model": Variant("s", "SSD 970 EVO"),
+            "Size": Variant("t", 1000204886016), "Removable": Variant("b", False),
+            "Ejectable": Variant("b", False), "MediaAvailable": Variant("b", True),
+            "ConnectionBus": Variant("s", ""), "Serial": Variant("s", "S4EWNX0")}))
+        usb = "/org/freedesktop/UDisks2/drives/Kingston"
+        server.add(usb, Interface("org.freedesktop.UDisks2.Drive", {
+            "Vendor": Variant("s", "Kingston"), "Model": Variant("s", "DataTraveler"),
+            "Size": Variant("t", 32010928128), "Removable": Variant("b", True),
+            "Ejectable": Variant("b", True), "MediaAvailable": Variant("b", True),
+            "ConnectionBus": Variant("s", "usb"), "Serial": Variant("s", "0014")}))
+
+        for path, device, label, drive_path, system, points in (
+                ("sda1", b"/dev/sda1\0", "Windows", drive, True, [b"/\0"] if mounted else []),
+                ("sdb1", b"/dev/sdb1\0", "ZALDROS", usb, False, []),
+                ("loop0", b"/dev/loop0\0", "snap", drive, False, [b"/snap/core\0"])):
+            server.add(f"/org/freedesktop/UDisks2/block_devices/{path}", Interface(
+                "org.freedesktop.UDisks2.Block", {
+                    "Device": Variant("ay", device), "IdLabel": Variant("s", label),
+                    "IdUsage": Variant("s", "filesystem"), "IdType": Variant("s", "ext4"),
+                    "IdUUID": Variant("s", f"uuid-{path}"),
+                    "Size": Variant("t", 512110190592), "ReadOnly": Variant("b", False),
+                    "Drive": Variant("o", drive_path), "HintSystem": Variant("b", system),
+                    "HintIgnore": Variant("b", False)}))
+            filesystem = Interface("org.freedesktop.UDisks2.Filesystem", {
+                "MountPoints": Variant("aay", points), "Size": Variant("t", 512110190592)})
+            filesystem.add_method("Mount", "a{sv}", "s", lambda _options: "/media/zaldros/ZALDROS")
+            filesystem.add_method("Unmount", "a{sv}", "", lambda _options: None)
+            server.add(f"/org/freedesktop/UDisks2/block_devices/{path}", filesystem)
+
+    # -- systemd -----------------------------------------------------------------------------
+    def add_systemd(self) -> None:
+        server = self.service("org.freedesktop.systemd1")
+        manager = Interface("org.freedesktop.systemd1.Manager", {
+            "Version": Variant("s", "259.5"), "SystemState": Variant("s", "running")})
+        units = [
+            ("NetworkManager.service", "Network Manager", "loaded", "active", "running", "",
+             "/org/freedesktop/systemd1/unit/NetworkManager_2eservice", 0, "", "/"),
+            ("bluetooth.service", "Bluetooth service", "loaded", "active", "running", "",
+             "/org/freedesktop/systemd1/unit/bluetooth_2eservice", 0, "", "/"),
+            ("zaldros-broken.service", "A unit that failed", "loaded", "failed", "failed", "",
+             "/org/freedesktop/systemd1/unit/zaldros_2dbroken_2eservice", 0, "", "/"),
+            ("dev-sda1.mount", "Root mount", "loaded", "active", "mounted", "",
+             "/org/freedesktop/systemd1/unit/dev_2dsda1_2emount", 0, "", "/")]
+        manager.add_method("ListUnits", "", "a(ssssssouso)", lambda: units)
+        manager.add_method("Subscribe", "", "", lambda: None)
+        self.started: list[str] = []
+        for method in ("StartUnit", "StopUnit", "RestartUnit"):
+            manager.add_method(
+                method, "ss", "o",
+                lambda name, _mode, method=method: (
+                    self.started.append(f"{method}:{name}") or "/org/freedesktop/systemd1/job/1"))
+        manager.add_method("GetUnit", "s", "o",
+                           lambda name: f"/org/freedesktop/systemd1/unit/{name.replace('.', '_2e')}")
+        server.add("/org/freedesktop/systemd1", manager)
+        server.add("/org/freedesktop/systemd1/unit/NetworkManager_2eservice", Interface(
+            "org.freedesktop.systemd1.Unit", {
+                "Id": Variant("s", "NetworkManager.service"),
+                "Description": Variant("s", "Network Manager"),
+                "ActiveState": Variant("s", "active"), "SubState": Variant("s", "running"),
+                "LoadState": Variant("s", "loaded")}))
+
+    def add_all(self) -> None:
+        self.add_upower()
+        self.add_logind()
+        self.add_network_manager()
+        self.add_bluez()
+        self.add_udisks()
+        self.add_systemd()
+
+
+def backend_on(address: str):
+    """A `ZaldrosBackend` whose both buses point at `address`. Used by the facet tests."""
+    from .facade import ZaldrosBackend
+    system = Bus("system", connection=Connection.connect(address))
+    session = Bus("session", connection=Connection.connect(address))
+    return ZaldrosBackend(system_bus=system, session_bus=session)

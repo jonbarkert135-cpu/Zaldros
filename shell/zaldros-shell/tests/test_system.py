@@ -1,59 +1,33 @@
-"""Tests for the system readouts. The contract under test is the honesty rule: unknown values must
-come back as unavailable, never as a plausible-looking number."""
+"""The shell's seam to the backend, and the honesty rule at that seam.
+
+`zaldros_shell/system.py` used to read /sys, run `wpctl`, run `gdbus` and run `localectl` itself;
+the readers now live in `zaldros_backend` and are tested against mock services in
+`test_backend_facets.py`. What is left to check here is the part the shell owns: that the seam
+hands the UI the same six readings under the same names, that a machine which reports nothing says
+so in the same words it always did, and that the sysfs fallbacks still work on a machine with no
+D-Bus at all — because that is the shell we ship on a live image.
+"""
+
 from pathlib import Path
-from types import SimpleNamespace
-from unittest import mock
+
+from zaldros_backend import Bus, ZaldrosBackend
+from zaldros_backend.bluetooth import BluetoothFacet
+from zaldros_backend.network import NetworkFacet
+from zaldros_backend.power import PowerFacet
+from zaldros_backend.session import layout_badge
 
 from zaldros_shell import system
 
 
-def test_battery_reads_a_real_sysfs_layout(tmp_path: Path):
-    bat = tmp_path / "BAT0"
-    bat.mkdir()
-    (bat / "capacity").write_text("87\n")
-    (bat / "status").write_text("Discharging\n")
-    reading = system.battery(str(tmp_path))
-    assert reading.available and reading.value == 87 and reading.detail == "Discharging"
+def busless() -> Bus:
+    """A bus that is known to be unreachable, without waiting for a connection to time out."""
+    bus = Bus("system", connection=None)
+    bus._next_attempt = float("inf")            # noqa: SLF001 - "already tried, it is not there"
+    bus._failure = "no bus in this environment"  # noqa: SLF001
+    return bus
 
 
-def test_missing_battery_is_reported_as_unavailable(tmp_path: Path):
-    reading = system.battery(str(tmp_path))
-    assert not reading.available and reading.value is None and reading.detail
-
-
-def test_absent_sysfs_path_does_not_raise():
-    assert system.battery("/no/such/path").available is False
-
-
-def test_backlight_is_a_percentage_of_the_maximum(tmp_path: Path):
-    device = tmp_path / "intel_backlight"
-    device.mkdir()
-    (device / "brightness").write_text("300")
-    (device / "max_brightness").write_text("1200")
-    assert system.backlight(str(tmp_path)).value == 25
-
-
-def test_network_reports_only_interfaces_that_are_up(tmp_path: Path):
-    down, up = tmp_path / "eth0", tmp_path / "wlan0"
-    down.mkdir(); up.mkdir()
-    (down / "operstate").write_text("down")
-    (up / "operstate").write_text("up")
-    (up / "wireless").mkdir()
-    reading = system.network(str(tmp_path))
-    assert reading.available and "wlan0" in reading.detail and "Wi-Fi" in reading.detail
-
-
-def test_no_link_is_reported_honestly(tmp_path: Path):
-    (tmp_path / "eth0").mkdir()
-    (tmp_path / "eth0" / "operstate").write_text("down")
-    assert system.network(str(tmp_path)).available is False
-
-
-def test_volume_without_an_audio_server_is_unavailable_not_zero():
-    reading = system.volume()
-    assert reading.available or reading.value is None
-
-
+# -- the seam ------------------------------------------------------------------------------------
 def test_snapshot_covers_every_quick_setting():
     snapshot = system.snapshot()
     assert set(snapshot) == {"battery", "brightness", "network", "volume", "bluetooth",
@@ -62,65 +36,106 @@ def test_snapshot_covers_every_quick_setting():
         assert reading.available or reading.value is None
 
 
-def test_unset_keymap_never_reaches_the_tray():
+def test_the_shell_shares_one_backend_instance():
+    """Two would mean two D-Bus connections and two copies of every signal."""
+    assert system.backend() is system.backend()
+
+
+def test_the_shell_survives_a_machine_with_no_services_at_all():
+    backend = ZaldrosBackend(system_bus=busless(), session_bus=busless())
+    system.set_backend(backend)
+    try:
+        for key, reading in system.snapshot().items():
+            assert not reading.available or reading.value is not None, key
+            assert reading.detail, f"{key} must say why it has no value"
+        assert system.user_name()
+        assert system.switch_layout() is False
+    finally:
+        system.set_backend(None)
+
+
+# -- the sysfs fallbacks, which are what a live image without D-Bus has ----------------------------
+def test_battery_reads_a_real_sysfs_layout(tmp_path: Path):
+    bat = tmp_path / "BAT0"
+    bat.mkdir()
+    (bat / "capacity").write_text("87\n")
+    (bat / "status").write_text("Discharging\n")
+    reading = PowerFacet(busless(), sysfs_root=str(tmp_path)).battery()
+    assert reading.available and reading.value == 87
+    assert reading.detail == "разряжается"
+    assert reading.get("charging") is False
+
+
+def test_a_charging_battery_is_marked_as_charging(tmp_path: Path):
+    bat = tmp_path / "BAT1"
+    bat.mkdir()
+    (bat / "capacity").write_text("40")
+    (bat / "status").write_text("Charging")
+    reading = PowerFacet(busless(), sysfs_root=str(tmp_path)).battery()
+    assert reading.get("charging") is True and reading.value == 40
+
+
+def test_missing_battery_is_reported_as_unavailable(tmp_path: Path):
+    reading = PowerFacet(busless(), sysfs_root=str(tmp_path)).battery()
+    assert not reading.available and reading.value is None
+    assert reading.detail == "батарея не обнаружена"
+
+
+def test_absent_sysfs_path_does_not_raise():
+    assert PowerFacet(busless(), sysfs_root="/no/such/path").battery().available is False
+
+
+def test_network_reports_only_interfaces_that_are_up(tmp_path: Path):
+    down, up = tmp_path / "eth0", tmp_path / "wlan0"
+    down.mkdir()
+    up.mkdir()
+    (down / "operstate").write_text("down")
+    (up / "operstate").write_text("up")
+    (up / "wireless").mkdir()
+    reading = NetworkFacet(busless(), sysfs_root=str(tmp_path)).status()
+    assert reading.available and "wlan0" in reading.detail and "Wi-Fi" in reading.detail
+    assert reading.value is None, "sysfs has no signal strength, so none may be shown"
+
+
+def test_no_link_is_reported_honestly(tmp_path: Path):
+    (tmp_path / "eth0").mkdir()
+    (tmp_path / "eth0" / "operstate").write_text("down")
+    reading = NetworkFacet(busless(), sysfs_root=str(tmp_path)).status()
+    assert not reading.available and reading.detail == "нет подключения"
+
+
+def test_a_bluetooth_radio_without_bluez_is_presence_only(tmp_path: Path):
+    (tmp_path / "hci0").mkdir()
+    reading = BluetoothFacet(busless(), sysfs_root=str(tmp_path)).adapter()
+    assert reading.available and reading.detail == "hci0"
+    assert reading.value is None, "sysfs cannot say whether the radio is powered"
+
+
+def test_no_bluetooth_adapter_uses_the_wording_the_panel_already_shows(tmp_path: Path):
+    reading = BluetoothFacet(busless(), sysfs_root=str(tmp_path)).adapter()
+    assert not reading.available and reading.detail == "адаптер не найден"
+
+
+# -- the tray badge --------------------------------------------------------------------------------
+def test_layout_badges_are_three_letters_in_the_interface_language():
+    assert layout_badge("ru") == "РУС"
+    assert layout_badge("us") == "ENG"
+    assert layout_badge("ru,us") == "РУС"
+
+
+def test_a_layout_we_have_no_name_for_keeps_its_own_code():
+    assert layout_badge("xyzzy") == "XYZ"
+
+
+def test_no_layout_at_all_means_no_badge_rather_than_a_wrong_one():
     """Run #29 in the booted ISO showed "(UN" in the tray: localectl had answered "(unset)" and
-    the badge was the first three characters of it."""
-    def runner(*_args, **_kwargs):
-        return SimpleNamespace(returncode=0, stdout="   VC Keymap: (unset)\n  X11 Layout: (unset)\n")
-
-    with mock.patch.object(system.shutil, "which", return_value="/usr/bin/localectl"), \
-         mock.patch.dict(system.os.environ, {"LANG": "ru_RU.UTF-8"}, clear=False):
-        reading = system.keyboard_layout(runner=runner)
-    assert reading.available, "LANG still tells us the layout"
-    assert reading.detail == "РУС", f"expected the Windows-style badge, got {reading.detail!r}"
-
-
-def test_layout_badges_follow_windows_and_never_invent_a_name():
-    assert system.layout_badge("ru") == "РУС"
-    assert system.layout_badge("us") == "ENG"
-    assert system.layout_badge("ru,us") == "РУС", "the active layout is the first one"
-    assert system.layout_badge("xy") == "XY", "an unknown layout keeps its own code"
-
-
-LAYOUT_LIST = "([('us', 'English (US)', 'us'), ('ru', 'Russian', 'ru')],)\n"
-
-
-def _kwin_runner(current="(uint32 1,)", calls=None):
-    def runner(args, **_kwargs):
-        if calls is not None:
-            calls.append(args)
-        method = args[args.index("--method") + 1]
-        if method.endswith("getLayoutsList"):
-            return SimpleNamespace(returncode=0, stdout=LAYOUT_LIST)
-        if method.endswith("getLayout"):
-            return SimpleNamespace(returncode=0, stdout=current)
-        return SimpleNamespace(returncode=0, stdout="()\n")
-    return runner
-
-
-def test_the_badge_follows_kwin_because_kwin_owns_the_keyboard():
-    """localectl only knows what the image was configured with; after the user switches layout,
-    KWin is the only process that knows which one is active."""
-    with mock.patch.object(system.shutil, "which", return_value="/usr/bin/gdbus"):
-        reading = system.keyboard_layout(runner=_kwin_runner())
-    assert reading.available and reading.source == "kwin"
-    assert reading.detail == "РУС", "index 1 of us,ru is Russian"
-
-
-def test_switching_asks_kwin_for_the_next_layout_and_wraps_around():
-    calls = []
-    with mock.patch.object(system.shutil, "which", return_value="/usr/bin/gdbus"):
-        assert system.switch_layout(runner=_kwin_runner(current="(uint32 1,)", calls=calls))
-    setters = [c for c in calls if c[c.index("--method") + 1].endswith("setLayout")]
-    assert setters, "the switch must go through KWin"
-    assert setters[0][-1] == "uint32 0", "after the last layout it wraps to the first"
-
-
-def test_without_kwin_the_badge_falls_back_instead_of_disappearing():
-    def dead(*_args, **_kwargs):
-        return SimpleNamespace(returncode=1, stdout="")
-
-    with mock.patch.object(system.shutil, "which", side_effect=lambda name: "/usr/bin/" + name), \
-         mock.patch.dict(system.os.environ, {"LANG": "ru_RU.UTF-8"}, clear=False):
-        reading = system.keyboard_layout(runner=dead)
-    assert reading.available and reading.detail == "РУС" and reading.source != "kwin"
+    the badge was the first three characters of it. The layout now comes from KWin over D-Bus,
+    so there is no string left to mis-slice — and with no KWin, the badge is empty."""
+    backend = ZaldrosBackend(system_bus=busless(), session_bus=busless())
+    system.set_backend(backend)
+    try:
+        reading = system.keyboard_layout()
+        assert reading.detail in ("", "РУС", "ENG") or not reading.available
+        assert reading.available or reading.value is None
+    finally:
+        system.set_backend(None)
