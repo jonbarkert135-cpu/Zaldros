@@ -19,8 +19,8 @@ from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
-from .model import (AppModel, FileModel, HostInfo, InstalledAppModel, Prefs, RecentModel, SettingsTree, WeatherState,
-                    ShellState, SystemState)
+from .model import (AppModel, ClipboardModel, FileModel, HostInfo, InstalledAppModel, Prefs, RecentModel,
+                    SettingsTree, WeatherState, ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
 def _assets_dir() -> Path:
@@ -89,6 +89,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     weather_state = WeatherState(fetch=tick)
     settings_tree = SettingsTree()
     user_prefs = Prefs()
+    clipboard_model = ClipboardModel()
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
     context.setContextProperty("installedModel", installed)
@@ -100,6 +101,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("weatherState", weather_state)
     context.setContextProperty("settingsTree", settings_tree)
     context.setContextProperty("prefs", user_prefs)
+    context.setContextProperty("clipboardModel", clipboard_model)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
     context.setContextProperty(
@@ -109,7 +111,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
         errors = "\n".join(str(error.toString()) for error in view.errors())
         raise RuntimeError(f"QML failed to load:\n{errors}")
     return view, [model, installed, state, system_state, file_model, recent_model, host_info,
-                  weather_state, settings_tree, user_prefs]
+                  weather_state, settings_tree, user_prefs, clipboard_model]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
@@ -118,6 +120,7 @@ _KEEPALIVE: list = []  # QML context properties must outlive the call; Python mu
 def render(output: str, start_open: bool = False, width: int = 1600, height: int = 1000,
            locale: str = "ru", quick_open: bool = False, context_open: bool = False,
            light: bool = False, search_open: bool = False, notifications_open: bool = False,
+           clipboard_open: bool = False,
            focused_window: str = "explorer", settings_page: int = 1,
            geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
@@ -139,6 +142,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     root.setProperty("quickOpen", quick_open)
     root.setProperty("searchOpen", search_open)
     root.setProperty("notificationsOpen", notifications_open)
+    root.setProperty("clipboardOpen", clipboard_open)
     root.setProperty("contextOpen", context_open)
     root.setProperty("focusedWindow", focused_window)
     root.setProperty("settingsPage", settings_page)
@@ -170,7 +174,7 @@ NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskV
                "widgetsButton", "weatherIcon", "weatherTemperature", "weatherCondition",
                "trayGroup", "trayQuickButton", "clock", "notificationButton",
                "startPanel", "startSearch", "startPinnedGrid", "startFooter",
-               "searchFlyout", "notificationCentre", "quickPanel", "contextMenu",
+               "searchFlyout", "notificationCentre", "quickPanel", "clipboardFlyout", "contextMenu",
                "explorerWindow", "explorerTabStrip", "explorerNavBar", "explorerCommandBar",
                "explorerSidebar", "explorerFileList", "settingsWindow", "settingsRail",
                "settingsBody", "titleBar", "captionButtons")

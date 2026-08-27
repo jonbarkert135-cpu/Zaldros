@@ -26,6 +26,9 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files
 - [ ] Right-click context menus (Windows 11 rounded style)
+- [x] Win+V — clipboard history flyout backed by the real QClipboard (pins persist, unpinned never
+      touches the disk)
+- [ ] Win+G — game bar with a working screenshot and recording (portal screencast + ffmpeg)
 - [ ] Notifications + quick settings backed by real NetworkManager / PipeWire / UPower
 
 ## After the desktop stands up

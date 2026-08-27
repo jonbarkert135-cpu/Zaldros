@@ -23,8 +23,13 @@
     },
     "public_library": {
       "file": "assets/refs/win11/library.json",
-      "note": "Public Microsoft screenshots (Microsoft Learn, Microsoft support, Windows blogs). Not committed \u2014 copyright Microsoft; tools/visual/fetch_references.py re-downloads them by URL and verifies the recorded sha256.",
+      "note": "Public Microsoft screenshots (Microsoft Learn, Microsoft support, Windows blogs). Not committed — copyright Microsoft; tools/visual/fetch_references.py re-downloads them by URL and verifies the recorded sha256.",
       "measured_by": "tools/visual/measure_library.py"
+    },
+    "clipboard": {
+      "file": "private capture supplied by the maintainer on 2026-08-26 (Win+V panel)",
+      "display_scale": 1.25,
+      "note": "the clipboard flyout was measured from the maintainer's own screenshot: panel 448 px wide, cards 96 px tall with an 18 px gutter, 26 px from the panel edge to a card. Divided by 1.25 those are 360 / 76 / 8 / 20. The file is deliberately NOT committed; only these numbers are."
     }
   },
   "taskbar": {
@@ -124,5 +129,14 @@
     "min_width": 300,
     "label_shortcut_gap": 24,
     "note": "Windows 11 sizes a context menu to its widest row; 300 is the measured floor, not a fixed width. Confirmed on the public 100 %-scale capture quick-access-update2.png, whose file menu is narrower than the desktop menu."
+  },
+  "clipboard": {
+    "width": 360,
+    "padding": 16,
+    "card_height": 76,
+    "card_gap": 8,
+    "gap_from_edge": 12,
+    "max_entries": 25,
+    "tolerance": 2
   }
 }

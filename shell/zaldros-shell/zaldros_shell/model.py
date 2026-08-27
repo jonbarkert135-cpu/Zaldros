@@ -3,15 +3,18 @@ testable without Qt."""
 
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
 
 from PySide6.QtCore import (
-    Property, QAbstractListModel, QModelIndex, QObject, Qt, QTimer, Signal, Slot,
+    Property, QAbstractListModel, QModelIndex, QObject, Qt, QTimer, QUrl, Signal, Slot,
 )
+from PySide6.QtGui import QGuiApplication, QImage
 
 from .backend import AppEntry, format_clock, load_pinned, memory_percent, read_running_commands
 from .desktop_entries import DesktopApp, discover, launch
+from . import clipboard as clipboard_history
 from . import files, hostinfo, prefs, settingspages, system, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
@@ -594,3 +597,115 @@ class Prefs(QObject):
     @Property("QVariantMap", notify=changed)
     def values(self) -> dict:
         return dict(self._values)
+
+
+CLIP_KIND, CLIP_PREVIEW, CLIP_PINNED, CLIP_PATH, CLIP_WHEN = (Qt.UserRole + 40 + n for n in range(5))
+
+
+class ClipboardModel(QAbstractListModel):
+    """Win+V: the real clipboard, not a mock-up.
+
+    The model listens to QClipboard::dataChanged, so what the flyout lists is exactly what was
+    copied in this session — text as text, an image as a PNG written into the session cache with
+    the path kept here. Activating a row puts the entry *back* on the clipboard, which is the only
+    thing the Windows flyout does when a card is clicked (it then pastes into the focused window;
+    pasting for the user is not ours to do without a focused text field).
+    """
+
+    changed = Signal()
+
+    def __init__(self, home=None, cache: Path | None = None, clipboard=None) -> None:
+        super().__init__()
+        self._history = clipboard_history.History(home=home)
+        self._cache = Path(cache) if cache else Path(
+            os.environ.get("XDG_CACHE_HOME") or (Path.home() / ".cache")) / "zaldros" / "clipboard"
+        self._clip = clipboard
+        if self._clip is None:
+            app = QGuiApplication.instance()
+            self._clip = app.clipboard() if app is not None else None
+        if self._clip is not None:
+            self._clip.dataChanged.connect(self.capture)
+            self.capture()
+
+    # --- Qt model ---------------------------------------------------------------------------
+    def roleNames(self) -> dict:  # noqa: N802
+        return {CLIP_KIND: b"kind", CLIP_PREVIEW: b"preview", CLIP_PINNED: b"pinned",
+                CLIP_PATH: b"path", CLIP_WHEN: b"when"}
+
+    def rowCount(self, parent=QModelIndex()) -> int:  # noqa: N802
+        return 0 if parent.isValid() else len(self._history)
+
+    def data(self, index, role=Qt.DisplayRole):
+        if not index.isValid() or not 0 <= index.row() < len(self._history):
+            return None
+        entry = self._history[index.row()]
+        return {CLIP_KIND: entry.kind, CLIP_PREVIEW: entry.preview(), CLIP_PINNED: entry.pinned,
+                CLIP_PATH: QUrl.fromLocalFile(entry.path).toString() if entry.path else "",
+                CLIP_WHEN: time.strftime("%H:%M", time.localtime(entry.when))}.get(role)
+
+    # --- clipboard --------------------------------------------------------------------------
+    @Slot()
+    def capture(self) -> bool:
+        """Take whatever is on the clipboard now. Returns True when the history changed."""
+        if self._clip is None:
+            return False
+        added = False
+        text = self._clip.text()
+        if text:
+            added = self._history.add_text(text)
+        else:
+            image = self._clip.image()
+            if image is not None and not image.isNull():
+                self._cache.mkdir(parents=True, exist_ok=True)
+                target = self._cache / f"clip-{int(time.time() * 1000)}.png"
+                if image.save(str(target), "PNG"):
+                    added = self._history.add_image(str(target))
+        if added:
+            self._refresh()
+        return added
+
+    def _refresh(self) -> None:
+        self.beginResetModel()
+        self.endResetModel()
+        self.changed.emit()
+
+    @Slot(int, result=bool)
+    def applyRow(self, row: int) -> bool:  # noqa: N802
+        """Put the entry back on the clipboard, ready to be pasted."""
+        if self._clip is None or not 0 <= row < len(self._history):
+            return False
+        entry = self._history[row]
+        if entry.kind == "text":
+            self._clip.setText(entry.text)
+        else:
+            image = QImage(entry.path)
+            if image.isNull():
+                return False
+            self._clip.setImage(image)
+        return True
+
+    @Slot(int, result=bool)
+    def pinRow(self, row: int) -> bool:  # noqa: N802
+        if self._history.toggle_pin(row):
+            self._refresh()
+            return True
+        return False
+
+    @Slot(int, result=bool)
+    def deleteRow(self, row: int) -> bool:  # noqa: N802
+        if self._history.remove(row):
+            self._refresh()
+            return True
+        return False
+
+    @Slot(result=int)
+    def clearAll(self) -> int:  # noqa: N802
+        """"Очистить все": everything except the pinned entries, as in Windows 11."""
+        removed = self._history.clear()
+        if removed:
+            self._refresh()
+        return removed
+
+    @Property(bool, notify=changed)
+    def empty(self) -> bool:
+        return len(self._history) == 0

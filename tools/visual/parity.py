@@ -38,6 +38,7 @@ STATES = {
     "search": {"search_open": True},
     "quick": {"quick_open": True},
     "notifications": {"notifications_open": True},
+    "clipboard": {"clipboard_open": True},
     "menu": {"context_open": True},
     "settings": {"focused_window": "settings"},
 }
@@ -49,6 +50,7 @@ CROPS = {
     "searchFlyout": ("search", 12),
     "quickPanel": ("quick", 12),
     "notificationCentre": ("notifications", 12),
+    "clipboardFlyout": ("clipboard", 12),
     "contextMenu": ("menu", 12),
     "explorerWindow": ("desktop", 12),
     "settingsWindow": ("settings", 12),
@@ -179,6 +181,12 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     add("notifications", "width", notifications["width"], centre["width"], notifications["tolerance"])
     add("notifications", "gap from edge", notifications["gap_from_edge"],
         WIDTH - (centre["left"] + centre["width"]), notifications["tolerance"])
+
+    clipboard = reference["clipboard"]
+    clip_panel = geometry["clipboard"]["clipboardFlyout"]
+    add("clipboard", "width", clipboard["width"], clip_panel["width"], clipboard["tolerance"])
+    add("clipboard", "gap from edge", clipboard["gap_from_edge"], clip_panel["left"],
+        clipboard["tolerance"])
 
     menu = reference["context_menu"]
     menu_box = geometry["menu"]["contextMenu"]

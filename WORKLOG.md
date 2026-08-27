@@ -894,3 +894,32 @@ Three changes, in the order that matters:
   `,none,` (run #35) and would look exactly like a probe that failed to fire.
 
 Tests: 188. Parity: 34/34.
+
+### Win+V: the clipboard, not a picture of one
+
+The maintainer's capture of the Windows 11 clipboard flyout set the target; the flyout is now real.
+`zaldros_shell/clipboard.py` holds the history with Windows' own rules, checked by
+`tests/test_clipboard.py`: 25 entries, a re-copy moves an entry to the top instead of duplicating
+it, a pinned entry is never pushed out, and «Очистить все» removes everything *except* the pinned
+cards. `model.ClipboardModel` listens to `QClipboard::dataChanged`, so every card is something
+that was really copied in this session — text as text, a bitmap written into
+`$XDG_CACHE_HOME/zaldros/clipboard` with only the path kept in the list. Clicking a card puts the
+entry back on the clipboard (Windows then pastes it into the focused field; pasting into a window
+we do not own is not ours to fake).
+
+One rule is ours rather than Windows': **only pinned entries are written to disk.** An unpinned
+history that outlives the session is a privacy leak; the pins live in
+`$XDG_CONFIG_HOME/zaldros/clipboard-pinned.json` and are the only part that survives a reboot.
+
+Geometry from the same capture at 125 %: panel 448 px = **360 logical** (the width every Windows 11
+flyout has), cards 96 px = 76 with an 8 px gutter. Recorded in `win11-reference.json → clipboard`
+with its provenance, and `tools/visual/parity.py` now renders a `clipboard` state and checks the
+panel: **36/36**.
+
+Not drawn, deliberately: the emoji / GIF / kaomoji / symbol tabs that share that Windows window.
+A tab that opens nothing is exactly the decoration this project refuses to ship; they come with
+their own data or not at all. And Win+V currently works while the desktop has focus — a
+session-wide binding needs the global-shortcut path Alt+Tab is still proving out, and it gets
+wired the moment that path has a passing boot verdict rather than on the assumption it will.
+
+Tests: 201. Parity: 36/36.

@@ -63,6 +63,12 @@ QtObject {
     // --- flyouts ----------------------------------------------------------------------------
     readonly property int quickWidth:        360
     readonly property int notificationWidth: 360
+    // Win+V (win11-reference.json → clipboard), measured from the maintainer's 125 % capture
+    readonly property int clipboardWidth:    360
+    readonly property int clipboardPadding:   16
+    readonly property int clipboardCardHeight: 76
+    readonly property int clipboardCardGap:    8
+    readonly property int clipboardMaxHeight: 420
     readonly property int flyoutGap:          12
     readonly property int menuItemHeight:     32
     readonly property int menuPadding:         4

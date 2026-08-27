@@ -25,6 +25,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--search", action="store_true", help="render with the search flyout open")
     r.add_argument("--notifications", action="store_true",
                    help="render with the notification centre open")
+    r.add_argument("--clipboard", action="store_true",
+                   help="render with the Win+V clipboard flyout open")
     r.add_argument("--window", default="explorer", choices=["explorer", "settings"],
                    help="which application window has focus")
     r.add_argument("--geometry", help="also write the component geometry to this JSON file")
@@ -37,7 +39,8 @@ def main(argv: list[str] | None = None) -> int:
     path = render(args.out, start_open=args.start, width=args.width, height=args.height,
                   locale=args.locale, quick_open=args.quick, context_open=args.context,
                   light=args.light, search_open=args.search,
-                  notifications_open=args.notifications, focused_window=args.window,
+                  notifications_open=args.notifications, clipboard_open=args.clipboard,
+                  focused_window=args.window,
                   geometry_output=args.geometry)
     print(f"rendered {path}")
     return 0

@@ -21,6 +21,7 @@ Item {
     property bool quickOpen: false
     property bool searchOpen: false
     property bool notificationsOpen: false
+    property bool clipboardOpen: false
     property bool contextOpen: false
     property bool lightMode: false
 
@@ -76,6 +77,7 @@ Item {
         shell.quickOpen = false;
         shell.searchOpen = false;
         shell.notificationsOpen = false;
+        shell.clipboardOpen = false;
         shell.contextOpen = false;
     }
 
@@ -87,6 +89,7 @@ Item {
     property var backendFiles: fileModel
     property var backendRecent: recentModel
     property var backendHost: hostInfo
+    property var backendClipboard: clipboardModel
 
     onLightModeChanged: Theme.dark = !lightMode
 
@@ -107,6 +110,18 @@ Item {
 
     // Tab is consumed by Qt's focus chain before Keys.onPressed sees it, so the switcher has to be
     // a real shortcut rather than a key handler.
+    // Win+V. Qt delivers this while the desktop has focus; a session-wide Meta+V needs the same
+    // global-shortcut path as Alt+Tab and is wired once that path has a passing boot verdict.
+    Shortcut {
+        sequences: ["Meta+V"]
+        context: Qt.ApplicationShortcut
+        onActivated: {
+            var open = !shell.clipboardOpen;
+            shell.closeAllFlyouts();
+            shell.clipboardOpen = open;
+        }
+    }
+
     Shortcut {
         sequences: ["Alt+Tab"]
         context: Qt.ApplicationShortcut
@@ -299,6 +314,17 @@ Item {
         z: 30
         shown: shell.notificationsOpen
         x: shell.width - width - Theme.flyoutGap
+        baseY: shell.height - Theme.taskbarHeight - height - Theme.flyoutGap
+        y: baseY
+    }
+
+    // --- clipboard history (Win+V) --------------------------------------------------------------
+    ClipboardFlyout {
+        id: clipboardFlyout
+        z: 30
+        shown: shell.clipboardOpen
+        clipboard: shell.backendClipboard
+        x: Theme.flyoutGap
         baseY: shell.height - Theme.taskbarHeight - height - Theme.flyoutGap
         y: baseY
     }
