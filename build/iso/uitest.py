@@ -7,7 +7,7 @@ Plasma and under a bare kwin_wayland session — the same test therefore runs on
 Steps that genuinely cannot be measured in this environment report {"status": "BLOCKED", "why": ...}
 instead of a number. Nothing is estimated.
 """
-import json, os, re, subprocess, time
+import json, os, re, shutil, subprocess, time
 from pathlib import Path
 
 MARK = "ZALDROS-UITEST "
@@ -182,6 +182,10 @@ def main():
         {"ready": opened, "caption": results["app_launch_explorer"].get("caption"),
          "windows": [w.get("caption") for w in windows()]}, ensure_ascii=False), flush=True)
 
+    # Win+G's screenshot path, measured rather than assumed: the same grabber the shell picks
+    # (capture.SCREENSHOT_TOOLS) is run here, and the step passes only if a file appears.
+    step("screenshot", lambda: _screenshot(), results)
+
     step("window_move", lambda: _move(), results)
     step("minimize", lambda: _set_minimized(True), results)
     step("restore", lambda: _set_minimized(False), results)
@@ -216,6 +220,21 @@ def _kwin_eval(js):
     script.write_text(js)
     kwin_call("loadScript", f"string:{script}")
     return kwin_call("start")
+
+
+def _screenshot():
+    """Grab the screen with whatever this image really ships. BLOCKED beats a guess."""
+    target = Path("/tmp/zaldros-shot.png")
+    if target.exists():
+        target.unlink()
+    for command in (["spectacle", "-b", "-n", "-f", "-o", str(target)], ["grim", str(target)]):
+        if not shutil.which(command[0]):
+            continue
+        sh(*command, timeout=30)
+        if target.is_file() and target.stat().st_size > 0:
+            return {"tool": command[0], "bytes": target.stat().st_size}
+        return {"tool": command[0], "error": "the tool ran but wrote no file"}
+    return False
 
 
 def _move():

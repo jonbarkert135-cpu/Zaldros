@@ -22,6 +22,7 @@ Item {
     property bool searchOpen: false
     property bool notificationsOpen: false
     property bool clipboardOpen: false
+    property bool gameBarOpen: false
     property bool contextOpen: false
     property bool lightMode: false
 
@@ -78,6 +79,7 @@ Item {
         shell.searchOpen = false;
         shell.notificationsOpen = false;
         shell.clipboardOpen = false;
+        shell.gameBarOpen = false;
         shell.contextOpen = false;
     }
 
@@ -90,6 +92,7 @@ Item {
     property var backendRecent: recentModel
     property var backendHost: hostInfo
     property var backendClipboard: clipboardModel
+    property var backendCapture: gameBarModel
 
     onLightModeChanged: Theme.dark = !lightMode
 
@@ -119,6 +122,18 @@ Item {
             var open = !shell.clipboardOpen;
             shell.closeAllFlyouts();
             shell.clipboardOpen = open;
+        }
+    }
+
+    // Win+G — the capture widget. Same story as Win+V: application-wide today, session-wide once
+    // the global-shortcut path has a passing boot verdict.
+    Shortcut {
+        sequences: ["Meta+G"]
+        context: Qt.ApplicationShortcut
+        onActivated: {
+            var open = !shell.gameBarOpen;
+            shell.closeAllFlyouts();
+            shell.gameBarOpen = open;
         }
     }
 
@@ -327,6 +342,16 @@ Item {
         x: Theme.flyoutGap
         baseY: shell.height - Theme.taskbarHeight - height - Theme.flyoutGap
         y: baseY
+    }
+
+    // --- game bar (Win+G) -------------------------------------------------------------------------
+    GameBarFlyout {
+        id: gameBarFlyout
+        z: 30
+        shown: shell.gameBarOpen
+        capture: shell.backendCapture
+        x: Theme.flyoutGap
+        y: Theme.flyoutGap
     }
 
     // --- context menus ----------------------------------------------------------------------------------

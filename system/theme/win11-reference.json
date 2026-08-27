@@ -30,6 +30,11 @@
       "file": "private capture supplied by the maintainer on 2026-08-26 (Win+V panel)",
       "display_scale": 1.25,
       "note": "the clipboard flyout was measured from the maintainer's own screenshot: panel 448 px wide, cards 96 px tall with an 18 px gutter, 26 px from the panel edge to a card. Divided by 1.25 those are 360 / 76 / 8 / 20. The file is deliberately NOT committed; only these numbers are."
+    },
+    "game_bar": {
+      "file": "private capture supplied by the maintainer on 2026-08-26 (Win+G «Записать» widget)",
+      "display_scale": 1.25,
+      "note": "measured off the maintainer's own screenshot: the widget is 383 px wide and 274 px tall, its four tiles are 70 px squares on a 90 px pitch, the first tile starts 21 px from the panel edge, the tile row starts 66 px below the panel top and the footer row is 82 px tall. Divided by 1.25: 306 x 219, tile 56, pitch 72, padding 17, header 53, footer 66. The file is deliberately NOT committed; only these numbers are."
     }
   },
   "taskbar": {
@@ -138,5 +143,18 @@
     "gap_from_edge": 12,
     "max_entries": 25,
     "tolerance": 2
+  },
+  "game_bar": {
+    "width": 306,
+    "height": 219,
+    "padding": 17,
+    "tile": 56,
+    "tile_gap": 16,
+    "header": 53,
+    "footer": 66,
+    "gap_from_edge": 12,
+    "tiles": 4,
+    "tolerance": 2,
+    "gap_from_edge_note": "ours, not Windows': the game bar widget is draggable, so its position in the capture says nothing. The panel sits Theme.flyoutGap (12) from the top-left corner like every other Zaldros flyout."
   }
 }

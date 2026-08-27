@@ -39,6 +39,7 @@ STATES = {
     "quick": {"quick_open": True},
     "notifications": {"notifications_open": True},
     "clipboard": {"clipboard_open": True},
+    "gamebar": {"game_bar_open": True},
     "menu": {"context_open": True},
     "settings": {"focused_window": "settings"},
 }
@@ -51,6 +52,7 @@ CROPS = {
     "quickPanel": ("quick", 12),
     "notificationCentre": ("notifications", 12),
     "clipboardFlyout": ("clipboard", 12),
+    "gameBarFlyout": ("gamebar", 12),
     "contextMenu": ("menu", 12),
     "explorerWindow": ("desktop", 12),
     "settingsWindow": ("settings", 12),
@@ -187,6 +189,11 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     add("clipboard", "width", clipboard["width"], clip_panel["width"], clipboard["tolerance"])
     add("clipboard", "gap from edge", clipboard["gap_from_edge"], clip_panel["left"],
         clipboard["tolerance"])
+
+    game_bar = reference["game_bar"]
+    bar = geometry["gamebar"]["gameBarFlyout"]
+    add("game bar", "width", game_bar["width"], bar["width"], game_bar["tolerance"])
+    add("game bar", "gap from edge", game_bar["gap_from_edge"], bar["left"], game_bar["tolerance"])
 
     menu = reference["context_menu"]
     menu_box = geometry["menu"]["contextMenu"]

@@ -308,6 +308,24 @@
       "passed": true
     },
     {
+      "component": "game bar",
+      "metric": "width",
+      "expected": 306.0,
+      "actual": 306.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "game bar",
+      "metric": "gap from edge",
+      "expected": 12.0,
+      "actual": 12.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
       "component": "context menu",
       "metric": "min width",
       "expected": 300.0,
@@ -327,7 +345,7 @@
     }
   ],
   "failed": 0,
-  "total": 36,
+  "total": 38,
   "components": [
     "taskbar.png",
     "startPanel.png",
@@ -335,6 +353,7 @@
     "quickPanel.png",
     "notificationCentre.png",
     "clipboardFlyout.png",
+    "gameBarFlyout.png",
     "contextMenu.png",
     "explorerWindow.png",
     "settingsWindow.png"

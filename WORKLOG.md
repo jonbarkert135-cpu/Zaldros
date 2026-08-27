@@ -958,3 +958,38 @@ The fix is in the test, not the product:
 
 Six new tests in `tests/test_ui_drive_keys.py` hold the sequencing in place. Tests: 207.
 Parity: 36/36.
+
+### Win+G: a capture panel that only offers what the machine can do
+
+The maintainer's capture of the Windows «Записать» widget set the target: a 383 × 274 px panel at
+125 % with four 70 px tiles on a 90 px pitch and a «Просмотреть мои записи» row under a divider.
+Divided by 1.25 that is 306 × 219, tiles 56 on a 72 pitch, padding 17 — recorded in
+`win11-reference.json → game_bar` with its provenance and checked by parity: **38/38**.
+
+What is behind the tiles matters more than their size. `zaldros_shell/capture.py` resolves every
+capability to an executable that actually exists in `PATH` (spectacle → portal → grim for stills,
+ffmpeg → wf-recorder for video) and builds the exact command; `zaldros_shell/portal.py` performs
+the four-call `org.freedesktop.portal.ScreenCast` handshake, because on Wayland no application may
+read the framebuffer without the compositor's consent — the PipeWire node it returns is what
+ffmpeg's `pipewiregrab` reads. `model.GameBarModel` reports a screenshot as taken **only when the
+file is on disk**, and a recording command is never built without a node, which would have
+produced a black rectangle called a video.
+
+Where a capability is missing, the tile is disabled and the panel prints the reason
+(«Запись недоступна: нужен ffmpeg, wf-recorder и портал захвата экрана…»). The «last 30 seconds»
+tile is permanently one of those: it needs a ring buffer the compositor does not offer us, and
+saying so is more honest than a button that does nothing. The ISO now installs `kde-spectacle`,
+`xdg-desktop-portal(-kde)` and (in `full`) `ffmpeg`, plus `python3-pyside6.qtdbus` — caught by
+`test_iso_packages.py`, which noticed the new import before CI did.
+
+Captures go where Linux keeps them, read from `user-dirs.dirs`: `<Изображения>/Zaldros/Снимки
+экрана` and `<Видео>/Zaldros/Записи`.
+
+Boot evidence, not assumption: `uitest.py` gained a `screenshot` step that runs the same grabber in
+the booted ISO and passes only if a non-empty file appears; `report.py` shows it in the matrix.
+
+Five more Fluent icons (MIT) vendored: camera, record, microphone, microphone-off, history. The
+licence tables were also corrected — they still claimed 26 vendored glyphs when the directory has
+90.
+
+Tests: 230. Parity: 38/38.

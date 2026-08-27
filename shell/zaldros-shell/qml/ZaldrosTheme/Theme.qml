@@ -69,6 +69,15 @@ QtObject {
     readonly property int clipboardCardHeight: 76
     readonly property int clipboardCardGap:    8
     readonly property int clipboardMaxHeight: 420
+
+    // Win+G (win11-reference.json → game_bar), measured from the maintainer's 125 % capture:
+    // panel 383 px, tiles 70 px on a 90 px pitch, 21 px padding, header 66 px, footer 82 px.
+    readonly property int gameBarWidth:      306
+    readonly property int gameBarPadding:     17
+    readonly property int gameBarTile:        56
+    readonly property int gameBarTileGap:     16
+    readonly property int gameBarHeader:      53
+    readonly property int gameBarFooter:      66
     readonly property int flyoutGap:          12
     readonly property int menuItemHeight:     32
     readonly property int menuPadding:         4

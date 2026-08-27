@@ -29,7 +29,9 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Right-click context menus (Windows 11 rounded style)
 - [x] Win+V — clipboard history flyout backed by the real QClipboard (pins persist, unpinned never
       touches the disk)
-- [ ] Win+G — game bar with a working screenshot and recording (portal screencast + ffmpeg)
+- [x] Win+G — capture widget: screenshot through the first grabber that really exists, recording
+      through the portal's ScreenCast node + ffmpeg, every missing tool named on screen
+- [ ] Win+G — the «last 30 seconds» ring buffer (needs a continuous encode we do not run yet)
 - [ ] Notifications + quick settings backed by real NetworkManager / PipeWire / UPower
 
 ## After the desktop stands up

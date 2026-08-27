@@ -4,6 +4,7 @@ testable without Qt."""
 from __future__ import annotations
 
 import os
+import subprocess
 import time
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from PySide6.QtGui import QGuiApplication, QImage
 from .backend import AppEntry, format_clock, load_pinned, memory_percent, read_running_commands
 from .desktop_entries import DesktopApp, discover, launch
 from . import clipboard as clipboard_history
+from . import capture, portal
 from . import files, hostinfo, prefs, settingspages, system, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
@@ -709,3 +711,206 @@ class ClipboardModel(QAbstractListModel):
     @Property(bool, notify=changed)
     def empty(self) -> bool:
         return len(self._history) == 0
+
+
+class GameBarModel(QObject):
+    """Win+G: a capture panel that only offers what this machine can really do.
+
+    Windows' game bar shows the same four tiles everywhere and lets you press ones that silently
+    fail. Here each capability is resolved to an executable that exists (`capture.pick`), and when
+    none does, `status` carries the sentence explaining what is missing — the tile is disabled and
+    says why, which is the whole difference between a desktop and a screenshot of one.
+
+    Screenshots are taken by the first available grabber and are only reported as taken when the
+    file is on disk. Recording needs the compositor's permission: the PipeWire node comes from
+    xdg-desktop-portal's ScreenCast (portal.py) and is fed to ffmpeg.
+    """
+
+    changed = Signal()
+
+    def __init__(self, home=None, runner=None, clock=time.time) -> None:
+        super().__init__()
+        self._home = home
+        self._run = runner or subprocess.Popen
+        self._clock = clock
+        self._recording_process = None
+        self._started_at = 0.0
+        self._elapsed = 0.0
+        self._mic = False                       # Windows starts with the microphone muted
+        self._status = ""
+        self._last_file = ""
+        self._shot_tool = capture.pick(capture.SCREENSHOT_TOOLS)
+        self._record_tool = capture.pick(capture.RECORDING_TOOLS)
+        self._timer = QTimer(self)
+        self._timer.setInterval(1000)
+        self._timer.timeout.connect(self._tick)
+
+    # --- what the panel may offer -------------------------------------------------------
+    @Property(bool, notify=changed)
+    def canScreenshot(self) -> bool:  # noqa: N802
+        return self._shot_tool is not None
+
+    @Property(bool, notify=changed)
+    def canRecord(self) -> bool:  # noqa: N802
+        return self._record_tool is not None
+
+    @Property(bool, notify=changed)
+    def recording(self) -> bool:
+        return self._recording_process is not None
+
+    @Property(bool, notify=changed)
+    def micEnabled(self) -> bool:  # noqa: N802
+        return self._mic
+
+    @Property(str, notify=changed)
+    def elapsedText(self) -> str:  # noqa: N802
+        return capture.elapsed_text(self._elapsed)
+
+    @Property(str, notify=changed)
+    def status(self) -> str:
+        """One line under the tiles: the last result, or why something is unavailable."""
+        if self._status:
+            return self._status
+        if not self.canScreenshot:
+            return capture.missing_reason("screenshot")
+        if not self.canRecord:
+            return capture.missing_reason("recording")
+        return ""
+
+    @Property(str, notify=changed)
+    def lastFile(self) -> str:  # noqa: N802
+        return self._last_file
+
+    # --- actions ------------------------------------------------------------------------
+    @Slot(result=bool)
+    def takeScreenshot(self) -> bool:  # noqa: N802
+        """Grab the screen. True only when the file really exists afterwards."""
+        if self._shot_tool is None:
+            self._status = capture.missing_reason("screenshot")
+            self.changed.emit()
+            return False
+        folder = capture.screenshots_dir(self._home)
+        folder.mkdir(parents=True, exist_ok=True)
+        target = folder / capture.screenshot_name(self._clock())
+        command = capture.screenshot_command(target, self._shot_tool)
+        try:
+            process = self._run(command)
+            wait = getattr(process, "wait", None)
+            if wait is not None:
+                wait(timeout=20)
+        except Exception as exc:                       # noqa: BLE001 - shown, never swallowed
+            self._status = f"Снимок не сделан: {exc}"
+            self.changed.emit()
+            return False
+        if not target.exists():
+            self._status = f"Снимок не сделан: {self._shot_tool.binary} не создал файл"
+            self.changed.emit()
+            return False
+        self._last_file = str(target)
+        self._status = f"Снимок сохранён: {target.name}"
+        self.changed.emit()
+        return True
+
+    @Slot(result=bool)
+    def toggleRecording(self) -> bool:  # noqa: N802
+        return self.stopRecording() if self.recording else self.startRecording()
+
+    @Slot(result=bool)
+    def startRecording(self) -> bool:  # noqa: N802
+        if self._record_tool is None:
+            self._status = capture.missing_reason("recording")
+            self.changed.emit()
+            return False
+        node = fd = None
+        if self._record_tool.name == "ffmpeg":
+            try:
+                cast = portal.session()
+            except portal.PortalError as exc:
+                self._status = str(exc)
+                self.changed.emit()
+                return False
+            node, fd = cast.node, cast.fd
+        folder = capture.recordings_dir(self._home)
+        folder.mkdir(parents=True, exist_ok=True)
+        target = folder / capture.recording_name(self._clock())
+        command = capture.recording_command(target, node=node, fd=fd,
+                                            with_microphone=self._mic, tool=self._record_tool)
+        if command is None:
+            self._status = capture.missing_reason("recording")
+            self.changed.emit()
+            return False
+        try:
+            self._recording_process = self._run(command)
+        except Exception as exc:                       # noqa: BLE001 - shown, never swallowed
+            self._recording_process = None
+            self._status = f"Запись не началась: {exc}"
+            self.changed.emit()
+            return False
+        self._last_file = str(target)
+        self._started_at = self._clock()
+        self._elapsed = 0.0
+        self._status = "Идёт запись"
+        self._timer.start()
+        self.changed.emit()
+        return True
+
+    @Slot(result=bool)
+    def stopRecording(self) -> bool:  # noqa: N802
+        process = self._recording_process
+        if process is None:
+            return False
+        self._timer.stop()
+        for method in ("terminate", "kill"):
+            call = getattr(process, method, None)
+            if call is None:
+                continue
+            try:
+                call()
+                break
+            except Exception:                          # noqa: BLE001 - try the harder one
+                continue
+        wait = getattr(process, "wait", None)
+        if wait is not None:
+            try:
+                wait(timeout=10)
+            except Exception:                          # noqa: BLE001 - reported below
+                pass
+        self._recording_process = None
+        name = Path(self._last_file).name if self._last_file else ""
+        exists = bool(self._last_file) and Path(self._last_file).exists()
+        self._status = (f"Запись сохранена: {name}" if exists
+                        else "Запись остановлена, но файл не появился")
+        self.changed.emit()
+        return True
+
+    @Slot(result=bool)
+    def toggleMic(self) -> bool:  # noqa: N802
+        """The microphone switch applies to the *next* recording; a live one is not re-encoded."""
+        self._mic = not self._mic
+        if self.recording:
+            self._status = ("Микрофон включится со следующей записи" if self._mic
+                            else "Микрофон выключится со следующей записи")
+        self.changed.emit()
+        return self._mic
+
+    @Slot(result=bool)
+    def openCaptures(self) -> bool:  # noqa: N802
+        """«Просмотреть мои записи» — open the folder in the file manager."""
+        folder = capture.recordings_dir(self._home)
+        folder.mkdir(parents=True, exist_ok=True)
+        opener = capture.which("xdg-open") or capture.which("dolphin")
+        if not opener:
+            self._status = "Открыть папку нечем: нет ни xdg-open, ни dolphin"
+            self.changed.emit()
+            return False
+        try:
+            self._run([opener, str(folder)])
+        except Exception as exc:                       # noqa: BLE001 - shown, never swallowed
+            self._status = f"Папка не открылась: {exc}"
+            self.changed.emit()
+            return False
+        return True
+
+    def _tick(self) -> None:
+        self._elapsed = self._clock() - self._started_at
+        self.changed.emit()

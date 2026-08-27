@@ -18,7 +18,7 @@ COLUMNS = [
 
 
 UI_STEPS = ["desktop_ready", "start_open", "start_close", "app_launch_explorer", "window_move",
-            "minimize", "restore", "alt_tab", "taskbar_response"]
+            "minimize", "restore", "alt_tab", "taskbar_response", "screenshot"]
 
 
 def ui_cell(d, step):

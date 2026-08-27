@@ -9,7 +9,7 @@ Anything not on this list is not shipped. Reference-only projects are in
 
 | Asset | Path | Upstream | Version / date | Licence | Copyright | Modify | Redistribute | Attribution | Derivative-work duty |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Fluent UI System Icons (26 SVGs) | `assets/icons/fluent/` | github.com/microsoft/fluentui-system-icons | fetched 2026-08-23 | **MIT** | © 2020 Microsoft Corporation | yes | yes | keep the MIT text (`assets/icons/fluent/LICENSE`) | none — permissive |
+| Fluent UI System Icons (90 SVGs) | `assets/icons/fluent/` | github.com/microsoft/fluentui-system-icons | fetched 2026-08-23 and 2026-08-27 | **MIT** | © 2020 Microsoft Corporation | yes | yes | keep the MIT text (`assets/icons/fluent/LICENSE`) | none — permissive |
 | Selawik (5 faces) | `assets/fonts/selawik/` | github.com/microsoft/Selawik | 1.01 | **SIL OFL 1.1** | © 2015 Microsoft, Reserved Font Name **Selawik** | yes | yes, incl. bundling | ship `LICENSE.txt` | **must rename** any modified face; may not be sold on its own |
 | Application icons (18 SVGs) | `assets/icons/apps/` | github.com/vinceliuice/Fluent-icon-theme | fetched 2026-08-23 | **GPL-3.0** | © vinceliuice and contributors | yes | yes | ship `COPYING` + `AUTHORS` (both vendored) | publish modifications; offer source |
 | Places/device icons (10 SVGs) | `assets/icons/places/` | github.com/yeyushengfan258/Win11-icon-theme | fetched 2026-08-23 | **GPL-3.0** (derived from Ubuntu Yaru) | © yeyushengfan258, Yaru authors | yes | yes | ship `COPYING` + `AUTHORS` (both vendored) | publish modifications; offer source |

@@ -6,7 +6,7 @@ Status: **COMPLETE / PARTIAL / PROTOTYPE / MISSING**. A high visual score never 
 
 | Component | Source | Implementation | Stack | Status | Visual score | Real behaviour today |
 | --- | --- | --- | --- | --- | --- | --- |
-| System icons | Fluent UI System Icons (MIT) | vendored SVG, recoloured per theme | SVG + Qt | **COMPLETE** | 5.0 | 26 glyphs, both themes, HiDPI |
+| System icons | Fluent UI System Icons (MIT) | vendored SVG, recoloured per theme | SVG + Qt | **COMPLETE** | 5.0 | 90 glyphs, both themes, HiDPI |
 | UI font | PT Sans (OFL 1.1) | vendored TTF, registered at startup + fontconfig alias | TTF | **COMPLETE** | 5.0 | closest measured match to Segoe UI Cyrillic; installed system-wide so KWin/Dolphin match |
 | Design tokens | ours, informed by Win11-gtk-theme values | `ZaldrosTheme/Theme.qml` | QML | **COMPLETE** | 4.5 | dark + light, one source of truth |
 | Taskbar | ours; behaviour ref. sfwbar | `Taskbar.qml` | QML | PROTOTYPE | 4.3 | real clock, real running-app state; still a window, not a panel |
@@ -18,7 +18,7 @@ Status: **COMPLETE / PARTIAL / PROTOTYPE / MISSING**. A high visual score never 
 | Desktop icons | ours + Fluent glyphs | `Shell.qml` | QML | PROTOTYPE | 3.8 | not interactive |
 | Wallpaper | **ours** — generated artwork | `assets/wallpaper/generate.py` | Qt painter | **COMPLETE** | 4.5 | 3840×2160 render, reproducible from source |
 | Application icons | host icon theme, then vendored Fluent-icon-theme (GPL-3) | `icons.py` `_app_icon` + `assets/icons/apps/` | SVG | **PARTIAL** | 4.5 | colour icons always render; lettered tile only for unknown apps |
-| System icon theme | **ours** — built from `assets/icons/` | `/usr/share/icons/Zaldros` | SVG theme | **COMPLETE** | 4.3 | 17 apps, 9 places, 26 glyphs; unknown names fall back to the lettered tile |
+| System icon theme | **ours** — built from `assets/icons/` | `/usr/share/icons/Zaldros` | SVG theme | **COMPLETE** | 4.3 | 17 apps, 9 places, 90 glyphs; unknown names fall back to the lettered tile |
 | Cursor theme | Fluent-icon-theme cursors (GPL-3) — the only borrowed pack | `/usr/share/icons/Fluent-dark-cursors` + `default` alias | Xcursor | **COMPLETE** | 4.5 | 111 shapes, set for KDE, GTK, GNOME schemas and the session env |
 | GTK app styling | **ours** — tokens over stock Adwaita | `gtk.css` in `/etc/skel` | GTK3/4 | PARTIAL | 3.0 | colour and font match the shell; chrome is Adwaita, not Fluent |
 | Window titlebars (real apps) | placeholder | borderless Breeze via `kwinrc` | KWin | PROTOTYPE | 2.5 | our own Aurorae theme not written yet |
