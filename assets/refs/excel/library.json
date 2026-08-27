@@ -1,0 +1,187 @@
+{
+  "about": {
+    "purpose": "Reference library of authentic Microsoft Excel screenshots published by Microsoft. The REFERENCE end of the Zaldros Sheets parity loop.",
+    "rule": "Every entry is hosted on a Microsoft domain (support.microsoft.com / support.content.office.net / learn.microsoft.com). Third-party sites, concepts and fan mockups are not admitted, and captures of Excel for the web, Excel for macOS or Excel for iPad are not admitted as desktop references.",
+    "images_not_committed": "The files are Microsoft's copyright and are NOT stored in this repository. tools/visual/fetch_references.py --library excel re-downloads them into assets/refs/excel/cache/ and verifies the sha256 recorded here.",
+    "measured_into": "system/theme/excel-reference.json",
+    "collected": "2026-08-28"
+  },
+  "states": [
+    "dark",
+    "dialogs",
+    "formula_bar",
+    "grid",
+    "headers",
+    "light",
+    "pivot_tables",
+    "ribbon",
+    "sorting",
+    "view"
+  ],
+  "entries": [
+    {
+      "id": "theme-light-colorful",
+      "file": "theme-colorful-excel-light.png",
+      "states": [
+        "ribbon",
+        "formula_bar",
+        "grid",
+        "headers",
+        "light"
+      ],
+      "url": "https://support.microsoft.com/en-us/office/media/colorful-theme-in-excel.png",
+      "page": "https://support.microsoft.com/en-us/office/change-the-look-and-feel-of-microsoft-365-63e65e1c-08d4-4dea-820e-335f54672310",
+      "width": 873,
+      "height": 617,
+      "bytes": 36233,
+      "sha256": "48d50f0a4a696fdee105f8d1869fbd7e179fc4c20ac83adceac445ff6e0acc29",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft 365 Excel, Colorful theme, 2023 visual refresh (Aptos Narrow, rounded ribbon card). The capture the Zaldros Sheets tokens are measured from."
+    },
+    {
+      "id": "theme-dark-black",
+      "file": "theme-black-dark.png",
+      "states": [
+        "ribbon",
+        "formula_bar",
+        "grid",
+        "headers",
+        "dark"
+      ],
+      "url": "https://support.microsoft.com/en-us/office/media/black-theme.png",
+      "page": "https://support.microsoft.com/en-us/office/change-the-look-and-feel-of-microsoft-365-63e65e1c-08d4-4dea-820e-335f54672310",
+      "width": 874,
+      "height": 643,
+      "bytes": 39350,
+      "sha256": "b1b8b67e70479e0b126e94333dae77f9ba732b54b48d1b54124c5c1b26a8ffc9",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft 365 Excel, Black theme — the dark-mode pair of the capture above, same crop and tool."
+    },
+    {
+      "id": "ribbon-anatomy",
+      "file": "ribbon-layout-overview.png",
+      "states": [
+        "ribbon"
+      ],
+      "url": "https://support.microsoft.com/en-us/excel/media/ribbon-layout-in-excel.png",
+      "page": "https://support.microsoft.com/en-us/office/show-the-ribbon-8894cf7f-9f6d-4d1b-92eb-c88a2373a70f",
+      "width": 311,
+      "height": 315,
+      "bytes": 16695,
+      "sha256": "afa4117413762485bf7f08caa0bd207f5b528bb284b876ebacb200f5a5f9b8b5",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Microsoft's own ribbon anatomy diagram: tabs, groups, dialog launcher."
+    },
+    {
+      "id": "ribbon-tabs-only",
+      "file": "ribbon-tabs-only.png",
+      "states": [
+        "ribbon"
+      ],
+      "url": "https://support.microsoft.com/en-us/excel/media/excel-ribbon-without-the-full-tabs-and-commands-showing.png",
+      "page": "https://support.microsoft.com/en-us/office/show-the-ribbon-8894cf7f-9f6d-4d1b-92eb-c88a2373a70f",
+      "width": 899,
+      "height": 109,
+      "bytes": 34632,
+      "sha256": "a8cbd74fb43b7b5e493487dde72f69075705bfd3668141b9dc4e60e8aba2ebc4",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "The collapsed \"Show tabs only\" ribbon state."
+    },
+    {
+      "id": "ribbon-display-options",
+      "file": "ribbon-display-options.png",
+      "states": [
+        "ribbon"
+      ],
+      "url": "https://support.microsoft.com/en-us/excel/media/ribbon-display-options-in-excel.png",
+      "page": "https://support.microsoft.com/en-us/office/show-the-ribbon-8894cf7f-9f6d-4d1b-92eb-c88a2373a70f",
+      "width": 321,
+      "height": 113,
+      "bytes": 6190,
+      "sha256": "7c62efbcc5e279b801d4b3b8ba29e08ca8266da289c82ea8a34942fa3bea53a7",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Ribbon Display Options: Classic / Single Line ribbon and the show-tabs modes."
+    },
+    {
+      "id": "sort-custom-dialog",
+      "file": "sort-custom-dialog.png",
+      "states": [
+        "dialogs",
+        "sorting"
+      ],
+      "url": "https://support.microsoft.com/en-US/Excel/media/custom-sort-dialog-001.png",
+      "page": "https://support.microsoft.com/en-us/office/sort-data-in-a-range-or-table-62d0b95d-2a90-4610-a6ae-2e545c4a4654",
+      "width": 685,
+      "height": 244,
+      "bytes": 10956,
+      "sha256": "6c76508ea7bf7e9b6bd1570ef25ca55fe65711e133e0266d08c690f984c53d98",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Current-generation Custom Sort dialog chrome."
+    },
+    {
+      "id": "freeze-panes-headers",
+      "file": "freeze-panes-headers.png",
+      "states": [
+        "view",
+        "headers"
+      ],
+      "url": "https://support.microsoft.com/en-US/Excel/media/excel16-unfreeze-panes.png",
+      "page": "https://support.microsoft.com/en-us/office/freeze-panes-to-lock-rows-and-columns-dab2ffc9-020d-4026-8121-67dd25f2508f",
+      "width": 364,
+      "height": 277,
+      "bytes": 19258,
+      "sha256": "023b02c01e386358f228ddc9ecc45d12a57c8551a373a9a556d003d4addf8d0e",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Desktop Excel with row/column headers and the View menu open (Excel 2016 chrome)."
+    },
+    {
+      "id": "pivottable-insert-pane",
+      "file": "pivottable-insert-pane.png",
+      "states": [
+        "pivot_tables"
+      ],
+      "url": "https://support.microsoft.com/en-US/Excel/media/insert-pivottable-pane-001.png",
+      "page": "https://support.microsoft.com/en-us/office/create-a-pivottable-to-analyze-worksheet-data-a9a84538-bfe9-40a9-a8e9-f99134456576",
+      "width": 422,
+      "height": 721,
+      "bytes": 87119,
+      "sha256": "003be2050a19d50927427bb2a74b33efb6408ea5b36df1572c575f40e189ea66",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "The current Insert PivotTable side pane."
+    },
+    {
+      "id": "pivottable-insert-button",
+      "file": "pivottable-insert-button.png",
+      "states": [
+        "ribbon",
+        "pivot_tables"
+      ],
+      "url": "https://support.microsoft.com/en-US/Excel/media/pivottable-button.png",
+      "page": "https://support.microsoft.com/en-us/office/create-a-pivottable-to-analyze-worksheet-data-a9a84538-bfe9-40a9-a8e9-f99134456576",
+      "width": 209,
+      "height": 129,
+      "bytes": 3582,
+      "sha256": "8844f5e6b83de34104f4e185a55c76aefc2560faa4d7cf38b188670a7e5fec51",
+      "excel_version": "Microsoft 365",
+      "display_scale": null,
+      "authenticity": "microsoft-published",
+      "evidence": "Insert tab, PivotTable group (editor highlight box added by Microsoft)."
+    }
+  ]
+}

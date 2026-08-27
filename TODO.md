@@ -36,6 +36,18 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
       measured and diffed, not eyeballed (the maintainer asked for this after the first game bar)
 - [ ] Notifications + quick settings backed by real NetworkManager / PipeWire / UPower
 
+## Zaldros Sheets (ADR-0013)
+- [x] Исследовать LOK / UNO / форк / тему VCL и выбрать шов — выбран UNO сейчас, LOK потом
+- [x] Мост к движку + 6 тестов на живом LibreOffice (формула, ошибка, XLSX туда-обратно)
+- [x] Своё окно: лента, строка формул, сетка, вкладки листов, строка состояния — по замерам
+- [x] Библиотека подлинных снимков Excel с контрольными суммами
+- [ ] Ввод в ячейку с клавиатуры и правка в строке формул (сейчас модель умеет, UI ещё нет)
+- [ ] Кнопки ленты через `.uno:` команды движка, а не свои реализации
+- [ ] Фаза 2: тайловый вид на LOK для диаграмм и предпросмотра печати
+- [ ] Недостающие эталоны: предпросмотр печати, параметры Excel, строка состояния, контекстное
+      меню ячейки, вкладки Data/Review/Page Layout/Formulas
+- [ ] Поставить `libreoffice-calc-nogui` и `python3-uno` в ISO
+
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [ ] Settings (display, network, sound, accounts)

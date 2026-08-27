@@ -23,10 +23,23 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-LIBRARY = ROOT / "assets" / "refs" / "win11" / "library.json"
-CACHE = ROOT / "assets" / "refs" / "win11" / "cache"
+LIBRARIES = {
+    "win11": ROOT / "assets" / "refs" / "win11",
+    "excel": ROOT / "assets" / "refs" / "excel",
+}
+LIBRARY = LIBRARIES["win11"] / "library.json"
+CACHE = LIBRARIES["win11"] / "cache"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36"
 TIMEOUT = 60
+
+
+def select_library(name: str) -> None:
+    """Point the module at one of the reference libraries (Windows 11 shell, or Excel)."""
+    global LIBRARY, CACHE
+    if name not in LIBRARIES:
+        raise SystemExit(f"unknown library {name!r}; known: {', '.join(sorted(LIBRARIES))}")
+    LIBRARY = LIBRARIES[name] / "library.json"
+    CACHE = LIBRARIES[name] / "cache"
 
 
 def load_entries(state: str | None) -> list[dict]:
@@ -53,8 +66,11 @@ def main() -> int:
                         help="verify the cache without downloading anything")
     parser.add_argument("--state", help="only entries covering this state")
     parser.add_argument("--quiet", action="store_true")
+    parser.add_argument("--library", default="win11", choices=sorted(LIBRARIES),
+                        help="which reference library to fetch")
     args = parser.parse_args()
 
+    select_library(args.library)
     CACHE.mkdir(parents=True, exist_ok=True)
     entries = load_entries(args.state)
     missing: list[str] = []

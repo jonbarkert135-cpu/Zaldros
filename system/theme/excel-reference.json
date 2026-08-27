@@ -1,0 +1,81 @@
+{
+  "_comment": [
+    "Measured Microsoft Excel geometry for Zaldros Sheets. Same rule as win11-reference.json:",
+    "no number here is a guess, and every number names the capture it came from.",
+    "",
+    "Sources (Microsoft's own support CDN, fetched 2026-08-28, stored under docs/sheets/refs/):",
+    "  light  theme-colorful-excel-light.png  873x617  Microsoft 365 Excel, Colorful theme",
+    "  dark   theme-black-dark.png            874x643  Microsoft 365 Excel, Black theme",
+    "Both show the 2023 visual refresh (Aptos Narrow, rounded ribbon card) — the current Excel,",
+    "not the 2019 ribbon in the owner's second screenshot.",
+    "",
+    "Scale: the captures are not at 100%. The anchor is the grid row, which measures 38 device",
+    "pixels in the light capture and is 20 px in Excel at 100% — so device px / 1.90 = our px.",
+    "Every derived value below is rounded to a whole pixel and marked with the raw measurement.",
+    "Column pitch measures 136 device px (71.6 at our scale); Excel's documented default column",
+    "width at 100% is 64 px, so column width is taken from Excel's own default, not from this",
+    "capture, and the discrepancy is recorded rather than hidden."
+  ],
+  "capture": {
+    "light": {"file": "theme-colorful-excel-light.png", "width": 873, "height": 617},
+    "dark": {"file": "theme-black-dark.png", "width": 874, "height": 643},
+    "row_height_device_px": 38,
+    "scale_from_row_anchor": 1.9
+  },
+  "window": {
+    "title_bar_height": 52,
+    "_title_bar_height_device": 98,
+    "tab_strip_height": 33,
+    "_tab_strip_height_device": 62,
+    "ribbon_body_height": 105,
+    "_ribbon_body_height_device": 200,
+    "ribbon_card_radius": 4,
+    "formula_bar_height": 23,
+    "_formula_bar_height_device": 43,
+    "name_box_width": 105,
+    "_name_box_width_device": 200,
+    "status_bar_height": 24
+  },
+  "grid": {
+    "row_height": 20,
+    "_row_height_device": 38,
+    "column_width": 64,
+    "_column_width_device": 136,
+    "_column_width_note": "Excel's documented 100% default (8.43 chars); the capture measures 71.6",
+    "column_header_height": 20,
+    "row_header_width": 29,
+    "_row_header_width_device": 56,
+    "_row_header_width_note": "56/1.9 = 29.5; Excel widens it with the row count",
+    "active_cell_border": 2
+  },
+  "palette": {
+    "light": {
+      "title": "#107c41",
+      "tab_strip": "#e9eef2",
+      "ribbon_card": "#ffffff",
+      "below_ribbon": "#e5e9ee",
+      "formula_bar": "#ffffff",
+      "header": "#f0f0f0",
+      "header_selected": "#d2d2d2",
+      "grid": "#ffffff",
+      "gridline": "#e0e0e0",
+      "accent": "#107c41",
+      "text": "#191919"
+    },
+    "dark": {
+      "title": "#1c2227",
+      "tab_strip": "#1c2227",
+      "ribbon_card": "#292929",
+      "below_ribbon": "#1c2227",
+      "formula_bar": "#292929",
+      "header": "#0a0a0a",
+      "header_selected": "#646464",
+      "grid": "#ffffff",
+      "gridline": "#e0e0e0",
+      "accent": "#60bd82",
+      "_accent_note": "the light accent lightened, not a different hue",
+      "text": "#f0f0f0"
+    }
+  },
+  "tabs": ["File", "Home", "Insert", "Draw", "Page Layout", "Formulas", "Data", "Review", "View", "Help"]
+}
