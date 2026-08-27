@@ -222,8 +222,10 @@ def _glyph(kind: str, w: int, h: int, size: int, colour: str) -> str:
                 f'H{fx + fw + off - 1} Q{fx + fw + off},{fy - off} {fx + fw + off},{fy - off + 1} '
                 f'V{fy + fw - off} H{fx + fw}" {stroke}/>\n')
     if kind == "close":
-        a, b = left + 0.5, top + 0.5
-        c, d = right - 0.5, bottom - 0.5
+        # the diagonals are antialiased whatever we do, so they run the full glyph box:
+        # the reference X measures 10 px across at 100 %, corner to corner
+        a, b = left, top
+        c, d = right, bottom
         return (f'    <line x1="{a}" y1="{b}" x2="{c}" y2="{d}" {stroke}/>\n'
                 f'    <line x1="{c}" y1="{b}" x2="{a}" y2="{d}" {stroke}/>\n')
     if kind == "alldesktops":
