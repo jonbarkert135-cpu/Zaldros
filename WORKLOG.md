@@ -923,3 +923,38 @@ session-wide binding needs the global-shortcut path Alt+Tab is still proving out
 wired the moment that path has a passing boot verdict rather than on the assumption it will.
 
 Tests: 201. Parity: 36/36.
+
+### Run #37 — Alt+Tab worked; the test was watching the wrong second
+
+The probes added in run #36 answered the question in one boot (iso 33108866212, all three variants,
+all three profiles). From `boot-full-modern`:
+
+- `qmp_errors: []` — every key really left the host this time.
+- `probe_lines: ["-PROBE meta_f9", "-PROBE alt_f9", "-PROBE ctrl_shift_f9", "-PROBE meta_tab"]` —
+  **all four** combinations reached a global shortcut, Alt among them.
+- `shortcut_fired_by_key: true`, and the switcher's own log:
+  `ZALDROS-SWITCHER cycle reverse=false candidates=1` → `nothing to switch to`.
+
+So the key was pressed, kglobalaccel routed it, our KWin script ran, found **one** window and
+correctly did nothing. The same script switched fine seconds later when the late report invoked it
+over D-Bus with two windows open (`candidates=2`, `activating Home — Dolphin (was __main__.py)`).
+Alt+Tab has worked since run #36; the harness has been photographing an empty desktop.
+
+Why: the driver started the Alt+Tab step as soon as it saw `ZALDROS-GEOMETRY`, which the **shell**
+prints seconds after login — 45 s before stage 2 launches Dolphin. Six FAILs came from measuring a
+switch that had nothing to switch to.
+
+The fix is in the test, not the product:
+- `uitest.py` prints `ZALDROS-WINDOWS-READY {...}` the moment KWin confirms the second window, and
+  before it starts moving, minimising and restoring it.
+- `ui-drive.py` waits for that line (`second_window` / `wait_for_second_window`, ≤180 s), then for
+  stage 2's own end marker (`wait_for_marker`, ≤90 s) so nobody else is changing the screen, and
+  only then presses Alt+Tab. Without the line the step is `BLOCKED` with the reason, never `FAIL`.
+  Escaped copies of the marker inside embedded logs are ignored, as `marked()` sanitising in
+  `selftest.py` and a test both ensure.
+- The late report gained `switcher_cycles` and `alt_tab_switched` — the switcher's verdict in its
+  own words, read before the D-Bus invoke fires one itself.
+- Stage 3's pause grew 30 s → 45 s to cover the longer, evidence-driven wait.
+
+Six new tests in `tests/test_ui_drive_keys.py` hold the sequencing in place. Tests: 207.
+Parity: 36/36.

@@ -190,6 +190,68 @@ def probe_step(qmp):
                     "that combination reached a global shortcut"}
 
 
+def second_window(serial_path):
+    """Read the guest's ZALDROS-WINDOWS-READY line: does a second toplevel window really exist?
+
+    Run #37 settled the Alt+Tab question the honest way. The key was delivered (no QMP errors),
+    kglobalaccel fired our action (the guest logged `cycle reverse=false candidates=1`) and the
+    KWin script then said `nothing to switch to` — because Dolphin was not open yet. The driver
+    had been waiting for ZALDROS-GEOMETRY, which the *shell* prints seconds after login, long
+    before the in-guest test launches an application. This marker is printed by that test itself,
+    after KWin confirms the second window.
+    """
+    if not serial_path or not Path(serial_path).is_file():
+        return None
+    text = Path(serial_path).read_text(errors="replace")
+    seen = None
+    for line in text.splitlines():
+        if "ZALDROS-WINDOWS-READY {" not in line:
+            continue
+        try:                                        # escaped copies inside embedded logs are skipped
+            payload = json.loads(line.split("ZALDROS-WINDOWS-READY ", 1)[1])
+        except Exception:
+            continue
+        if isinstance(payload, dict):
+            seen = payload
+    return seen
+
+
+def wait_for_second_window(serial_path, timeout=180):
+    """Alt+Tab with one window proves nothing, so the driver waits instead of measuring noise."""
+    deadline = time.monotonic() + timeout
+    waited = 0.0
+    while time.monotonic() < deadline:
+        found = second_window(serial_path)
+        if found and found.get("ready"):
+            found = dict(found)
+            found["waited_seconds"] = round(waited, 1)
+            return found
+        time.sleep(2)
+        waited += 2
+    return second_window(serial_path)
+
+
+def wait_for_marker(serial_path, marker, timeout=90):
+    """Wait until a marker line appears on the serial log. Returns the seconds waited, or None.
+
+    Used to keep the two halves of the test from stepping on each other: the guest moves,
+    minimises and restores its own window, and an Alt+Tab measured in the middle of that would
+    photograph somebody else's change.
+    """
+    if not serial_path:
+        return None
+    deadline = time.monotonic() + timeout
+    started = time.monotonic()
+    while time.monotonic() < deadline:
+        try:
+            if marker in Path(serial_path).read_text(errors="replace"):
+                return round(time.monotonic() - started, 1)
+        except OSError:
+            pass
+        time.sleep(2)
+    return None
+
+
 def hit_boxes(serial_path):
     """Read the last ZALDROS-GEOMETRY line the guest printed on the serial console."""
     if not serial_path or not Path(serial_path).is_file():
@@ -248,20 +310,27 @@ def main():
             "why": "the guest did not publish /tmp/zaldros-ui-geometry.json, so the Start button "
                    "position on screen is unknown and clicking a guessed point proves nothing"}
 
-    # Alt+Tab runs last, and only once the guest has published its geometry — that line is printed
-    # by the in-guest test, which by then has launched Dolphin. Runs #27-#28b measured Alt+Tab
-    # while the shell was the *only* toplevel window: KWin shows no switcher for a single window
-    # and releases Alt before the screenshot, so the frame could not change and the step reported
-    # FAIL for a shortcut that may well have worked. With no second window the honest answer is
+    # Alt+Tab runs last, and only once the guest has reported a *second* window of its own.
+    # Runs #27-#37 measured Alt+Tab while the shell was the only toplevel window: the shortcut
+    # fires, the script finds one candidate and correctly does nothing, and the frame cannot
+    # change — a FAIL for a feature that works. With no second window the honest answer is
     # BLOCKED, not FAIL.
-    if start:
+    ready = wait_for_second_window(args.serial)
+    if ready and ready.get("ready"):
+        # ...and only once the guest has stopped moving that window around.
+        waited = wait_for_marker(args.serial, "ZALDROS-UITEST {", timeout=90)
         results["alt_tab"] = alt_tab_step(qmp, out)
+        results["alt_tab"]["second_window"] = ready
+        results["alt_tab"]["guest_test_finished"] = waited is not None
+        results["alt_tab"]["waited_for_guest_seconds"] = waited
         results["shortcut_probes"] = probe_step(qmp)
     else:
         results["alt_tab"] = {
             "status": "BLOCKED",
-            "why": "the guest never came up far enough to open a second window, and Alt+Tab with "
-                   "one toplevel window cannot change the screen either way"}
+            "second_window": ready,
+            "why": "the guest never reported a second toplevel window (ZALDROS-WINDOWS-READY), and "
+                   "Alt+Tab with one window cannot change the screen either way"}
+        results["shortcut_probes"] = probe_step(qmp)
     results["qmp_errors"] = qmp.errors            # empty is the only acceptable value
     (out / f"{args.name}-host.json").write_text(json.dumps(results, indent=2, ensure_ascii=False))
     print(json.dumps(results, indent=2, ensure_ascii=False))

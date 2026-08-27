@@ -143,3 +143,60 @@ def test_the_late_report_says_whether_a_key_ever_fired_the_switcher():
     selftest = (ISO / "selftest.py").read_text()
     assert '"probe_lines"' in selftest
     assert '"shortcut_fired_by_key"' in selftest
+
+
+# --- Run #37: the key fired, and the driver still called it a failure ----------------------
+#
+# Boot 33108866212 answered the question the probes were built for: every one of the four probe
+# shortcuts fired (`probe_lines` lists all four), `shortcut_fired_by_key` was true, `qmp_errors`
+# was empty and the KWin script logged `cycle reverse=false candidates=1 / nothing to switch to`.
+# Alt+Tab worked. It was pressed while the shell was the only window on screen, because the driver
+# waited for ZALDROS-GEOMETRY — printed by the shell right after login — instead of for an
+# application. These tests keep the driver honest about *when* it may measure Alt+Tab.
+
+
+def test_the_driver_waits_for_a_real_second_window(tmp_path):
+    serial = tmp_path / "serial.log"
+    serial.write_text('ubuntu login: ZALDROS-GEOMETRY {"items": {"startButton": {"x": 1}}}\n')
+    assert drive.second_window(serial) is None
+
+    serial.write_text(serial.read_text()
+                      + 'ZALDROS-WINDOWS-READY {"ready": true, "caption": "Home — Dolphin"}\n')
+    found = drive.second_window(serial)
+    assert found["ready"] is True and found["caption"] == "Home — Dolphin"
+
+
+def test_an_escaped_copy_inside_an_embedded_log_is_not_mistaken_for_the_marker(tmp_path):
+    """The late report embeds the session log, so escaped copies of markers travel with it."""
+    serial = tmp_path / "serial.log"
+    serial.write_text('ZALDROS-LATE {"tail": "ZALDROS-WINDOWS-READY {\\"ready\\": true}"}\n')
+    assert drive.second_window(serial) is None
+
+
+def test_without_a_second_window_alt_tab_is_blocked_not_failed(tmp_path, monkeypatch):
+    serial = tmp_path / "serial.log"
+    serial.write_text("nothing here\n")
+    monkeypatch.setattr(drive.time, "sleep", lambda *_: None)
+    assert drive.wait_for_second_window(serial, timeout=0) is None
+
+
+def test_alt_tab_is_measured_only_after_the_guest_test_has_finished(tmp_path, monkeypatch):
+    serial = tmp_path / "serial.log"
+    serial.write_text("ZALDROS-UITEST {\"variant\": \"full\"}\n")
+    monkeypatch.setattr(drive.time, "sleep", lambda *_: None)
+    assert drive.wait_for_marker(serial, "ZALDROS-UITEST {", timeout=1) is not None
+    assert drive.wait_for_marker(serial, "ZALDROS-NEVER {", timeout=0) is None
+
+
+def test_the_guest_announces_the_second_window_before_it_starts_moving_it():
+    uitest = (ISO / "uitest.py").read_text()
+    ready = uitest.index("WINDOWS_MARK + json.dumps")
+    assert ready < uitest.index('step("window_move"'), "the marker must precede the window ops"
+    assert ready > uitest.index('step("app_launch_explorer"')
+
+
+def test_the_late_report_quotes_what_the_switcher_did():
+    selftest = (ISO / "selftest.py").read_text()
+    assert '"switcher_cycles"' in selftest and '"alt_tab_switched"' in selftest
+    # the switcher's verdict must be read before the D-Bus invoke fires one itself
+    assert selftest.index('"alt_tab_switched"') < selftest.index('"invoke_delta"')

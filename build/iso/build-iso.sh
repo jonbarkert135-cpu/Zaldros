@@ -238,10 +238,11 @@ ExecStart=/usr/local/bin/zaldros-selftest --serial /dev/ttyS0
 # Stage 2: pause so the host can inject input over QMP, then run the UI interaction test.
 ExecStart=/bin/sleep 45
 ExecStart=/bin/sh -c 'runuser -u ubuntu -- env XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland /usr/local/bin/zaldros-uitest > /dev/ttyS0 2>/var/log/zaldros-uitest.err'
-# Stage 3: the host drives Alt+Tab *after* the guest publishes its geometry, which is the last
-# thing stage 2 prints. Powering off right there threw away every message KWin wrote while the
-# switcher was supposed to appear. Wait for the host to finish, then dump the session log.
-ExecStart=/bin/sleep 30
+# Stage 3: the host drives Alt+Tab *after* stage 2 has finished — it now waits for the guest's
+# ZALDROS-WINDOWS-READY line and then for stage 2's own end marker, so the switcher is measured
+# with a second window open and nobody else touching it. Powering off right there threw away
+# every message KWin wrote while switching. Wait for the host to finish, then dump the log.
+ExecStart=/bin/sleep 45
 ExecStart=/usr/local/bin/zaldros-selftest --late --serial /dev/ttyS0
 TimeoutStartSec=600
 ExecStopPost=/usr/bin/systemctl poweroff

@@ -9,6 +9,7 @@ MARK = "ZALDROS-SELFTEST "
 LATE_MARK = "ZALDROS-LATE "
 GEOMETRY_MARK = "ZALDROS-GEOMETRY "
 UITEST_MARK = "ZALDROS-UITEST "
+WINDOWS_READY_MARK = "ZALDROS-WINDOWS-READY "   # printed by uitest.py once a second window exists
 
 
 def marked(mark, payload):
@@ -20,7 +21,7 @@ def marked(mark, payload):
     JSONDecodeError. Markers appear once per line, at the front, or not at all.
     """
     body = json.dumps(payload, ensure_ascii=False)
-    for other in (MARK, LATE_MARK, GEOMETRY_MARK, UITEST_MARK):
+    for other in (MARK, LATE_MARK, GEOMETRY_MARK, UITEST_MARK, WINDOWS_READY_MARK):
         body = body.replace(other.strip(), other.strip().replace("ZALDROS-", "ZALDROS_"))
     return mark + body
 
@@ -332,6 +333,14 @@ def late_report():
         # one over D-Bus, so every line here was produced by a real key from the host.
         "probe_lines": [line.split("ZALDROS")[1] for line in text.splitlines()
                         if "ZALDROS-PROBE" in line or "ZALDROS_PROBE" in line][-20:],
+        # The switcher's own verdict, in its own words: how many windows it saw and whether it
+        # activated one. A key that fires but finds a single window is not a broken shortcut.
+        "switcher_cycles": [line.split("ZALDROS-SWITCHER ", 1)[-1] for line in text.splitlines()
+                            if "ZALDROS-SWITCHER" in line and ("cycle reverse" in line
+                                                               or "activating" in line
+                                                               or "nothing to switch" in line)][-20:],
+        "alt_tab_switched": any("ZALDROS-SWITCHER" in line and "activating" in line
+                                for line in text.splitlines()),
         "shortcut_fired_by_key": any(("ZALDROS-SWITCHER" in line or "ZALDROS_SWITCHER" in line)
                                      and "cycle reverse" in line for line in text.splitlines()),
         "kwin_logging_rules": kwin_environ("QT_LOGGING_RULES"),

@@ -13,6 +13,12 @@ from pathlib import Path
 MARK = "ZALDROS-UITEST "
 # The shell publishes the on-screen hit boxes the host-side driver needs (see app.write_hit_boxes).
 GEOM_MARK = "ZALDROS-GEOMETRY "
+# Printed the moment a *second* toplevel window really exists. Run #37 proved the host driver was
+# pressing Alt+Tab while the shell was the only window on screen — the shortcut fired, the KWin
+# script ran and honestly logged "candidates=1 / nothing to switch to", and the pixel test called
+# that a FAIL. The driver now waits for this line instead of for the geometry, which the shell
+# publishes long before any application is up.
+WINDOWS_MARK = "ZALDROS-WINDOWS-READY "
 KWIN_SCRIPT = """
 var out = [];
 workspace.windowList().forEach(function (w) {
@@ -171,6 +177,11 @@ def main():
          lambda: (subprocess.Popen(["dolphin"], stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL), wait_for_window("dolphin"))[1],
          results)
+    opened = results["app_launch_explorer"].get("status") == "PASS"
+    print(WINDOWS_MARK + json.dumps(
+        {"ready": opened, "caption": results["app_launch_explorer"].get("caption"),
+         "windows": [w.get("caption") for w in windows()]}, ensure_ascii=False), flush=True)
+
     step("window_move", lambda: _move(), results)
     step("minimize", lambda: _set_minimized(True), results)
     step("restore", lambda: _set_minimized(False), results)
