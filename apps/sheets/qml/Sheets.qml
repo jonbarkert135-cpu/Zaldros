@@ -227,11 +227,22 @@ Item {
             height: win.formula_bar_height
             color: "transparent"
             border.color: pal.gridline; border.width: 1; radius: 2
-            Text {
+            // The formula bar is an editor, not a label: typing here and pressing Enter sends
+            // the text to the engine, exactly as typing into the cell does.
+            TextInput {
                 objectName: "formulaText"
-                anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
+                anchors { left: parent.left; leftMargin: 8; right: parent.right; rightMargin: 8
+                          verticalCenter: parent.verticalCenter }
                 text: book.formula; color: pal.text
                 font.family: root.uiFont; font.pixelSize: 13
+                clip: true
+                onAccepted: book.commit(text)
+                Keys.onPressed: function (event) {
+                    if (event.key === Qt.Key_Escape) {
+                        text = book.formula;
+                        event.accepted = true;
+                    }
+                }
             }
         }
     }

@@ -3,8 +3,66 @@
 // Cell contents come from the engine through gridModel; this file computes nothing.
 import QtQuick
 
+// Typing goes straight to the engine: the in-cell editor and the formula bar both call
+// book.commit(), which calls Workbook.set_input() and redraws with what the engine answered.
+// Nothing here decides whether «=SUM(A1:A2)» is a formula — Calc does.
 Item {
     id: sheetArea
+    focus: true
+
+    // The cell being edited, or -1: Excel's own two modes, «ready» and «edit».
+    property int editingRow: -1
+    property int editingColumn: -1
+
+    function beginEdit(row, column, initial) {
+        book.select(row, column);
+        sheetArea.editingRow = row;
+        sheetArea.editingColumn = column;
+        cellEditor.text = initial === undefined ? gridModel.cellFormula(row, column) : initial;
+        cellEditor.forceActiveFocus();
+        cellEditor.cursorPosition = cellEditor.text.length;
+    }
+
+    function commitEdit(advance) {
+        if (sheetArea.editingRow < 0)
+            return;
+        var row = sheetArea.editingRow;
+        var column = sheetArea.editingColumn;
+        sheetArea.editingRow = -1;
+        sheetArea.editingColumn = -1;
+        book.select(row, column);
+        book.commit(cellEditor.text);
+        if (advance)
+            book.select(Math.min(row + 1, sheetArea.rows - 1), column);
+        sheetArea.forceActiveFocus();
+    }
+
+    function cancelEdit() {
+        sheetArea.editingRow = -1;
+        sheetArea.editingColumn = -1;
+        sheetArea.forceActiveFocus();
+    }
+
+    Keys.onPressed: function (event) {
+        if (sheetArea.editingRow >= 0)
+            return;
+        var row = book.selectedRow;
+        var column = book.selectedColumn;
+        if (event.key === Qt.Key_Up)          { book.select(Math.max(row - 1, 0), column); event.accepted = true; }
+        else if (event.key === Qt.Key_Down)   { book.select(Math.min(row + 1, sheetArea.rows - 1), column); event.accepted = true; }
+        else if (event.key === Qt.Key_Left)   { book.select(row, Math.max(column - 1, 0)); event.accepted = true; }
+        else if (event.key === Qt.Key_Right || event.key === Qt.Key_Tab)
+                                              { book.select(row, Math.min(column + 1, sheetArea.columns - 1)); event.accepted = true; }
+        else if (event.key === Qt.Key_F2)     { sheetArea.beginEdit(row, column); event.accepted = true; }
+        else if (event.key === Qt.Key_Delete) { book.commit(""); event.accepted = true; }
+        else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                                              { book.select(Math.min(row + 1, sheetArea.rows - 1), column); event.accepted = true; }
+        else if (event.text.length > 0 && event.text >= " ") {
+            // Typing over a cell replaces it, as in Excel — F2 edits in place instead.
+            sheetArea.beginEdit(row, column, event.text);
+            event.accepted = true;
+        }
+    }
     readonly property var g: ref.grid
     readonly property var pal: book.light ? ref.palette.light : ref.palette.dark
     readonly property int columns: Math.max(1, Math.ceil((width - g.row_header_width)
@@ -111,7 +169,11 @@ Item {
                         }
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: book.select(rowIndex, index)
+                            onClicked: {
+                                book.select(rowIndex, index);
+                                sheetArea.forceActiveFocus();
+                            }
+                            onDoubleClicked: sheetArea.beginEdit(rowIndex, index)
                         }
                     }
                 }
@@ -130,6 +192,40 @@ Item {
         Rectangle {                       // the fill handle
             width: 5; height: 5; color: pal.accent
             anchors { right: parent.right; bottom: parent.bottom; margins: -2 }
+        }
+    }
+
+    // --- the in-cell editor ---------------------------------------------------------------
+    Rectangle {
+        objectName: "cellEditor"
+        visible: sheetArea.editingRow >= 0
+        x: g.row_header_width + sheetArea.editingColumn * g.column_width
+        y: g.column_header_height + sheetArea.editingRow * g.row_height
+        width: g.column_width; height: g.row_height
+        color: "#ffffff"
+        border.width: g.active_cell_border
+        border.color: pal.accent
+        TextInput {
+            id: cellEditor
+            anchors { fill: parent; leftMargin: 4; rightMargin: 4 }
+            verticalAlignment: TextInput.AlignVCenter
+            color: "#191919"
+            font.family: theme.family
+            font.pixelSize: 13
+            clip: true
+            Keys.onPressed: function (event) {
+                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    sheetArea.commitEdit(true);
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Escape) {
+                    sheetArea.cancelEdit();
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Tab) {
+                    sheetArea.commitEdit(false);
+                    book.select(book.selectedRow, book.selectedColumn + 1);
+                    event.accepted = true;
+                }
+            }
         }
     }
 }

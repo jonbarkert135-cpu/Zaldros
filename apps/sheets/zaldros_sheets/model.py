@@ -87,6 +87,11 @@ class GridModel(QAbstractTableModel):
         entry = self._cache.get((row, column))
         return bool(entry and entry[1])
 
+    @Slot(int, int, result=str)
+    def cellFormula(self, row: int, column: int) -> str:
+        """What the formula bar and the in-cell editor show: the engine's own formula text."""
+        return self.formula_at(row, column)
+
     @Slot(int, result=str)
     def columnName(self, index: int) -> str:
         return column_name(index)

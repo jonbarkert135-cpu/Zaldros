@@ -91,3 +91,40 @@ def test_opening_a_missing_file_names_the_file(engine, tmp_path):
     with pytest.raises(EngineError) as caught:
         engine.open(tmp_path / "absent.xlsx")
     assert "absent.xlsx" in str(caught.value)
+
+
+# --- typing into a cell, end to end ---------------------------------------------------------
+def test_typing_a_formula_is_the_engines_decision_not_ours(engine):
+    """`set_input` is what the in-cell editor and the formula bar call. The engine decides
+    whether what was typed is a number, a text or a formula — we never parse it."""
+    book = engine.new_workbook()
+    try:
+        book.set_input(0, 0, "7")
+        book.set_input(1, 0, "8")
+        cell = book.set_input(2, 0, "=A1+A2")
+        assert cell.kind == "formula" and cell.value == 15
+        assert book.set_input(3, 0, "просто текст").kind == "text"
+        assert book.set_input(4, 0, "3,5").kind in ("number", "text")   # locale is the engine's
+    finally:
+        book.close()
+
+
+def test_clearing_a_cell_leaves_it_empty_rather_than_showing_a_zero(engine):
+    book = engine.new_workbook()
+    try:
+        book.set_input(0, 0, "42")
+        cleared = book.set_input(0, 0, "")
+        assert cleared.kind == "empty" and cleared.text == ""
+    finally:
+        book.close()
+
+
+def test_the_editor_shows_the_formula_and_the_grid_shows_the_result(engine):
+    book = engine.new_workbook()
+    try:
+        book.set_input(0, 0, "2")
+        book.set_input(0, 1, "=A1*3")
+        cell = book.cell(0, 1)
+        assert cell.formula == "=A1*3" and cell.text == "6"
+    finally:
+        book.close()
