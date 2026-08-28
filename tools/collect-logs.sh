@@ -35,6 +35,10 @@ grab() {
     else
         echo "[missing tool: $1]" >"${file}"
     fi
+    # An empty file is ambiguous to whoever reads the archive: did the probe not run, or did the
+    # machine really have nothing to say? `systemctl --failed` on a healthy host prints nothing,
+    # and that silence is a *result*. It gets written down as one.
+    [ -s "${file}" ] || echo "[no output from: $*]" >"${file}"
 }
 
 copy() {

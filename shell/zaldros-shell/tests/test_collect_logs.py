@@ -42,8 +42,41 @@ def test_the_archive_holds_every_section_even_where_the_tool_is_missing(archive)
                      "45-network.txt", "48-firmware.txt"):
         assert expected in names, expected
     assert "kernel: Linux" in summary
-    # A missing tool is a recorded fact, not a silently empty file.
+    # A missing tool, a failing tool and a tool with nothing to report are all recorded facts,
+    # never a silently empty file. `systemctl --failed` prints nothing on a healthy host, which is
+    # why this assertion first went red on CI while passing in the sandbox.
     assert failed.strip(), "an empty probe file tells the reader nothing"
+    with tarfile.open(archive) as tar:
+        for name in tar.getnames():
+            member = tar.getmember(name)
+            if member.isfile() and not name.endswith(".png"):
+                assert member.size > 0, f"{name} is empty and therefore says nothing"
+
+
+def test_a_silent_tool_is_written_down_as_silent(tmp_path):
+    """The regression that made this file red on CI and green in the sandbox.
+
+    `systemctl --failed` prints nothing on a machine with no failed units — the most common case
+    on real hardware, and the one where an empty file is most misleading. Simulated with a stub on
+    PATH so the assertion holds on every host, not just on one.
+    """
+    stub_dir = tmp_path / "bin"
+    stub_dir.mkdir()
+    stub = stub_dir / "systemctl"
+    stub.write_text("#!/bin/sh\nexit 0\n")
+    stub.chmod(0o755)
+    out = tmp_path / "out"
+    out.mkdir()
+    env = dict(os.environ, PATH=f"{stub_dir}:{os.environ['PATH']}",
+               PYTHONPATH=str(REPO / "backend"))
+    done = subprocess.run(["sh", str(SCRIPT), str(out)], capture_output=True, text=True,
+                          env=env, timeout=300)
+    assert done.returncode == 0, done.stderr
+    archive = next(out.glob("zaldros-logs-*.tar.gz"))
+    with tarfile.open(archive) as tar:
+        root = tar.getnames()[0].split("/")[0]
+        failed = tar.extractfile(f"{root}/14-systemd-failed.txt").read().decode()
+    assert "[no output from:" in failed, failed
 
 
 def test_the_backend_answers_even_with_no_buses(archive):
