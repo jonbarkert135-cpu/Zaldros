@@ -63,6 +63,13 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Графики ЦП/памяти рисуются, но история теряется при закрытии окна
 - [ ] «Журнал приложений» и «Пользователи» — не делались
 
+## Диспетчер устройств (ADR-0017)
+- [x] Дерево категорий из sysfs/DMI/procfs, свойства устройства, пометка «драйвер не загружен»,
+      причина у каждой пустой ветки, пересканирование шины PCI
+- [ ] Ветка Bluetooth из BlueZ (имя адаптера, состояние) вместо строки PCI/USB
+- [ ] Модули памяти из DMI type 17 (нужен root)
+- [ ] Диагностика: перезагрузка модуля ядра, журнал устройства из journald
+
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [x] Settings: every row backed by a real control with read + write (ADR-0015) — display,

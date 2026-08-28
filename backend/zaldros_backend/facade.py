@@ -25,6 +25,7 @@ from .audio import AudioFacet
 from .bluetooth import BluetoothFacet
 from .bus import Bus
 from .defaultapps import DefaultAppsFacet
+from .devices import DevicesFacet
 from .display import DisplayFacet
 from .firewall import FirewallFacet
 from .inputdevices import InputFacet
@@ -65,6 +66,8 @@ class ZaldrosBackend:
         # The Task Manager's data source. Constructed here, but it reads nothing until someone
         # calls sample(): a closed Task Manager costs exactly zero /proc reads (ADR-0016).
         self.processes = ProcessFacet()
+        # The Device Manager's tree: pure sysfs reads, done only when the window asks.
+        self.devices = DevicesFacet()
 
         # The facets Settings needs beyond the tray: they are constructed here too, because a
         # second construction site is a second place to get a bus wrong.

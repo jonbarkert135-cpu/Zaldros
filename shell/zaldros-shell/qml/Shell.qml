@@ -31,11 +31,11 @@ Item {
     // --- window manager --------------------------------------------------------------------
     // Two real applications live in the window layer. Each one has open / minimised / maximised
     // state and a z order; the taskbar reflects it and Alt+Tab walks it.
-    property var windowIds: ["explorer", "settings", "taskmanager"]
+    property var windowIds: ["explorer", "settings", "taskmanager", "devicemanager"]
     property string focusedWindow: "explorer"
-    property var openWindows: ({ explorer: true, settings: true, taskmanager: false })
-    property var minimised: ({ explorer: false, settings: false, taskmanager: false })
-    property var maximised: ({ explorer: false, settings: false, taskmanager: false })
+    property var openWindows: ({ explorer: true, settings: true, taskmanager: false, devicemanager: false })
+    property var minimised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false })
+    property var maximised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false })
 
     function isOpen(id) { return openWindows[id] === true && minimised[id] !== true }
     function focusWindow(id) {
@@ -97,6 +97,7 @@ Item {
     property var backendCapture: gameBarModel
     property var backendProcesses: processModel
     property var backendStartup: startupModel
+    property var backendDevices: deviceModel
 
     onLightModeChanged: Theme.dark = !lightMode
 
@@ -324,6 +325,41 @@ Item {
         }
     }
 
+    // «Диспетчер устройств». Closed by default, like the Task Manager: an unopened window may
+    // not change a pixel of the desktop and may not touch sysfs.
+    AppWindow {
+        id: deviceManagerWindow
+        objectName: "deviceManagerWindow"
+        title: "Диспетчер устройств"
+        iconGlyph: "apps"
+        visible: shell.isOpen("devicemanager")
+        active: shell.focusedWindow === "devicemanager"
+        maximized: shell.maximised["devicemanager"] === true
+        z: shell.focusedWindow === "devicemanager" ? 12 : 10
+        x: maximized ? 0 : shell.placedX(280, 1040)
+        y: maximized ? 0 : shell.placedY(110, 640)
+        width: maximized ? shell.width : shell.placedWidth(1040)
+        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(640)
+        onActivateRequested: shell.focusWindow("devicemanager")
+        onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "devicemanager", true)
+        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "devicemanager", !maximized)
+        onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "devicemanager", false)
+
+        DeviceManager {
+            anchors.fill: parent
+            model: shell.backendDevices
+        }
+    }
+
+    Connections {
+        target: deviceManagerWindow
+        function onVisibleChanged() {
+            // Enumerating happens when the window opens. Hardware changes rarely and udev will
+            // announce it; a timer here would be exactly the polling ADR-0014 removed.
+            if (deviceManagerWindow.visible && shell.backendDevices) shell.backendDevices.refresh();
+        }
+    }
+
     // Sampling follows the window: open means a 2 s refresh, closed means no /proc reads at all.
     Connections {
         target: taskManagerWindow
@@ -501,6 +537,9 @@ Item {
                  // Settings are pinned, this one is not, so the closed desktop is pixel-identical.
                  ? [{ id: "taskmanager", name: "Диспетчер задач", glyph: "apps", running: true,
                       active: shell.focusedWindow === "taskmanager" && shell.isOpen("taskmanager") }]
+                 : []).concat(shell.openWindows["devicemanager"] === true
+                 ? [{ id: "devicemanager", name: "Диспетчер устройств", glyph: "apps", running: true,
+                      active: shell.focusedWindow === "devicemanager" && shell.isOpen("devicemanager") }]
                  : [])
         state: shell.backendState
         system: shell.backendSystem

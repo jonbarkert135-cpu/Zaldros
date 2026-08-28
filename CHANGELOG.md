@@ -18,6 +18,9 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
   driver reports load, autostart entries, end task, search and sorting — all read from /proc and
   sysfs, with unknown values shown as a dash and no sampling at all while the window is closed
   (ADR-0016).
+- Device Manager: the hardware tree read from sysfs, DMI and procfs — PCI, USB, disks, network,
+  displays, cameras, input devices, sound cards, printers — with unbound drivers marked and every
+  empty category carrying the reason it is empty (ADR-0017).
 - A Windows 11-style Alt+Tab switcher of our own (`system/theme/tabbox/zaldros`); the stock KWin
   layout needs the Plasma QML stack and silently did nothing in a Zaldros session.
 - Windows 11 widget style for QWidget applications: the `Windows-modern` Kvantum theme (GPL-3)

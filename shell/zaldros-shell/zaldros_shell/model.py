@@ -1419,3 +1419,124 @@ class StartupModel(QAbstractListModel):
     @Property(int, notify=changed)
     def count(self) -> int:
         return len(self._rows)
+
+
+DEVICE_ROLES = {name: Qt.UserRole + 300 + index for index, name in enumerate(
+    ("kind", "title", "status", "driver", "working", "expanded", "category", "detailKeys",
+     "detailValues", "source"))}
+
+
+class DeviceModel(QAbstractListModel):
+    """The Device Manager tree, flattened for a ListView: category rows and device rows.
+
+    Windows draws a tree; a flat model with a `kind` role gives the same picture with a fraction
+    of the code, and keeps expand/collapse in one place. Categories that are empty stay in the
+    list carrying the reason — a machine with no camera says so instead of showing nothing.
+    """
+
+    changed = Signal()
+
+    def __init__(self, facet=None) -> None:
+        super().__init__()
+        self._facet = facet
+        self._tree: list[dict] = []
+        self._rows: list[dict] = []
+        self._expanded: set[str] = set()
+        self._problems = 0
+
+    @property
+    def facet(self):
+        if self._facet is None:
+            self._facet = system.backend().devices
+        return self._facet
+
+    @Slot()
+    def refresh(self) -> None:
+        """Re-enumerate. Called when the window opens, not on a timer: hardware appears rarely,
+        and udev will tell us when it does (a future subscription, deliberately not a poll)."""
+        self._tree = self.facet.tree()
+        self._problems = sum(1 for node in self._tree for device in node["devices"]
+                             if not device["working"])
+        # A category with something broken in it starts open, like Windows does.
+        for node in self._tree:
+            if any(not device["working"] for device in node["devices"]):
+                self._expanded.add(node["category"])
+        self._flatten()
+
+    def _flatten(self) -> None:
+        rows: list[dict] = []
+        for node in self._tree:
+            category = node["category"]
+            rows.append({"kind": "category", "title": category, "category": category,
+                         "status": node["reason"], "expanded": category in self._expanded,
+                         "working": True, "driver": "", "detailKeys": [], "detailValues": [],
+                         "source": ""})
+            if category not in self._expanded:
+                continue
+            for device in node["devices"]:
+                details = device["details"]
+                rows.append({"kind": "device", "title": device["name"], "category": category,
+                             "status": device["status"], "driver": device["driver"],
+                             "working": device["working"], "expanded": False,
+                             "detailKeys": list(details.keys()),
+                             "detailValues": [str(value) for value in details.values()],
+                             "source": device["source"]})
+        self.beginResetModel()
+        self._rows = rows
+        self.endResetModel()
+        self.changed.emit()
+
+    @Slot(int)
+    def toggle(self, row: int) -> None:
+        if not (0 <= row < len(self._rows)):
+            return
+        entry = self._rows[row]
+        if entry["kind"] != "category":
+            return
+        category = entry["category"]
+        self._expanded.symmetric_difference_update({category})
+        self._flatten()
+
+    @Slot(int, result="QVariantMap")
+    def get(self, row: int) -> dict:
+        """One flattened row, for the properties pane."""
+        return dict(self._rows[row]) if 0 <= row < len(self._rows) else {}
+
+    @Slot(result="QVariantMap")
+    def rescan(self) -> dict:
+        """«Обновить конфигурацию оборудования» — the kernel's answer, refusal included."""
+        result = self.facet.rescan()
+        self.refresh()
+        return {"ok": result.available, "detail": result.detail}
+
+    def roleNames(self) -> dict:  # noqa: N802
+        return {role: name.encode() for name, role in DEVICE_ROLES.items()}
+
+    def rowCount(self, parent=QModelIndex()) -> int:  # noqa: N802
+        return 0 if parent.isValid() else len(self._rows)
+
+    def data(self, index: QModelIndex, role: int = Qt.DisplayRole):
+        if not index.isValid() or not (0 <= index.row() < len(self._rows)):
+            return None
+        entry = self._rows[index.row()]
+        for name, value in DEVICE_ROLES.items():
+            if value == role:
+                return entry.get(name)
+        return None
+
+    @Property(int, notify=changed)
+    def count(self) -> int:
+        return len(self._rows)
+
+    @Property(int, notify=changed)
+    def problemCount(self) -> int:  # noqa: N802
+        return self._problems
+
+    @Property(str, notify=changed)
+    def summary(self) -> str:
+        devices = sum(len(node["devices"]) for node in self._tree)
+        if not self._tree:
+            return "Оборудование ещё не перечислено"
+        if self._problems:
+            return f"Устройств: {devices}    С проблемами: {self._problems}"
+        return f"Устройств: {devices}    Все с загруженными драйверами"
