@@ -21,7 +21,7 @@ from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
 from .model import (AppModel, ClipboardModel, FileModel, GameBarModel, HostInfo, InstalledAppModel,
-                    DeviceModel, Prefs, ProcessModel, RecentModel, SettingsControls, SettingsTree, StartupModel,
+                    DeviceModel, Prefs, ProcessModel, TerminalModel, RecentModel, SettingsControls, SettingsTree, StartupModel,
                     WeatherState, ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
@@ -99,6 +99,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     process_model = ProcessModel()
     startup_model = StartupModel()
     device_model = DeviceModel()
+    terminal_model = TerminalModel()
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
     context.setContextProperty("installedModel", installed)
@@ -116,6 +117,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("processModel", process_model)
     context.setContextProperty("startupModel", startup_model)
     context.setContextProperty("deviceModel", device_model)
+    context.setContextProperty("terminalModel", terminal_model)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
     context.setContextProperty(
@@ -126,7 +128,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
         raise RuntimeError(f"QML failed to load:\n{errors}")
     return view, [model, installed, state, system_state, file_model, recent_model, host_info,
                   weather_state, settings_tree, settings_controls, user_prefs, clipboard_model,
-                  game_bar_model, process_model, startup_model, device_model]
+                  game_bar_model, process_model, startup_model, device_model, terminal_model]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
@@ -138,7 +140,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
            clipboard_open: bool = False, game_bar_open: bool = False,
            focused_window: str = "explorer", settings_page: int = 1,
            task_manager_open: bool = False, task_manager_page: int = 0,
-           device_manager_open: bool = False,
+           device_manager_open: bool = False, terminal_open: bool = False,
            geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -164,6 +166,9 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     root.setProperty("contextOpen", context_open)
     root.setProperty("focusedWindow", focused_window)
     root.setProperty("settingsPage", settings_page)
+    if terminal_open:
+        QMetaObject.invokeMethod(root, "toggleWindow", Q_ARG("QVariant", "terminal"))
+        root.setProperty("focusedWindow", "terminal")
     if device_manager_open:
         QMetaObject.invokeMethod(root, "toggleWindow", Q_ARG("QVariant", "devicemanager"))
         root.setProperty("focusedWindow", "devicemanager")

@@ -19,6 +19,7 @@ from .desktop_entries import DesktopApp, discover, launch
 from . import clipboard as clipboard_history
 from . import capture, portal
 from . import files, hostinfo, prefs, settingscontrols, settingspages, system, taskmanager, weather
+from zaldros_backend import terminal
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
@@ -1540,3 +1541,184 @@ class DeviceModel(QAbstractListModel):
         if self._problems:
             return f"Устройств: {devices}    С проблемами: {self._problems}"
         return f"Устройств: {devices}    Все с загруженными драйверами"
+
+
+class TerminalModel(QObject):
+    """Tabs, panes and keystrokes for Zaldros Terminal.
+
+    Reading is event-driven: a QSocketNotifier per pty wakes only when the shell has written
+    something. No timer polls the terminal, and a window with no output costs nothing — the same
+    rule as the rest of the shell (ADR-0014).
+    """
+
+    changed = Signal()
+    outputChanged = Signal()
+
+    def __init__(self, factory=None) -> None:
+        super().__init__()
+        self._factory = factory or terminal.PtySession
+        self._tabs: list = []
+        self._active = 0
+        self._notifiers: dict[int, object] = {}
+        self._columns = terminal.DEFAULT_COLUMNS
+        self._rows = terminal.DEFAULT_ROWS
+
+    # --- tabs and panes ---------------------------------------------------------------------
+    @Slot(str, result=bool)
+    def openTab(self, command: str = "") -> bool:  # noqa: N802
+        """New tab. False when the shell does not exist — the dropdown never offers one that
+        does not, but a profile can vanish between listing and clicking."""
+        session = self._factory(command or self._default_command(), self._columns, self._rows)
+        if not session.start():
+            return False
+        tab = terminal.Tab(panes=[terminal.Pane(session)], name=terminal._shell_title(
+            session.command))
+        self._tabs.append(tab)
+        self._active = len(self._tabs) - 1
+        self._watch(session)
+        self.changed.emit()
+        return True
+
+    @Slot(result=bool)
+    def splitPane(self) -> bool:  # noqa: N802
+        """Alt+Shift+Plus: a second shell beside the first, inside the same tab."""
+        tab = self._tab()
+        if tab is None:
+            return False
+        session = self._factory(self._default_command(), max(self._columns // 2, 20), self._rows)
+        if not session.start():
+            return False
+        tab.panes.append(terminal.Pane(session))
+        tab.active = len(tab.panes) - 1
+        self._watch(session)
+        self.changed.emit()
+        return True
+
+    @Slot(int)
+    def selectTab(self, index: int) -> None:  # noqa: N802
+        if 0 <= index < len(self._tabs):
+            self._active = index
+            self.changed.emit()
+
+    @Slot(int)
+    def selectPane(self, index: int) -> None:  # noqa: N802
+        tab = self._tab()
+        if tab and 0 <= index < len(tab.panes):
+            tab.active = index
+            self.changed.emit()
+
+    @Slot(int)
+    def closeTab(self, index: int) -> None:  # noqa: N802
+        if not (0 <= index < len(self._tabs)):
+            return
+        for pane in self._tabs[index].panes:
+            self._unwatch(pane.session)
+            pane.session.close()
+        del self._tabs[index]
+        self._active = max(0, min(self._active, len(self._tabs) - 1))
+        self.changed.emit()
+
+    @Slot()
+    def closeAll(self) -> None:  # noqa: N802
+        while self._tabs:
+            self.closeTab(len(self._tabs) - 1)
+
+    # --- input ------------------------------------------------------------------------------
+    @Slot(str)
+    def send(self, text: str) -> None:
+        session = self._session()
+        if session is not None:
+            session.write(text)
+
+    @Slot(result=str)
+    def copy(self) -> str:
+        """Ctrl+Shift+C — the visible screen, exactly as it is drawn."""
+        session = self._session()
+        return session.screen.text() if session else ""
+
+    @Slot(str)
+    def paste(self, text: str) -> None:
+        """Ctrl+Shift+V. Bracketed paste is deliberately not claimed: without it a pasted
+        newline runs the command, which is what a plain terminal does."""
+        self.send(text)
+
+    @Slot(int, int)
+    def resize(self, columns: int, rows: int) -> None:
+        self._columns, self._rows = max(1, columns), max(1, rows)
+        for tab in self._tabs:
+            for pane in tab.panes:
+                width = self._columns // max(1, len(tab.panes))
+                pane.session.resize(width, self._rows)
+        self.outputChanged.emit()
+
+    # --- what QML draws -----------------------------------------------------------------------
+    @Property("QVariantList", notify=changed)
+    def tabs(self) -> list:
+        return [{"name": tab.panes[tab.active].session.screen.title or tab.name,
+                 "panes": len(tab.panes), "active": index == self._active}
+                for index, tab in enumerate(self._tabs)]
+
+    @Property("QVariantList", notify=outputChanged)
+    def panes(self) -> list:
+        tab = self._tab()
+        if tab is None:
+            return []
+        return [{"lines": pane.session.screen.lines(),
+                 "cursorX": pane.session.screen.cursor_x,
+                 "cursorY": pane.session.screen.cursor_y,
+                 "active": index == tab.active,
+                 "alive": pane.session.alive,
+                 "title": pane.session.screen.title or pane.title}
+                for index, pane in enumerate(tab.panes)]
+
+    @Property("QVariantList", constant=True)
+    def profiles(self) -> list:
+        return [profile.as_row() for profile in terminal.profiles()]
+
+    @Property(int, notify=changed)
+    def tabCount(self) -> int:  # noqa: N802
+        return len(self._tabs)
+
+    @Property(int, notify=changed)
+    def activeTab(self) -> int:  # noqa: N802
+        return self._active
+
+    @Property(int, notify=outputChanged)
+    def columns(self) -> int:
+        return self._columns
+
+    @Property(int, notify=outputChanged)
+    def rows(self) -> int:
+        return self._rows
+
+    # --- plumbing ----------------------------------------------------------------------------
+    def _default_command(self) -> str:
+        found = terminal.profiles()
+        return found[0].command if found else "/bin/sh"
+
+    def _tab(self):
+        return self._tabs[self._active] if 0 <= self._active < len(self._tabs) else None
+
+    def _session(self):
+        tab = self._tab()
+        return tab.panes[tab.active].session if tab and tab.panes else None
+
+    def _watch(self, session) -> None:
+        from PySide6.QtCore import QSocketNotifier
+        if session.fd < 0:
+            return
+        notifier = QSocketNotifier(session.fd, QSocketNotifier.Read)
+        notifier.activated.connect(lambda *_args, session=session: self._drain(session))
+        self._notifiers[session.fd] = notifier
+
+    def _unwatch(self, session) -> None:
+        notifier = self._notifiers.pop(session.fd, None)
+        if notifier is not None:
+            notifier.setEnabled(False)
+
+    def _drain(self, session) -> None:
+        data = session.read()
+        if not data and not session.alive:
+            self._unwatch(session)
+        self.outputChanged.emit()
+        self.changed.emit()          # the tab title can change with any line of output

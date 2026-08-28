@@ -78,6 +78,12 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Агент сопряжения BlueZ (ввод PIN-кода)
 - [ ] Создание и редактирование профилей VPN, ручная настройка прокси
 
+## Терминал (ADR-0019)
+- [x] Настоящий pty, разбор xterm, вкладки, панели, профили, сочетания клавиш, копирование
+- [ ] Выделение мышью и полоса прокрутки (буфер уже хранится)
+- [ ] Файл настроек в духе Windows Terminal `settings.json`, выбор моноширинного шрифта
+- [ ] Проверить zsh, fish и pwsh на машине, где они установлены
+
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [x] Settings: every row backed by a real control with read + write (ADR-0015) — display,

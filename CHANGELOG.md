@@ -24,6 +24,9 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
 - Connectivity write paths: joining a Wi-Fi network with a password, VPN profiles on and off, DNS
   and proxy readings, Bluetooth pairing and removal, per-application volume, recording device
   selection and power profiles (ADR-0018).
+- Zaldros Terminal: a real pty with our own xterm parser — tabs, split panes, shell profiles,
+  Campbell colours, 256-colour and truecolour, the alternate screen, and Windows Terminal's
+  shortcuts (ADR-0019).
 - A Windows 11-style Alt+Tab switcher of our own (`system/theme/tabbox/zaldros`); the stock KWin
   layout needs the Plasma QML stack and silently did nothing in a Zaldros session.
 - Windows 11 widget style for QWidget applications: the `Windows-modern` Kvantum theme (GPL-3)

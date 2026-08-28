@@ -31,11 +31,11 @@ Item {
     // --- window manager --------------------------------------------------------------------
     // Two real applications live in the window layer. Each one has open / minimised / maximised
     // state and a z order; the taskbar reflects it and Alt+Tab walks it.
-    property var windowIds: ["explorer", "settings", "taskmanager", "devicemanager"]
+    property var windowIds: ["explorer", "settings", "taskmanager", "devicemanager", "terminal"]
     property string focusedWindow: "explorer"
-    property var openWindows: ({ explorer: true, settings: true, taskmanager: false, devicemanager: false })
-    property var minimised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false })
-    property var maximised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false })
+    property var openWindows: ({ explorer: true, settings: true, taskmanager: false, devicemanager: false, terminal: false })
+    property var minimised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false, terminal: false })
+    property var maximised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false, terminal: false })
 
     function isOpen(id) { return openWindows[id] === true && minimised[id] !== true }
     function focusWindow(id) {
@@ -98,6 +98,7 @@ Item {
     property var backendProcesses: processModel
     property var backendStartup: startupModel
     property var backendDevices: deviceModel
+    property var backendTerminal: terminalModel
 
     onLightModeChanged: Theme.dark = !lightMode
 
@@ -325,6 +326,38 @@ Item {
         }
     }
 
+    // Zaldros Terminal. Closed by default; opening it starts one real shell on a pty.
+    AppWindow {
+        id: terminalWindow
+        objectName: "terminalWindow"
+        title: "Терминал"
+        iconGlyph: "terminal"
+        // The tab strip lives inside the application (as in Windows Terminal), so the window
+        // keeps the plain 32 px title bar rather than a second strip of tabs.
+        visible: shell.isOpen("terminal")
+        active: shell.focusedWindow === "terminal"
+        maximized: shell.maximised["terminal"] === true
+        z: shell.focusedWindow === "terminal" ? 12 : 10
+        x: maximized ? 0 : shell.placedX(360, 980)
+        y: maximized ? 0 : shell.placedY(170, 600)
+        width: maximized ? shell.width : shell.placedWidth(980)
+        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(600)
+        onActivateRequested: shell.focusWindow("terminal")
+        onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "terminal", true)
+        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "terminal", !maximized)
+        onCloseRequested: {
+            shell.openWindows = shell.setFlag(shell.openWindows, "terminal", false);
+            // Closing the window kills the shells it owns: an invisible pty is a leak, and a
+            // background bash nobody can see is exactly what the performance rule forbids.
+            if (shell.backendTerminal) shell.backendTerminal.closeAll();
+        }
+
+        Terminal {
+            anchors.fill: parent
+            model: shell.backendTerminal
+        }
+    }
+
     // «Диспетчер устройств». Closed by default, like the Task Manager: an unopened window may
     // not change a pixel of the desktop and may not touch sysfs.
     AppWindow {
@@ -537,6 +570,9 @@ Item {
                  // Settings are pinned, this one is not, so the closed desktop is pixel-identical.
                  ? [{ id: "taskmanager", name: "Диспетчер задач", glyph: "apps", running: true,
                       active: shell.focusedWindow === "taskmanager" && shell.isOpen("taskmanager") }]
+                 : []).concat(shell.openWindows["terminal"] === true
+                 ? [{ id: "terminal", name: "Терминал", glyph: "terminal", running: true,
+                      active: shell.focusedWindow === "terminal" && shell.isOpen("terminal") }]
                  : []).concat(shell.openWindows["devicemanager"] === true
                  ? [{ id: "devicemanager", name: "Диспетчер устройств", glyph: "apps", running: true,
                       active: shell.focusedWindow === "devicemanager" && shell.isOpen("devicemanager") }]
