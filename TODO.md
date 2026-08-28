@@ -98,6 +98,12 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Рецензирование, оглавление, сноски, колонтитулы, печать из UI
 - [ ] Поставить `libreoffice-writer-nogui` в ISO рядом с `libreoffice-calc-nogui`
 
+## Zaldros Slides (ADR-0022)
+- [x] Мост к Impress, макеты, заметки, переходы, PPTX/ODP, экспорт PDF — на живом движке
+- [ ] Режим докладчика и показ слайдов
+- [ ] Анимации, темы, вставка картинок и таблиц, правка текста прямо на слайде
+- [ ] Переход не переживает круг через PPTX — проверить на новых версиях LibreOffice
+
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [x] Settings: every row backed by a real control with read + write (ADR-0015) — display,
