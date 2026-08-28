@@ -21,6 +21,23 @@ The runners report `KVM available`, so those boots are accelerated, not TCG. `fu
 `start_close`, `taskbar_response` and `alt_tab` as PASS with a second real window
 (`Home — Dolphin`) on screen and an empty `qmp_errors` list.
 
+### Where a CI job's evidence is kept
+
+Every build and boot job publishes what it saw to its own branch — `ci-logs-<variant>` for builds
+(`steps.tsv`, `environment.txt`, `el-torito.txt`, per-step logs) and
+`ci-logs-boot-<variant>-<profile>` for boots (JSON reports, serial log, PNG screendumps). No
+repository admin rights are needed to read them, unlike job artifacts:
+
+```bash
+git fetch origin '+refs/heads/ci-logs-*:refs/remotes/origin/ci-logs-*'
+git show origin/ci-logs-boot-full-modern:zaldros-full-modern-host.json
+```
+
+Publishing goes through `build/iso/publish-evidence.sh`, which retries the `cannot lock ref` race
+that two overlapping runs cause and fails loudly if nothing lands (**ADR-0024**). The UEFI half of
+each ISO is verified from the El Torito catalogue by `build/iso/verify-iso.py`: no UEFI boot image
+means the build fails, an unreadable report means `UNVERIFIED` — never a pass.
+
 **What that evidence is not.** Nothing has run on real hardware: no laptop, no GPU that is not
 virtio, no Wi-Fi or Bluetooth radio, no installer. Every "works" in this repository means "works
 in QEMU on a GitHub runner" until a machine says otherwise.

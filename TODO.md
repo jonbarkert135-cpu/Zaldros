@@ -9,9 +9,12 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Build host with `/dev/kvm`: the GitHub runners have it (`KVM available`), and the `iso`
       workflow boot-tests 9 images on it — run 33157358995. Still open: **the owner's machine**,
       for a build under real root and a boot on real hardware
-- [ ] **Owner action:** copy the `set -o pipefail` from `docs/ci/iso.yml` into
-      `.github/workflows/iso.yml` (step "Result matrix") — Viktor's GitHub App may not push
-      workflow files; until then a crashed report or a failed boot can still read green (ADR-0021)
+- [ ] **Owner action:** copy four fixes from `docs/ci/iso.yml` into `.github/workflows/iso.yml`
+      — Viktor's GitHub App may not push workflow files. (1) `set -o pipefail` in "Result matrix",
+      or a crashed report reads green (ADR-0021); (2+3) both publish steps now call
+      `build/iso/publish-evidence.sh`, which retries the `cannot lock ref` race that reddened run
+      33161289986; (4) "Diagnostics summary" probes end in `|| echo`, or one missing file drops the
+      last 200 lines of the build log out of the summary (ADR-0024)
 - [ ] Settle the base distribution with the test in `docs/research/03-base-distribution-reopened.md`
 
 ## Real desktop (next slice)

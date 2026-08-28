@@ -31,6 +31,11 @@ step() {                              # step <name> <command...> — records the
 
 collect_debug() {                     # runs on every exit, including failures
   local rc=$?
+  # `set -e` inside this function is how diagnostics get truncated: the first probe that exits
+  # non-zero (a chroot that no longer exists, a missing file) would abort the whole group and
+  # leave a half-written environment.txt. A diagnostic that stops early is worse than none,
+  # because it looks complete.
+  set +e
   {
     echo "=== exit code: $rc"; echo "=== date: $(date -Is)"
     echo "=== uname -a"; uname -a
@@ -264,7 +269,12 @@ chroot "$ROOT" systemctl enable zaldros-selftest.service
 chroot "$ROOT" systemctl mask casper-md5check.service
 
 echo "== squashfs + ISO"
-umount -l "$ROOT/dev" "$ROOT/proc" "$ROOT/sys" 2>/dev/null || true; trap - EXIT
+# The trap used to be disarmed here, which meant the whole squashfs + ISO half of the build — the
+# part that runs mksquashfs and grub-mkrescue on a 3 GiB tree — produced no diagnostics at all,
+# pass or fail. It also left environment.txt missing on every successful build, and the CI step
+# that reads it died with exit 1 behind `continue-on-error`, taking the last 200 lines of the
+# build log out of the run summary with it. The trap now stays armed to the end.
+umount -l "$ROOT/dev" "$ROOT/proc" "$ROOT/sys" 2>/dev/null || true
 install -d "$WORK/iso/casper" "$WORK/iso/boot/grub"
 mksquashfs "$ROOT" "$WORK/iso/casper/filesystem.squashfs" -comp zstd -Xcompression-level 15 -noappend
 cp "$ROOT"/boot/vmlinuz-* "$WORK/iso/casper/vmlinuz"
@@ -286,8 +296,18 @@ menuentry "Zaldros OS ($VARIANT)" {
 }
 EOS
 step grub-mkrescue grub-mkrescue -o "$OUT" "$WORK/iso" -- -volid ZALDROS
-# Evidence, not assumption: does this ISO actually carry an EFI El Torito image?
+# Evidence, not assumption: does this ISO actually carry a UEFI El Torito image? The old probe
+# (`-find /EFI`) asked the wrong question and ended every good build with an xorriso FAILURE line;
+# grub-mkrescue carries UEFI as the FAT image /efi.img inside the catalogue, not as a /EFI tree.
 echo "== El Torito catalogue"
-xorriso -indev "$OUT" -report_el_torito plain 2>&1 | tail -20 || true
-xorriso -indev "$OUT" -find /EFI -type f 2>&1 | head -20 || true
+ET="$DEBUG_DIR/el-torito.txt"
+xorriso -indev "$OUT" -report_el_torito plain > "$ET" 2>&1 || true
+tail -20 "$ET"
+et_rc=0
+python3 "$REPO/build/iso/verify-iso.py" --el-torito-report "$ET" || et_rc=$?
+printf '%s\t%s\t%s\n' "el-torito" "$et_rc" "verify-iso.py --el-torito-report $ET" \
+  >> "$DEBUG_DIR/steps.tsv"
+# rc 3 is "could not be verified here" — loud, but not a reason to throw away a built ISO.
+# rc 1 means the catalogue was read and there is no UEFI boot image: that image is not shippable.
+[ "$et_rc" -ne 1 ] || exit 1
 echo "ISO: $OUT ($(du -h "$OUT" | cut -f1))"

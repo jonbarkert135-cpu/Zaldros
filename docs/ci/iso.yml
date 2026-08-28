@@ -35,14 +35,25 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
+          # Every probe ends in `|| echo` — under `bash -e` one missing file used to abort the
+          # whole group, and the *last 200 lines of the build log* never reached the summary.
+          # That is the first thing anyone reads when a build breaks.
           sudo chown -R "$USER" build-debug-${{ matrix.variant }} build-${{ matrix.variant }}.log || true
           D=build-debug-${{ matrix.variant }}
           {
             echo "## build ${{ matrix.variant }} — ${{ job.status }}"
-            echo "### step exit codes"; echo '```'; cat "$D/steps.tsv" 2>/dev/null; echo '```'
-            echo "### environment"; echo '```'; head -80 "$D/environment.txt" 2>/dev/null; echo '```'
+            echo "### step exit codes"; echo '```'
+            cat "$D/steps.tsv" 2>/dev/null || echo "[no steps.tsv — the script died before its first step]"
+            echo '```'
+            echo "### El Torito / UEFI evidence"; echo '```'
+            tail -20 "$D/el-torito.txt" 2>/dev/null || echo "[no el-torito.txt — no ISO was assembled]"
+            echo '```'
+            echo "### environment"; echo '```'
+            head -80 "$D/environment.txt" 2>/dev/null || echo "[no environment.txt — collect_debug never ran]"
+            echo '```'
             echo "### last 200 lines of the build log"; echo '```'
-            tail -200 build-${{ matrix.variant }}.log 2>/dev/null; echo '```'
+            tail -200 build-${{ matrix.variant }}.log 2>/dev/null || echo "[no build log]"
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
       # Artifacts and job logs need repository admin rights to download, which blocks the
       # read-the-error → fix loop. Publishing the same diagnostics to a branch makes them plainly
@@ -51,16 +62,12 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          BRANCH=ci-logs-${{ matrix.variant }}
           rm -rf /tmp/pub && mkdir -p /tmp/pub
           cp -a build-debug-${{ matrix.variant }}/. /tmp/pub/ 2>/dev/null || true
           cp build-${{ matrix.variant }}.log /tmp/pub/ 2>/dev/null || true
-          cd /tmp/pub
-          git init -q . && git checkout -q -b "$BRANCH"
-          git config user.email "ci@zaldros.invalid" && git config user.name "zaldros ci"
-          echo "run ${{ github.run_id }} / ${{ matrix.variant }} / ${{ job.status }}" > RUN.txt
-          git add -A && git commit -qm "diagnostics: run ${{ github.run_id }} ${{ matrix.variant }} ${{ job.status }}"
-          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" "$BRANCH"
+          EVIDENCE_REMOTE="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" \
+            ./build/iso/publish-evidence.sh /tmp/pub ci-logs-${{ matrix.variant }} \
+            "diagnostics: run ${{ github.run_id }} ${{ matrix.variant }} ${{ job.status }}"
       - name: Keep every diagnostic, pass or fail
         if: always()
         uses: actions/upload-artifact@v4
@@ -112,13 +119,12 @@ jobs:
       - name: Publish boot results to the ci-logs branch
         if: always()
         run: |
-          BRANCH=ci-logs-boot-${{ matrix.variant }}-${{ matrix.profile }}
-          mogrify -format png results/*.ppm 2>/dev/null && rm -f results/*.ppm || true
-          cd results
-          git init -q . && git checkout -q -b "$BRANCH"
-          git config user.email "ci@zaldros.invalid" && git config user.name "zaldros ci"
-          git add -A && git commit -q --allow-empty -m "boot ${{ matrix.variant }}/${{ matrix.profile }} — ${{ job.status }}"
-          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" "$BRANCH"
+          # Two overlapping runs force-push the same branch; the loser gets `cannot lock ref`.
+          # The publisher below retries that race and still fails loudly if nothing lands.
+          EVIDENCE_REMOTE="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" \
+            ./build/iso/publish-evidence.sh results \
+            ci-logs-boot-${{ matrix.variant }}-${{ matrix.profile }} \
+            "boot ${{ matrix.variant }}/${{ matrix.profile }} — ${{ job.status }}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
