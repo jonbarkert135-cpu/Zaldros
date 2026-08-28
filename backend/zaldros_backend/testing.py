@@ -109,6 +109,9 @@ class MockSystem:
         self.address = address
         self.servers: dict[str, ObjectServer] = {}
         self._connections: list[Connection] = []
+        # What the code under test actually asked the services to do, so a test can assert on the
+        # arguments that went onto the bus rather than on a return value it made up itself.
+        self.calls: dict[str, list] = {}
 
     def service(self, name: str) -> ObjectServer:
         """The server that owns `name`, created on its own connection the first time."""
@@ -254,6 +257,46 @@ class MockSystem:
                     "RsnFlags": Variant("u", 0x100 if flags else 0),
                     "Frequency": Variant("u", 5180)}))
 
+        # Settings: saved connections, one of them a VPN. This is what «Сеть → VPN» reads.
+        settings = Interface("org.freedesktop.NetworkManager.Settings", {})
+        settings.add_method("ListConnections", "", "ao", lambda: [
+            "/org/freedesktop/NetworkManager/Settings/1",
+            "/org/freedesktop/NetworkManager/Settings/2"])
+        server.add("/org/freedesktop/NetworkManager/Settings", settings)
+        for path, values in (
+                ("1", {"connection": {"id": Variant("s", "Zaldros-Guest"),
+                                      "type": Variant("s", "802-11-wireless"),
+                                      "uuid": Variant("s", "1111")}}),
+                ("2", {"connection": {"id": Variant("s", "Работа VPN"),
+                                      "type": Variant("s", "vpn"),
+                                      "uuid": Variant("s", "2222")}})):
+            connection = Interface("org.freedesktop.NetworkManager.Settings.Connection", {})
+            connection.add_method("GetSettings", "", "a{sa{sv}}", lambda values=values: values)
+            server.add(f"/org/freedesktop/NetworkManager/Settings/{path}", connection)
+
+        manager.add_method("AddAndActivateConnection", "a{sa{sv}}oo", "oo",
+                           lambda settings_map, device_path, specific:
+                           self._record("AddAndActivateConnection",
+                                        (settings_map, device_path, specific))
+                           or ("/org/freedesktop/NetworkManager/Settings/9", active))
+        manager.add_method("DeactivateConnection", "o", "",
+                           lambda path: self._record("DeactivateConnection", path))
+        manager.properties["ActiveConnections"] = Variant("ao", [active] if connected else [])
+
+    def _record(self, name: str, value):
+        """Remember a call so a test can assert what really went onto the bus."""
+        self.calls.setdefault(name, []).append(value)
+        return None
+
+    # -- power-profiles-daemon ------------------------------------------------------------------
+    def add_power_profiles(self, active: str = "balanced") -> None:
+        server = self.service("org.freedesktop.UPower.PowerProfiles")
+        profiles = Interface("org.freedesktop.UPower.PowerProfiles", {
+            "ActiveProfile": Variant("s", active),
+            "Profiles": Variant("aa{sv}", [{"Profile": Variant("s", name)}
+                                           for name in ("power-saver", "balanced", "performance")])})
+        server.add("/org/freedesktop/UPower/PowerProfiles", profiles)
+
     # -- BlueZ -------------------------------------------------------------------------------
     def add_bluez(self, powered: bool = True) -> None:
         server = self.service("org.bluez")
@@ -270,6 +313,7 @@ class MockSystem:
             "Adapter": Variant("o", "/org/bluez/hci0")})
         headset.add_method("Connect", "", "", lambda: None)
         headset.add_method("Disconnect", "", "", lambda: None)
+        headset.add_method("Pair", "", "", lambda: None)
         server.add("/org/bluez/hci0/dev_AA_00_11_22_33_44", headset)
         server.add("/org/bluez/hci0/dev_AA_00_11_22_33_44",
                         Interface("org.bluez.Battery1", {"Percentage": Variant("y", 65)}))
@@ -279,6 +323,13 @@ class MockSystem:
                 "Alias": Variant("s", "Клавиатура"), "Icon": Variant("s", "input-keyboard"),
                 "Paired": Variant("b", False), "Connected": Variant("b", False),
                 "Trusted": Variant("b", False), "Adapter": Variant("o", "/org/bluez/hci0")}))
+        keyboard = server.objects["/org/bluez/hci0/dev_BB_00_11_22_33_44"]["org.bluez.Device1"]
+        keyboard.add_method("Pair", "", "",
+                            lambda: self._record("Pair", "/org/bluez/hci0/dev_BB_00_11_22_33_44"))
+        # RemoveDevice belongs on the adapter object that already exists — adding a second
+        # Adapter1 interface would replace the properties the tray reads.
+        server.objects["/org/bluez/hci0"]["org.bluez.Adapter1"].add_method(
+            "RemoveDevice", "o", "", lambda path: self._record("RemoveDevice", path))
 
     # -- udisks2 -----------------------------------------------------------------------------
     def add_udisks(self, mounted: bool = True) -> None:
@@ -519,6 +570,7 @@ class MockSystem:
         server.add(path, transaction)
 
     def add_all(self) -> None:
+        self.add_power_profiles()
         self.add_upower()
         self.add_logind()
         self.add_network_manager()

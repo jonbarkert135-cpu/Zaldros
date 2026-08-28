@@ -70,6 +70,14 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Модули памяти из DMI type 17 (нужен root)
 - [ ] Диагностика: перезагрузка модуля ядра, журнал устройства из journald
 
+## Сеть, звук, Bluetooth, питание (ADR-0018)
+- [x] Wi-Fi с паролем, отключение, сохранённые профили, VPN вкл/выкл, DNS, прокси
+- [x] Сопряжение и удаление Bluetooth, батарея устройства
+- [x] Громкость по приложениям, выбор устройства записи
+- [x] Режимы питания power-profiles-daemon
+- [ ] Агент сопряжения BlueZ (ввод PIN-кода)
+- [ ] Создание и редактирование профилей VPN, ручная настройка прокси
+
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [x] Settings: every row backed by a real control with read + write (ADR-0015) — display,

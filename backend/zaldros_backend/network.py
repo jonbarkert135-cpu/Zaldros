@@ -11,6 +11,7 @@ from typing import Any, Callable
 
 from .bus import Bus, Result
 from .catalog import NetworkManager as NM
+from .wire import Variant
 from .reading import NO_DATA, NO_SERVICE, Reading
 
 CONNECTIVITY_TEXT = {
@@ -210,6 +211,109 @@ class NetworkFacet:
     def activate(self, connection_path: str, device_path: str = "/") -> Result:
         return self._bus.call(NM.SERVICE, NM.PATH, NM.IFACE, "ActivateConnection", "ooo",
                               [connection_path, device_path, "/"])
+
+
+    # -- joining and leaving a network ---------------------------------------------------------
+    def connect_wifi(self, ssid: str, password: str = "", device_path: str = "") -> Result:
+        """Join a network, saving it the way `nmcli` does: AddAndActivateConnection.
+
+        The SSID goes on the wire as a byte array (`ay`) — NetworkManager rejects a string, and
+        that is the mistake every hand-rolled client makes. An open network gets no security
+        block at all rather than an empty one, because an empty `802-11-wireless-security` makes
+        NetworkManager ask for a key that does not exist.
+        """
+        device = device_path or self._wifi_device()
+        if not device:
+            return Result.bad("нет устройства Wi-Fi", NM.SERVICE)
+        settings: dict[str, dict[str, Any]] = {
+            "connection": {"id": Variant("s", ssid), "type": Variant("s", "802-11-wireless")},
+            "802-11-wireless": {"ssid": Variant("ay", list(ssid.encode("utf-8"))),
+                                "mode": Variant("s", "infrastructure")},
+        }
+        if password:
+            settings["802-11-wireless-security"] = {"key-mgmt": Variant("s", "wpa-psk"),
+                                                    "psk": Variant("s", password)}
+        return self._bus.call(NM.SERVICE, NM.PATH, NM.IFACE, "AddAndActivateConnection",
+                              "a{sa{sv}}oo", [settings, device, "/"], timeout=45.0)
+
+    def disconnect_device(self, device_path: str) -> Result:
+        return self._bus.call(NM.SERVICE, device_path, NM.DEVICE, "Disconnect", timeout=20.0)
+
+    def deactivate(self, active_path: str) -> Result:
+        return self._bus.call(NM.SERVICE, NM.PATH, NM.IFACE, "DeactivateConnection", "o",
+                              [active_path], timeout=20.0)
+
+    # -- saved connections, VPN included ---------------------------------------------------------
+    def saved_connections(self, kinds: tuple[str, ...] | None = None) -> list[Reading]:
+        """What NetworkManager has stored. `kinds` filters by connection type ('vpn', ...)."""
+        listed = self._bus.call_one(NM.SERVICE, NM.SETTINGS_PATH, NM.SETTINGS,
+                                    "ListConnections")
+        if not listed.ok:
+            return []
+        active = self._active_connection_ids()
+        out: list[Reading] = []
+        for path in listed.value or []:
+            values = self._bus.call_one(NM.SERVICE, path, NM.CONNECTION, "GetSettings")
+            if not values.ok:
+                continue
+            connection = (values.value or {}).get("connection", {})
+            kind = str(connection.get("type", ""))
+            if kinds and kind not in kinds:
+                continue
+            name = str(connection.get("id", "")) or path
+            out.append(Reading.measured(None, name, path, kind=kind, uuid=str(connection.get("uuid", "")),
+                                        active=name in active,
+                                        active_path=active.get(name, "")))
+        return sorted(out, key=lambda item: item.detail.casefold())
+
+    def vpn_connections(self) -> list[Reading]:
+        """VPN and WireGuard profiles. Not 'the VPN is on': a profile, and whether it is up."""
+        return self.saved_connections(("vpn", "wireguard"))
+
+    def activate_saved(self, connection_path: str, device_path: str = "/") -> Result:
+        return self.activate(connection_path, device_path)
+
+    def _active_connection_ids(self) -> dict[str, str]:
+        listed = self._bus.get(NM.SERVICE, NM.PATH, NM.IFACE, "ActiveConnections")
+        found: dict[str, str] = {}
+        if not listed.ok:
+            return found
+        for path in listed.value or []:
+            values = self._bus.get_all(NM.SERVICE, path, NM.ACTIVE_CONNECTION)
+            if values.ok:
+                found[str((values.value or {}).get("Id", ""))] = path
+        return found
+
+    # -- what the connection actually resolved to -------------------------------------------------
+    def dns_servers(self) -> list[str]:
+        """Nameservers from NetworkManager's IPv4/IPv6 config — the ones in use, not resolv.conf
+        (which on a systemd-resolved machine only ever says 127.0.0.53)."""
+        servers: list[str] = []
+        for path in (self._bus.get(NM.SERVICE, NM.PATH, NM.IFACE, "ActiveConnections").value or []):
+            for property_name, interface in (("Ip4Config", NM.IP4CONFIG), ("Ip6Config", NM.IP6CONFIG)):
+                config = self._bus.get(NM.SERVICE, path, NM.ACTIVE_CONNECTION, property_name)
+                if not config.ok or str(config.value) in ("", "/"):
+                    continue
+                data = self._bus.get(NM.SERVICE, str(config.value), interface, "NameserverData")
+                for entry in (data.value or []):
+                    address = str(entry.get("address", "")) if isinstance(entry, dict) else str(entry)
+                    if address and address not in servers:
+                        servers.append(address)
+        return servers
+
+    def proxy(self) -> Reading:
+        """The environment's proxy, which is what applications actually obey on Linux.
+
+        There is no system-wide proxy service to ask: KDE and GNOME each write their own settings
+        and export them into the environment. Reporting the environment is therefore the honest
+        answer, and the source says so.
+        """
+        import os
+        for name in ("https_proxy", "http_proxy", "HTTPS_PROXY", "HTTP_PROXY", "all_proxy"):
+            value = os.environ.get(name)
+            if value:
+                return Reading.measured(None, value, f"env:{name}", variable=name)
+        return Reading.missing("прокси не настроен", "env")
 
     # -- change notification -----------------------------------------------------------------
     def watch(self, callback: Callable[[], None]) -> list:

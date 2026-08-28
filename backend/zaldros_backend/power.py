@@ -9,7 +9,8 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from .bus import Bus, Result
-from .catalog import Login1, UPower
+from .catalog import PowerProfiles, Login1, UPower
+from .wire import Variant
 from .reading import NO_DATA, NO_SERVICE, NOT_PRESENT, NOT_SUPPORTED, Reading
 
 # The wording the shell already renders in quick settings. Kept verbatim: the
@@ -204,6 +205,36 @@ class PowerFacet:
     def set_firmware_setup(self, enabled: bool) -> Result:
         return self._bus.call(Login1.SERVICE, Login1.PATH, Login1.MANAGER,
                               "SetRebootToFirmwareSetup", "b", [bool(enabled)], timeout=30.0)
+
+    # -- power profiles ------------------------------------------------------------------------
+    def profiles(self) -> list[Reading]:
+        """power-profiles-daemon's list: «Экономия энергии», «Сбалансированный», «Максимальная
+        производительность» — the same three Windows shows, when the daemon is installed."""
+        listed = self._bus.get(PowerProfiles.SERVICE, PowerProfiles.PATH, PowerProfiles.IFACE,
+                               "Profiles")
+        if not listed.ok:
+            return []
+        active = self.active_profile()
+        out: list[Reading] = []
+        for entry in listed.value or []:
+            name = str(entry.get("Profile", "")) if isinstance(entry, dict) else str(entry)
+            if not name:
+                continue
+            out.append(Reading.measured(None, PowerProfiles.NAMES.get(name, name),
+                                        PowerProfiles.SERVICE, profile=name,
+                                        active=name == active.get("profile")))
+        return out
+
+    def active_profile(self) -> dict:
+        value = self._bus.get(PowerProfiles.SERVICE, PowerProfiles.PATH, PowerProfiles.IFACE,
+                              "ActiveProfile")
+        if not value.ok:
+            return {"profile": "", "reason": "служба профилей питания не установлена"}
+        return {"profile": str(value.value), "reason": ""}
+
+    def set_profile(self, profile: str) -> Result:
+        return self._bus.set(PowerProfiles.SERVICE, PowerProfiles.PATH, PowerProfiles.IFACE,
+                             "ActiveProfile", Variant("s", profile))
 
     # -- change notification -----------------------------------------------------------------
     def watch(self, callback: Callable[[], None]) -> list:

@@ -97,6 +97,10 @@ class NetworkManager:
     ACCESS_POINT = "org.freedesktop.NetworkManager.AccessPoint"
     ACTIVE_CONNECTION = "org.freedesktop.NetworkManager.Connection.Active"
     SETTINGS = "org.freedesktop.NetworkManager.Settings"
+    SETTINGS_PATH = "/org/freedesktop/NetworkManager/Settings"
+    CONNECTION = "org.freedesktop.NetworkManager.Settings.Connection"
+    IP4CONFIG = "org.freedesktop.NetworkManager.IP4Config"
+    IP6CONFIG = "org.freedesktop.NetworkManager.IP6Config"
     NAMESPACE = "/org/freedesktop/NetworkManager"
 
     # NetworkManager.State
@@ -344,3 +348,17 @@ class Firewall:
     FIREWALLD_IFACE = "org.fedoraproject.FirewallD1"
     UFW_CONF = "/etc/ufw/ufw.conf"              # ENABLED=yes|no, written by `ufw enable`
     UFW_UNIT = "ufw.service"
+
+
+# --------------------------------------------------------------------------------------------
+# power-profiles-daemon (https://gitlab.freedesktop.org/upower/power-profiles-daemon, 2026-08-28)
+# The bus name moved from net.hadess.PowerProfiles to org.freedesktop.UPower.PowerProfiles in
+# 0.20; the old name is kept as an alias because Ubuntu 26.04 still ships both activation files.
+# --------------------------------------------------------------------------------------------
+class PowerProfiles:
+    SERVICE = "org.freedesktop.UPower.PowerProfiles"
+    PATH = "/org/freedesktop/UPower/PowerProfiles"
+    IFACE = "org.freedesktop.UPower.PowerProfiles"
+    LEGACY_SERVICE = "net.hadess.PowerProfiles"
+    NAMES = {"power-saver": "Экономия энергии", "balanced": "Сбалансированный",
+             "performance": "Максимальная производительность"}

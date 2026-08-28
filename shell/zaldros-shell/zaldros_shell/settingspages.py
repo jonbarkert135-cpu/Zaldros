@@ -81,6 +81,20 @@ class _State:
         return f"{reading.value} %" if reading and reading.available and reading.value is not None else "–"
 
 
+def _dynamic(controls, prefix: str, strip: str = "") -> list[tuple[str, str]]:
+    """Controls the registry created for this machine — one per VPN profile, one per audio
+    stream. The page tree cannot know them in advance, and inventing placeholder rows for
+    profiles that may not exist is exactly what this project does not do."""
+    if controls is None:
+        return []
+    found = []
+    for control_id, title in controls.titles().items():
+        if control_id.startswith(prefix):
+            found.append((control_id, title[len(strip):] if strip and title.startswith(strip)
+                          else title))
+    return sorted(found, key=lambda item: item[1].casefold())
+
+
 def control_entry(controls, control_id: str, title: str, subtitle: str = "",
                   glyph: str = "settings", group: str = "") -> Entry:
     """One row wired to a real control: its value is read from the system, right now.
@@ -287,11 +301,13 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         C("network.ethernet", "Интерфейсы", "Проводные адаптеры NetworkManager", "ethernet"),
     ])
     page("vpn", "VPN", "vpn", "network", [
-        Entry("Профили", "Настроенные подключения", "vpn", "не настроено"),
-    ])
+        C("network.vpn_summary", "Профили", "Настроенные подключения NetworkManager", "vpn"),
+    ] + [C(control_id, name, "Профиль NetworkManager", "vpn")
+         for control_id, name in _dynamic(controls, "network.vpn:", "VPN: ")])
     page("proxy", "Прокси-сервер", "globe", "network", [
-        Entry("Автоматическое определение", "WPAD", "globe", "", toggle=True),
-        Entry("Ручная настройка", "Адрес и порт", "settings", "не задано"),
+        C("network.proxy", "Прокси", "Переменные окружения, которым подчиняются приложения",
+          "globe"),
+        C("network.dns", "DNS-серверы", "Из активного подключения", "globe"),
     ])
     page("network-advanced", "Дополнительные сетевые параметры", "settings", "network", [
         C("network.ethernet", "Все адаптеры", "Список сетевых интерфейсов", "list"),

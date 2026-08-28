@@ -162,6 +162,98 @@ class AudioFacet:
                                             Audio.WPCTL, default=match.group(1) == "*"))
         return devices
 
+    def streams(self) -> list[Reading]:
+        """Per-application volume — the «Микшер громкости» list.
+
+        `wpctl status` lists playback streams under «Streams:»; each one carries the node id and
+        the application's own name. The volume of a single stream is then read with
+        `wpctl get-volume <id>`, because the status listing does not print it for streams.
+        A stream whose volume cannot be read is listed with an unavailable reading, not with 100 %.
+        """
+        if self.tool() != Audio.WPCTL:
+            return []
+        out = self._text(Audio.WPCTL, "status")
+        if out is None:
+            return []
+        streams: list[Reading] = []
+        in_streams = False
+        for line in out.splitlines():
+            stripped = line.strip(" │├└─*")
+            if stripped.startswith("Streams:"):
+                in_streams = True
+                continue
+            if not in_streams:
+                continue
+            if stripped.endswith(":") and not stripped[0:1].isdigit():
+                in_streams = stripped.startswith("Streams")
+                continue
+            match = re.match(r"(\d+)\.\s+(.+)", stripped)
+            if match is None:
+                continue
+            node_id, name = int(match.group(1)), match.group(2).strip()
+            volume = self._node_volume(node_id)
+            if volume is None:
+                streams.append(Reading.missing("громкость потока не читается",
+                                               f"{Audio.WPCTL} get-volume {node_id}"))
+                continue
+            percent, muted = volume
+            streams.append(Reading.measured(percent, name, Audio.WPCTL, node=node_id,
+                                            muted=muted))
+        return streams
+
+    def _node_volume(self, node_id: int) -> tuple[int, bool] | None:
+        text = self._text(Audio.WPCTL, "get-volume", str(node_id))
+        if text is None:
+            return None
+        match = VOLUME_LINE.search(text)
+        if match is None:
+            return None
+        return (round(float(match.group(1)) * 100), "[MUTED]" in text)
+
+    def set_stream_volume(self, node_id: int, percent: int) -> Result:
+        """Set one application's volume. Clamped to 0..150 like every Linux mixer, because
+        PipeWire happily accepts 500 % and destroys the user's ears."""
+        if self.tool() != Audio.WPCTL:
+            return Result.bad(NO_SERVER, str(self.tool()))
+        value = max(0, min(int(percent), 150))
+        return self._command(Audio.WPCTL, "set-volume", str(int(node_id)), f"{value / 100:.2f}")
+
+    def set_stream_muted(self, node_id: int, muted: bool) -> Result:
+        if self.tool() != Audio.WPCTL:
+            return Result.bad(NO_SERVER, str(self.tool()))
+        return self._command(Audio.WPCTL, "set-mute", str(int(node_id)), "1" if muted else "0")
+
+    def inputs(self) -> list[Reading]:
+        """Recording devices, the same way `outputs()` reads playback ones."""
+        if self.tool() != Audio.WPCTL:
+            return []
+        out = self._text(Audio.WPCTL, "status")
+        if out is None:
+            return []
+        devices: list[Reading] = []
+        section = ""
+        for line in out.splitlines():
+            stripped = line.strip()
+            if "Sinks:" in line:
+                section = "sinks"
+                continue
+            if "Sources:" in line:
+                section = "sources"
+                continue
+            if section != "sources":
+                continue
+            match = re.search(r"(\*?)\s*(\d+)\.\s+(.+?)\s*\[vol:", stripped)
+            if match is None:
+                continue
+            devices.append(Reading.measured(int(match.group(2)), match.group(3).strip(),
+                                            Audio.WPCTL, default=match.group(1) == "*"))
+        return devices
+
+    def set_default_input(self, node_id: int) -> Result:
+        if self.tool() != Audio.WPCTL:
+            return Result.bad(NO_SERVER, str(self.tool()))
+        return self._command(Audio.WPCTL, "set-default", str(int(node_id)))
+
     def set_default_output(self, node_id: int) -> Result:
         if self.tool() != Audio.WPCTL:
             return Result.bad(NO_SERVER, str(self.tool()))

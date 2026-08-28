@@ -139,6 +139,10 @@ class Registry:
         return self.set(control_id, True)
 
     # -- registration ----------------------------------------------------------------------------
+    def titles(self) -> dict[str, str]:
+        """id → title for every control on this machine, including the ones built per device."""
+        return {control_id: control.title for control_id, control in self._controls.items()}
+
     def _add(self, control_id: str, kind: str, title: str, reader, writer=None) -> None:
         self._controls[control_id] = Control(control_id, kind, title, reader, writer)
 
@@ -149,6 +153,7 @@ class Registry:
         self._build_network()
         self._build_bluetooth()
         self._build_power()
+        self._build_connectivity()
         self._build_input()
         self._build_time_language()
         self._build_privacy()
@@ -455,6 +460,111 @@ class Registry:
                   lambda value: _ok(self._backend.power.set_firmware_setup(bool(value))))
 
     # -- keyboard, mouse, touchpad -----------------------------------------------------------
+    def _build_connectivity(self) -> None:
+        """The rows added in TASK 5: VPN profiles, DNS, proxy, per-application volume and the
+        power profiles. Each one is a real read and, where the system allows it, a real write."""
+
+        # -- VPN: one switch per stored profile, because 'VPN on' is not a thing NetworkManager has
+        for profile in self._backend.network.vpn_connections():
+            path, title = profile.source, profile.detail
+            self._add(f"network.vpn:{path}", SWITCH, f"VPN: {title}",
+                      lambda path=path: self._vpn_state(path),
+                      lambda value, path=path: self._set_vpn(path, bool(value)))
+
+        def vpn_summary() -> State:
+            profiles = self._backend.network.vpn_connections()
+            if not profiles:
+                return State(INFO, True, None, "профили не настроены", False, "", [],
+                             "NetworkManager")
+            active = [item.detail for item in profiles if item.get("active")]
+            return State(INFO, True, len(profiles),
+                         ", ".join(active) if active else f"профилей: {len(profiles)}",
+                         False, READ_ONLY, [], "NetworkManager")
+
+        self._add("network.vpn_summary", INFO, "VPN", vpn_summary)
+
+        def dns() -> State:
+            servers = self._backend.network.dns_servers()
+            if not servers:
+                return State(INFO, False, None, "", False, "DNS-серверы не сообщены", [],
+                             "NetworkManager")
+            return State(INFO, True, len(servers), ", ".join(servers), False, READ_ONLY, [],
+                         "NetworkManager IP4Config")
+
+        self._add("network.dns", INFO, "DNS-серверы", dns)
+
+        def proxy() -> State:
+            reading = self._backend.network.proxy()
+            if not reading.available:
+                return State(INFO, True, None, "не настроен", False, READ_ONLY, [], reading.source)
+            return State(INFO, True, None, reading.detail, False, READ_ONLY, [], reading.source)
+
+        self._add("network.proxy", INFO, "Прокси-сервер", proxy)
+
+        # -- per-application volume ------------------------------------------------------------
+        for stream in self._backend.audio.streams():
+            if not stream.available:
+                continue
+            node = stream.get("node")
+            self._add(f"sound.app:{node}", CHOICE, f"Громкость: {stream.detail}",
+                      lambda node=node: self._stream_state(node),
+                      lambda value, node=node:
+                      _ok(self._backend.audio.set_stream_volume(int(node), int(value))))
+
+        def input_device() -> State:
+            inputs = self._backend.audio.inputs()
+            if not inputs:
+                return State(CHOICE, False, None, "", False, "устройства записи не найдены")
+            current = next((item for item in inputs if item.get("default")), inputs[0])
+            return State(CHOICE, True, str(current.value), current.detail, True, "",
+                         [{"id": str(item.value), "title": item.detail} for item in inputs],
+                         current.source)
+
+        self._add("sound.input", CHOICE, "Устройство записи", input_device,
+                  lambda value: _ok(self._backend.audio.set_default_input(int(value))))
+
+        # -- power profiles ----------------------------------------------------------------------
+        def power_profile() -> State:
+            profiles = self._backend.power.profiles()
+            if not profiles:
+                state = self._backend.power.active_profile()
+                return State(CHOICE, False, None, "", False,
+                             state["reason"] or "профили питания недоступны")
+            current = next((item for item in profiles if item.get("active")), profiles[0])
+            return State(CHOICE, True, current.get("profile"), current.detail, True, "",
+                         [{"id": item.get("profile"), "title": item.detail} for item in profiles],
+                         "power-profiles-daemon")
+
+        self._add("power.profile", CHOICE, "Режим питания", power_profile,
+                  lambda value: _ok(self._backend.power.set_profile(str(value))))
+
+    def _vpn_state(self, path: str) -> State:
+        profile = next((item for item in self._backend.network.vpn_connections()
+                        if item.source == path), None)
+        if profile is None:
+            return State(SWITCH, False, None, "", False, "профиль удалён")
+        active = bool(profile.get("active"))
+        return State(SWITCH, True, active, "подключено" if active else "отключено", True, "",
+                     [], "NetworkManager")
+
+    def _set_vpn(self, path: str, enabled: bool) -> bool:
+        if enabled:
+            return _ok(self._backend.network.activate_saved(path))
+        profile = next((item for item in self._backend.network.vpn_connections()
+                        if item.source == path), None)
+        active_path = profile.get("active_path") if profile else ""
+        if not active_path:
+            return False              # nothing to deactivate: not a success
+        return _ok(self._backend.network.deactivate(active_path))
+
+    def _stream_state(self, node: int) -> State:
+        stream = next((item for item in self._backend.audio.streams()
+                       if item.get("node") == node), None)
+        if stream is None or not stream.available:
+            return State(CHOICE, False, None, "", False, "поток завершился")
+        return State(CHOICE, True, str(stream.value), f"{stream.value} %", True, "",
+                     _percent_choices(), stream.source)
+
     def _build_input(self) -> None:
         options = (
             ("mouse.left_handed", "pointer", "left_handed", SWITCH, "Основная кнопка — правая"),

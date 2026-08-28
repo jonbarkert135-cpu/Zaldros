@@ -112,6 +112,29 @@ class BluetoothFacet:
     def disconnect(self, device_path: str) -> Result:
         return self._bus.call(BlueZ.SERVICE, device_path, BlueZ.DEVICE, "Disconnect", timeout=20.0)
 
+    def pair(self, device_path: str) -> Result:
+        """Pair, then trust. BlueZ needs an agent for a device that asks for a PIN; without one
+        it returns an error, which is passed through — a silent failure would leave the user
+        looking at a device that never connects.
+        """
+        paired = self._bus.call(BlueZ.SERVICE, device_path, BlueZ.DEVICE, "Pair", timeout=60.0)
+        if not paired.ok:
+            return paired
+        self.trust(device_path)
+        return paired
+
+    def trust(self, device_path: str, trusted: bool = True) -> Result:
+        return self._bus.set(BlueZ.SERVICE, device_path, BlueZ.DEVICE, "Trusted",
+                             Variant("b", trusted))
+
+    def remove(self, device_path: str) -> Result:
+        """«Удалить устройство» — the adapter owns the pairing, so the adapter is asked."""
+        adapter = self.adapter()
+        if not adapter.available or not adapter.source.startswith("/org/bluez"):
+            return Result.bad("адаптер Bluetooth не найден", BlueZ.SERVICE)
+        return self._bus.call(BlueZ.SERVICE, adapter.source, BlueZ.ADAPTER, "RemoveDevice", "o",
+                              [device_path], timeout=20.0)
+
     # -- change notification -----------------------------------------------------------------
     def watch(self, callback: Callable[[], None]) -> list:
         subscriptions = []
