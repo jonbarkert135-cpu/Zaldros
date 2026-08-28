@@ -31,11 +31,11 @@ Item {
     // --- window manager --------------------------------------------------------------------
     // Two real applications live in the window layer. Each one has open / minimised / maximised
     // state and a z order; the taskbar reflects it and Alt+Tab walks it.
-    property var windowIds: ["explorer", "settings"]
+    property var windowIds: ["explorer", "settings", "taskmanager"]
     property string focusedWindow: "explorer"
-    property var openWindows: ({ explorer: true, settings: true })
-    property var minimised: ({ explorer: false, settings: false })
-    property var maximised: ({ explorer: false, settings: false })
+    property var openWindows: ({ explorer: true, settings: true, taskmanager: false })
+    property var minimised: ({ explorer: false, settings: false, taskmanager: false })
+    property var maximised: ({ explorer: false, settings: false, taskmanager: false })
 
     function isOpen(id) { return openWindows[id] === true && minimised[id] !== true }
     function focusWindow(id) {
@@ -95,6 +95,8 @@ Item {
     property var backendHost: hostInfo
     property var backendClipboard: clipboardModel
     property var backendCapture: gameBarModel
+    property var backendProcesses: processModel
+    property var backendStartup: startupModel
 
     onLightModeChanged: Theme.dark = !lightMode
 
@@ -143,9 +145,25 @@ Item {
         sequences: ["Alt+Tab"]
         context: Qt.ApplicationShortcut
         onActivated: {
-            var index = shell.windowIds.indexOf(shell.focusedWindow);
-            shell.focusWindow(shell.windowIds[(index + 1) % shell.windowIds.length]);
+            // Only windows that are actually open take part: Alt+Tab must never *launch* the
+            // Task Manager, which is what cycling the full id list would do.
+            var live = shell.windowIds.filter(function (id) { return shell.openWindows[id] === true });
+            if (live.length === 0)
+                return;
+            var index = live.indexOf(shell.focusedWindow);
+            shell.focusWindow(live[(index + 1) % live.length]);
             shell.startOpen = false;
+        }
+    }
+
+    // Ctrl+Shift+Esc — the Windows shortcut, opening the Task Manager and focusing it.
+    Shortcut {
+        sequences: ["Ctrl+Shift+Escape"]
+        context: Qt.ApplicationShortcut
+        onActivated: {
+            shell.closeAllFlyouts();
+            shell.openWindows = shell.setFlag(shell.openWindows, "taskmanager", true);
+            shell.focusWindow("taskmanager");
         }
     }
 
@@ -276,6 +294,42 @@ Item {
         Explorer {
             anchors.fill: parent
             model: shell.backendFiles
+        }
+    }
+
+    // Ctrl+Shift+Esc, as in Windows. Closed by default: a Task Manager nobody opened must not
+    // change a single pixel of the desktop, and must not read /proc either.
+    AppWindow {
+        id: taskManagerWindow
+        objectName: "taskManagerWindow"
+        title: "Диспетчер задач"
+        iconGlyph: "apps"
+        visible: shell.isOpen("taskmanager")
+        active: shell.focusedWindow === "taskmanager"
+        maximized: shell.maximised["taskmanager"] === true
+        z: shell.focusedWindow === "taskmanager" ? 12 : 10
+        x: maximized ? 0 : shell.placedX(300, 1020)
+        y: maximized ? 0 : shell.placedY(120, 660)
+        width: maximized ? shell.width : shell.placedWidth(1020)
+        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(660)
+        onActivateRequested: shell.focusWindow("taskmanager")
+        onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "taskmanager", true)
+        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "taskmanager", !maximized)
+        onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "taskmanager", false)
+
+        TaskManager {
+            anchors.fill: parent
+            model: shell.backendProcesses
+            startup: shell.backendStartup
+        }
+    }
+
+    // Sampling follows the window: open means a 2 s refresh, closed means no /proc reads at all.
+    Connections {
+        target: taskManagerWindow
+        function onVisibleChanged() {
+            if (shell.backendProcesses) shell.backendProcesses.setActive(taskManagerWindow.visible);
+            if (taskManagerWindow.visible && shell.backendStartup) shell.backendStartup.refresh();
         }
     }
 
@@ -442,7 +496,12 @@ Item {
             { id: "settings", name: "Параметры", glyph: "settings",
               running: shell.openWindows["settings"] === true,
               active: shell.focusedWindow === "settings" && shell.isOpen("settings") }
-        ]
+        ].concat(shell.openWindows["taskmanager"] === true
+                 // A taskbar button appears only while the Task Manager runs — Explorer and
+                 // Settings are pinned, this one is not, so the closed desktop is pixel-identical.
+                 ? [{ id: "taskmanager", name: "Диспетчер задач", glyph: "apps", running: true,
+                      active: shell.focusedWindow === "taskmanager" && shell.isOpen("taskmanager") }]
+                 : [])
         state: shell.backendState
         system: shell.backendSystem
         apps: shell.backendApps

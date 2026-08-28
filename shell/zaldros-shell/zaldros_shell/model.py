@@ -18,7 +18,7 @@ from .backend import (AppEntry, cpu_percent, cpu_times, format_clock, load_pinne
 from .desktop_entries import DesktopApp, discover, launch
 from . import clipboard as clipboard_history
 from . import capture, portal
-from . import files, hostinfo, prefs, settingscontrols, settingspages, system, weather
+from . import files, hostinfo, prefs, settingscontrols, settingspages, system, taskmanager, weather
 
 NAME, EXEC, ICON, COLOR, RUNNING, INSTALLED, SUBTITLE = (Qt.UserRole + n for n in range(7))
 
@@ -1186,3 +1186,236 @@ class GameBarModel(QObject):
     def _tick(self) -> None:
         self._elapsed = self._clock() - self._started_at
         self.changed.emit()
+
+
+PROC_ROLES = {name: Qt.UserRole + 100 + index for index, name in enumerate(
+    ("pid", "ppid", "name", "cmdline", "user", "stateText", "threads", "rss", "cpu",
+     "cpuText", "memText", "diskText", "isKernel", "readBytes", "openFiles"))}
+
+
+class ProcessModel(QAbstractListModel):
+    """The Task Manager's list: real processes from /proc, sorted and searched.
+
+    Nothing is sampled unless `active` is true — the window being open is the only thing that
+    starts the two-second refresh, and closing it stops every read (ADR-0016). The first sample
+    deliberately has no CPU column: one reading of /proc cannot tell you a load, so the cells show
+    a dash until the second sample makes a difference available.
+    """
+
+    changed = Signal()
+
+    def __init__(self, facet=None, interval_ms: int = 2000) -> None:
+        super().__init__()
+        self._facet = facet
+        self._rows: list[dict] = []
+        self._all: list[dict] = []
+        self._query = ""
+        self._sort_key = "cpu"
+        self._descending = True
+        self._snapshot = None
+        self._summary = None
+        self._active = False
+        self._cpu_history = taskmanager.History()
+        self._memory_history = taskmanager.History()
+        self._timer = QTimer(self)
+        self._timer.setInterval(interval_ms)
+        self._timer.timeout.connect(self.refresh)
+
+    @property
+    def facet(self):
+        if self._facet is None:
+            self._facet = system.backend().processes
+        return self._facet
+
+    # --- lifecycle: the window decides when the machine is read ---------------------------
+    @Slot(bool)
+    def setActive(self, active: bool) -> None:  # noqa: N802
+        self._active = bool(active)
+        if self._active:
+            self.refresh()
+            self._timer.start()
+        else:
+            self._timer.stop()
+
+    @Property(bool, notify=changed)
+    def active(self) -> bool:
+        return self._active
+
+    @Slot()
+    def refresh(self) -> None:
+        snapshot = self.facet.sample()
+        self._snapshot = snapshot
+        self._summary = taskmanager.summarise(snapshot)
+        self._cpu_history.push(snapshot.cpu)
+        self._memory_history.push(snapshot.memory_percent)
+        self._all = [process.as_row() for process in snapshot.processes]
+        self._apply()
+
+    def _apply(self) -> None:
+        rows = [row for row in self._all if taskmanager.matches(row, self._query)]
+        rows = taskmanager.sort_rows(rows, self._sort_key, self._descending)
+        self.beginResetModel()
+        self._rows = rows
+        self.endResetModel()
+        self.changed.emit()
+
+    # --- view controls --------------------------------------------------------------------
+    @Slot(str)
+    def search(self, query: str) -> None:
+        self._query = query or ""
+        self._apply()
+
+    @Slot(str)
+    def sortBy(self, key: str) -> None:  # noqa: N802
+        """Clicking the active column header reverses it, as in Windows."""
+        if key not in taskmanager.COLUMN_KEYS:
+            return
+        if key == self._sort_key:
+            self._descending = not self._descending
+        else:
+            self._sort_key = key
+            self._descending = key in taskmanager.NUMERIC
+        self._apply()
+
+    @Property(str, notify=changed)
+    def sortKey(self) -> str:  # noqa: N802
+        return self._sort_key
+
+    @Property(bool, notify=changed)
+    def sortDescending(self) -> bool:  # noqa: N802
+        return self._descending
+
+    # --- actions --------------------------------------------------------------------------
+    @Slot(int, bool, result="QVariantMap")
+    def endTask(self, pid: int, force: bool = False) -> dict:  # noqa: N802
+        """«Снять задачу». Returns what the kernel said, never an optimistic success."""
+        reading = self.facet.end(int(pid), force=bool(force))
+        self.refresh()
+        return {"ok": reading.available, "detail": reading.detail, "pid": int(pid)}
+
+    @Slot(int, result="QVariantMap")
+    def inspect(self, pid: int) -> dict:
+        reading = self.facet.process(int(pid))
+        data = {"available": reading.available, "detail": reading.detail,
+                "source": reading.source}
+        data.update(reading.extra)
+        data["memText"] = taskmanager.format_bytes(reading.get("rss"))
+        return data
+
+    # --- data -----------------------------------------------------------------------------
+    def roleNames(self) -> dict:  # noqa: N802
+        return {role: name.encode() for name, role in PROC_ROLES.items()}
+
+    def rowCount(self, parent=QModelIndex()) -> int:  # noqa: N802
+        return 0 if parent.isValid() else len(self._rows)
+
+    def data(self, index: QModelIndex, role: int = Qt.DisplayRole):
+        if not index.isValid() or not (0 <= index.row() < len(self._rows)):
+            return None
+        row = self._rows[index.row()]
+        if role == PROC_ROLES["cpuText"]:
+            return taskmanager.format_percent(row.get("cpu"))
+        if role == PROC_ROLES["memText"]:
+            return taskmanager.format_bytes(row.get("rss"))
+        if role == PROC_ROLES["diskText"]:
+            return taskmanager.format_bytes(row.get("readBytes"))
+        for name, value in PROC_ROLES.items():
+            if value == role:
+                return row.get(name)
+        return None
+
+    @Property(int, notify=changed)
+    def count(self) -> int:
+        return len(self._rows)
+
+    @Property("QVariantMap", notify=changed)
+    def summary(self) -> dict:
+        """The header strip. Empty before the first sample — never pre-filled with zeroes."""
+        if self._summary is None:
+            return {}
+        summary = self._summary
+        return {"cpu": summary.cpu, "memory": summary.memory, "disk": summary.disk,
+                "network": summary.network, "uptime": summary.uptime,
+                "processes": summary.processes, "threads": summary.threads,
+                "memoryDetail": summary.memory_detail}
+
+    @Property("QVariantList", notify=changed)
+    def cores(self) -> list:
+        return list(self._snapshot.cores) if self._snapshot else []
+
+    @Property("QVariantList", notify=changed)
+    def cpuHistory(self) -> list:  # noqa: N802
+        return self._cpu_history.points()
+
+    @Property("QVariantList", notify=changed)
+    def memoryHistory(self) -> list:  # noqa: N802
+        return self._memory_history.points()
+
+    @Property("QVariantList", notify=changed)
+    def gpus(self) -> list:
+        """Real cards only. A driver that does not export a load reports the reason instead."""
+        from zaldros_backend import processes as backend_processes
+        return [{"name": card.detail, "percent": card.percent,
+                 "available": card.available, "reason": card.get("reason", "")}
+                for card in backend_processes.gpus()]
+
+    @Property("QVariantList", constant=True)
+    def columns(self) -> list:
+        return [{"key": key, "title": title, "numeric": numeric}
+                for key, title, numeric in taskmanager.COLUMNS]
+
+
+class StartupModel(QAbstractListModel):
+    """«Автозагрузка»: freedesktop autostart entries, with a switch that really writes."""
+
+    NAME_R, FILE_R, ENABLED_R, COMMAND_R, WRITABLE_R = (Qt.UserRole + 200 + n for n in range(5))
+
+    changed = Signal()
+
+    def __init__(self, facet=None) -> None:
+        super().__init__()
+        self._facet = facet
+        self._rows: list = []
+
+    @property
+    def facet(self):
+        if self._facet is None:
+            self._facet = system.backend().processes
+        return self._facet
+
+    @Slot()
+    def refresh(self) -> None:
+        self.beginResetModel()
+        self._rows = self.facet.startup()
+        self.endResetModel()
+        self.changed.emit()
+
+    @Slot(int, result="QVariantMap")
+    def toggle(self, row: int) -> dict:
+        """Flip an entry and read the file back — the switch shows the disk, not the click."""
+        if not (0 <= row < len(self._rows)):
+            return {"ok": False, "detail": "нет такой строки"}
+        entry = self._rows[row]
+        result = self.facet.set_startup_enabled(entry.get("file", ""), not entry.get("enabled"))
+        self.refresh()
+        return {"ok": result.available, "detail": result.detail}
+
+    def roleNames(self) -> dict:  # noqa: N802
+        return {self.NAME_R: b"name", self.FILE_R: b"file", self.ENABLED_R: b"enabled",
+                self.COMMAND_R: b"command", self.WRITABLE_R: b"writable"}
+
+    def rowCount(self, parent=QModelIndex()) -> int:  # noqa: N802
+        return 0 if parent.isValid() else len(self._rows)
+
+    def data(self, index: QModelIndex, role: int = Qt.DisplayRole):
+        if not index.isValid() or not (0 <= index.row() < len(self._rows)):
+            return None
+        entry = self._rows[index.row()]
+        return {self.NAME_R: entry.detail, self.FILE_R: entry.get("file", ""),
+                self.ENABLED_R: bool(entry.get("enabled")),
+                self.COMMAND_R: entry.get("command", ""),
+                self.WRITABLE_R: bool(entry.get("writable"))}.get(role)
+
+    @Property(int, notify=changed)
+    def count(self) -> int:
+        return len(self._rows)

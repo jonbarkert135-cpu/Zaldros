@@ -33,6 +33,7 @@ from .network import NetworkFacet
 from .notifications import NotificationClient, NotificationServer
 from .permissions import PermissionsFacet
 from .power import PowerFacet
+from .processes import ProcessFacet
 from .reading import Reading
 from .services import ServicesFacet
 from .session import SessionFacet
@@ -61,6 +62,9 @@ class ZaldrosBackend:
         self.session = SessionFacet(self.system_bus, self.session_bus)
         self.notify = NotificationClient(self.session_bus)
         self.hardware = hardware
+        # The Task Manager's data source. Constructed here, but it reads nothing until someone
+        # calls sample(): a closed Task Manager costs exactly zero /proc reads (ADR-0016).
+        self.processes = ProcessFacet()
 
         # The facets Settings needs beyond the tray: they are constructed here too, because a
         # second construction site is a second place to get a bus wrong.

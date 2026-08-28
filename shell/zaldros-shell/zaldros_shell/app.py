@@ -14,14 +14,15 @@ from pathlib import Path
 
 import json
 
-from PySide6.QtCore import QCoreApplication, QObject, QPointF, QTimer, QUrl
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QObject, QPointF, QTimer, QUrl,
+                            Q_ARG)
 from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuick import QQuickView
 
 from .icons import IconProvider
 from .model import (AppModel, ClipboardModel, FileModel, GameBarModel, HostInfo, InstalledAppModel,
-                    Prefs, RecentModel, SettingsControls, SettingsTree, WeatherState,
-                    ShellState, SystemState)
+                    Prefs, ProcessModel, RecentModel, SettingsControls, SettingsTree, StartupModel,
+                    WeatherState, ShellState, SystemState)
 
 QML_DIR = Path(__file__).resolve().parent.parent / "qml"
 def _assets_dir() -> Path:
@@ -93,6 +94,10 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     user_prefs = Prefs()
     clipboard_model = ClipboardModel()
     game_bar_model = GameBarModel()
+    # The Task Manager is constructed but idle: ProcessModel reads /proc only after the window
+    # sets it active, so a session that never opens it costs nothing (ADR-0016).
+    process_model = ProcessModel()
+    startup_model = StartupModel()
     context = view.engine().rootContext()
     context.setContextProperty("appModel", model)
     context.setContextProperty("installedModel", installed)
@@ -107,6 +112,8 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     context.setContextProperty("prefs", user_prefs)
     context.setContextProperty("clipboardModel", clipboard_model)
     context.setContextProperty("gameBarModel", game_bar_model)
+    context.setContextProperty("processModel", process_model)
+    context.setContextProperty("startupModel", startup_model)
     context.setContextProperty("uiFontFamily", family)
     view.engine().addImageProvider("zaldrosicon", IconProvider(ASSETS / "icons" / "fluent"))
     context.setContextProperty(
@@ -117,7 +124,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
         raise RuntimeError(f"QML failed to load:\n{errors}")
     return view, [model, installed, state, system_state, file_model, recent_model, host_info,
                   weather_state, settings_tree, settings_controls, user_prefs, clipboard_model,
-                  game_bar_model]
+                  game_bar_model, process_model, startup_model]
 
 
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
@@ -128,6 +135,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
            light: bool = False, search_open: bool = False, notifications_open: bool = False,
            clipboard_open: bool = False, game_bar_open: bool = False,
            focused_window: str = "explorer", settings_page: int = 1,
+           task_manager_open: bool = False, task_manager_page: int = 0,
            geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -153,6 +161,15 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     root.setProperty("contextOpen", context_open)
     root.setProperty("focusedWindow", focused_window)
     root.setProperty("settingsPage", settings_page)
+    if task_manager_open:
+        # Opening it here rather than by default keeps every other frame byte-identical.
+        QMetaObject.invokeMethod(root, "toggleWindow", Q_ARG("QVariant", "taskmanager"))
+        root.setProperty("focusedWindow", "taskmanager")
+        window = root.findChild(QObject, "taskManagerWindow")
+        if window is not None:
+            page = window.findChild(QObject, "taskManagerRail")
+            if page is not None and page.parent() is not None:
+                page.parent().setProperty("page", task_manager_page)
     view.show()
     result: dict[str, bool] = {}
 

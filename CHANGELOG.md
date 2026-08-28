@@ -14,6 +14,10 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
   `tests/test_ui_font.py` (ADR-0011).
 
 ### Added
+- Task Manager (Ctrl+Shift+Esc): real processes, CPU/memory/disk/network/uptime, GPU where the
+  driver reports load, autostart entries, end task, search and sorting — all read from /proc and
+  sysfs, with unknown values shown as a dash and no sampling at all while the window is closed
+  (ADR-0016).
 - A Windows 11-style Alt+Tab switcher of our own (`system/theme/tabbox/zaldros`); the stock KWin
   layout needs the Plasma QML stack and silently did nothing in a Zaldros session.
 - Windows 11 widget style for QWidget applications: the `Windows-modern` Kvantum theme (GPL-3)

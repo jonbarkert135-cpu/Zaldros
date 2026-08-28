@@ -55,6 +55,14 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
       меню ячейки, вкладки Data/Review/Page Layout/Formulas
 - [ ] Поставить `libreoffice-calc-nogui` и `python3-uno` в ISO
 
+## Диспетчер задач (ADR-0016)
+- [x] Процессы, ЦП/память/диск/сеть/время работы, автозагрузка, завершение процесса, поиск,
+      сортировка — всё из `/proc` и sysfs, без выдуманных метрик
+- [ ] Страница «Службы» в окне диспетчера (фасет `services` готов с ADR-0014)
+- [ ] Раздел «Приложения»: нужен список окон от композитора (тот же протокол, что и для таскбара)
+- [ ] Графики ЦП/памяти рисуются, но история теряется при закрытии окна
+- [ ] «Журнал приложений» и «Пользователи» — не делались
+
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [x] Settings: every row backed by a real control with read + write (ADR-0015) — display,

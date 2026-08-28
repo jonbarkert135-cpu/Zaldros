@@ -69,3 +69,7 @@ _Last updated: 2026-08-26_
 - Run #24: iso + CI green, boot=FAIL on all 9 (`shell`) — the ISO never shipped `data/pinned.json`.
   Fixed in the run #25 candidate together with a flat-layout guard test. [ci run 32675722125, 2026-08-24]
 - Run #27 (visual parity cycle 1): Windows 11 geometry measured into `system/theme/win11-reference.json`; `tools/visual/parity.py` reports 29/29 component checks matching; Explorer and Settings became real applications. Boot verdict unchanged from run #25 (PASS 9/9). [local render + pytest, 2026-08-26]
+- Диспетчер задач (ADR-0016): процессы, ЦП/память/диск/сеть/GPU/автозагрузка из `/proc` и sysfs;
+  закрытое окно не делает ни одного чтения (проверено тестом). Семь кадров попиксельно идентичны
+  HEAD `89975d5`, паритет 41/41, shell 372 passed + 1 skipped, tools 44. На живом железе не
+  проверялось. [local pytest + parity, 2026-08-28]

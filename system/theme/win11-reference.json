@@ -1,170 +1,181 @@
 {
-  "about": {
-    "purpose": "Measured Windows 11 geometry. The shell is checked against these numbers by tools/visual/parity.py; nothing here is guessed.",
-    "unit": "logical pixels at 100 % display scale",
-    "regenerate": "python3 tools/visual/measure_reference.py  (--check verifies the taskbar and Start numbers against the committed capture)"
-  },
-  "sources": {
-    "start": {
-      "file": "assets/refs/win11_start_reference.png",
-      "capture": "1920x1280",
-      "display_scale": 1.25,
-      "note": "committed; measured by tools/visual/measure_reference.py"
-    },
-    "taskbar_explorer_settings_notifications_menu": {
-      "file": "private captures supplied by the maintainer on 2026-08-26",
-      "display_scale": 1.25,
-      "note": "desktop, Explorer, Settings, notification centre and context menu were measured from the maintainer's own screenshots. Those files show a personal desktop and are deliberately NOT committed: only the measurements below survive."
-    },
-    "taskbar_widgets_quick_settings": {
-      "file": "private captures supplied by the maintainer on 2026-08-26 (second set)",
-      "display_scale": 1.25,
-      "note": "the full-width taskbar, the keyboard-layout flyout and Quick Settings were measured from the maintainer's own screenshots; the files are deliberately NOT committed, only these numbers."
-    },
-    "public_library": {
-      "file": "assets/refs/win11/library.json",
-      "note": "Public Microsoft screenshots (Microsoft Learn, Microsoft support, Windows blogs). Not committed — copyright Microsoft; tools/visual/fetch_references.py re-downloads them by URL and verifies the recorded sha256.",
-      "measured_by": "tools/visual/measure_library.py"
-    },
-    "clipboard": {
-      "file": "private capture supplied by the maintainer on 2026-08-26 (Win+V panel)",
-      "display_scale": 1.25,
-      "note": "the clipboard flyout was measured from the maintainer's own screenshot: panel 448 px wide, cards 96 px tall with an 18 px gutter, 26 px from the panel edge to a card. Divided by 1.25 those are 360 / 76 / 8 / 20. The file is deliberately NOT committed; only these numbers are."
-    },
-    "game_bar": {
-      "file": "private capture supplied by the maintainer on 2026-08-26 (Win+G «Записать» widget)",
-      "display_scale": 1.25,
-      "note": "measured off the maintainer's own screenshot: the widget is 383 px wide and 274 px tall, its four tiles are 70 px squares on a 90 px pitch, the first tile starts 21 px from the panel edge, the tile row starts 66 px below the panel top and the footer row is 82 px tall. Divided by 1.25: 306 x 219, tile 56, pitch 72, padding 17, header 53, footer 66. The file is deliberately NOT committed; only these numbers are. The floating bar in the same shot is 654 x 67 px = 523 x 54 logical."
-    }
-  },
-  "taskbar": {
-    "height": 48,
-    "icon": 24,
-    "button_pitch": 44,
-    "button_height": 40,
-    "tray_icon": 16,
-    "tray_button_pitch": 36,
-    "group_alignment": "centred",
-    "indicator_active_width": 16,
-    "indicator_width": 6,
-    "indicator_height": 3,
-    "search_height": 32,
-    "clock_lines": 2,
-    "right_margin": 12,
-    "tolerance": 2,
-    "search_width": 220,
-    "background": "#212121",
-    "widget_icon_left": 20,
-    "widget_icon": 24,
-    "widget_text_left": 52,
-    "widget_lines": 2,
-    "pinned_on_bar": 6
-  },
+ "about": {
+  "purpose": "Measured Windows 11 geometry. The shell is checked against these numbers by tools/visual/parity.py; nothing here is guessed.",
+  "unit": "logical pixels at 100 % display scale",
+  "regenerate": "python3 tools/visual/measure_reference.py  (--check verifies the taskbar and Start numbers against the committed capture)"
+ },
+ "sources": {
   "start": {
-    "width": 640,
-    "height": 726,
-    "gap_above_taskbar": 12,
-    "padding": 32,
-    "alignment": "centred",
-    "search_width": 576,
-    "search_height": 38,
-    "search_top_inset": 32,
-    "footer_height": 64,
-    "pin_columns": 6,
-    "pin_cell_width": 96,
-    "pin_cell_height": 84,
-    "pin_icon": 32,
-    "tolerance": 2,
-    "pin_icon_artwork": 28.8
+   "file": "assets/refs/win11_start_reference.png",
+   "capture": "1920x1280",
+   "display_scale": 1.25,
+   "note": "committed; measured by tools/visual/measure_reference.py"
   },
-  "window": {
-    "corner_radius": 8,
-    "title_bar_height": 32,
-    "tab_strip_height": 40,
-    "caption_button_width": 46,
-    "caption_button_height": 32,
-    "caption_glyph": 10,
-    "title_font": 12,
-    "title_icon": 16,
-    "title_left_margin": 12,
-    "close_hover": "#c42b1c",
-    "tolerance": 1
+  "taskbar_explorer_settings_notifications_menu": {
+   "file": "private captures supplied by the maintainer on 2026-08-26",
+   "display_scale": 1.25,
+   "note": "desktop, Explorer, Settings, notification centre and context menu were measured from the maintainer's own screenshots. Those files show a personal desktop and are deliberately NOT committed: only the measurements below survive."
   },
-  "explorer": {
-    "tab_strip_height": 40,
-    "navigation_bar_height": 48,
-    "command_bar_height": 48,
-    "sidebar_width": 190,
-    "row_height": 32,
-    "background_dark": "#191919",
-    "tolerance": 2
+  "taskbar_widgets_quick_settings": {
+   "file": "private captures supplied by the maintainer on 2026-08-26 (second set)",
+   "display_scale": 1.25,
+   "note": "the full-width taskbar, the keyboard-layout flyout and Quick Settings were measured from the maintainer's own screenshots; the files are deliberately NOT committed, only these numbers."
   },
-  "settings": {
-    "sidebar_width": 320,
-    "card_height": 74,
-    "card_radius": 4,
-    "card_spacing": 6,
-    "page_title_font": 28,
-    "tolerance": 3
-  },
-  "quick_settings": {
-    "width": 360,
-    "corner_radius": 8,
-    "tile_columns": 3,
-    "gap_from_edge": 12,
-    "tolerance": 2,
-    "padding": 25,
-    "tile_width": 95,
-    "tile_height": 47,
-    "tile_gap": 13,
-    "columns": 3
-  },
-  "notifications": {
-    "width": 360,
-    "corner_radius": 8,
-    "gap_from_edge": 12,
-    "tolerance": 2
-  },
-  "context_menu": {
-    "corner_radius": 8,
-    "item_height": 32,
-    "separator_height": 7,
-    "padding": 4,
-    "tolerance": 1,
-    "min_width": 300,
-    "label_shortcut_gap": 24,
-    "note": "Windows 11 sizes a context menu to its widest row; 300 is the measured floor, not a fixed width. Confirmed on the public 100 %-scale capture quick-access-update2.png, whose file menu is narrower than the desktop menu."
+  "public_library": {
+   "file": "assets/refs/win11/library.json",
+   "note": "Public Microsoft screenshots (Microsoft Learn, Microsoft support, Windows blogs). Not committed — copyright Microsoft; tools/visual/fetch_references.py re-downloads them by URL and verifies the recorded sha256.",
+   "measured_by": "tools/visual/measure_library.py"
   },
   "clipboard": {
-    "width": 360,
-    "padding": 16,
-    "card_height": 76,
-    "card_gap": 8,
-    "gap_from_edge": 12,
-    "max_entries": 25,
-    "tolerance": 2
+   "file": "private capture supplied by the maintainer on 2026-08-26 (Win+V panel)",
+   "display_scale": 1.25,
+   "note": "the clipboard flyout was measured from the maintainer's own screenshot: panel 448 px wide, cards 96 px tall with an 18 px gutter, 26 px from the panel edge to a card. Divided by 1.25 those are 360 / 76 / 8 / 20. The file is deliberately NOT committed; only these numbers are."
   },
   "game_bar": {
-    "width": 306,
-    "height": 219,
-    "padding": 17,
-    "tile": 56,
-    "tile_gap": 16,
-    "header": 53,
-    "footer": 66,
-    "gap_from_edge": 12,
-    "tiles": 4,
-    "tolerance": 2,
-    "gap_from_edge_note": "ours, not Windows': the game bar widget is draggable, so its position in the capture says nothing. The panel sits Theme.flyoutGap (12) from the top-left corner like every other Zaldros flyout.",
-    "bar": {
-      "width": 523,
-      "height": 54,
-      "radius": 8,
-      "button": 40,
-      "tile": 42,
-      "glyph": 20,
-      "group_padding": 24,
-      "note": "the floating bar measured from the same capture: 654 x 67 px at 125 % = 523 x 54, the widget field 279 px = 223 wide with five buttons, buttons on a 50 px = 40 pitch. Our field holds three buttons (no Xbox friends, no Edge) and is sized to them, like Windows sizes it to its own."
-    }
+   "file": "private capture supplied by the maintainer on 2026-08-26 (Win+G «Записать» widget)",
+   "display_scale": 1.25,
+   "note": "measured off the maintainer's own screenshot: the widget is 383 px wide and 274 px tall, its four tiles are 70 px squares on a 90 px pitch, the first tile starts 21 px from the panel edge, the tile row starts 66 px below the panel top and the footer row is 82 px tall. Divided by 1.25: 306 x 219, tile 56, pitch 72, padding 17, header 53, footer 66. The file is deliberately NOT committed; only these numbers are. The floating bar in the same shot is 654 x 67 px = 523 x 54 logical."
   }
+ },
+ "taskbar": {
+  "height": 48,
+  "icon": 24,
+  "button_pitch": 44,
+  "button_height": 40,
+  "tray_icon": 16,
+  "tray_button_pitch": 36,
+  "group_alignment": "centred",
+  "indicator_active_width": 16,
+  "indicator_width": 6,
+  "indicator_height": 3,
+  "search_height": 32,
+  "clock_lines": 2,
+  "right_margin": 12,
+  "tolerance": 2,
+  "search_width": 220,
+  "background": "#212121",
+  "widget_icon_left": 20,
+  "widget_icon": 24,
+  "widget_text_left": 52,
+  "widget_lines": 2,
+  "pinned_on_bar": 6
+ },
+ "start": {
+  "width": 640,
+  "height": 726,
+  "gap_above_taskbar": 12,
+  "padding": 32,
+  "alignment": "centred",
+  "search_width": 576,
+  "search_height": 38,
+  "search_top_inset": 32,
+  "footer_height": 64,
+  "pin_columns": 6,
+  "pin_cell_width": 96,
+  "pin_cell_height": 84,
+  "pin_icon": 32,
+  "tolerance": 2,
+  "pin_icon_artwork": 28.8
+ },
+ "window": {
+  "corner_radius": 8,
+  "title_bar_height": 32,
+  "tab_strip_height": 40,
+  "caption_button_width": 46,
+  "caption_button_height": 32,
+  "caption_glyph": 10,
+  "title_font": 12,
+  "title_icon": 16,
+  "title_left_margin": 12,
+  "close_hover": "#c42b1c",
+  "tolerance": 1
+ },
+ "explorer": {
+  "tab_strip_height": 40,
+  "navigation_bar_height": 48,
+  "command_bar_height": 48,
+  "sidebar_width": 190,
+  "row_height": 32,
+  "background_dark": "#191919",
+  "tolerance": 2
+ },
+ "settings": {
+  "sidebar_width": 320,
+  "card_height": 74,
+  "card_radius": 4,
+  "card_spacing": 6,
+  "page_title_font": 28,
+  "tolerance": 3
+ },
+ "quick_settings": {
+  "width": 360,
+  "corner_radius": 8,
+  "tile_columns": 3,
+  "gap_from_edge": 12,
+  "tolerance": 2,
+  "padding": 25,
+  "tile_width": 95,
+  "tile_height": 47,
+  "tile_gap": 13,
+  "columns": 3
+ },
+ "notifications": {
+  "width": 360,
+  "corner_radius": 8,
+  "gap_from_edge": 12,
+  "tolerance": 2
+ },
+ "context_menu": {
+  "corner_radius": 8,
+  "item_height": 32,
+  "separator_height": 7,
+  "padding": 4,
+  "tolerance": 1,
+  "min_width": 300,
+  "label_shortcut_gap": 24,
+  "note": "Windows 11 sizes a context menu to its widest row; 300 is the measured floor, not a fixed width. Confirmed on the public 100 %-scale capture quick-access-update2.png, whose file menu is narrower than the desktop menu."
+ },
+ "clipboard": {
+  "width": 360,
+  "padding": 16,
+  "card_height": 76,
+  "card_gap": 8,
+  "gap_from_edge": 12,
+  "max_entries": 25,
+  "tolerance": 2
+ },
+ "game_bar": {
+  "width": 306,
+  "height": 219,
+  "padding": 17,
+  "tile": 56,
+  "tile_gap": 16,
+  "header": 53,
+  "footer": 66,
+  "gap_from_edge": 12,
+  "tiles": 4,
+  "tolerance": 2,
+  "gap_from_edge_note": "ours, not Windows': the game bar widget is draggable, so its position in the capture says nothing. The panel sits Theme.flyoutGap (12) from the top-left corner like every other Zaldros flyout.",
+  "bar": {
+   "width": 523,
+   "height": 54,
+   "radius": 8,
+   "button": 40,
+   "tile": 42,
+   "glyph": 20,
+   "group_padding": 24,
+   "note": "the floating bar measured from the same capture: 654 x 67 px at 125 % = 523 x 54, the widget field 279 px = 223 wide with five buttons, buttons on a 50 px = 40 pitch. Our field holds three buttons (no Xbox friends, no Edge) and is sized to them, like Windows sizes it to its own."
+  }
+ },
+ "task_manager": {
+  "_derivation": "Производная от уже измеренных токенов Windows 11 (Explorer/Settings): подлинного снимка Task Manager в библиотеке эталонов пока нет. Не измерение — производная, см. ADR-0016.",
+  "rail_width": 190,
+  "command_bar_height": 48,
+  "row_height": 32,
+  "header_height": 28,
+  "status_bar_height": 28,
+  "column_width": 80,
+  "background_dark": "#191919",
+  "tolerance": 2
+ }
 }

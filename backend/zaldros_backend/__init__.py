@@ -17,10 +17,11 @@ Nothing here imports Qt except `qtbridge`, so the backend is testable — and us
 from .bus import Bus, Result
 from .connection import Connection, DBusError
 from .facade import DOMAINS, ZaldrosBackend
+from .processes import Process, ProcessFacet, Sampler, Snapshot
 from .notifications import Notification, NotificationServer, policy_from
 from .reading import NO_DATA, NO_SERVICE, NOT_PRESENT, NOT_SUPPORTED, Reading
 from .wire import Message, Variant
 
 __all__ = ["Bus", "Connection", "DBusError", "DOMAINS", "Message", "Notification",
-           "NotificationServer", "policy_from", "Reading", "Result", "Variant", "ZaldrosBackend",
+           "NotificationServer", "policy_from", "Process", "ProcessFacet", "Sampler", "Snapshot", "Reading", "Result", "Variant", "ZaldrosBackend",
            "NO_DATA", "NO_SERVICE", "NOT_PRESENT", "NOT_SUPPORTED"]

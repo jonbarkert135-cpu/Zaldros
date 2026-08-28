@@ -15,3 +15,16 @@ REPO = Path(__file__).resolve().parents[3]
 for path in (REPO / "shell" / "zaldros-shell", REPO / "backend"):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
+
+
+import pytest
+
+
+@pytest.fixture(scope="session")
+def qt_app():
+    """One offscreen QGuiApplication for the tests that exercise Qt models."""
+    import os
+    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    from PySide6.QtCore import QCoreApplication
+    from PySide6.QtGui import QGuiApplication
+    return QCoreApplication.instance() or QGuiApplication([])
