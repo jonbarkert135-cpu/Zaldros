@@ -41,17 +41,46 @@ def test_the_shell_shares_one_backend_instance():
     assert system.backend() is system.backend()
 
 
-def test_the_shell_survives_a_machine_with_no_services_at_all():
+def test_the_shell_survives_a_machine_with_no_services_at_all(tmp_path: Path):
+    """No buses *and* no hardware: every tray reading says it has nothing, and says why.
+
+    The sysfs roots are pointed at an empty directory on purpose. Cutting the buses is only half
+    of "no services at all": network, bluetooth and power all fall back to sysfs, so a test that
+    leaves them on the real /sys tests the machine running the test instead. That is exactly how
+    this test broke — a CI runner whose cable is up made `network` come back available (a link,
+    but no signal number, which is the documented Ethernet contract) and the run went red for six
+    commits in a row, starting at 5f44ab9 (run 33124081665).
+    """
     backend = ZaldrosBackend(system_bus=busless(), session_bus=busless())
+    backend.network = NetworkFacet(busless(), sysfs_root=str(tmp_path))
+    backend.bluetooth = BluetoothFacet(busless(), sysfs_root=str(tmp_path))
+    backend.power = PowerFacet(busless(), sysfs_root=str(tmp_path))
     system.set_backend(backend)
     try:
         for key, reading in system.snapshot().items():
-            assert not reading.available or reading.value is not None, key
+            assert not reading.available, f"{key} claims a value on a machine that has none"
+            assert reading.value is None, key
             assert reading.detail, f"{key} must say why it has no value"
         assert system.user_name()
         assert system.switch_layout() is False
     finally:
         system.set_backend(None)
+
+
+def test_a_reading_may_be_available_without_a_number_and_the_seam_allows_it(tmp_path: Path):
+    """The contract at the seam, written down because it is what the test above got wrong.
+
+    `available` means "this fact is real", not "there is a number". A cable is a real connection
+    with no signal strength, and a radio seen only in sysfs is real presence with no power state.
+    Inventing a 100 % for either would be exactly the fabrication spec PART 3 §25 forbids.
+    """
+    wired = tmp_path / "enp3s0"
+    wired.mkdir()
+    (wired / "operstate").write_text("up\n")
+    reading = NetworkFacet(busless(), sysfs_root=str(tmp_path)).status()
+    assert reading.available and reading.value is None
+    assert reading.detail == "enp3s0 · Ethernet" and reading.source == str(wired)
+    assert reading.get("kind") == "ethernet"
 
 
 # -- the sysfs fallbacks, which are what a live image without D-Bus has ----------------------------

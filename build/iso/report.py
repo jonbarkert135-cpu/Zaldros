@@ -13,8 +13,30 @@ COLUMNS = [
     ("app launch", lambda d: "PASS" if (d.get("app_launch") or {}).get("started") else "FAIL"),
     ("RAM MiB", lambda d: d.get("mem_used_mib", "—")),
     ("procs", lambda d: d.get("process_count", "—")),
-    ("boot time", lambda d: (d.get("boot_time") or "—").splitlines()[0][:60]),
+    ("boot time", lambda d: boot_time_cell(d.get("boot_time"))),
 ]
+
+
+def boot_time_cell(value):
+    """One cell out of `selftest.boot_seconds()`, which is a dict, not a line of text.
+
+    It used to be the raw `systemd-analyze time` output, so this column called `.splitlines()`
+    on it. When the guest started measuring two ways (uptime at self-test, plus kernel/userspace
+    when systemd-analyze answers) the column began raising AttributeError and the whole matrix
+    vanished from the run summary. Both shapes are accepted, and "no measurement" prints as a
+    dash instead of a guess.
+    """
+    if isinstance(value, dict):
+        kernel, userspace = value.get("kernel_s"), value.get("userspace_s")
+        if kernel is not None and userspace is not None:
+            return f"{kernel:g}s kernel + {userspace:g}s userspace"
+        uptime = value.get("uptime_at_selftest_s")
+        if uptime is not None:
+            return f"{uptime:g}s to self-test"
+        return "—"
+    if isinstance(value, str) and value.strip():
+        return value.splitlines()[0][:60]
+    return "—"
 
 
 UI_STEPS = ["desktop_ready", "start_open", "start_close", "app_launch_explorer", "window_move",

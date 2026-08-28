@@ -105,7 +105,10 @@ jobs:
         run: cat results/*.ui-drive.log 2>/dev/null || echo "no UI drive log"
       - name: Result matrix
         if: always()
-        run: python3 ./build/iso/report.py results | tee -a "$GITHUB_STEP_SUMMARY"
+        run: |
+          # pipefail, or `tee` reports success for a report that crashed and a boot that failed.
+          set -o pipefail
+          python3 ./build/iso/report.py results | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Publish boot results to the ci-logs branch
         if: always()
         run: |

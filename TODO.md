@@ -4,8 +4,14 @@ Priority follows the owner's order: bootable system → real desktop → shell �
 Explorer → Settings → hardware → installer/updates → compatibility → performance → visual fidelity.
 
 ## Blocking everything
-- [ ] Confirm the GitHub Actions `image` job builds a container image (first real build evidence)
-- [ ] Get a build host with `/dev/kvm` (CI cannot boot a VM comfortably) — or the owner's machine
+- [x] Confirm the GitHub Actions `image` job builds a container image — green; superseded as the
+      real evidence by the `iso` workflow, which builds three live ISOs (ADR-0021)
+- [x] Build host with `/dev/kvm`: the GitHub runners have it (`KVM available`), and the `iso`
+      workflow boot-tests 9 images on it — run 33157358995. Still open: **the owner's machine**,
+      for a build under real root and a boot on real hardware
+- [ ] **Owner action:** copy the `set -o pipefail` from `docs/ci/iso.yml` into
+      `.github/workflows/iso.yml` (step "Result matrix") — Viktor's GitHub App may not push
+      workflow files; until then a crashed report or a failed boot can still read green (ADR-0021)
 - [ ] Settle the base distribution with the test in `docs/research/03-base-distribution-reopened.md`
 
 ## Real desktop (next slice)
@@ -22,7 +28,8 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Replace the vendored GPL-3 app/place SVGs with our own artwork (last borrowed pixels besides the cursors)
 - [ ] Extend the `Zaldros` icon theme to mime and device names (currently apps/places/actions only)
 - [ ] Ship Win11-gtk-theme (GPL-3) so GTK applications match the shell
-- [ ] Build the ISO the AnduinOS way (debootstrap + squashfs + xorriso) — no container runtime needed
+- [x] Build the ISO the AnduinOS way (Ubuntu base rootfs + squashfs + xorriso, no container
+      runtime): `build/iso/build-iso.sh`, three variants built in CI, `iso-full` ≈ 2.83 GiB
 - [ ] Window management: Alt+Tab (own KWin script — run #37 proved the shortcut fires and switches;
       the boot test now waits for a second window before measuring it), snap layouts,
       minimise/maximise/close on real windows
