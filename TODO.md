@@ -84,6 +84,13 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [ ] Файл настроек в духе Windows Terminal `settings.json`, выбор моноширинного шрифта
 - [ ] Проверить zsh, fish и pwsh на машине, где они установлены
 
+## Zaldros Writer (ADR-0020)
+- [x] Мост к движку Writer, лента, страница, стили, таблицы, DOCX/ODT, экспорт PDF
+- [ ] Проверить на машине с `libreoffice-writer-nogui` (в песочнице пакета нет, тесты пропущены)
+- [ ] Ввод с клавиатуры в страницу и курсор внутри абзаца
+- [ ] Рецензирование, оглавление, сноски, колонтитулы, печать из UI
+- [ ] Поставить `libreoffice-writer-nogui` в ISO рядом с `libreoffice-calc-nogui`
+
 ## After the desktop stands up
 - [ ] Explorer (Dolphin fork) — first real system application
 - [x] Settings: every row backed by a real control with read + write (ADR-0015) — display,

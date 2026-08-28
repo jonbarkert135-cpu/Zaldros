@@ -1,0 +1,30 @@
+{
+ "_comment": [
+  "Geometry for Zaldros Writer. Word and Excel share one Office ribbon after the 2023 refresh,",
+  "so these values are DERIVED from the measured Excel capture (excel-reference.json), not",
+  "measured from a Word capture — there is no authentic Word screenshot in the reference",
+  "library yet. Derived, not measured: see ADR-0020. Do not quote these as measurements."
+ ],
+ "derived_from": "system/theme/excel-reference.json",
+ "window": {
+  "title_bar_height": 52,
+  "_title_bar_height_device": 98,
+  "tab_strip_height": 33,
+  "_tab_strip_height_device": 62,
+  "ribbon_body_height": 105,
+  "_ribbon_body_height_device": 200,
+  "ribbon_card_radius": 4,
+  "formula_bar_height": 23,
+  "_formula_bar_height_device": 43,
+  "name_box_width": 105,
+  "_name_box_width_device": 200,
+  "status_bar_height": 24
+ },
+ "page": {
+  "width_mm": 210,
+  "height_mm": 297,
+  "margin_mm": 20,
+  "note": "A4 with 20 mm margins — LibreOffice's own default page, not a guess"
+ },
+ "tolerance": 2
+}

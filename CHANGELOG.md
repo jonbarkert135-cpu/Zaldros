@@ -27,6 +27,9 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
 - Zaldros Terminal: a real pty with our own xterm parser — tabs, split panes, shell profiles,
   Campbell colours, 256-colour and truecolour, the alternate screen, and Windows Terminal's
   shortcuts (ADR-0019).
+- Zaldros Writer: a Word-shaped window on the LibreOffice Writer engine — paragraphs, real
+  paragraph styles, tables, images, DOCX/ODT/RTF, PDF export and the engine's own pagination
+  (ADR-0020).
 - A Windows 11-style Alt+Tab switcher of our own (`system/theme/tabbox/zaldros`); the stock KWin
   layout needs the Plasma QML stack and silently did nothing in a Zaldros session.
 - Windows 11 widget style for QWidget applications: the `Windows-modern` Kvantum theme (GPL-3)
