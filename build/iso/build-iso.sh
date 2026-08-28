@@ -139,7 +139,11 @@ cp -a "$REPO/assets" "$ROOT/opt/zaldros/assets"
 cp -a "$REPO/system/theme" "$ROOT/opt/zaldros/theme"
 cp "$(dirname "$0")/selftest.py" "$ROOT/usr/local/bin/zaldros-selftest"
 cp "$(dirname "$0")/uitest.py"   "$ROOT/usr/local/bin/zaldros-uitest"
-chmod +x "$ROOT/usr/local/bin/zaldros-selftest" "$ROOT/usr/local/bin/zaldros-uitest"
+# The log collector ships *inside* the image on purpose: on real hardware the interesting failures
+# happen where there is no repository checkout and possibly no network (ADR-0021).
+cp "$REPO/tools/collect-logs.sh" "$ROOT/usr/local/bin/zaldros-collect-logs"
+chmod +x "$ROOT/usr/local/bin/zaldros-selftest" "$ROOT/usr/local/bin/zaldros-uitest" \
+         "$ROOT/usr/local/bin/zaldros-collect-logs"
 echo "$VARIANT" > "$ROOT/etc/zaldros-variant"
 
 # The visual layer. ADR-0010: the only upstream theme fetched here is the cursor pack; the icon

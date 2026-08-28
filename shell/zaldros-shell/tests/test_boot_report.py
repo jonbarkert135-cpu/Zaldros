@@ -102,3 +102,29 @@ def test_the_reviewed_workflow_does_not_swallow_the_report_exit_code():
     assert "report.py results | tee" in text, workflow
     step = text.split("report.py results | tee")[0]
     assert "set -o pipefail" in step.rsplit("- name:", 1)[1], "tee hides a crash and an exit code"
+
+
+# -- the UI drive's Alt+Tab verdict ----------------------------------------------------------------
+ui_drive = _load("ui-drive") if (ISO / "ui-drive.py").is_file() else None
+
+
+def test_a_held_frame_equal_to_the_release_frame_is_not_a_visible_switcher():
+    """iso run 33158172265: alt_tab-held.png and alt_tab-after.png were byte-identical
+    (md5 a4880e3e48) and the report still claimed `switcher_visible: true`. The window really did
+    switch — our Explorer on top before, Dolphin on top after — but nothing proved an overlay."""
+    verdict = ui_drive.alt_tab_verdict(showed=0.47488, overlay=0.0, switched=0.47488)
+    assert verdict["status"] == "PASS", "the window changed; that is what the step is about"
+    assert verdict["switched"] is True
+    assert verdict["switcher_visible"] is False
+    assert verdict["held_equals_after"] is True
+
+
+def test_an_overlay_that_appears_and_vanishes_is_a_visible_switcher():
+    verdict = ui_drive.alt_tab_verdict(showed=0.31, overlay=0.12, switched=0.47)
+    assert verdict["switcher_visible"] is True and verdict["held_equals_after"] is False
+    assert verdict["status"] == "PASS"
+
+
+def test_a_screen_that_never_changed_fails_however_the_overlay_measured():
+    verdict = ui_drive.alt_tab_verdict(showed=0.0, overlay=0.0, switched=0.0)
+    assert verdict["status"] == "FAIL" and verdict["switched"] is False

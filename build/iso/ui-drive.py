@@ -117,9 +117,9 @@ def alt_tab_step(qmp, out, settle=1.2):
     """Alt+Tab the way a person does it: hold Alt, tap Tab, *look at the screen*, then let go.
 
     Run #29 pressed and released in one batch and could only see the aftermath, which made a
-    switcher that never drew indistinguishable from one that drew and vanished. Two measurements
-    are taken instead: `switcher_fraction` with Alt still held (did the switcher appear?) and
-    `switched_fraction` after release (did the window actually change?).
+    switcher that never drew indistinguishable from one that drew and vanished. Three frames are
+    taken instead: before, with Alt still held, and after release — and the verdict about the
+    switcher is `alt_tab_verdict`'s, not a single fraction's.
     """
     before = out / "alt_tab-before.ppm"
     held = out / "alt_tab-held.ppm"
@@ -147,18 +147,44 @@ def alt_tab_step(qmp, out, settle=1.2):
         switched = changed_fraction(before, after)
     except Exception as exc:                                # noqa: BLE001 - reported, not hidden
         return {"status": "FAIL", "error": str(exc)}
-    ok = switched >= CHANGE_THRESHOLD or showed >= CHANGE_THRESHOLD
+    try:
+        overlay = changed_fraction(held, after)
+    except Exception as exc:                                # noqa: BLE001 - reported, not hidden
+        return {"status": "FAIL", "error": str(exc)}
+    verdict = alt_tab_verdict(showed, overlay, switched)
+    verdict.update({"seconds": elapsed, "screenshot": after.name, "held_screenshot": held.name})
+    return verdict
+
+
+def alt_tab_verdict(showed, overlay, switched):
+    """Turn three frame comparisons into claims that mean what they say.
+
+    `showed` = before vs held, `overlay` = held vs after, `switched` = before vs after.
+
+    The old version called `switcher_visible` true whenever the screen changed while Alt was held —
+    but the window switch *itself* changes the screen while Alt is held, so the field was true even
+    when no switcher had ever been drawn. iso run 33158172265 proved it: `alt_tab-held.png` and
+    `alt_tab-after.png` were byte-identical (md5 a4880e3e48) and the report still said
+    `switcher_visible: true`.
+
+    An overlay that exists only while Alt is down must make the held frame differ from *both* the
+    frame before it and the frame after release. If the held frame equals the release frame, the
+    only honest thing to say is that no switcher was captured — and the window switch, which is
+    the thing a user actually needs, is reported separately.
+    """
+    visible = overlay >= CHANGE_THRESHOLD and showed >= CHANGE_THRESHOLD
     return {
-        "status": "PASS" if ok else "FAIL",
-        "seconds": elapsed,
-        "switcher_visible": showed >= CHANGE_THRESHOLD,
-        "switcher_fraction": showed,
+        # The step is about switching windows. A missing overlay is reported, not fatal.
+        "status": "PASS" if switched >= CHANGE_THRESHOLD else "FAIL",
         "switched": switched >= CHANGE_THRESHOLD,
         "switched_fraction": switched,
-        "screenshot": after.name,
-        "held_screenshot": held.name,
-        "note": ("measured with the guest's Dolphin window open. The held frame shows the switcher "
-                 "itself; the after frame shows whether the window really changed."),
+        "switcher_visible": visible,
+        "switcher_fraction": showed,
+        "switcher_overlay_fraction": overlay,
+        "held_equals_after": overlay < CHANGE_THRESHOLD,
+        "note": ("measured with the guest's Dolphin window open. switcher_visible requires the "
+                 "held frame to differ from both neighbours; when held == after, no switcher was "
+                 "on screen while Alt was down and only the window change is proven."),
     }
 
 
