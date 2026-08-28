@@ -3,8 +3,9 @@ import QtQuick.Controls
 import ZaldrosTheme
 import ".."
 
-// Zaldros Terminal, shaped like Windows Terminal: a tab strip with a «+» and a profile dropdown
-// in the title area, panes side by side, a monospace grid on the Campbell palette.
+// Командная строка, собранная по снимку настоящей: **одна** полоса вверху, где вкладка, «+» и
+// стрелка профилей стоят прямо в заголовке окна рядом с кнопками управления — а не двумя рядами,
+// как было. Вкладки живут в AppWindow (`tabs`), поэтому здесь остались только панели и сетка.
 //
 // Every character comes from a real pty (zaldros_backend/terminal.py). Nothing here is simulated:
 // the prompt, the colours and the exit code are the shell's own.
@@ -36,95 +37,6 @@ Item {
 
     Rectangle { anchors.fill: parent; color: "#0c0c0c" }
 
-    // --- tab strip -------------------------------------------------------------------------
-    Rectangle {
-        id: tabStrip
-        width: parent.width
-        height: Theme.tabStripHeight
-        color: Theme.mica
-
-        Row {
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
-
-            Repeater {
-                model: terminal.model ? terminal.model.tabs : []
-                delegate: Rectangle {
-                    width: 168; height: 32
-                    radius: Theme.radiusSmall
-                    color: modelData.active ? "#0c0c0c"
-                         : (tabHover.containsMouse ? Theme.surfaceCard : "transparent")
-                    Text {
-                        x: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 120
-                        elide: Text.ElideRight
-                        text: modelData.name + (modelData.panes > 1
-                                                ? "  (" + modelData.panes + ")" : "")
-                        color: Theme.textPrimary
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontCaption
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "✕"
-                        color: Theme.textSecondary
-                        font.pixelSize: 10
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -6
-                            onClicked: terminal.model.closeTab(index)
-                        }
-                    }
-                    MouseArea {
-                        id: tabHover
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: terminal.model.selectTab(index)
-                    }
-                }
-            }
-
-            // New tab, and the caret that opens the profile list — the Windows Terminal pair.
-            Rectangle {
-                width: 28; height: 32; radius: Theme.radiusSmall
-                color: plusHover.containsMouse ? Theme.surfaceCard : "transparent"
-                Text {
-                    anchors.centerIn: parent
-                    text: "+"
-                    color: Theme.textPrimary
-                    font.pixelSize: 16
-                }
-                MouseArea {
-                    id: plusHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: terminal.model.openTab("")
-                }
-            }
-            Rectangle {
-                width: 22; height: 32; radius: Theme.radiusSmall
-                color: caretHover.containsMouse ? Theme.surfaceCard : "transparent"
-                Text {
-                    anchors.centerIn: parent
-                    text: "⌄"
-                    color: Theme.textSecondary
-                    font.pixelSize: 12
-                }
-                MouseArea {
-                    id: caretHover
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: terminal.dropdownOpen = !terminal.dropdownOpen
-                }
-            }
-        }
-    }
-
     // --- profile dropdown ---------------------------------------------------------------------
     Rectangle {
         id: dropdown
@@ -132,7 +44,7 @@ Item {
         visible: terminal.dropdownOpen
         z: 5
         x: 200
-        y: tabStrip.height + 2
+        y: 2
         width: 260
         height: profileColumn.height + 8
         radius: Theme.radiusMedium
@@ -174,11 +86,11 @@ Item {
     // --- panes -------------------------------------------------------------------------------
     Row {
         id: grid
-        anchors.top: tabStrip.bottom
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.margins: 6
+        anchors.margins: 0
         spacing: 6
 
         Repeater {
@@ -193,7 +105,8 @@ Item {
                 Column {
                     id: screen
                     anchors.fill: parent
-                    anchors.margins: 4
+                    anchors.leftMargin: 10
+                    anchors.topMargin: 6
                     Repeater {
                         model: modelData.lines
                         delegate: Row {

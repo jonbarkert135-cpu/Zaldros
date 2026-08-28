@@ -23,6 +23,7 @@ from __future__ import annotations
 import errno
 import fcntl
 import os
+import platform
 import pty
 import re
 import shutil
@@ -30,6 +31,8 @@ import signal
 import struct
 import termios
 from dataclasses import dataclass, field
+
+from .hardware import os_name
 
 DEFAULT_COLUMNS, DEFAULT_ROWS = 120, 30
 
@@ -74,6 +77,24 @@ def profiles() -> list[Profile]:
         seen.add(os.path.realpath(path))
         found.append(Profile(title, path, not found))
     return found
+
+
+#: The name the window and the first tab carry, as «Командная строка» does in Windows.
+PROMPT_TITLE = "Командная строка"
+
+
+def banner() -> list[str]:
+    """The two lines a command prompt greets you with.
+
+    Ours, not Microsoft's: no Windows version string is copied, because copying one would be both
+    a lie about what is running and a use of someone else's product name in their own words. The
+    kernel line is read from the machine, so it is true wherever it is printed.
+    """
+    system = os_name() or "Zaldros"
+    kernel = platform.release()
+    return [f"{system} [Ядро Linux {kernel}]",
+            "(c) Проект Zaldros. Свободное ПО, лицензия GPL-3.0.",
+            ""]
 
 
 def _shell_title(path: str) -> str:
@@ -159,9 +180,16 @@ class Screen:
         while len(self.grid) < rows:
             self.grid.append([Cell() for _ in range(columns)])
         while len(self.grid) > rows:
-            # Rows disappearing off the top go to scrollback, not to nothing: a resize must never
-            # eat output the user has not read.
+            # Shrinking drops **empty rows below the cursor first**, the way xterm does. Taking
+            # them off the top instead pushed the greeting into scrollback the moment the window
+            # settled on its real size, and the first line vanished before anyone could read it.
+            last = len(self.grid) - 1
+            if last > self.cursor_y and not any(cell.text.strip() for cell in self.grid[last]):
+                self.grid.pop()
+                continue
+            # Anything with content that has to go, goes to scrollback — never to nothing.
             self.scrollback.append(self.grid.pop(0))
+            self.cursor_y = max(0, self.cursor_y - 1)
         self.columns, self.rows = columns, rows
         self.scroll_top = min(self.scroll_top, rows - 1)
         self.scroll_bottom = rows - 1
@@ -496,6 +524,11 @@ class PtySession:
         self.pid, self.fd = pid, fd
         os.set_blocking(fd, False)
         self.resize(self.screen.columns, self.screen.rows)
+        # The greeting is written into our own screen, not into the shell: the shell never sees
+        # it, so a script that reads this terminal's output gets the shell's bytes and nothing of
+        # ours. It scrolls away like the real one's.
+        # The blank third line is the gap a command prompt leaves before its first prompt.
+        self.screen.feed(("\r\n".join(banner())).encode())
         return True
 
     def resize(self, columns: int, rows: int) -> None:

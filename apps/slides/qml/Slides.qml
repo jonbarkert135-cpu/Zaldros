@@ -31,7 +31,7 @@ Item {
                        font.family: root.uiFont; font.pixelSize: 12; font.bold: true }
             }
             Text {
-                text: qsTr("Презентация1 — Zaldros Slides")
+                text: qsTr("Презентация1 — PowerPoint")
                 color: "#ffffff"; font.family: root.uiFont; font.pixelSize: 13
                 anchors.verticalCenter: parent.verticalCenter
             }

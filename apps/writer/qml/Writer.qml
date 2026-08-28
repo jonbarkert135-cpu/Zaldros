@@ -42,8 +42,8 @@ Item {
                        font.family: root.uiFont; font.pixelSize: 11; font.bold: true }
             }
             Text {
-                text: document.path === "" ? qsTr("Документ1 — Zaldros Writer")
-                                           : document.path + " — Zaldros Writer"
+                text: document.path === "" ? qsTr("Документ1 — Word")
+                                           : document.path + " — Word"
                 color: "#ffffff"
                 font.family: root.uiFont
                 font.pixelSize: 13

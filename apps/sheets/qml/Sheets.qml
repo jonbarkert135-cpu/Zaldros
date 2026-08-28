@@ -64,7 +64,7 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            text: book.document + " \u2014 " + qsTr("Zaldros Sheets")
+            text: book.document + " \u2014 " + qsTr("Excel")
             color: "#ffffff"; font.family: root.uiFont; font.pixelSize: 14
         }
 

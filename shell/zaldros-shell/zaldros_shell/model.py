@@ -1571,8 +1571,11 @@ class TerminalModel(QObject):
         session = self._factory(command or self._default_command(), self._columns, self._rows)
         if not session.start():
             return False
-        tab = terminal.Tab(panes=[terminal.Pane(session)], name=terminal._shell_title(
-            session.command))
+        # The tab carries the application's name, the way «Командная строка» does; a tab opened
+        # from the profile list carries that profile's shell instead.
+        name = (terminal.PROMPT_TITLE if not command
+                else terminal._shell_title(session.command))
+        tab = terminal.Tab(panes=[terminal.Pane(session)], name=name)
         self._tabs.append(tab)
         self._active = len(self._tabs) - 1
         self._watch(session)
@@ -1654,7 +1657,7 @@ class TerminalModel(QObject):
     # --- what QML draws -----------------------------------------------------------------------
     @Property("QVariantList", notify=changed)
     def tabs(self) -> list:
-        return [{"name": tab.panes[tab.active].session.screen.title or tab.name,
+        return [{"name": tab.name,
                  "panes": len(tab.panes), "active": index == self._active}
                 for index, tab in enumerate(self._tabs)]
 

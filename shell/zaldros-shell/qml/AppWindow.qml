@@ -21,7 +21,15 @@ Item {
     property bool showTitleText: true
     // Windows 11 apps with tabs (Explorer) put the tab strip *in* the title bar and grow it to
     // 40 px; everything else keeps the 32 px bar. [{ title, glyph }]
+    // Tabs drawn in the title bar. Explorer passes decorative ones; the command prompt passes
+    // live ones and listens to these signals, which is why a tab without an `active` field is
+    // treated as active — the old look must not shift by one pixel.
     property var tabs: []
+    property bool showTabMenu: false
+    signal tabActivated(int index)
+    signal tabCloseRequested(int index)
+    signal newTabRequested()
+    signal tabMenuRequested()
     readonly property int barHeight: tabs.length > 0 ? Theme.tabStripHeight : Theme.titleBarHeight
     property int workAreaHeight: parent ? parent.height - Theme.taskbarHeight : height
     // children declared inside an AppWindow land in the body, below the title bar
@@ -130,12 +138,22 @@ Item {
                 Repeater {
                     model: win.tabs
                     delegate: Rectangle {
+                        id: tabItem
+                        readonly property bool isActive: modelData.active === undefined
+                                                         ? true : modelData.active
                         width: Math.min(240, tabLabel.implicitWidth + 68)
                         height: 32
                         radius: Theme.radiusMedium
-                        color: Theme.appBackground
-                        border.width: 1
+                        color: tabItem.isActive ? Theme.appBackground
+                             : (tabArea.containsMouse ? Theme.hover : "transparent")
+                        border.width: tabItem.isActive ? 1 : 0
                         border.color: Theme.border
+                        MouseArea {
+                            id: tabArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: win.tabActivated(index)
+                        }
                         Row {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
@@ -163,6 +181,11 @@ Item {
                             anchors.rightMargin: 8
                             glyph: "close"; width: 10; height: 10
                             color: Theme.textSecondary
+                            MouseArea {
+                                anchors.fill: parent
+                                anchors.margins: -6
+                                onClicked: win.tabCloseRequested(index)
+                            }
                         }
                     }
                 }
@@ -170,6 +193,21 @@ Item {
                     glyph: "add"
                     tooltip: "Новая вкладка"
                     anchors.verticalCenter: parent.verticalCenter
+                    onTriggered: win.newTabRequested()
+                }
+                // The caret that opens the profile list, as in Windows Terminal.
+                Item {
+                    visible: win.showTabMenu
+                    width: visible ? 22 : 0
+                    height: 32
+                    anchors.verticalCenter: parent.verticalCenter
+                    Text {
+                        anchors.centerIn: parent
+                        text: "\u2304"
+                        color: Theme.textSecondary
+                        font.pixelSize: 12
+                    }
+                    MouseArea { anchors.fill: parent; onClicked: win.tabMenuRequested() }
                 }
             }
 

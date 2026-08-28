@@ -330,10 +330,20 @@ Item {
     AppWindow {
         id: terminalWindow
         objectName: "terminalWindow"
-        title: "Терминал"
+        title: "Командная строка"
         iconGlyph: "terminal"
-        // The tab strip lives inside the application (as in Windows Terminal), so the window
-        // keeps the plain 32 px title bar rather than a second strip of tabs.
+        // One bar, like the real thing: the tabs, the «+» and the profile caret sit in the
+        // title bar itself, next to the caption buttons.
+        tabs: shell.backendTerminal
+              ? shell.backendTerminal.tabs.map(function (tab) {
+                    return { title: tab.name, glyph: "terminal", active: tab.active };
+                })
+              : []
+        showTabMenu: true
+        onTabActivated: function (index) { shell.backendTerminal.selectTab(index) }
+        onTabCloseRequested: function (index) { shell.backendTerminal.closeTab(index) }
+        onNewTabRequested: shell.backendTerminal.openTab("")
+        onTabMenuRequested: terminalPane.dropdownOpen = !terminalPane.dropdownOpen
         visible: shell.isOpen("terminal")
         active: shell.focusedWindow === "terminal"
         maximized: shell.maximised["terminal"] === true
@@ -353,6 +363,7 @@ Item {
         }
 
         Terminal {
+            id: terminalPane
             anchors.fill: parent
             model: shell.backendTerminal
         }
@@ -571,7 +582,7 @@ Item {
                  ? [{ id: "taskmanager", name: "Диспетчер задач", glyph: "apps", running: true,
                       active: shell.focusedWindow === "taskmanager" && shell.isOpen("taskmanager") }]
                  : []).concat(shell.openWindows["terminal"] === true
-                 ? [{ id: "terminal", name: "Терминал", glyph: "terminal", running: true,
+                 ? [{ id: "terminal", name: "Командная строка", glyph: "terminal", running: true,
                       active: shell.focusedWindow === "terminal" && shell.isOpen("terminal") }]
                  : []).concat(shell.openWindows["devicemanager"] === true
                  ? [{ id: "devicemanager", name: "Диспетчер устройств", glyph: "apps", running: true,

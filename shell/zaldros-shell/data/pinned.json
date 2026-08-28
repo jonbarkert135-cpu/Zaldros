@@ -16,7 +16,7 @@
       "taskbar": true
     },
     {
-      "name": "Терминал",
+      "name": "Командная строка",
       "exec_name": "konsole",
       "icon": "Т",
       "color": "#3a3f4b",
