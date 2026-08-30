@@ -1,27 +1,31 @@
 /*
- * Zaldros window switching, owned by us (ADR-0012, phase 2: ADR-0025).
+ * Zaldros window switching fallback (ADR-0012, phase 3).
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Copyright (c) 2026 the Zaldros project
  *
- * Phase 1 (main.js, replaced by this file) proved the shortcut fires and the window really
- * changes: iso run 33161193018 reported `switched: true`, `switched_fraction: 0.475`. The same
- * report also said `switcher_overlay_fraction: 0.0` — nothing was ever drawn while Alt was held,
- * because a JavaScript KWin script has no way to put anything on screen.
+ * This file no longer draws anything, and it no longer owns Alt+Tab.
  *
- * A QML script does: `X-Plasma-API: declarativescript` gives this file the same workspace API
- * (as the singleton `Workspace`, see below), plus the ability to own a Window. KWin draws it as an internal window,
- * above the session, which is the one place in a Zaldros session where an overlay can appear at
- * all — the shell is a normal Wayland client and cannot raise itself over Dolphin.
+ * What was measured. Phase 1 (main.js) proved the shortcut fires and the window really changes
+ * (run 33161193018: `switched: true`, `switched_fraction: 0.475`) but a JavaScript KWin script
+ * cannot put pixels on screen. Phase 2 rewrote it as a QML `declarativescript` with its own
+ * `Window`; run #39 drew nothing, and run #40 — with the popup flags removed and a diagnostic
+ * line added — answered why in one line:
  *
- * KWin's own tabbox stays out of this: runs #29-#34 pressed Alt+Tab in a booted ISO, the
- * framebuffer never moved and not one kwin_tabbox line appeared with that category on.
+ *     ZALDROS-SWITCHER overlay window visible=false geometry=0,0 1280x800
  *
- * Colours are substituted at install time from the same tokens as the shell theme; see
- * system/theme/install-visual-theme.sh.
+ * We asked for the window, the geometry was right, and Qt/KWin still refused to create it: a KWin
+ * script is not allowed to own a window at all, whatever the flags. So the overlay is gone.
+ *
+ * The switcher a Zaldros session actually shows is KWin's own tabbox running our layout
+ * (system/theme/tabbox/zaldros), which KWin draws above the session itself; Alt+Tab is bound to
+ * KWin's "Walk Through Windows" again in system/theme/install-visual-theme.sh.
+ *
+ * What is left here: the same window cycling on Meta+Tab — a switcher with no UI, kept because it
+ * is the one path that is proven to change windows if the tabbox regresses — and the diagnostic
+ * probes.
  */
 import QtQuick
-import QtQuick.Window
 import org.kde.kwin
 
 Item {
@@ -32,17 +36,6 @@ Item {
     // booted ISO: "ReferenceError: workspace is not defined" from this file, twice per Alt+Tab).
     // One alias keeps the rest of the file reading like the documented API.
     readonly property var workspace: Workspace
-
-    readonly property color backdropColour: "@BACKDROP@"
-    readonly property color surfaceColour: "@SURFACE@"
-    readonly property color textColour: "@TEXT@"
-    readonly property color accentColour: "@ACCENT@"
-    readonly property int cornerRadius: @RADIUS@
-
-    // Captions of the windows the last Alt+Tab walked through, and which one it landed on.
-    property var captions: []
-    property int current: -1
-    property bool overlayVisible: false
 
     readonly property string logPrefix: "ZALDROS-SWITCHER "
 
@@ -95,140 +88,26 @@ Item {
             next.minimized = false;
         }
         workspace.activeWindow = next;
-        show(windows, windows.indexOf(next));
-    }
-
-    function show(windows, selected) {
-        var names = [];
-        for (var i = 0; i < windows.length; i++) {
-            names.push(String(windows[i].caption));
-        }
-        root.captions = names;
-        root.current = selected;
-        root.overlayVisible = true;
-        hideTimer.restart();
-        log("overlay shown windows=" + names.length + " current=" + selected);
-        // One line that says whether the *window* exists as far as Qt is concerned, so a boot can
-        // tell "we never asked" from "we asked and KWin drew nothing" without another 15-min run.
-        log("overlay window visible=" + overlay.visible
-            + " geometry=" + overlay.x + "," + overlay.y + " " + overlay.width + "x" + overlay.height
-            + " backdrop=" + root.backdropColour);
-    }
-
-    function screenRect() {
-        // One overlay across the whole virtual screen. ponytail: on two monitors it spans both;
-        // per-output placement when someone actually runs two.
-        var geometry = workspace.virtualScreenGeometry;
-        if (geometry && geometry.width > 0) {
-            return geometry;
-        }
-        var size = workspace.virtualScreenSize;
-        if (size && size.width > 0) {
-            return Qt.rect(0, 0, size.width, size.height);
-        }
-        log("no screen geometry from the workspace, falling back to 1280x800");
-        return Qt.rect(0, 0, 1280, 800);
-    }
-
-    Timer {
-        id: hideTimer
-        // ponytail: KWin's scripting API reports no modifier release, so the overlay lives on a
-        // timer instead of on the Alt key. Every further Alt+Tab restarts it, so walking a list
-        // keeps it up; letting go early leaves it for the rest of this second. Replace with a real
-        // "modifiers released" signal if KWin ever exposes one to scripts.
-        // 2000 ms, not 1600: the boot driver looks at 1.4 s and lets go at 2.6 s, and 200 ms of
-        // margin is not enough once a screendump takes its own time (run #39).
-        interval: 2000
-        onTriggered: {
-            root.overlayVisible = false;
-            root.log("overlay hidden");
-        }
-    }
-
-    Window {
-        id: overlay
-        // Borderless and full-screen: Windows 11 dims the whole desktop behind the switcher rather
-        // than showing a small dialog, and KWin treats this as an internal window, so nothing else
-        // in the session has to cooperate.
-        // Run #39 drew nothing with `Qt.Popup | Qt.X11BypassWindowManagerHint`: a Wayland
-        // compositor has no X11 hint to bypass, and KWin treats an internal Qt.Popup as a popup
-        // that needs a transient parent and a grab, so it never reached the scene. A plain
-        // frameless always-on-top window is the one KWin *does* adopt as an internal window.
-        flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
-        visible: root.overlayVisible
-        color: "transparent"
-        x: root.screenRect().x
-        y: root.screenRect().y
-        width: root.screenRect().width
-        height: root.screenRect().height
-
-        Rectangle {
-            anchors.fill: parent
-            color: root.backdropColour
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: Math.min(row.width + 24, parent.width * 0.9)
-                height: row.height + 24
-                radius: root.cornerRadius
-                color: root.surfaceColour
-
-                Row {
-                    id: row
-                    anchors.centerIn: parent
-                    spacing: 12
-
-                    Repeater {
-                        model: root.captions
-
-                        // ponytail: caption cards, not live thumbnails. WindowThumbnail is a
-                        // tabbox/effect type and is not offered to scripts; the caption is what we
-                        // can render truthfully today.
-                        Rectangle {
-                            width: 200
-                            height: 120
-                            radius: root.cornerRadius
-                            color: index === root.current ? Qt.rgba(1, 1, 1, 0.10)
-                                                          : Qt.rgba(1, 1, 1, 0.04)
-                            border.width: index === root.current ? 2 : 0
-                            border.color: root.accentColour
-
-                            Text {
-                                anchors.fill: parent
-                                anchors.margins: 12
-                                text: modelData
-                                color: root.textColour
-                                elide: Text.ElideRight
-                                wrapMode: Text.Wrap
-                                maximumLineCount: 4
-                                textFormat: Text.PlainText
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     ShortcutHandler {
         name: "Zaldros Walk Through Windows"
         text: "Zaldros: следующее окно"
-        sequence: "Alt+Tab"
+        sequence: "Meta+Tab"
         onActivated: root.cycle(false)
     }
 
     ShortcutHandler {
         name: "Zaldros Walk Through Windows (Reverse)"
         text: "Zaldros: предыдущее окно"
-        sequence: "Alt+Shift+Tab"
+        sequence: "Meta+Shift+Tab"
         onActivated: root.cycle(true)
     }
 
     // Diagnostic probes. They do nothing but print, and they exist so one boot can say *which* key
     // presses reach a global shortcut instead of only whether Alt+Tab did. The host driver presses
-    // all four (build/iso/ui-drive.py, PROBE_KEYS) and the late report lists the lines that appeared.
+    // these (build/iso/ui-drive.py, PROBE_KEYS) and the late report lists the lines that appeared.
+    // Its fourth press, Meta+Tab, now lands on the fallback cycle above and logs "cycle reverse=".
     ShortcutHandler {
         name: "Zaldros Probe Meta F9"
         text: "Zaldros: проверка Meta+F9"
@@ -248,13 +127,6 @@ Item {
         text: "Zaldros: проверка Ctrl+Shift+F9"
         sequence: "Ctrl+Shift+F9"
         onActivated: console.log("ZALDROS-PROBE ctrl_shift_f9")
-    }
-
-    ShortcutHandler {
-        name: "Zaldros Probe Meta Tab"
-        text: "Zaldros: проверка Meta+Tab"
-        sequence: "Meta+Tab"
-        onActivated: console.log("ZALDROS-PROBE meta_tab")
     }
 
     Component.onCompleted: log("loaded (qml), windows=" + switchable().length)

@@ -145,3 +145,21 @@ def test_no_window_hangs_off_a_1280x800_screen(tmp_path: Path) -> None:
             f"{name} hangs off the right edge: {box} on {screen}"
         assert box["top"] + box["height"] <= screen["height"], \
             f"{name} hangs off the bottom edge: {box} on {screen}"
+
+
+def test_the_switcher_surface_is_not_a_popup() -> None:
+    """Runs #29-#34 saw nothing on Alt+Tab and run #39 saw nothing from the script's own window;
+    both used `Qt.Popup | Qt.X11BypassWindowManagerHint`. KWin never puts an internal popup in the
+    scene (it wants a transient parent and a grab) and a Wayland session has no X11 hint to bypass.
+    """
+    flags = re.search(r"flags:\s*(.+)", QML.read_text()).group(1)
+    assert "Qt.Popup" not in flags and "X11Bypass" not in flags, flags
+    assert "Qt.FramelessWindowHint" in flags, flags
+
+
+def test_the_layout_says_in_the_log_that_it_loaded_and_appeared() -> None:
+    """One boot has to be able to tell "the QML never loaded" from "it loaded and KWin drew
+    nothing"; selftest.py collects the ZALDROS-SWITCHER lines."""
+    text = QML.read_text()
+    assert "ZALDROS-SWITCHER tabbox layout loaded" in text
+    assert "ZALDROS-SWITCHER tabbox surface visible=" in text

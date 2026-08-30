@@ -375,8 +375,9 @@ roundedcornersEnabled=true
 blurEnabled=true
 contrastEnabled=true
 kwin4_effect_squashEnabled=true
-# Our own Alt+Tab (system/theme/kwin-scripts/zaldros-switcher). KWin's tabbox drew nothing in
-# runs #29-#34 and logged nothing either; a KWin script does the switching and says so in the log.
+# Our KWin script (system/theme/kwin-scripts/zaldros-switcher). Since run #40 it is a fallback on
+# Meta+Tab and a set of diagnostic probes: it cannot draw (a script may not own a window), so the
+# visible switcher on Alt+Tab is KWin's tabbox with our layout.
 zaldros-switcherEnabled=true
 
 [Effect-blur]
@@ -469,21 +470,23 @@ fi
 install -Dm644 /dev/stdin "$DEST/etc/xdg/kglobalshortcutsrc" <<'EOF'
 [kwin]
 _k_friendly_name=KWin
-# Run #35, measured: our KWin script registers its actions in kglobalaccel's *kwin* component, and
-# the live file came back with "Zaldros Walk Through Windows=,none," while KWin's own action still
-# held Alt+Tab (allShortcutInfos: 150994945). Writing "none" only in the current-key field left the
-# default Alt+Tab in place and it was restored; both fields must be none for the key to be free,
-# and our own action has to sit in this same [kwin] group to be autoloaded.
-Walk Through Windows=none,none,Walk Through Windows
-Walk Through Windows (Reverse)=none,none,Walk Through Windows (Reverse)
-Zaldros Walk Through Windows=Alt+Tab,Alt+Tab,Zaldros: следующее окно
-Zaldros Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Zaldros: предыдущее окно
+# Both fields (current,default) matter: run #35 measured that blanking only the first one left
+# KWin's default in place. Our own actions have to sit in this same [kwin] group to be autoloaded.
+# Run #40 gave Alt+Tab back to KWin. Our script activated the right window (`switched: true`,
+# `switched_fraction: 0.475`) but its own overlay stayed at `visible=false`: a KWin *script* is
+# not allowed to own a window, so it can never draw. The one thing in a Zaldros session that KWin
+# does draw over everything is its own tabbox — with our layout inside it
+# (system/theme/tabbox/zaldros). So the key belongs to KWin's action, and the script keeps only
+# a fallback on Meta+Tab plus the probes.
+Walk Through Windows=Alt+Tab,Alt+Tab,Walk Through Windows
+Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Walk Through Windows (Reverse)
+Zaldros Walk Through Windows=Meta+Tab,Meta+Tab,Zaldros: следующее окно
+Zaldros Walk Through Windows (Reverse)=Meta+Shift+Tab,Meta+Shift+Tab,Zaldros: предыдущее окно
 # Diagnostic probes (see kwin-scripts/zaldros-switcher/contents/ui/main.qml). They only print, and
 # an unseeded action is autoloaded as ",none," — so they must be listed here to be pressable.
 Zaldros Probe Meta F9=Meta+F9,Meta+F9,Zaldros: проверка Meta+F9
 Zaldros Probe Alt F9=Alt+F9,Alt+F9,Zaldros: проверка Alt+F9
 Zaldros Probe Ctrl Shift F9=Ctrl+Shift+F9,Ctrl+Shift+F9,Zaldros: проверка Ctrl+Shift+F9
-Zaldros Probe Meta Tab=Meta+Tab,Meta+Tab,Zaldros: проверка Meta+Tab
 Walk Through Windows of Current Application=Alt+`,Alt+`,Walk Through Windows of Current Application
 Show Desktop=Meta+D,Meta+D,Peek at Desktop
 Window Close=Alt+F4,Alt+F4,Close Window
@@ -502,13 +505,13 @@ install -Dm644 "$DEST/etc/xdg/kglobalshortcutsrc" "$DEST/etc/skel/.config/kgloba
 install -d "$DEST/home/ubuntu/.config"
 install -Dm644 "$DEST/etc/xdg/kglobalshortcutsrc" "$DEST/home/ubuntu/.config/kglobalshortcutsrc"
 
-# Our Alt+Tab lives in a KWin script, not in KWin's tabbox (see the file header for why).
+# The Meta+Tab fallback and the probes (see the file header for what run #40 measured).
 KWINSCRIPT_SRC="$(dirname "$0")/kwin-scripts/zaldros-switcher"
 if [[ -d "$KWINSCRIPT_SRC" ]]; then
   install -Dm644 "$KWINSCRIPT_SRC/metadata.json" \
     "$DEST/usr/share/kwin/scripts/zaldros-switcher/metadata.json"
-  # QML, not JavaScript, since ADR-0025: a JS script cannot draw, and the switcher overlay has to
-  # come from KWin itself. Same colour tokens as the switcher layout above — one edit, one look.
+  # Still QML (declarativescript): it needs the Workspace singleton and ShortcutHandler. Colour
+  # tokens are substituted anyway so the file stays interchangeable with the tabbox layout.
   install -d "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/ui"
   sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
       -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
@@ -517,7 +520,7 @@ if [[ -d "$KWINSCRIPT_SRC" ]]; then
       > "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/ui/main.qml"
   chmod 644 "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/ui/main.qml"
 else
-  echo "warning: no KWin script in $KWINSCRIPT_SRC, Alt+Tab will do nothing" >&2
+  echo "warning: no KWin script in $KWINSCRIPT_SRC, Meta+Tab will do nothing" >&2
 fi
 
 # Run #34: the session log was 90% one repeated line — `"applications.menu" not found in

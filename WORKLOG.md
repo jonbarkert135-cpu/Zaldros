@@ -1645,3 +1645,35 @@ pty-шеллы) — гонять по одному.
 
 Гейты: shell 472 passed, 1 skipped (130 с), tools 44 passed. Два набора тестов оболочки
 одновременно запускать нельзя — они поднимают настоящие pty и виснут.
+
+## Прогон #40: скрипту KWin вообще не дают окна — Alt+Tab возвращаем самому KWin
+
+Прогон #40 (iso `33324988234`, все 12 job'ов зелёные) добавил в сессию одну диагностическую
+строку, ради которой он и запускался:
+
+```
+qml: ZALDROS-SWITCHER overlay shown windows=2 current=0
+qml: ZALDROS-SWITCHER overlay window visible=false geometry=0,0 1280x800 backdrop=#cc000000
+```
+
+Мы просим окно показаться, геометрия правильная (1280×800), а Qt/KWin отвечает `visible=false`:
+окно не создаётся вовсе. Дело не во флагах (`Qt.Popup` мы убрали в #39→#40) и не в таймингах:
+**скрипт KWin не может владеть окном**. Замеры прогона это подтверждают:
+`switched: true`, `switched_fraction: 0.475` (окно реально переключилось), при
+`switcher_overlay_fraction: 0.0`, `held_equals_after: true`, md5 held == after
+(`2ac2df76819b17c89d9d91ac4440ca5b`).
+
+Единственное, что KWin рисует поверх сессии сам — его собственный tabbox. Поэтому:
+
+- `Alt+Tab` / `Alt+Shift+Tab` снова принадлежат действиям KWin `Walk Through Windows`;
+- визуал даёт наш layout `system/theme/tabbox/zaldros` (`kwinrc: TabBox/LayoutName=zaldros`);
+- в layout'е был **тот же дефект флагов**, что мы нашли в скрипте в #39:
+  `Qt.Popup | Qt.X11BypassWindowManagerHint`. Это правдоподобная причина и молчания прогонов
+  #29–#34: тогда Alt+Tab был у KWin, tabbox открывался, а окно ни разу не попадало в сцену;
+- скрипт остаётся как запасной путь без UI на `Meta+Tab` (единственный доказанно рабочий способ
+  сменить окно) плюс диагностические пробы;
+- layout печатает `ZALDROS-SWITCHER tabbox layout loaded` и
+  `ZALDROS-SWITCHER tabbox surface visible=… geometry=…`, чтобы следующий прогон отличал
+  «QML не загрузился» от «загрузился, но KWin ничего не нарисовал».
+
+Гейты: shell 473 passed, 1 skipped; tools 44 passed.

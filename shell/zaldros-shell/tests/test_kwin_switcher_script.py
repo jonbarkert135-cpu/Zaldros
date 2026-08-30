@@ -1,10 +1,14 @@
-"""Alt+Tab as a KWin script: the shortcut, the wiring, and the log it must leave.
+"""The KWin script: the Meta+Tab fallback, the probes, and the log it must leave.
 
-Runs #29-#34 pressed Alt+Tab in a booted ISO four times. The framebuffer never changed by one
-pixel and the session log never gained one kwin_tabbox line, even with that category on — KWin's
-tabbox was failing silently. The switching is ours now (ADR-0012), implemented in KWin's scripting
-API where every step prints what it did. These tests hold the chain together: the script exists,
-the installer ships and enables it, and the key belongs to our action and not to KWin's.
+History, all measured in booted ISOs: runs #29-#34 found Alt+Tab dead, so the switching moved into
+a KWin script (ADR-0012). The script does switch — run #40 reported `switched: true`,
+`switched_fraction: 0.475` — but it can never draw: its own diagnostic printed
+`overlay window visible=false geometry=0,0 1280x800`, i.e. Qt refused to create the window at all,
+because a KWin script may not own one.
+
+So since run #40 Alt+Tab belongs to KWin's own action again and the visible switcher is KWin's
+tabbox with our layout (tests/test_switcher.py). This script stays as the no-UI fallback on
+Meta+Tab plus the diagnostic probes; these tests hold that wiring together.
 """
 
 import json
@@ -23,7 +27,7 @@ def test_the_script_package_is_a_valid_kwin_script():
     meta = json.loads((SCRIPT_DIR / "metadata.json").read_text())
     assert meta["KPackageStructure"] == "KWin/Script"
     assert meta["KPlugin"]["Id"] == "zaldros-switcher"
-    # declarativescript, not javascript: a JS script has no way to draw the overlay (ADR-0025).
+    # declarativescript, not javascript: it needs the Workspace singleton and ShortcutHandler.
     assert meta["X-Plasma-API"] == "declarativescript"
     # KWin hardcodes contents/ui/main.qml for declarativescript (scripting.cpp), so that is where
     # the file has to live; X-Plasma-MainScript only has to agree with it.
@@ -32,13 +36,14 @@ def test_the_script_package_is_a_valid_kwin_script():
     assert (SCRIPT_DIR / "contents" / meta["X-Plasma-MainScript"]).is_file()
 
 
-def test_the_script_registers_both_directions_on_alt_tab():
+def test_the_script_keeps_both_directions_on_the_fallback_key():
     js = MAIN_QML.read_text()
     registered = dict(re.findall(r'name:\s*"([^"]+)"\s*\n\s*text:\s*"[^"]*"\s*\n\s*sequence:\s*"([^"]+)"', js))
     switching = {name: keys for name, keys in registered.items() if "Probe" not in name}
+    # Not Alt+Tab: that key is KWin's again, so the tabbox is what appears on it (run #40).
     assert switching == {
-        "Zaldros Walk Through Windows": "Alt+Tab",
-        "Zaldros Walk Through Windows (Reverse)": "Alt+Shift+Tab",
+        "Zaldros Walk Through Windows": "Meta+Tab",
+        "Zaldros Walk Through Windows (Reverse)": "Meta+Shift+Tab",
     }
 
 
@@ -62,19 +67,19 @@ def test_the_installer_ships_and_enables_the_script(needle):
     assert needle in INSTALLER
 
 
-def test_kwin_no_longer_holds_the_alt_tab_grab():
-    # Run #35, measured in a booted ISO: leaving Alt+Tab as KWin's *default* while blanking only
-    # the current key restored the grab, and our action came back as ",none,". Both fields must
-    # be none.
-    assert "Walk Through Windows=none,none,Walk Through Windows" in INSTALLER
-    assert "Walk Through Windows (Reverse)=none,none," in INSTALLER
+def test_kwin_holds_the_alt_tab_grab_again():
+    # Run #40: only KWin itself can put a switcher on screen, so its own action keeps the key and
+    # our layout rides inside its tabbox. Both fields are seeded — run #35 measured that a blank
+    # current-key field alone is silently refilled from the default.
+    assert "Walk Through Windows=Alt+Tab,Alt+Tab,Walk Through Windows" in INSTALLER
+    assert "Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab," in INSTALLER
 
 
 def test_our_shortcut_lives_in_the_component_kwin_registers_into():
     # KWin script actions register into kglobalaccel's "kwin" component; a [zaldros-switcher]
     # group only created a phantom component with no action behind it.
     kwin_group = INSTALLER.split("[kwin]", 1)[1].split("EOF", 1)[0]
-    assert "Zaldros Walk Through Windows=Alt+Tab,Alt+Tab," in kwin_group
+    assert "Zaldros Walk Through Windows=Meta+Tab,Meta+Tab," in kwin_group
     assert "[zaldros-switcher]" not in INSTALLER
 
 
@@ -106,10 +111,9 @@ def test_the_switch_restores_a_minimized_window():
     assert "next.minimized = false" in js
 
 
-# ── The overlay (ADR-0025) ──────────────────────────────────────────────────────────────────────
-# iso run 33161193018 measured `switcher_overlay_fraction: 0.0`: the switch happened and nothing
-# was drawn. These tests run the script's QML in this sandbox against stubs of KWin's own types,
-# so a typo costs seconds instead of a 15-minute ISO cycle.
+# ── Behaviour, against stubs of KWin's own types ────────────────────────────────────────────────
+# The script's QML runs in this sandbox against stubs, so a typo costs seconds instead of a
+# 15-minute ISO cycle.
 
 SUBSTITUTIONS = {
     "@BACKDROP@": "#cc000000",
@@ -219,8 +223,8 @@ def test_the_script_qml_loads_against_stubbed_kwin_types(tmp_path: Path) -> None
     assert not real, f"QML warnings from the switcher script: {real}"
 
 
-def test_alt_tab_switches_the_window_and_raises_the_overlay(tmp_path: Path) -> None:
-    """The whole point of ADR-0025: the same call that switches must also put something on screen."""
+def test_the_fallback_switches_the_window(tmp_path: Path) -> None:
+    """No UI is expected here any more — only that the right window becomes active."""
     from PySide6.QtCore import QMetaObject, Q_ARG
 
     root, _errors, workspace, build, app = _load(tmp_path)
@@ -233,25 +237,16 @@ def test_alt_tab_switches_the_window_and_raises_the_overlay(tmp_path: Path) -> N
     QMetaObject.invokeMethod(root, "cycle", Q_ARG("QVariant", False))
     app.processEvents()
 
-    assert workspace.property("activeWindow") is first, "Alt+Tab must activate the other window"
-    assert root.property("captions").toVariant() == ["Проводник", "Dolphin"]
-    assert root.property("current") == 0, "the overlay must mark the window we switched to"
-    windows = [c for c in root.children() if c.inherits("QQuickWindow")]
-    assert len(windows) == 1, "the script owns exactly one overlay window"
-    overlay = windows[0]
-    # `visible` on the Window itself cannot be read here: the offscreen platform never maps a
-    # window, so the state the QML binds to is what this can honestly assert.
-    assert root.property("overlayVisible") is True, "the overlay must be raised by the switch"
-    assert (overlay.property("width"), overlay.property("height")) == (1280, 800), \
-        "the overlay covers the screen the workspace reported"
+    assert workspace.property("activeWindow") is first, "the fallback must activate the other window"
 
 
-def test_the_overlay_is_not_a_popup() -> None:
-    """Run #39: KWin drew nothing for a `Qt.Popup` internal window (a popup wants a transient
-    parent and a grab), and `Qt.X11BypassWindowManagerHint` means nothing to a Wayland session."""
-    flags = re.search(r"flags:\s*(.+)", MAIN_QML.read_text()).group(1)
-    assert "Qt.Popup" not in flags and "X11Bypass" not in flags, flags
-    assert "Qt.FramelessWindowHint" in flags, flags
+def test_the_script_owns_no_window() -> None:
+    """Run #40, in a booted ISO: `overlay window visible=false geometry=0,0 1280x800`. Qt would not
+    create a window for a KWin script whatever the flags were, so keeping one here would only be
+    dead code that reads like a working overlay."""
+    text = MAIN_QML.read_text()
+    assert "Window {" not in text, "a KWin script cannot own a window (run #40)"
+    assert "QtQuick.Window" not in text
 
 
 def test_a_minimized_target_is_restored(tmp_path: Path) -> None:
@@ -266,16 +261,3 @@ def test_a_minimized_target_is_restored(tmp_path: Path) -> None:
     QMetaObject.invokeMethod(root, "cycle", Q_ARG("QVariant", False))
     app.processEvents()
     assert first.property("minimized") is False
-
-
-def test_the_overlay_outlives_the_held_frame_and_dies_before_the_release_frame() -> None:
-    """The boot driver screenshots 1.2 s after Tab with Alt still held, and again 1.2 s after
-    release. An overlay on a timer only proves itself if it is up at the first frame and gone at
-    the second (build/iso/ui-drive.py, alt_tab_step / alt_tab_verdict)."""
-    driver = (REPO / "build" / "iso" / "ui-drive.py").read_text()
-    settle = float(re.search(r"def alt_tab_step\(qmp, out, settle=([0-9.]+)\)", driver).group(1))
-    interval = int(re.search(r"interval:\s*(\d+)", MAIN_QML.read_text()).group(1))
-    assert settle * 1000 < interval < settle * 2000, (
-        f"overlay lifetime {interval} ms must outlast the held frame ({settle * 1000:.0f} ms) "
-        f"and end before the release frame ({settle * 2000:.0f} ms)"
-    )
