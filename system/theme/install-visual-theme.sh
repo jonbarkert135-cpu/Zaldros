@@ -506,8 +506,12 @@ Walk Through Windows=Alt+Tab,Alt+Tab,Walk Through Windows
 Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Walk Through Windows (Reverse)
 # Meta+Tab is KWin's *alternative* tabbox, drawn with the zaldros-grid layout: the Task View
 # peek. It has to be seeded here for the same reason Alt+Tab does — nothing else grabs the key.
-Walk Through Windows (Alternative)=Meta+Tab,Meta+Tab,Walk Through Windows (Alternative)
-Walk Through Windows (Reverse Alternative)=Meta+Shift+Tab,Meta+Shift+Tab,Walk Through Windows (Reverse Alternative)
+# The action ids have NO parentheses around "Alternative" — that is how KWin registers them
+# (run #42 wrote `Walk Through Windows Alternative=none,none,...` into the guest's own
+# kglobalshortcutsrc while our `(Alternative)` lines sat next to it, unused, and Meta+Tab did
+# nothing). Do not "fix" these names to match the Alt+Tab ones above.
+Walk Through Windows Alternative=Meta+Tab,Meta+Tab,Walk Through Windows Alternative
+Walk Through Windows Alternative (Reverse)=Meta+Shift+Tab,Meta+Shift+Tab,Walk Through Windows Alternative (Reverse)
 # The script's own cycling (no UI) moved off Meta+Tab to make room for the grid; it stays as a
 # keyboard-only fallback and as the thing the boot test can fire when the tabbox is not up.
 Zaldros Walk Through Windows=Meta+F10,Meta+F10,Zaldros: следующее окно

@@ -1,5 +1,21 @@
 # Worklog
 
+
+## 2026-08-30 — run #42: Meta+Tab — правильное имя действия KWin
+
+Прогон iso `33330071419` (коммит `e6bf26f`) — 12/12 зелёных, но шаг `task_view` = FAIL:
+Meta+Tab не открыл альтернативный tabbox (`switcher_fraction 0.0`, `held_equals_after true`).
+Причина видна в самом гостевом `~/.config/kglobalshortcutsrc`: KWin сам записал туда
+`Walk Through Windows Alternative=none,none,...` — то есть его действие называется **без скобок**,
+а наши строки `Walk Through Windows (Alternative)=Meta+Tab,...` лежали рядом мёртвым грузом.
+Alt+Tab при этом работал как раньше (`switcher_overlay_fraction 0.99957`).
+
+Исправлено: имена действий в `system/theme/install-visual-theme.sh` приведены к тем, что регистрирует
+KWin (`Walk Through Windows Alternative`, `Walk Through Windows Alternative (Reverse)`); тест
+`test_switcher.py` проверяет их с якорем `\n`, чтобы старая форма со скобками больше не проходила.
+Плюс selftest теперь читает и секцию `[TabBoxAlternative]` (`tabbox_alternative_config`), чтобы в
+следующем прогоне выбор `zaldros-grid` был доказан, а не предположен.
+
 ## 2026-08-26 — ADR-0010: of the theme packs, only the cursors ship
 
 The maintainer asked why Zaldros exists when Linuxfx/WindowsFX (now Winux) already does this, and

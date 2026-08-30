@@ -174,6 +174,7 @@ def switcher():
     package = Path("/usr/share/kwin/tabbox/zaldros")
     layout = ""
     tabbox = {}
+    tabbox_alt = {}
     kwinrc = Path("/etc/xdg/kwinrc")
     if kwinrc.is_file():
         section = ""
@@ -181,9 +182,10 @@ def switcher():
             line = line.strip()
             if line.startswith("["):
                 section = line
-            elif "=" in line and section == "[TabBox]":
+            elif "=" in line and section in ("[TabBox]", "[TabBoxAlternative]"):
                 key, _, value = line.partition("=")
-                tabbox[key.strip()] = value.strip()
+                target = tabbox if section == "[TabBox]" else tabbox_alt
+                target[key.strip()] = value.strip()
         layout = tabbox.get("LayoutName", "")
     runtime = ""
     socks = [q for q in wayland_sockets() if not q.name.endswith(".lock")]
@@ -235,6 +237,7 @@ def switcher():
                              if Path("/usr/share/kwin/tabbox").is_dir() else [],
         "configured_layout": layout,
         "tabbox_config": tabbox,
+        "tabbox_alternative_config": tabbox_alt,
         "kglobalaccel_component_present": bool(walk) or "Walk Through Windows" in shortcut,
         "all_shortcut_infos_error": shortcut[:300] if not walk else "",
         "walk_through_windows": walk,

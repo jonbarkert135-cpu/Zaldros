@@ -223,8 +223,8 @@ def test_meta_tab_opens_the_alternative_tabbox_and_not_the_ui_less_script() -> N
     """The script cannot draw (run #40), so the key that shows the grid must be KWin's own
     alternative tabbox action; the script's silent cycling moved to Meta+F10."""
     installer = INSTALLER.read_text()
-    assert "Walk Through Windows (Alternative)=Meta+Tab,Meta+Tab," in installer
-    assert "Walk Through Windows (Reverse Alternative)=Meta+Shift+Tab,Meta+Shift+Tab," in installer
+    assert "\nWalk Through Windows Alternative=Meta+Tab,Meta+Tab," in installer
+    assert "\nWalk Through Windows Alternative (Reverse)=Meta+Shift+Tab,Meta+Shift+Tab," in installer
     assert "Zaldros Walk Through Windows=Meta+F10,Meta+F10," in installer, \
         "the UI-less fallback must not sit on the same key as the grid"
 
