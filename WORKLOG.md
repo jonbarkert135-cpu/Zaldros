@@ -1609,3 +1609,39 @@ pty-шеллы) — гонять по одному.
 **Чего нет.** Что оверлей теперь рисуется, докажет только следующий `iso`:
 `switcher_overlay_fraction > 0`, `held_equals_after: false` и разные md5 у трёх кадров. Живого
 железа по-прежнему не было.
+
+## Прогон #39: скрипт заработал, окно переключается — оверлей всё ещё не рисуется
+
+Ветка `feat/switcher-overlay`, коммит `a1fd54a`, iso-прогон 33323860605 (все 12 задач зелёные).
+Ветка с доказательствами: `origin/ci-logs-boot-full-modern`.
+
+Что впервые получилось (`zaldros-full-modern.late.json`):
+
+- `switcher_script_lines`: `loaded (qml), windows=0` → `cycle reverse=false candidates=2` →
+  `activating Home — Dolphin (was __main__.py)` → `overlay shown windows=2 current=0` → `overlay hidden`.
+- `alt_tab_switched: true`, `switched_fraction: 0.475`, `kwin_scripts_installed: zaldros-switcher`.
+- В `session_log_tail` больше нет `ReferenceError: workspace is not defined` — алиас на синглтон
+  `Workspace` закрыл вопрос.
+- Кадры `alt_tab-before.png` и `alt_tab-held.png` действительно разные: Dolphin поднялся наверх.
+
+Что не получилось:
+
+- `switcher_overlay_fraction: 0.0`, `held_equals_after: true`, md5 `held` и `after` совпадают
+  (`47e46056…`). Скрипт сказал «оверлей показан», а на экране его не было.
+
+Причина (гипотеза прогона #40): окно оверлея было объявлено с
+`flags: Qt.Popup | Qt.X11BypassWindowManagerHint`. В сессии Wayland обходить нечего — X11-подсказка
+не значит ничего, а внутреннее окно с типом `Qt.Popup` KWin ждёт с transient-родителем и захватом
+ввода, поэтому в сцену оно не попадает. Заменено на
+`Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus`.
+
+Заодно:
+
+- `hideTimer` 1600 → 2000 мс. Драйвер снимает `held` на 1.4 с и отпускает Alt на 2.6 с; 200 мс
+  запаса мало, когда сам screendump занимает время.
+- Одна диагностическая строка при показе: `overlay window visible=… geometry=… backdrop=…`,
+  чтобы следующий прогон отличил «не попросили» от «попросили, а KWin ничего не нарисовал».
+- Тест `test_the_overlay_is_not_a_popup` фиксирует запрет на `Qt.Popup`/`X11Bypass`.
+
+Гейты: shell 472 passed, 1 skipped (130 с), tools 44 passed. Два набора тестов оболочки
+одновременно запускать нельзя — они поднимают настоящие pty и виснут.

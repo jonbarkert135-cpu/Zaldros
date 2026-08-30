@@ -246,6 +246,14 @@ def test_alt_tab_switches_the_window_and_raises_the_overlay(tmp_path: Path) -> N
         "the overlay covers the screen the workspace reported"
 
 
+def test_the_overlay_is_not_a_popup() -> None:
+    """Run #39: KWin drew nothing for a `Qt.Popup` internal window (a popup wants a transient
+    parent and a grab), and `Qt.X11BypassWindowManagerHint` means nothing to a Wayland session."""
+    flags = re.search(r"flags:\s*(.+)", MAIN_QML.read_text()).group(1)
+    assert "Qt.Popup" not in flags and "X11Bypass" not in flags, flags
+    assert "Qt.FramelessWindowHint" in flags, flags
+
+
 def test_a_minimized_target_is_restored(tmp_path: Path) -> None:
     from PySide6.QtCore import QMetaObject, Q_ARG
 

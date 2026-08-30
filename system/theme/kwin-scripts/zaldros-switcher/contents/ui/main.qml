@@ -108,6 +108,11 @@ Item {
         root.overlayVisible = true;
         hideTimer.restart();
         log("overlay shown windows=" + names.length + " current=" + selected);
+        // One line that says whether the *window* exists as far as Qt is concerned, so a boot can
+        // tell "we never asked" from "we asked and KWin drew nothing" without another 15-min run.
+        log("overlay window visible=" + overlay.visible
+            + " geometry=" + overlay.x + "," + overlay.y + " " + overlay.width + "x" + overlay.height
+            + " backdrop=" + root.backdropColour);
     }
 
     function screenRect() {
@@ -131,7 +136,9 @@ Item {
         // timer instead of on the Alt key. Every further Alt+Tab restarts it, so walking a list
         // keeps it up; letting go early leaves it for the rest of this second. Replace with a real
         // "modifiers released" signal if KWin ever exposes one to scripts.
-        interval: 1600
+        // 2000 ms, not 1600: the boot driver looks at 1.4 s and lets go at 2.6 s, and 200 ms of
+        // margin is not enough once a screendump takes its own time (run #39).
+        interval: 2000
         onTriggered: {
             root.overlayVisible = false;
             root.log("overlay hidden");
@@ -143,7 +150,11 @@ Item {
         // Borderless and full-screen: Windows 11 dims the whole desktop behind the switcher rather
         // than showing a small dialog, and KWin treats this as an internal window, so nothing else
         // in the session has to cooperate.
-        flags: Qt.Popup | Qt.X11BypassWindowManagerHint
+        // Run #39 drew nothing with `Qt.Popup | Qt.X11BypassWindowManagerHint`: a Wayland
+        // compositor has no X11 hint to bypass, and KWin treats an internal Qt.Popup as a popup
+        // that needs a transient parent and a grab, so it never reached the scene. A plain
+        // frameless always-on-top window is the one KWin *does* adopt as an internal window.
+        flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
         visible: root.overlayVisible
         color: "transparent"
         x: root.screenRect().x
