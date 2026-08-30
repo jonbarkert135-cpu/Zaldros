@@ -1556,3 +1556,27 @@ KWin про отпускание модификатора не говорят); 
 
 **Чего нет.** Что KWin действительно загрузит QML-пакет и покажет окно на живой сессии — не
 доказано ничем, кроме следующего прогона `iso`. Живого железа по-прежнему не было.
+
+## Прогон #38: KWin не читает `X-Plasma-MainScript` — путь для QML захардкожен
+
+**Что показал прогон.** `iso` 33317608220 (`7a477b8`) зелёный, все девять загрузок прошли, но
+`boot (full, modern)` дал ровно те же цифры, что и до оверлея: `switcher_visible: false`,
+`switcher_overlay_fraction: 0.0`, `held_equals_after: true` (`switched: true`,
+`switched_fraction: 0.339`). Диагностика гостя объясняет почему: `kwin_scripts_installed:
+"zaldros-switcher"`, но `switcher_script_lines: []` и `probe_lines: []` — скрипт не напечатал ни
+строки, то есть KWin его не запускал.
+
+**Причина.** В `scripting.cpp` KWin строит путь сам:
+`.../contents/` + (javascript ? `code/main.js` : `ui/main.qml`). Для `declarativescript` поле
+`X-Plasma-MainScript` не читается вообще, файл обязан лежать в `contents/ui/main.qml`. Мы положили
+QML в `contents/code/` — по документации туториала, а не по коду загрузчика, — и пакет молча не
+загрузился. Урок: путь пакета проверять по загрузчику, а не по туториалу.
+
+**Что сделано.** `contents/code/main.qml` → `contents/ui/main.qml`, `X-Plasma-MainScript` приведён к
+`ui/main.qml`, установщик ставит файл в `contents/ui/`. Тесты держат обе стороны: и место файла в
+репозитории, и путь, который пишет установщик.
+
+**Гейты.** shell 471 passed + 1 skipped, tools 44 — как и до переноса; новой логики не добавлено.
+
+**Чего нет.** Что оверлей теперь виден, снова докажет только следующий прогон `iso`:
+`switcher_overlay_fraction > 0` и `held_equals_after: false`. Живого железа по-прежнему не было.

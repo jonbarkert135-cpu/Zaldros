@@ -10,5 +10,5 @@
         "Name[ru]": "Переключатель окон Zaldros"
     },
     "X-Plasma-API": "declarativescript",
-    "X-Plasma-MainScript": "code/main.qml"
+    "X-Plasma-MainScript": "ui/main.qml"
 }

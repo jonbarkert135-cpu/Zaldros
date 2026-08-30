@@ -22,7 +22,7 @@ REPO = Path(__file__).resolve().parents[3]
 ISO = REPO / "build" / "iso"
 DRIVE_SRC = (ISO / "ui-drive.py").read_text()
 SWITCHER_QML = (REPO / "system" / "theme" / "kwin-scripts" / "zaldros-switcher"
-                / "contents" / "code" / "main.qml").read_text()
+                / "contents" / "ui" / "main.qml").read_text()
 INSTALLER = (REPO / "system" / "theme" / "install-visual-theme.sh").read_text()
 
 

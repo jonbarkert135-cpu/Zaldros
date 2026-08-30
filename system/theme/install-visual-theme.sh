@@ -478,7 +478,7 @@ Walk Through Windows=none,none,Walk Through Windows
 Walk Through Windows (Reverse)=none,none,Walk Through Windows (Reverse)
 Zaldros Walk Through Windows=Alt+Tab,Alt+Tab,Zaldros: следующее окно
 Zaldros Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Zaldros: предыдущее окно
-# Diagnostic probes (see kwin-scripts/zaldros-switcher/contents/code/main.qml). They only print, and
+# Diagnostic probes (see kwin-scripts/zaldros-switcher/contents/ui/main.qml). They only print, and
 # an unseeded action is autoloaded as ",none," — so they must be listed here to be pressable.
 Zaldros Probe Meta F9=Meta+F9,Meta+F9,Zaldros: проверка Meta+F9
 Zaldros Probe Alt F9=Alt+F9,Alt+F9,Zaldros: проверка Alt+F9
@@ -509,13 +509,13 @@ if [[ -d "$KWINSCRIPT_SRC" ]]; then
     "$DEST/usr/share/kwin/scripts/zaldros-switcher/metadata.json"
   # QML, not JavaScript, since ADR-0025: a JS script cannot draw, and the switcher overlay has to
   # come from KWin itself. Same colour tokens as the switcher layout above — one edit, one look.
-  install -d "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code"
+  install -d "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/ui"
   sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
       -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
       -e "s|@RADIUS@|8|g" \
-      "$KWINSCRIPT_SRC/contents/code/main.qml" \
-      > "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code/main.qml"
-  chmod 644 "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code/main.qml"
+      "$KWINSCRIPT_SRC/contents/ui/main.qml" \
+      > "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/ui/main.qml"
+  chmod 644 "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/ui/main.qml"
 else
   echo "warning: no KWin script in $KWINSCRIPT_SRC, Alt+Tab will do nothing" >&2
 fi

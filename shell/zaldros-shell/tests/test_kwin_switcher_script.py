@@ -15,7 +15,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 SCRIPT_DIR = REPO / "system" / "theme" / "kwin-scripts" / "zaldros-switcher"
-MAIN_QML = SCRIPT_DIR / "contents" / "code" / "main.qml"
+MAIN_QML = SCRIPT_DIR / "contents" / "ui" / "main.qml"
 INSTALLER = (REPO / "system" / "theme" / "install-visual-theme.sh").read_text()
 
 
@@ -25,7 +25,9 @@ def test_the_script_package_is_a_valid_kwin_script():
     assert meta["KPlugin"]["Id"] == "zaldros-switcher"
     # declarativescript, not javascript: a JS script has no way to draw the overlay (ADR-0025).
     assert meta["X-Plasma-API"] == "declarativescript"
-    assert meta["X-Plasma-MainScript"] == "code/main.qml"
+    # KWin hardcodes contents/ui/main.qml for declarativescript (scripting.cpp), so that is where
+    # the file has to live; X-Plasma-MainScript only has to agree with it.
+    assert meta["X-Plasma-MainScript"] == "ui/main.qml"
     # X-Plasma-MainScript is relative to contents/, as KPackage resolves it.
     assert (SCRIPT_DIR / "contents" / meta["X-Plasma-MainScript"]).is_file()
 
@@ -50,7 +52,7 @@ def test_the_script_switches_real_windows_and_says_so():
 
 @pytest.mark.parametrize("needle", [
     "usr/share/kwin/scripts/zaldros-switcher/metadata.json",
-    "usr/share/kwin/scripts/zaldros-switcher/contents/code/main.qml",
+    "usr/share/kwin/scripts/zaldros-switcher/contents/ui/main.qml",
     "zaldros-switcherEnabled=true",
 ])
 def test_the_installer_ships_and_enables_the_script(needle):
