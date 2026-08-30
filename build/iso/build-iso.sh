@@ -66,7 +66,7 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window"
+BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami"
 case "$VARIANT" in
   # kde-spectacle and the portal are what makes Win+G's screenshot and recording real rather than
   # decorative: the shell resolves a grabber at runtime (zaldros_shell/capture.py) and disables the

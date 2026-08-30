@@ -137,18 +137,33 @@ KWin.TabBoxSwitcher {
                                     border.width: index === grid.currentIndex ? 2 : 0
                                     border.color: tabBox.accentColour
 
-                                    Text {
+                                    // Windows 11 puts the application icon left of the title on
+                                    // every card. The icon comes from its own file so a missing
+                                    // Kirigami module costs the icon, not the whole switcher.
+                                    Row {
                                         id: caption
                                         anchors.top: parent.top
                                         anchors.left: parent.left
                                         anchors.right: parent.right
                                         anchors.margins: 8
                                         height: grid.captionHeight - 8
-                                        text: model.caption
-                                        color: tabBox.textColour
-                                        elide: Text.ElideRight
-                                        textFormat: Text.PlainText
-                                        verticalAlignment: Text.AlignVCenter
+                                        spacing: 6
+
+                                        Loader {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            source: "IconBadge.qml"
+                                            onLoaded: item.iconSource = model.icon
+                                        }
+
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: caption.width - x
+                                            text: model.caption
+                                            color: tabBox.textColour
+                                            elide: Text.ElideRight
+                                            textFormat: Text.PlainText
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
                                     }
 
                                     // Holder for the live thumbnail. It carries the card radius

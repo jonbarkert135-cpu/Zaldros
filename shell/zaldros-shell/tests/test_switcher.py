@@ -172,3 +172,24 @@ def test_the_cards_sit_on_one_rounded_panel() -> None:
     assert "id: panel" in text, "the cards need a container, not bare cards on the backdrop"
     assert "tabBox.surfaceColour" in text, "the panel must use the theme surface colour"
     assert "radius: tabBox.cornerRadius * 2" in text, "the panel corners follow the theme radius"
+
+
+def test_the_card_icon_cannot_take_the_switcher_down_with_it() -> None:
+    """KWin publishes `icon` as a QIcon, which plain QtQuick cannot paint (`Image.source` rejects
+    it), so the badge needs Kirigami. A failed QML import kills the file it sits in, and main.qml
+    is the switcher — hence a separate file behind a Loader, and the module in the image."""
+    text = QML.read_text()
+    badge = PACKAGE / "contents" / "ui" / "IconBadge.qml"
+    assert badge.is_file(), "the icon lives in its own file"
+    assert "kirigami" in badge.read_text().lower(), "the badge is the only place Kirigami appears"
+    imports = [line for line in text.splitlines() if line.startswith("import ")]
+    assert not any("kirigami" in line.lower() for line in imports), \
+        "main.qml must not import Kirigami; a missing module would blank the switcher"
+    assert 'source: "IconBadge.qml"' in text and "Loader {" in text, \
+        "the badge must be loaded, not imported"
+
+    installer = INSTALLER.read_text()
+    assert 'for qml in "$TABBOX_SRC"/contents/ui/*.qml' in installer, \
+        "the installer must ship every QML file in the package, not just main.qml"
+    packages = (REPO / "build" / "iso" / "build-iso.sh").read_text()
+    assert "qml6-module-org-kde-kirigami" in packages, "the image needs the module for the icon"

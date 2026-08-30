@@ -455,11 +455,15 @@ if [[ -d "$TABBOX_SRC" ]]; then
   rm -rf "$DEST/usr/share/kwin/tabbox/zaldros"
   install -d "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui"
   install -Dm644 "$TABBOX_SRC/metadata.json" "$DEST/usr/share/kwin/tabbox/zaldros/metadata.json"
-  sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
-      -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
-      -e "s|@RADIUS@|8|g" \
-      "$TABBOX_SRC/contents/ui/main.qml" > "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui/main.qml"
-  chmod 644 "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui/main.qml"
+  # Every QML file in the package, not just main.qml: the icon badge lives in its own file so a
+  # missing Kirigami module cannot take the whole switcher down with it.
+  for qml in "$TABBOX_SRC"/contents/ui/*.qml; do
+    out="$DEST/usr/share/kwin/tabbox/zaldros/contents/ui/$(basename "$qml")"
+    sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
+        -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
+        -e "s|@RADIUS@|8|g" "$qml" > "$out"
+    chmod 644 "$out"
+  done
 else
   echo "warning: no switcher package in $TABBOX_SRC, Alt+Tab will have no layout" >&2
 fi
