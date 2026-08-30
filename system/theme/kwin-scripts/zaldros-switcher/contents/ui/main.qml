@@ -21,7 +21,7 @@
  * (system/theme/tabbox/zaldros), which KWin draws above the session itself; Alt+Tab is bound to
  * KWin's "Walk Through Windows" again in system/theme/install-visual-theme.sh.
  *
- * What is left here: the same window cycling on Meta+Tab — a switcher with no UI, kept because it
+ * What is left here: the same window cycling on Meta+F10 — a switcher with no UI, kept because it
  * is the one path that is proven to change windows if the tabbox regresses — and the diagnostic
  * probes.
  */
@@ -93,21 +93,22 @@ Item {
     ShortcutHandler {
         name: "Zaldros Walk Through Windows"
         text: "Zaldros: следующее окно"
-        sequence: "Meta+Tab"
+        sequence: "Meta+F10"
         onActivated: root.cycle(false)
     }
 
     ShortcutHandler {
         name: "Zaldros Walk Through Windows (Reverse)"
         text: "Zaldros: предыдущее окно"
-        sequence: "Meta+Shift+Tab"
+        sequence: "Meta+Shift+F10"
         onActivated: root.cycle(true)
     }
 
     // Diagnostic probes. They do nothing but print, and they exist so one boot can say *which* key
     // presses reach a global shortcut instead of only whether Alt+Tab did. The host driver presses
     // these (build/iso/ui-drive.py, PROBE_KEYS) and the late report lists the lines that appeared.
-    // Its fourth press, Meta+Tab, now lands on the fallback cycle above and logs "cycle reverse=".
+    // Its fourth press, Meta+F10, now lands on the fallback cycle above and logs "cycle reverse=".
+    // (Meta+Tab moved to KWin's alternative tabbox — the Task View grid — in this run.)
     ShortcutHandler {
         name: "Zaldros Probe Meta F9"
         text: "Zaldros: проверка Meta+F9"

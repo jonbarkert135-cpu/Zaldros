@@ -32,6 +32,12 @@ KWin.TabBoxSwitcher {
     readonly property color accentColour: "@ACCENT@"
     readonly property int cornerRadius: @RADIUS@
 
+    // The same source builds two packages (see system/theme/install-visual-theme.sh): the Alt+Tab
+    // switcher, one row of small cards, and the Meta+Tab grid — bigger cards wrapped over several
+    // rows, the shape of the Windows Task View. Only these three numbers and the id differ, so a
+    // fix to the switcher is a fix to both.
+    readonly property string layoutId: "@LAYOUT@"
+
     // No binding for currentIndex here: `grid` lives inside the Instantiator's delegate, which is
     // a separate component scope, and KWin writes this property itself before showing the box
     // (tabboxhandler.cpp: item->setCurrentIndex(indexRow)). The grid pushes its selection back in
@@ -39,8 +45,8 @@ KWin.TabBoxSwitcher {
 
     // Proof the layout is loaded at all: without it, a boot cannot tell an unloadable QML file
     // from a tabbox that never opened.
-    Component.onCompleted: console.log("ZALDROS-SWITCHER tabbox layout loaded")
-    onVisibleChanged: console.log("ZALDROS-SWITCHER tabbox visible=" + tabBox.visible)
+    Component.onCompleted: console.log("ZALDROS-SWITCHER tabbox layout loaded id=@LAYOUT@")
+    onVisibleChanged: console.log("ZALDROS-SWITCHER tabbox visible=" + tabBox.visible + " id=@LAYOUT@")
 
     Instantiator {
         active: tabBox.visible
@@ -89,8 +95,10 @@ KWin.TabBoxSwitcher {
                         id: cards
                         anchors.centerIn: parent
                         focus: true
-                        width: Math.min(grid.contentWidthHint, tabBox.screenGeometry.width * 0.85)
-                        height: Math.min(grid.contentHeightHint, tabBox.screenGeometry.height * 0.75)
+                        // Exactly the grid's own size: fitScale already keeps it inside the
+                        // screen, and a second clamp here would cost a whole column to rounding.
+                        width: grid.contentWidthHint
+                        height: grid.contentHeightHint
 
                         GridView {
                             id: grid
@@ -103,14 +111,29 @@ KWin.TabBoxSwitcher {
                             highlightMoveDuration: 0
 
                             // 16:10 cards, the aspect the switcher is shown at on a 16:10 screen.
-                            readonly property int cardWidth: 300
-                            readonly property int cardHeight: 188
+                            readonly property int baseCardWidth: @CARDW@
+                            readonly property int baseCardHeight: @CARDH@
                             readonly property int captionHeight: 30
                             readonly property int gutter: 16
                             readonly property int panelPadding: 20
-                            readonly property int columns: Math.max(1, Math.min(count,
-                                Math.floor(tabBox.screenGeometry.width * 0.85 / cellWidth)))
+                            // @MAXCOL@ caps the row, so the grid layout wraps into rows instead of
+                            // growing into one long strip; the switcher layout passes a high cap.
+                            readonly property int columns: Math.max(1, Math.min(count, @MAXCOL@))
                             readonly property int rows: Math.max(1, Math.ceil(count / columns))
+                            // Shrink, never grow. With fixed card sizes the last row fell off the
+                            // panel as soon as the windows did not fit (measured in the offscreen
+                            // preview: five windows at 420x262 on 1280x800 clipped the bottom row).
+                            // The gutters and captions are fixed furniture: take them out of the
+                            // budget first, then scale the thumbnails into what is left. Scaling
+                            // them along with the cards made the grid 10 px too wide, and GridView
+                            // silently dropped a column (offscreen preview, five windows).
+                            readonly property real fitScale: Math.min(1,
+                                (tabBox.screenGeometry.width * 0.85 - columns * gutter)
+                                    / (columns * baseCardWidth),
+                                (tabBox.screenGeometry.height * 0.75
+                                    - rows * (captionHeight + gutter)) / (rows * baseCardHeight))
+                            readonly property int cardWidth: Math.floor(baseCardWidth * fitScale)
+                            readonly property int cardHeight: Math.floor(baseCardHeight * fitScale)
                             readonly property int contentWidthHint: cellWidth * columns
                             readonly property int contentHeightHint: cellHeight * rows
 

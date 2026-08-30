@@ -121,7 +121,7 @@ def test_the_switcher_qml_modules_are_in_the_image() -> None:
 
 def test_the_switcher_package_is_installed_by_the_theme_installer() -> None:
     theme = THEME.read_text()
-    assert "/usr/share/kwin/tabbox/zaldros" in theme, "the layout must be installed where KWin looks"
+    assert "/usr/share/kwin/tabbox/$layout" in theme, "the layouts must be installed where KWin looks"
     assert "LayoutName=zaldros" in theme, "and selected in kwinrc"
 
 

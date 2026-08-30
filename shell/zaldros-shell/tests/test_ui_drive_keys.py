@@ -68,7 +68,10 @@ def test_the_driver_only_uses_key_names_qemu_knows():
 
 def test_left_alt_is_called_alt():
     assert "alt_l" not in key_names_used()
-    assert '"alt", True' in DRIVE_SRC
+    # The hold-and-look step takes the modifier as an argument now (Meta+Tab reuses it for the
+    # Task View grid), so the name lives in the default value.
+    assert 'modifier="alt"' in DRIVE_SRC
+    assert 'qmp.key_state(modifier, True)' in DRIVE_SRC
 
 
 class FakeSocket:
@@ -129,13 +132,13 @@ def test_every_probe_the_driver_presses_exists_as_a_shortcut():
     registered = dict(re.findall(r'name:\s*"([^"]+)"\s*\n\s*text:\s*"[^"]*"\s*\n\s*sequence:\s*"([^"]+)"',
                                  SWITCHER_QML))
     printed = set(re.findall(r'ZALDROS-PROBE ([a-z0-9_]+)"', SWITCHER_QML))
-    # meta_tab is pressed too, but since run #40 it lands on the real fallback cycle (which logs
+    # meta_f10 is pressed too, but it lands on the real fallback cycle (which logs
     # "cycle reverse=") instead of a printing probe, so it is not in `printed`.
-    assert printed | {"meta_tab"} == set(drive.PROBE_KEYS), "driver and script disagree about the probes"
+    assert printed | {"meta_f10"} == set(drive.PROBE_KEYS), "driver and script disagree about the probes"
     for action, keys in (("Zaldros Probe Meta F9", "Meta+F9"),
                          ("Zaldros Probe Alt F9", "Alt+F9"),
                          ("Zaldros Probe Ctrl Shift F9", "Ctrl+Shift+F9"),
-                         ("Zaldros Walk Through Windows", "Meta+Tab")):
+                         ("Zaldros Walk Through Windows", "Meta+F10")):
         assert registered.get(action) == keys
         # unseeded actions are autoloaded as ",none," and cannot be pressed (run #35)
         assert f"{action}={keys},{keys}," in INSTALLER
@@ -202,3 +205,12 @@ def test_the_late_report_quotes_what_the_switcher_did():
     assert '"switcher_cycles"' in selftest and '"alt_tab_switched"' in selftest
     # the switcher's verdict must be read before the D-Bus invoke fires one itself
     assert selftest.index('"alt_tab_switched"') < selftest.index('"invoke_delta"')
+
+
+def test_the_driver_looks_at_the_task_view_grid_too():
+    """Meta+Tab opens the alternative tabbox (layout `zaldros-grid`). It is only proven if the
+    driver holds Meta the same way it holds Alt and keeps the three frames."""
+    assert 'modifier="meta_l", prefix="task_view"' in DRIVE_SRC, \
+        "the grid needs its own held/before/after frames, not just a key press"
+    report = (ISO / "report.py").read_text()
+    assert '"task_view"' in report, "an unreported step is not evidence"

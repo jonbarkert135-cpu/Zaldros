@@ -113,29 +113,32 @@ def timed_step(qmp, out, name, action, settle=1.5):
             "screenshot": after.name}
 
 
-def alt_tab_step(qmp, out, settle=1.2):
+def alt_tab_step(qmp, out, settle=1.2, modifier="alt", prefix="alt_tab"):
     """Alt+Tab the way a person does it: hold Alt, tap Tab, *look at the screen*, then let go.
 
     Run #29 pressed and released in one batch and could only see the aftermath, which made a
     switcher that never drew indistinguishable from one that drew and vanished. Three frames are
     taken instead: before, with Alt still held, and after release — and the verdict about the
     switcher is `alt_tab_verdict`'s, not a single fraction's.
+
+    Meta+Tab is driven by the same code with `modifier="meta_l"`: it opens KWin's *alternative*
+    tabbox, which we dress as the Task View grid (system/theme/tabbox, layout `zaldros-grid`).
     """
-    before = out / "alt_tab-before.ppm"
-    held = out / "alt_tab-held.ppm"
-    after = out / "alt_tab-after.ppm"
+    before = out / f"{prefix}-before.ppm"
+    held = out / f"{prefix}-held.ppm"
+    after = out / f"{prefix}-after.ppm"
     qmp.screendump(before)
     started = time.monotonic()
     try:
         # `alt`, not `alt_l`: QKeyCode names the left Alt `alt`, and QEMU rejected every
         # `alt_l` event for six runs while this driver ignored the error reply (run #36).
-        qmp.key_state("alt", True)
+        qmp.key_state(modifier, True)
         time.sleep(0.2)
         qmp.key_state("tab", True)
         qmp.key_state("tab", False)
         time.sleep(settle)
         qmp.screendump(held)
-        qmp.key_state("alt", False)
+        qmp.key_state(modifier, False)
     except QMPError as exc:
         return {"status": "FAIL", "qmp_error": str(exc),
                 "why": "the key was never delivered to the guest, so this says nothing about KWin"}
@@ -192,12 +195,13 @@ def alt_tab_verdict(showed, overlay, switched):
 # it could never answer before: *which* key presses reach a global shortcut. Each one only prints
 # a ZALDROS-PROBE line, and the guest's late report says which lines appeared. If none fire, the
 # whole keyboard→kglobalaccel path is dead; if Meta+F9 fires and Alt+F9 does not, the Alt modifier
-# is being eaten; if Alt+F9 fires and Meta+Tab does not, Tab is the problem. No more guessing.
+# is being eaten. Meta+Tab used to be pressed here; it now opens the alternative tabbox (the Task
+# View grid), so the script's own cycle sits on Meta+F10 and that is what this presses.
 PROBE_KEYS = {
     "meta_f9": ("meta_l", "f9"),
     "alt_f9": ("alt", "f9"),
     "ctrl_shift_f9": ("ctrl", "shift", "f9"),
-    "meta_tab": ("meta_l", "tab"),
+    "meta_f10": ("meta_l", "f10"),
 }
 
 
@@ -349,6 +353,9 @@ def main():
         results["alt_tab"]["second_window"] = ready
         results["alt_tab"]["guest_test_finished"] = waited is not None
         results["alt_tab"]["waited_for_guest_seconds"] = waited
+        # Meta+Tab: the alternative tabbox in Task View proportions. Same three frames, so the
+        # report can say whether it drew, not only whether a key was accepted.
+        results["task_view"] = alt_tab_step(qmp, out, modifier="meta_l", prefix="task_view")
         results["shortcut_probes"] = probe_step(qmp)
     else:
         results["alt_tab"] = {

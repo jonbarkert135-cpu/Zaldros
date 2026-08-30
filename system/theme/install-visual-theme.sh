@@ -411,8 +411,15 @@ MultiScreenMode=0
 ApplicationsMode=0
 MinimizedMode=0
 
+# Meta+Tab: the same switcher in Task View proportions (usr/share/kwin/tabbox/zaldros-grid).
 [TabBoxAlternative]
-LayoutName=zaldros
+LayoutName=zaldros-grid
+ShowTabBox=true
+HighlightWindows=true
+SwitchingMode=0
+MultiScreenMode=0
+ApplicationsMode=0
+MinimizedMode=0
 EOF
 
 # Two layouts, switched with Alt+Shift, exactly like a Russian Windows install. Run #30 booted with
@@ -452,17 +459,30 @@ else
   t_backdrop="#cc000000"; t_surface="#202020"; t_text="#ffffff"; t_accent="#60cdff"
 fi
 if [[ -d "$TABBOX_SRC" ]]; then
-  rm -rf "$DEST/usr/share/kwin/tabbox/zaldros"
-  install -d "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui"
-  install -Dm644 "$TABBOX_SRC/metadata.json" "$DEST/usr/share/kwin/tabbox/zaldros/metadata.json"
-  # Every QML file in the package, not just main.qml: the icon badge lives in its own file so a
-  # missing Kirigami module cannot take the whole switcher down with it.
-  for qml in "$TABBOX_SRC"/contents/ui/*.qml; do
-    out="$DEST/usr/share/kwin/tabbox/zaldros/contents/ui/$(basename "$qml")"
-    sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
-        -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
-        -e "s|@RADIUS@|8|g" "$qml" > "$out"
-    chmod 644 "$out"
+  # Two packages out of one source. `zaldros` is Alt+Tab: small cards in a single row, the
+  # Windows 11 switcher. `zaldros-grid` is Meta+Tab (kwinrc [TabBoxAlternative]): bigger cards
+  # capped at three per row, so several windows wrap into a grid — the shape of the Windows
+  # Task View. KWin's tabbox closes when the modifier is released, so this is a *peek*, not the
+  # sticky Task View with virtual desktops; that one needs a real effect, not a tabbox layout.
+  #   id : card width : card height : max columns
+  for spec in "zaldros:300:188:99" "zaldros-grid:420:262:3"; do
+    IFS=: read -r layout cardw cardh maxcol <<<"$spec"
+    rm -rf "$DEST/usr/share/kwin/tabbox/$layout"
+    install -d "$DEST/usr/share/kwin/tabbox/$layout/contents/ui"
+    sed -e "s|\"Id\": \"zaldros\"|\"Id\": \"$layout\"|" \
+        "$TABBOX_SRC/metadata.json" > "$DEST/usr/share/kwin/tabbox/$layout/metadata.json"
+    chmod 644 "$DEST/usr/share/kwin/tabbox/$layout/metadata.json"
+    # Every QML file in the package, not just main.qml: the icon badge lives in its own file so a
+    # missing Kirigami module cannot take the whole switcher down with it.
+    for qml in "$TABBOX_SRC"/contents/ui/*.qml; do
+      out="$DEST/usr/share/kwin/tabbox/$layout/contents/ui/$(basename "$qml")"
+      sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
+          -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
+          -e "s|@RADIUS@|8|g"             -e "s|@LAYOUT@|$layout|g" \
+          -e "s|@CARDW@|$cardw|g"         -e "s|@CARDH@|$cardh|g" \
+          -e "s|@MAXCOL@|$maxcol|g" "$qml" > "$out"
+      chmod 644 "$out"
+    done
   done
 else
   echo "warning: no switcher package in $TABBOX_SRC, Alt+Tab will have no layout" >&2
@@ -484,8 +504,14 @@ _k_friendly_name=KWin
 # a fallback on Meta+Tab plus the probes.
 Walk Through Windows=Alt+Tab,Alt+Tab,Walk Through Windows
 Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Walk Through Windows (Reverse)
-Zaldros Walk Through Windows=Meta+Tab,Meta+Tab,Zaldros: следующее окно
-Zaldros Walk Through Windows (Reverse)=Meta+Shift+Tab,Meta+Shift+Tab,Zaldros: предыдущее окно
+# Meta+Tab is KWin's *alternative* tabbox, drawn with the zaldros-grid layout: the Task View
+# peek. It has to be seeded here for the same reason Alt+Tab does — nothing else grabs the key.
+Walk Through Windows (Alternative)=Meta+Tab,Meta+Tab,Walk Through Windows (Alternative)
+Walk Through Windows (Reverse Alternative)=Meta+Shift+Tab,Meta+Shift+Tab,Walk Through Windows (Reverse Alternative)
+# The script's own cycling (no UI) moved off Meta+Tab to make room for the grid; it stays as a
+# keyboard-only fallback and as the thing the boot test can fire when the tabbox is not up.
+Zaldros Walk Through Windows=Meta+F10,Meta+F10,Zaldros: следующее окно
+Zaldros Walk Through Windows (Reverse)=Meta+Shift+F10,Meta+Shift+F10,Zaldros: предыдущее окно
 # Diagnostic probes (see kwin-scripts/zaldros-switcher/contents/ui/main.qml). They only print, and
 # an unseeded action is autoloaded as ",none," — so they must be listed here to be pressable.
 Zaldros Probe Meta F9=Meta+F9,Meta+F9,Zaldros: проверка Meta+F9

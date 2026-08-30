@@ -1,4 +1,4 @@
-"""The KWin script: the Meta+Tab fallback, the probes, and the log it must leave.
+"""The KWin script: the Meta+F10 fallback, the probes, and the log it must leave.
 
 History, all measured in booted ISOs: runs #29-#34 found Alt+Tab dead, so the switching moved into
 a KWin script (ADR-0012). The script does switch — run #40 reported `switched: true`,
@@ -8,7 +8,8 @@ because a KWin script may not own one.
 
 So since run #40 Alt+Tab belongs to KWin's own action again and the visible switcher is KWin's
 tabbox with our layout (tests/test_switcher.py). This script stays as the no-UI fallback on
-Meta+Tab plus the diagnostic probes; these tests hold that wiring together.
+Meta+F10 plus the diagnostic probes (Meta+Tab now opens the alternative tabbox, the Task
+View grid); these tests hold that wiring together.
 """
 
 import json
@@ -42,8 +43,8 @@ def test_the_script_keeps_both_directions_on_the_fallback_key():
     switching = {name: keys for name, keys in registered.items() if "Probe" not in name}
     # Not Alt+Tab: that key is KWin's again, so the tabbox is what appears on it (run #40).
     assert switching == {
-        "Zaldros Walk Through Windows": "Meta+Tab",
-        "Zaldros Walk Through Windows (Reverse)": "Meta+Shift+Tab",
+        "Zaldros Walk Through Windows": "Meta+F10",
+        "Zaldros Walk Through Windows (Reverse)": "Meta+Shift+F10",
     }
 
 
@@ -79,7 +80,7 @@ def test_our_shortcut_lives_in_the_component_kwin_registers_into():
     # KWin script actions register into kglobalaccel's "kwin" component; a [zaldros-switcher]
     # group only created a phantom component with no action behind it.
     kwin_group = INSTALLER.split("[kwin]", 1)[1].split("EOF", 1)[0]
-    assert "Zaldros Walk Through Windows=Meta+Tab,Meta+Tab," in kwin_group
+    assert "Zaldros Walk Through Windows=Meta+F10,Meta+F10," in kwin_group
     assert "[zaldros-switcher]" not in INSTALLER
 
 

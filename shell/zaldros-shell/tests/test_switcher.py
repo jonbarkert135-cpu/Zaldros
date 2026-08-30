@@ -26,6 +26,11 @@ SUBSTITUTIONS = {
     "@TEXT@": "#ffffff",
     "@ACCENT@": "#60cdff",
     "@RADIUS@": "8",
+    # The grid package's numbers, so the QML that loads here is the bigger of the two variants.
+    "@LAYOUT@": "zaldros-grid",
+    "@CARDW@": "420",
+    "@CARDH@": "262",
+    "@MAXCOL@": "3",
 }
 
 STUBS = {
@@ -69,11 +74,12 @@ def test_metadata_is_a_kwin_window_switcher_package() -> None:
 
 def test_kwinrc_selects_our_layout_for_both_key_paths() -> None:
     installer = INSTALLER.read_text()
-    assert installer.count("LayoutName=zaldros") == 2, \
-        "TabBox and TabBoxAlternative must both point at the layout we install"
+    assert "LayoutName=zaldros\n" in installer, "Alt+Tab must use the switcher layout"
+    assert "LayoutName=zaldros-grid\n" in installer, \
+        "Meta+Tab must use the Task View grid layout"
     assert "thumbnail_grid" not in installer.split("[TabBox]")[1], \
         "the Plasma-dependent layout must not come back"
-    assert "/usr/share/kwin/tabbox/zaldros" in installer, "the package must be installed"
+    assert "/usr/share/kwin/tabbox/$layout" in installer, "the packages must be installed"
 
 
 def test_switcher_imports_nothing_from_plasma() -> None:
@@ -193,3 +199,41 @@ def test_the_card_icon_cannot_take_the_switcher_down_with_it() -> None:
         "the installer must ship every QML file in the package, not just main.qml"
     packages = (REPO / "build" / "iso" / "build-iso.sh").read_text()
     assert "qml6-module-org-kde-kirigami" in packages, "the image needs the module for the icon"
+
+
+def test_the_task_view_grid_is_the_same_source_with_different_numbers() -> None:
+    """Meta+Tab shows the Windows Task View shape: the same cards, bigger, wrapped into rows.
+
+    Two tabbox packages out of one QML file, so a fix to the switcher is a fix to both. The only
+    difference is what the installer substitutes: id, card size and how many fit in a row.
+    """
+    text = QML.read_text()
+    for token in ("@LAYOUT@", "@CARDW@", "@CARDH@", "@MAXCOL@"):
+        assert token in text, f"{token} must be substituted at install time, not hardcoded"
+
+    installer = INSTALLER.read_text()
+    assert '"zaldros:300:188:99" "zaldros-grid:420:262:3"' in installer, \
+        "one loop builds both packages; the grid gets bigger cards and a three-column cap"
+    assert "-e \"s|@LAYOUT@|$layout|g\"" in installer, "each package must know its own id"
+    assert '"$DEST/usr/share/kwin/tabbox/$layout/metadata.json"' in installer, \
+        "the two packages need different metadata ids, or KWin sees one plugin twice"
+
+
+def test_meta_tab_opens_the_alternative_tabbox_and_not_the_ui_less_script() -> None:
+    """The script cannot draw (run #40), so the key that shows the grid must be KWin's own
+    alternative tabbox action; the script's silent cycling moved to Meta+F10."""
+    installer = INSTALLER.read_text()
+    assert "Walk Through Windows (Alternative)=Meta+Tab,Meta+Tab," in installer
+    assert "Walk Through Windows (Reverse Alternative)=Meta+Shift+Tab,Meta+Shift+Tab," in installer
+    assert "Zaldros Walk Through Windows=Meta+F10,Meta+F10," in installer, \
+        "the UI-less fallback must not sit on the same key as the grid"
+
+
+def test_the_grid_shrinks_instead_of_falling_off_the_screen() -> None:
+    """Fixed card sizes only fit while the windows are few. The grid scales the thumbnails down
+    to whatever is left after the gutters and captions, so no row is ever clipped."""
+    text = QML.read_text()
+    assert "fitScale" in text, "the cards must scale to the screen, not trust a fixed size"
+    assert "Math.min(1," in text, "shrink only — cards must never be blown up past their design size"
+    assert "width: grid.contentWidthHint" in text, \
+        "clamping the grid to a fraction of the screen loses a whole column to rounding"

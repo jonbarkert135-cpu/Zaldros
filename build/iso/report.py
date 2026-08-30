@@ -40,7 +40,7 @@ def boot_time_cell(value):
 
 
 UI_STEPS = ["desktop_ready", "start_open", "start_close", "app_launch_explorer", "window_move",
-            "minimize", "restore", "alt_tab", "taskbar_response", "screenshot"]
+            "minimize", "restore", "alt_tab", "task_view", "taskbar_response", "screenshot"]
 
 
 def ui_cell(d, step):
