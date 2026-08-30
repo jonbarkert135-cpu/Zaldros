@@ -68,9 +68,12 @@ def ui_table(rows):
 
 
 def main(directory="results"):
-    # ponytail: only the per-boot result files; the -host/.ui-guest halves are read through them.
-    rows = [json.loads(p.read_text()) for p in sorted(Path(directory).glob("*.json"))
-            if not p.name.endswith(("-host.json", ".ui-guest.json"))]
+    # Only the per-boot result files. The other halves (-host, .ui-guest, .late — the last one
+    # started landing in results/ when the diagnostics were made to outlive the build, ADR-0024)
+    # are read through the boot result, and a name-based exclusion list keeps going stale, so the
+    # test is what a boot row actually is: a dict that says which image it came from.
+    rows = [d for d in (json.loads(p.read_text()) for p in sorted(Path(directory).glob("*.json")))
+            if isinstance(d, dict) and "variant" in d]
     if not rows:
         print("no results — BLOCKED, nothing ran")
         return 1

@@ -128,3 +128,20 @@ def test_an_overlay_that_appears_and_vanishes_is_a_visible_switcher():
 def test_a_screen_that_never_changed_fails_however_the_overlay_measured():
     verdict = ui_drive.alt_tab_verdict(showed=0.0, overlay=0.0, switched=0.0)
     assert verdict["status"] == "FAIL" and verdict["switched"] is False
+
+
+def test_the_matrix_ignores_the_diagnostic_halves_next_to_a_boot_result(tmp_path):
+    """iso run 33326841932: every boot job went red at "Result matrix" while the boot itself
+    passed. `results/` had grown a `*.late.json` (the in-guest diagnostics), the report read it as
+    an extra image and printed a `| ? | ? | FAIL |` row, which took the exit code to 1."""
+    import json as _json
+
+    (tmp_path / "zaldros-full-modern.json").write_text(_json.dumps(
+        {"variant": "full", "profile": "modern", "boot": "PASS", "kernel": "7.0.0-30-generic",
+         "systemd_state": "running", "wayland_socket": True, "kwin": True, "shell": True}))
+    (tmp_path / "zaldros-full-modern.late.json").write_text(_json.dumps(
+        {"switcher_script_lines": ["qml: ZALDROS-SWITCHER tabbox layout loaded"]}))
+    (tmp_path / "zaldros-full-modern-host.json").write_text(_json.dumps({"alt_tab": {}}))
+
+    report = _load("report")
+    assert report.main(str(tmp_path)) == 0, "a passing boot next to its diagnostics is not a failure"
