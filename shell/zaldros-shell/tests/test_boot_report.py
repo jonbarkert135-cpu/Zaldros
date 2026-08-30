@@ -142,6 +142,8 @@ def test_the_matrix_ignores_the_diagnostic_halves_next_to_a_boot_result(tmp_path
     (tmp_path / "zaldros-full-modern.late.json").write_text(_json.dumps(
         {"switcher_script_lines": ["qml: ZALDROS-SWITCHER tabbox layout loaded"]}))
     (tmp_path / "zaldros-full-modern-host.json").write_text(_json.dumps({"alt_tab": {}}))
+    # The build manifest also carries `variant`, so a row is "variant AND a boot verdict".
+    (tmp_path / "zaldros-full.json").write_text(_json.dumps({"variant": "full", "size_mib": 2900}))
 
     report = _load("report")
     assert report.main(str(tmp_path)) == 0, "a passing boot next to its diagnostics is not a failure"
