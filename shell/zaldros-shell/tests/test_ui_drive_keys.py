@@ -21,8 +21,8 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 ISO = REPO / "build" / "iso"
 DRIVE_SRC = (ISO / "ui-drive.py").read_text()
-SWITCHER_JS = (REPO / "system" / "theme" / "kwin-scripts" / "zaldros-switcher"
-               / "contents" / "code" / "main.js").read_text()
+SWITCHER_QML = (REPO / "system" / "theme" / "kwin-scripts" / "zaldros-switcher"
+                / "contents" / "ui" / "main.qml").read_text()
 INSTALLER = (REPO / "system" / "theme" / "install-visual-theme.sh").read_text()
 
 
@@ -126,14 +126,16 @@ def test_a_refused_key_fails_the_step_instead_of_measuring_pixels(monkeypatch, t
 
 def test_every_probe_the_driver_presses_exists_as_a_shortcut():
     """A probe is only evidence if the script registers it and the config seeds its key."""
-    registered = dict(re.findall(r'registerShortcut\("([^"]+)",\s*"[^"]*",\s*"([^"]+)"',
-                                 SWITCHER_JS))
-    printed = set(re.findall(r'probe\("([a-z0-9_]+)"\)', SWITCHER_JS))
-    assert printed == set(drive.PROBE_KEYS), "driver and script disagree about the probes"
+    registered = dict(re.findall(r'name:\s*"([^"]+)"\s*\n\s*text:\s*"[^"]*"\s*\n\s*sequence:\s*"([^"]+)"',
+                                 SWITCHER_QML))
+    printed = set(re.findall(r'ZALDROS-PROBE ([a-z0-9_]+)"', SWITCHER_QML))
+    # meta_tab is pressed too, but since run #40 it lands on the real fallback cycle (which logs
+    # "cycle reverse=") instead of a printing probe, so it is not in `printed`.
+    assert printed | {"meta_tab"} == set(drive.PROBE_KEYS), "driver and script disagree about the probes"
     for action, keys in (("Zaldros Probe Meta F9", "Meta+F9"),
                          ("Zaldros Probe Alt F9", "Alt+F9"),
                          ("Zaldros Probe Ctrl Shift F9", "Ctrl+Shift+F9"),
-                         ("Zaldros Probe Meta Tab", "Meta+Tab")):
+                         ("Zaldros Walk Through Windows", "Meta+Tab")):
         assert registered.get(action) == keys
         # unseeded actions are autoloaded as ",none," and cannot be pressed (run #35)
         assert f"{action}={keys},{keys}," in INSTALLER

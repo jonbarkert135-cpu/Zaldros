@@ -1528,3 +1528,152 @@ UEFI), 3 — UNVERIFIED. Отчёт сохраняется в `el-torito.txt` и
 проверен на записанном отчёте, а не на свежем образе — это скажет первый прогон `iso` после коммита.
 Три правки живого `.github/workflows/iso.yml` (два шага публикации и summary) может внести только
 владелец: GitHub App Виктора не пушит workflow-файлы.
+
+## 2026-08-28 — Переключатель должен рисовать себя сам (ADR-0025)
+
+**Ответ на открытый вопрос.** Прогон `iso` 33161193018 честно сказал: `switched: true` (0.475),
+`switcher_overlay_fraction: 0.0`, `held_equals_after: true` — окно меняется, оверлея нет. Причина
+не в тайминге: **JS-скрипт KWin не имеет способа получить поверхность на экране**. Оболочка тоже
+не может — это обычный клиент Wayland, он не поднимается над Dolphin, пока таскбар не станет
+панелью layer-shell.
+
+**Что сделано.** Пакет `zaldros-switcher` переведён с `javascript` на `declarativescript`:
+`contents/code/main.qml`. Логика обхода окон перенесена дословно (она доказана прогоном #37),
+шорткаты — через `ShortcutHandler` с теми же именами действий, так что `kglobalshortcutsrc` из
+установщика продолжает их засевать. Добавлено полноэкранное внутреннее окно KWin: затемнение и ряд
+карточек с заголовками, выделенная — рамкой акцента; цвета подставляет установщик из тех же токенов,
+что и тема.
+
+**Потолки, названные в коде.** Оверлей гаснет по таймеру 1600 мс, а не по отпусканию Alt (скриптам
+KWin про отпускание модификатора не говорят); карточки — заголовки, а не миниатюры
+(`WindowThumbnail` скриптам не предлагается); на двух мониторах оверлей накроет оба.
+
+**Гейты.** shell 471 passed + 1 skipped (было 465+2), tools 44. Новое здесь — не текстовые проверки:
+скрипт **запускается** в песочнице против заглушек типов KWin, и `cycle(false)` обязан активировать
+другое окно, развернуть свёрнутое, собрать заголовки и поднять оверлей 1280×800. Ещё один тест
+читает `settle` из `ui-drive.py` и `interval` из QML: оверлей обязан пережить кадр удержания и
+погаснуть до кадра после отпускания.
+
+**Чего нет.** Что KWin действительно загрузит QML-пакет и покажет окно на живой сессии — не
+доказано ничем, кроме следующего прогона `iso`. Живого железа по-прежнему не было.
+
+## Прогон #38: KWin не читает `X-Plasma-MainScript` — путь для QML захардкожен
+
+**Что показал прогон.** `iso` 33317608220 (`7a477b8`) зелёный, все девять загрузок прошли, но
+`boot (full, modern)` дал ровно те же цифры, что и до оверлея: `switcher_visible: false`,
+`switcher_overlay_fraction: 0.0`, `held_equals_after: true` (`switched: true`,
+`switched_fraction: 0.339`). Диагностика гостя объясняет почему: `kwin_scripts_installed:
+"zaldros-switcher"`, но `switcher_script_lines: []` и `probe_lines: []` — скрипт не напечатал ни
+строки, то есть KWin его не запускал.
+
+**Причина.** В `scripting.cpp` KWin строит путь сам:
+`.../contents/` + (javascript ? `code/main.js` : `ui/main.qml`). Для `declarativescript` поле
+`X-Plasma-MainScript` не читается вообще, файл обязан лежать в `contents/ui/main.qml`. Мы положили
+QML в `contents/code/` — по документации туториала, а не по коду загрузчика, — и пакет молча не
+загрузился. Урок: путь пакета проверять по загрузчику, а не по туториалу.
+
+**Что сделано.** `contents/code/main.qml` → `contents/ui/main.qml`, `X-Plasma-MainScript` приведён к
+`ui/main.qml`, установщик ставит файл в `contents/ui/`. Тесты держат обе стороны: и место файла в
+репозитории, и путь, который пишет установщик.
+
+**Гейты.** shell 471 passed + 1 skipped, tools 44 — как и до переноса; новой логики не добавлено.
+
+**Чего нет.** Что оверлей теперь виден, снова докажет только следующий прогон `iso`:
+`switcher_overlay_fraction > 0` и `held_equals_after: false`. Живого железа по-прежнему не было.
+
+## Прогон #39: у QML-скрипта KWin нет глобального `workspace` — есть синглтон `Workspace`
+
+**Что показал прогон.** `iso` 33318689574 (`e45c1c8`) зелёный, но `boot (full, modern)` снова без
+оверлея: все три кадра `alt_tab-{before,held,after}.png` побитово одинаковы (md5
+`676101f2706e5a4a37928b5b3cc1560d`), `switcher_cycles: []`, `alt_tab_switched: false`. Разница с
+прогоном #38 в том, что пакет наконец **загрузился**: сочетание клавиш срабатывает (`invoke_delta`
+показывает ответ действия и новую строку в логе), а в логе сессии стоит настоящая причина:
+`.../zaldros-switcher/contents/ui/main.qml:50: ReferenceError: workspace is not defined` (и строка
+110).
+
+**Причина.** Глобальные объекты `workspace` и `options` подставляются только в JavaScript-скрипты.
+QML-скрипт получает тот же API как синглтоны из `import org.kde.kwin`: `Workspace`, `Options`,
+`KWin`. Мы писали код по примерам для `main.js`, где `workspace` есть, — в QML он молча
+undefined, и всё тело `cycle()` падало на первой же строке.
+
+**Что сделано.** В `main.qml` добавлено `readonly property var workspace: Workspace` — один алиас,
+остальной код не тронут (лениво и без переписывания). Тест
+`test_kwin_switcher_script.py` больше не подсовывает `workspace` контекстным свойством: заглушка
+объявлена в `qmldir` как `singleton Workspace`, то есть песочница теперь воспроизводит именно тот
+способ доставки API, что и живой KWin. Плюс проверка, что алиас в файле присутствует.
+
+**Гейты.** shell 471 passed + 1 skipped, tools 44. Отдельно замечено: полный прогон shell-набора
+занимает ~2:15 и виснет, если запускать два набора одновременно (тесты поднимают настоящие
+pty-шеллы) — гонять по одному.
+
+**Чего нет.** Что оверлей теперь рисуется, докажет только следующий `iso`:
+`switcher_overlay_fraction > 0`, `held_equals_after: false` и разные md5 у трёх кадров. Живого
+железа по-прежнему не было.
+
+## Прогон #39: скрипт заработал, окно переключается — оверлей всё ещё не рисуется
+
+Ветка `feat/switcher-overlay`, коммит `a1fd54a`, iso-прогон 33323860605 (все 12 задач зелёные).
+Ветка с доказательствами: `origin/ci-logs-boot-full-modern`.
+
+Что впервые получилось (`zaldros-full-modern.late.json`):
+
+- `switcher_script_lines`: `loaded (qml), windows=0` → `cycle reverse=false candidates=2` →
+  `activating Home — Dolphin (was __main__.py)` → `overlay shown windows=2 current=0` → `overlay hidden`.
+- `alt_tab_switched: true`, `switched_fraction: 0.475`, `kwin_scripts_installed: zaldros-switcher`.
+- В `session_log_tail` больше нет `ReferenceError: workspace is not defined` — алиас на синглтон
+  `Workspace` закрыл вопрос.
+- Кадры `alt_tab-before.png` и `alt_tab-held.png` действительно разные: Dolphin поднялся наверх.
+
+Что не получилось:
+
+- `switcher_overlay_fraction: 0.0`, `held_equals_after: true`, md5 `held` и `after` совпадают
+  (`47e46056…`). Скрипт сказал «оверлей показан», а на экране его не было.
+
+Причина (гипотеза прогона #40): окно оверлея было объявлено с
+`flags: Qt.Popup | Qt.X11BypassWindowManagerHint`. В сессии Wayland обходить нечего — X11-подсказка
+не значит ничего, а внутреннее окно с типом `Qt.Popup` KWin ждёт с transient-родителем и захватом
+ввода, поэтому в сцену оно не попадает. Заменено на
+`Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus`.
+
+Заодно:
+
+- `hideTimer` 1600 → 2000 мс. Драйвер снимает `held` на 1.4 с и отпускает Alt на 2.6 с; 200 мс
+  запаса мало, когда сам screendump занимает время.
+- Одна диагностическая строка при показе: `overlay window visible=… geometry=… backdrop=…`,
+  чтобы следующий прогон отличил «не попросили» от «попросили, а KWin ничего не нарисовал».
+- Тест `test_the_overlay_is_not_a_popup` фиксирует запрет на `Qt.Popup`/`X11Bypass`.
+
+Гейты: shell 472 passed, 1 skipped (130 с), tools 44 passed. Два набора тестов оболочки
+одновременно запускать нельзя — они поднимают настоящие pty и виснут.
+
+## Прогон #40: скрипту KWin вообще не дают окна — Alt+Tab возвращаем самому KWin
+
+Прогон #40 (iso `33324988234`, все 12 job'ов зелёные) добавил в сессию одну диагностическую
+строку, ради которой он и запускался:
+
+```
+qml: ZALDROS-SWITCHER overlay shown windows=2 current=0
+qml: ZALDROS-SWITCHER overlay window visible=false geometry=0,0 1280x800 backdrop=#cc000000
+```
+
+Мы просим окно показаться, геометрия правильная (1280×800), а Qt/KWin отвечает `visible=false`:
+окно не создаётся вовсе. Дело не во флагах (`Qt.Popup` мы убрали в #39→#40) и не в таймингах:
+**скрипт KWin не может владеть окном**. Замеры прогона это подтверждают:
+`switched: true`, `switched_fraction: 0.475` (окно реально переключилось), при
+`switcher_overlay_fraction: 0.0`, `held_equals_after: true`, md5 held == after
+(`2ac2df76819b17c89d9d91ac4440ca5b`).
+
+Единственное, что KWin рисует поверх сессии сам — его собственный tabbox. Поэтому:
+
+- `Alt+Tab` / `Alt+Shift+Tab` снова принадлежат действиям KWin `Walk Through Windows`;
+- визуал даёт наш layout `system/theme/tabbox/zaldros` (`kwinrc: TabBox/LayoutName=zaldros`);
+- в layout'е был **тот же дефект флагов**, что мы нашли в скрипте в #39:
+  `Qt.Popup | Qt.X11BypassWindowManagerHint`. Это правдоподобная причина и молчания прогонов
+  #29–#34: тогда Alt+Tab был у KWin, tabbox открывался, а окно ни разу не попадало в сцену;
+- скрипт остаётся как запасной путь без UI на `Meta+Tab` (единственный доказанно рабочий способ
+  сменить окно) плюс диагностические пробы;
+- layout печатает `ZALDROS-SWITCHER tabbox layout loaded` и
+  `ZALDROS-SWITCHER tabbox surface visible=… geometry=…`, чтобы следующий прогон отличал
+  «QML не загрузился» от «загрузился, но KWin ничего не нарисовал».
+
+Гейты: shell 473 passed, 1 skipped; tools 44 passed.

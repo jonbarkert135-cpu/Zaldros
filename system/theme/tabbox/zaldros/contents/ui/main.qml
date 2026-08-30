@@ -37,6 +37,11 @@ KWin.TabBoxSwitcher {
     // (tabboxhandler.cpp: item->setCurrentIndex(indexRow)). The grid pushes its selection back in
     // onCurrentIndexChanged below, exactly as kwin's own thumbnail_grid layout does.
 
+    // Proof the layout is loaded at all: without it, a boot cannot tell an unloadable QML file
+    // from a tabbox that never opened.
+    Component.onCompleted: console.log("ZALDROS-SWITCHER tabbox layout loaded")
+    onVisibleChanged: console.log("ZALDROS-SWITCHER tabbox visible=" + tabBox.visible)
+
     Instantiator {
         active: tabBox.visible
 
@@ -44,8 +49,17 @@ KWin.TabBoxSwitcher {
             // A borderless full-screen surface: Windows 11 dims the whole desktop behind the
             // switcher rather than showing a small dialog, and KWin treats this as an internal
             // window, so nothing else in the session has to cooperate.
-            flags: Qt.Popup | Qt.X11BypassWindowManagerHint
+            // Not Qt.Popup: an internal popup wants a transient parent and a keyboard grab, and
+            // KWin never puts it in the scene; Qt.X11BypassWindowManagerHint means nothing to a
+            // Wayland session. Measured in runs #29-#34 (nothing drawn) and again in run #39 with
+            // the same flags on the script's own window.
+            flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus
             visible: true
+
+            // One line per appearance, so a boot can tell "the layout never loaded" from "it
+            // loaded and KWin drew nothing". Same prefix as the script: selftest.py greps it.
+            Component.onCompleted: console.log("ZALDROS-SWITCHER tabbox surface visible=" + visible
+                + " geometry=" + x + "," + y + " " + width + "x" + height)
             color: "transparent"
             x: tabBox.screenGeometry.x
             y: tabBox.screenGeometry.y

@@ -14,6 +14,11 @@ benchmarked unless it says so explicitly (spec PART 1 §15).
   `tests/test_ui_font.py` (ADR-0011).
 
 ### Added
+- Alt+Tab now draws a switcher overlay: the KWin script became a QML script
+  (`declarativescript`), which is the only way a script can put anything on screen. Same window
+  walk as before, plus a full-screen dimmed overlay with a card per window. Verified in the
+  sandbox against stubs of KWin's own types; whether a live session shows it is what the next
+  `iso` run reports as `switcher_overlay_fraction` (ADR-0025).
 - Task Manager (Ctrl+Shift+Esc): real processes, CPU/memory/disk/network/uptime, GPU where the
   driver reports load, autostart entries, end task, search and sorting — all read from /proc and
   sysfs, with unknown values shown as a dash and no sampling at all while the window is closed

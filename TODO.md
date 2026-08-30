@@ -34,7 +34,8 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Build the ISO the AnduinOS way (Ubuntu base rootfs + squashfs + xorriso, no container
       runtime): `build/iso/build-iso.sh`, three variants built in CI, `iso-full` ≈ 2.83 GiB
 - [ ] Window management: Alt+Tab (own KWin script — run #37 proved the shortcut fires and switches;
-      the boot test now waits for a second window before measuring it), snap layouts,
+      the switcher is a QML script since ADR-0025 and now draws its own overlay — unproven on a
+      live session until the next `iso` run reports `switcher_overlay_fraction` > 0), snap layouts,
       minimise/maximise/close on real windows
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files
