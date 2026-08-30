@@ -443,12 +443,14 @@ EOF
 # The switcher QML itself. Colours come from the same tokens as the colour scheme above, so the
 # switcher can never drift away from the rest of the desktop: one edit, both surfaces.
 TABBOX_SRC="$(dirname "$0")/tabbox/zaldros"
+# Switcher colours. Defined here, outside the block, because the KWin script further down
+# substitutes the same four tokens into its overlay.
+if [[ "$VARIANT" == "light" ]]; then
+  t_backdrop="#cc000000"; t_surface="#f3f3f3"; t_text="#ffffff"; t_accent="#0067c0"
+else
+  t_backdrop="#cc000000"; t_surface="#202020"; t_text="#ffffff"; t_accent="#60cdff"
+fi
 if [[ -d "$TABBOX_SRC" ]]; then
-  if [[ "$VARIANT" == "light" ]]; then
-    t_backdrop="#cc000000"; t_surface="#f3f3f3"; t_text="#ffffff"; t_accent="#0067c0"
-  else
-    t_backdrop="#cc000000"; t_surface="#202020"; t_text="#ffffff"; t_accent="#60cdff"
-  fi
   rm -rf "$DEST/usr/share/kwin/tabbox/zaldros"
   install -d "$DEST/usr/share/kwin/tabbox/zaldros/contents/ui"
   install -Dm644 "$TABBOX_SRC/metadata.json" "$DEST/usr/share/kwin/tabbox/zaldros/metadata.json"
@@ -476,7 +478,7 @@ Walk Through Windows=none,none,Walk Through Windows
 Walk Through Windows (Reverse)=none,none,Walk Through Windows (Reverse)
 Zaldros Walk Through Windows=Alt+Tab,Alt+Tab,Zaldros: следующее окно
 Zaldros Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Zaldros: предыдущее окно
-# Diagnostic probes (see kwin-scripts/zaldros-switcher/contents/code/main.js). They only print, and
+# Diagnostic probes (see kwin-scripts/zaldros-switcher/contents/code/main.qml). They only print, and
 # an unseeded action is autoloaded as ",none," — so they must be listed here to be pressable.
 Zaldros Probe Meta F9=Meta+F9,Meta+F9,Zaldros: проверка Meta+F9
 Zaldros Probe Alt F9=Alt+F9,Alt+F9,Zaldros: проверка Alt+F9
@@ -505,8 +507,15 @@ KWINSCRIPT_SRC="$(dirname "$0")/kwin-scripts/zaldros-switcher"
 if [[ -d "$KWINSCRIPT_SRC" ]]; then
   install -Dm644 "$KWINSCRIPT_SRC/metadata.json" \
     "$DEST/usr/share/kwin/scripts/zaldros-switcher/metadata.json"
-  install -Dm644 "$KWINSCRIPT_SRC/contents/code/main.js" \
-    "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code/main.js"
+  # QML, not JavaScript, since ADR-0025: a JS script cannot draw, and the switcher overlay has to
+  # come from KWin itself. Same colour tokens as the switcher layout above — one edit, one look.
+  install -d "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code"
+  sed -e "s|@BACKDROP@|$t_backdrop|g" -e "s|@SURFACE@|$t_surface|g" \
+      -e "s|@TEXT@|$t_text|g"         -e "s|@ACCENT@|$t_accent|g" \
+      -e "s|@RADIUS@|8|g" \
+      "$KWINSCRIPT_SRC/contents/code/main.qml" \
+      > "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code/main.qml"
+  chmod 644 "$DEST/usr/share/kwin/scripts/zaldros-switcher/contents/code/main.qml"
 else
   echo "warning: no KWin script in $KWINSCRIPT_SRC, Alt+Tab will do nothing" >&2
 fi

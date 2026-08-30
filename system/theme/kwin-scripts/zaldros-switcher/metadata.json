@@ -9,6 +9,6 @@
         "Name": "Zaldros switcher",
         "Name[ru]": "Переключатель окон Zaldros"
     },
-    "X-Plasma-API": "javascript",
-    "X-Plasma-MainScript": "code/main.js"
+    "X-Plasma-API": "declarativescript",
+    "X-Plasma-MainScript": "code/main.qml"
 }
