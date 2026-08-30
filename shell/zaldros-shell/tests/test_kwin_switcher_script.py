@@ -44,6 +44,9 @@ def test_the_script_registers_both_directions_on_alt_tab():
 
 def test_the_script_switches_real_windows_and_says_so():
     js = MAIN_QML.read_text()
+    # A QML script has no `workspace` global (run #38: "ReferenceError: workspace is not defined");
+    # it must come from the module singleton.
+    assert "property var workspace: Workspace" in js
     assert "workspace.activeWindow = next" in js      # it actually switches
     assert "workspace.stackingOrder" in js            # from the real window list
     assert "skipSwitcher" in js and "normalWindow" in js
@@ -170,8 +173,15 @@ def _load(tmp_path):
 
     stub_dir = tmp_path / "imports" / "org" / "kde" / "kwin"
     stub_dir.mkdir(parents=True)
-    (stub_dir / "qmldir").write_text("module org.kde.kwin\nShortcutHandler 1.0 ShortcutHandler.qml\n")
+    # Workspace is a *singleton* of the module in KWin's declarative API, not a context property:
+    # run #38 in a booted ISO printed "ReferenceError: workspace is not defined" from this script.
+    (stub_dir / "qmldir").write_text(
+        "module org.kde.kwin\n"
+        "ShortcutHandler 1.0 ShortcutHandler.qml\n"
+        "singleton Workspace 1.0 Workspace.qml\n"
+    )
     (stub_dir / "ShortcutHandler.qml").write_text(SHORTCUT_HANDLER_STUB)
+    (stub_dir / "Workspace.qml").write_text("pragma Singleton\n" + WORKSPACE_STUB)
 
     app = QGuiApplication.instance() or QGuiApplication([])
     engine = QQmlApplicationEngine()
@@ -191,15 +201,16 @@ def _load(tmp_path):
         obj.setParent(engine)
         return obj
 
-    workspace = build(WORKSPACE_STUB, "workspace.qml")
-    engine.rootContext().setContextProperty("workspace", workspace)
-
     errors: list[str] = []
     engine.warnings.connect(lambda ws: errors.extend(w.toString() for w in ws))
     engine.load(QUrl.fromLocalFile(str(_script_qml(tmp_path))))
     app.processEvents()
     assert engine.rootObjects(), f"the switcher script did not load: {errors}"
-    return engine.rootObjects()[0], errors, workspace, build, app
+    root = engine.rootObjects()[0]
+    # The script reaches the singleton through one alias; the tests drive the same object.
+    workspace = root.property("workspace")
+    assert workspace is not None, "the script must resolve the Workspace singleton"
+    return root, errors, workspace, build, app
 
 
 def test_the_script_qml_loads_against_stubbed_kwin_types(tmp_path: Path) -> None:

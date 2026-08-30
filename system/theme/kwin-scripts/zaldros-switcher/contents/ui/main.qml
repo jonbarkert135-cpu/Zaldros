@@ -9,8 +9,8 @@
  * report also said `switcher_overlay_fraction: 0.0` — nothing was ever drawn while Alt was held,
  * because a JavaScript KWin script has no way to put anything on screen.
  *
- * A QML script does: `X-Plasma-API: declarativescript` gives this file the same `workspace`
- * global the JS API had, plus the ability to own a Window. KWin draws it as an internal window,
+ * A QML script does: `X-Plasma-API: declarativescript` gives this file the same workspace API
+ * (as the singleton `Workspace`, see below), plus the ability to own a Window. KWin draws it as an internal window,
  * above the session, which is the one place in a Zaldros session where an overlay can appear at
  * all — the shell is a normal Wayland client and cannot raise itself over Dolphin.
  *
@@ -26,6 +26,12 @@ import org.kde.kwin
 
 Item {
     id: root
+
+    // KWin gives a *QML* script no `workspace` global — only plain JS scripts get one; the
+    // declarative API exposes the singleton `Workspace` from org.kde.kwin instead (run #38 in a
+    // booted ISO: "ReferenceError: workspace is not defined" from this file, twice per Alt+Tab).
+    // One alias keeps the rest of the file reading like the documented API.
+    readonly property var workspace: Workspace
 
     readonly property color backdropColour: "@BACKDROP@"
     readonly property color surfaceColour: "@SURFACE@"
