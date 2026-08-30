@@ -70,105 +70,129 @@ KWin.TabBoxSwitcher {
                 anchors.fill: parent
                 color: tabBox.backdropColour
 
-                FocusScope {
+                // Windows 11 does not scatter the cards on the dimmed desktop: they sit on one
+                // rounded translucent panel. Ours is the theme surface colour at the same alpha as
+                // the shell's flyouts; a real acrylic blur would need the Plasma QML stack that a
+                // Zaldros session does not run (ADR-0008), so the panel is tinted, not blurred.
+                Rectangle {
+                    id: panel
                     anchors.centerIn: parent
-                    focus: true
-                    width: Math.min(grid.contentWidthHint, parent.width * 0.9)
-                    height: Math.min(grid.contentHeightHint, parent.height * 0.8)
+                    width: cards.width + 2 * grid.panelPadding
+                    height: cards.height + 2 * grid.panelPadding
+                    radius: tabBox.cornerRadius * 2
+                    color: Qt.rgba(tabBox.surfaceColour.r, tabBox.surfaceColour.g,
+                                   tabBox.surfaceColour.b, 0.92)
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.08)
 
-                    GridView {
-                        id: grid
-                        anchors.fill: parent
+                    FocusScope {
+                        id: cards
+                        anchors.centerIn: parent
                         focus: true
-                        clip: true
-                        model: tabBox.model
-                        currentIndex: tabBox.currentIndex
-                        keyNavigationWraps: true
-                        highlightMoveDuration: 0
+                        width: Math.min(grid.contentWidthHint, tabBox.screenGeometry.width * 0.85)
+                        height: Math.min(grid.contentHeightHint, tabBox.screenGeometry.height * 0.75)
 
-                        // 16:10 cards, the aspect the switcher is shown at on a 16:10 screen.
-                        readonly property int cardWidth: 280
-                        readonly property int cardHeight: 175
-                        readonly property int captionHeight: 28
-                        readonly property int gutter: 12
-                        readonly property int columns: Math.max(1, Math.min(count,
-                            Math.floor(tabBox.screenGeometry.width * 0.9 / cellWidth)))
-                        readonly property int rows: Math.max(1, Math.ceil(count / columns))
-                        readonly property int contentWidthHint: cellWidth * columns
-                        readonly property int contentHeightHint: cellHeight * rows
+                        GridView {
+                            id: grid
+                            anchors.fill: parent
+                            focus: true
+                            clip: true
+                            model: tabBox.model
+                            currentIndex: tabBox.currentIndex
+                            keyNavigationWraps: true
+                            highlightMoveDuration: 0
 
-                        cellWidth: cardWidth + gutter
-                        cellHeight: cardHeight + captionHeight + gutter
+                            // 16:10 cards, the aspect the switcher is shown at on a 16:10 screen.
+                            readonly property int cardWidth: 300
+                            readonly property int cardHeight: 188
+                            readonly property int captionHeight: 30
+                            readonly property int gutter: 16
+                            readonly property int panelPadding: 20
+                            readonly property int columns: Math.max(1, Math.min(count,
+                                Math.floor(tabBox.screenGeometry.width * 0.85 / cellWidth)))
+                            readonly property int rows: Math.max(1, Math.ceil(count / columns))
+                            readonly property int contentWidthHint: cellWidth * columns
+                            readonly property int contentHeightHint: cellHeight * rows
 
-                        delegate: MouseArea {
-                            id: card
-                            width: grid.cellWidth
-                            height: grid.cellHeight
-                            hoverEnabled: true
-                            onClicked: tabBox.model.activate(index)
+                            cellWidth: cardWidth + gutter
+                            cellHeight: cardHeight + captionHeight + gutter
 
-                            Accessible.name: model.caption
-                            Accessible.role: Accessible.ListItem
+                            delegate: MouseArea {
+                                id: card
+                                width: grid.cellWidth
+                                height: grid.cellHeight
+                                hoverEnabled: true
+                                onClicked: tabBox.model.activate(index)
 
-                            Rectangle {
-                                anchors.fill: parent
-                                anchors.margins: grid.gutter / 2
-                                radius: tabBox.cornerRadius
-                                color: index === grid.currentIndex ? Qt.rgba(1, 1, 1, 0.10)
-                                                                   : (card.containsMouse ? Qt.rgba(1, 1, 1, 0.06)
-                                                                                         : "transparent")
-                                border.width: index === grid.currentIndex ? 1 : 0
-                                border.color: tabBox.accentColour
+                                Accessible.name: model.caption
+                                Accessible.role: Accessible.ListItem
 
-                                Text {
-                                    id: caption
-                                    anchors.top: parent.top
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.margins: 8
-                                    height: grid.captionHeight - 8
-                                    text: model.caption
-                                    color: tabBox.textColour
-                                    elide: Text.ElideRight
-                                    textFormat: Text.PlainText
-                                    verticalAlignment: Text.AlignVCenter
-                                }
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: grid.gutter / 2
+                                    radius: tabBox.cornerRadius
+                                    color: index === grid.currentIndex ? Qt.rgba(1, 1, 1, 0.16)
+                                                                       : (card.containsMouse ? Qt.rgba(1, 1, 1, 0.08)
+                                                                                             : "transparent")
+                                    border.width: index === grid.currentIndex ? 2 : 0
+                                    border.color: tabBox.accentColour
 
-                                Item {
-                                    anchors.top: caption.bottom
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.bottom: parent.bottom
-                                    anchors.margins: 8
-                                    anchors.topMargin: 0
+                                    Text {
+                                        id: caption
+                                        anchors.top: parent.top
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.margins: 8
+                                        height: grid.captionHeight - 8
+                                        text: model.caption
+                                        color: tabBox.textColour
+                                        elide: Text.ElideRight
+                                        textFormat: Text.PlainText
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
 
-                                    KWin.WindowThumbnail {
-                                        anchors.fill: parent
-                                        wId: model.windowId
+                                    // Holder for the live thumbnail. It carries the card radius
+                                    // for the gap around the thumbnail; Qt's clip is rectangular,
+                                    // so the thumbnail's own corners stay square — rounding them
+                                    // would need a shader mask, which is not worth it here.
+                                    Rectangle {
+                                        anchors.top: caption.bottom
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.bottom: parent.bottom
+                                        anchors.margins: 8
+                                        anchors.topMargin: 0
+                                        radius: tabBox.cornerRadius
+                                        color: "transparent"
+
+                                        KWin.WindowThumbnail {
+                                            anchors.fill: parent
+                                            wId: model.windowId
+                                        }
                                     }
                                 }
                             }
+
+                            onCurrentIndexChanged: tabBox.currentIndex = grid.currentIndex
+
+                            Keys.onPressed: function(event) {
+                                if (event.key === Qt.Key_Left) grid.moveCurrentIndexLeft();
+                                else if (event.key === Qt.Key_Right) grid.moveCurrentIndexRight();
+                                else if (event.key === Qt.Key_Up) grid.moveCurrentIndexUp();
+                                else if (event.key === Qt.Key_Down) grid.moveCurrentIndexDown();
+                                else return;
+                                event.accepted = true;
+                            }
                         }
 
-                        onCurrentIndexChanged: tabBox.currentIndex = grid.currentIndex
-
-                        Keys.onPressed: function(event) {
-                            if (event.key === Qt.Key_Left) grid.moveCurrentIndexLeft();
-                            else if (event.key === Qt.Key_Right) grid.moveCurrentIndexRight();
-                            else if (event.key === Qt.Key_Up) grid.moveCurrentIndexUp();
-                            else if (event.key === Qt.Key_Down) grid.moveCurrentIndexDown();
-                            else return;
-                            event.accepted = true;
+                        // An empty switcher is a real state (no other window is open); saying so is
+                        // better than showing an empty rectangle and looking broken.
+                        Text {
+                            anchors.centerIn: parent
+                            visible: grid.count === 0
+                            text: qsTr("Нет открытых окон")
+                            color: tabBox.textColour
                         }
-                    }
-
-                    // An empty switcher is a real state (no other window is open); saying so is
-                    // better than showing an empty rectangle and looking broken.
-                    Text {
-                        anchors.centerIn: parent
-                        visible: grid.count === 0
-                        text: qsTr("Нет открытых окон")
-                        color: tabBox.textColour
                     }
                 }
             }

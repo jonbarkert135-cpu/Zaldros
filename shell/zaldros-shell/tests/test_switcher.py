@@ -163,3 +163,12 @@ def test_the_layout_says_in_the_log_that_it_loaded_and_appeared() -> None:
     text = QML.read_text()
     assert "ZALDROS-SWITCHER tabbox layout loaded" in text
     assert "ZALDROS-SWITCHER tabbox surface visible=" in text
+
+
+def test_the_cards_sit_on_one_rounded_panel() -> None:
+    """Run #41 drew the cards straight onto the dimmed desktop; Windows 11 puts them on a single
+    rounded panel, and the theme's surface colour existed in this file without ever being used."""
+    text = QML.read_text()
+    assert "id: panel" in text, "the cards need a container, not bare cards on the backdrop"
+    assert "tabBox.surfaceColour" in text, "the panel must use the theme surface colour"
+    assert "radius: tabBox.cornerRadius * 2" in text, "the panel corners follow the theme radius"
