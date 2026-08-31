@@ -159,6 +159,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
            snap_zone: tuple[int, int] | None = None,
            snap_bar: bool = False, snap_bar_window: str = "explorer",
            snap_assist: bool | None = None,
+           drag_point: tuple[float, float] | None = None, drag_window: str = "explorer",
            geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -203,6 +204,12 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
         # Exactly what a window dragged to the top edge reports.
         QMetaObject.invokeMethod(root, "requestSnapBar", Q_ARG("QVariant", snap_bar_window),
                                  Q_ARG("QVariant", True))
+    if drag_point is not None:
+        # Exactly what a window being dragged reports on every pointer move: the shell decides
+        # whether that point means a zone and draws the preview pane if it does.
+        QMetaObject.invokeMethod(root, "reportDragPoint", Q_ARG("QVariant", drag_window),
+                                 Q_ARG("QVariant", float(drag_point[0])),
+                                 Q_ARG("QVariant", float(drag_point[1])))
     if terminal_open:
         QMetaObject.invokeMethod(root, "toggleWindow", Q_ARG("QVariant", "terminal"))
         root.setProperty("focusedWindow", "terminal")
@@ -250,7 +257,7 @@ NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskV
                "explorerWindow", "explorerTabStrip", "explorerNavBar", "explorerCommandBar",
                "explorerSidebar", "explorerFileList", "settingsWindow", "settingsRail",
                "settingsBody", "titleBar", "captionButtons", "snapFlyout", "snapBar",
-               "snapBarLayouts", "snapBarHint", "snapAssist", "snapAssistGrid", "snapAssistScrim",
+               "snapBarLayouts", "snapBarHint", "snapAssist", "snapAssistGrid", "snapAssistScrim", "edgePreview",
                *(f"snapAssistCard{index}" for index in range(4)),
                *(f"snapAssistTitle{index}" for index in range(4)),
                *(f"snapAssistPreview{index}" for index in range(4)),

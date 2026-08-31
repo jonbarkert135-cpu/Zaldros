@@ -50,6 +50,11 @@ Item {
     // Windows 11 drops the snap bar down when a dragged window reaches the top edge of the screen.
     // The window only reports whether it is up there; the shell owns the bar.
     signal snapBarRequested(bool atTopEdge)
+    // Windows 11 snaps a window when it is *dropped* against a screen edge, and shows a
+    // translucent pane where it would land while the pointer is still down. The window only
+    // reports the pointer in the shell's coordinates and the release; the shell decides the zone.
+    signal dragPointMoved(real sx, real sy)
+    signal dragDropped()
     readonly property bool dragging: titleDrag.drag.active
     onDraggingChanged: win.snapBarRequested(win.dragging && win.y <= Theme.snapBarTrigger)
     onYChanged: if (win.dragging) win.snapBarRequested(win.y <= Theme.snapBarTrigger)
@@ -94,6 +99,14 @@ Item {
                 anchors.rightMargin: captionRow.width
                 onPressed: win.activateRequested()
                 onDoubleClicked: win.maximiseToggled()
+                onPositionChanged: function (mouse) {
+                    if (!titleDrag.drag.active || !win.parent) return;
+                    var point = titleDrag.mapToItem(win.parent, mouse.x, mouse.y);
+                    win.dragPointMoved(point.x, point.y);
+                }
+                // Always reported: the shell acts only if it has a pending zone for this window,
+                // and drag.active is already false by the time the release arrives.
+                onReleased: win.dragDropped()
                 drag.target: (win.maximized || win.snapped) ? null : win
                 drag.minimumX: 0
                 drag.minimumY: 0

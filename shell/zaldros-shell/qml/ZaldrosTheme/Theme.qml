@@ -114,6 +114,11 @@ QtObject {
     readonly property int snapAssistPadding:   16
     readonly property int snapAssistGap:       12
     readonly property int snapAssistCaption:   36
+    // Edge drag (Aero Snap): how close to the left or right edge the pointer must come, and how
+    // tall the corner band at the top and bottom of that edge is (quadrant instead of half).
+    // DERIVED — Microsoft publishes no number for either; both are picked to feel like Windows.
+    readonly property int edgeSnapMargin:       8
+    readonly property int edgeSnapCorner:     120
 
     // --- radii --------------------------------------------------------------------------------
     readonly property int radiusSmall:         4
@@ -147,6 +152,9 @@ QtObject {
     readonly property color surfaceAcrylic:  dark ? "#f7262626" : "#f9fafafa"
     // Snap Assist scrim over the free zone (Windows blurs the desktop there; we have no blur yet).
     readonly property color snapAssistScrim: dark ? "#d9202020" : "#e6f3f3f3"
+    // The translucent pane Windows shows where a dropped window would land.
+    readonly property color edgePreviewFill: dark ? "#33ffffff" : "#26000000"
+    readonly property color edgePreviewBorder: dark ? "#66ffffff" : "#59000000"
     readonly property color taskbarBg:       dark ? "#212121" : "#f3f3f3"   // measured, opaque
     readonly property color mica:            dark ? "#202020" : "#f5f5f5"   // title bar / tab strip
     readonly property color border:          dark ? "#1fffffff" : "#14000000"

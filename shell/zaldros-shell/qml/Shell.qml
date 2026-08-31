@@ -52,6 +52,10 @@ Item {
     property var snapAssistZone: ({ x: 0.5, y: 0, w: 0.5, h: 1 })
     // The window that took the first zone: it is the one Snap Assist must not offer again.
     property string snapAssistSource: ""
+    // Edge drag (Aero Snap): the zone the pointer of a dragged window is currently over, and whose
+    // window it belongs to. Dropping there snaps; leaving the edge clears it.
+    property var edgeZone: null
+    property string edgeTarget: ""
 
     // One source for a window's human name and icon: the taskbar buttons, Snap Assist and Alt+Tab
     // all read it, so a renamed window cannot end up called two different things.
@@ -90,6 +94,29 @@ Item {
         } else if (shell.snapBarTarget === id) {
             shell.snapBarOpen = false;
         }
+    }
+    // Which zone a pointer at (sx, sy) means, or null for "no snap": within Theme.edgeSnapMargin
+    // of the left or right edge it is that half, and inside the corner band at either end of that
+    // edge it is the quadrant. The top edge is deliberately left out — the snap bar owns it.
+    function edgeZoneAt(sx, sy) {
+        var left = sx <= Theme.edgeSnapMargin;
+        var right = sx >= shell.width - Theme.edgeSnapMargin;
+        if ((!left && !right) || sy < 0 || sy > shell.workHeight) return null;
+        var x = left ? 0 : 0.5;
+        if (sy <= Theme.edgeSnapCorner) return { x: x, y: 0, w: 0.5, h: 0.5 };
+        if (sy >= shell.workHeight - Theme.edgeSnapCorner) return { x: x, y: 0.5, w: 0.5, h: 0.5 };
+        return { x: x, y: 0, w: 0.5, h: 1 };
+    }
+    // Reported by a window being dragged, on every pointer move.
+    function reportDragPoint(id, sx, sy) {
+        shell.edgeTarget = id;
+        shell.edgeZone = shell.edgeZoneAt(sx, sy);
+    }
+    // Reported on release: snap only if this window still has a zone under the pointer.
+    function dropDrag(id) {
+        var zone = shell.edgeTarget === id ? shell.edgeZone : null;
+        shell.edgeZone = null;
+        if (zone !== null) shell.applySnap(id, zone);
     }
     // The largest rectangle of the work area the given zone leaves free: the strip left of it,
     // right of it, above it or below it, whichever is biggest. For a half or a third that is the
@@ -421,6 +448,8 @@ Item {
         onSnapBarRequested: function (atTopEdge) {
             shell.requestSnapBar("settings", atTopEdge);
         }
+        onDragPointMoved: function (sx, sy) { shell.reportDragPoint("settings", sx, sy) }
+        onDragDropped: shell.dropDrag("settings")
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("settings", anchorX, anchorY);
         }
@@ -464,6 +493,8 @@ Item {
         onSnapBarRequested: function (atTopEdge) {
             shell.requestSnapBar("explorer", atTopEdge);
         }
+        onDragPointMoved: function (sx, sy) { shell.reportDragPoint("explorer", sx, sy) }
+        onDragDropped: shell.dropDrag("explorer")
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("explorer", anchorX, anchorY);
         }
@@ -500,6 +531,8 @@ Item {
         onSnapBarRequested: function (atTopEdge) {
             shell.requestSnapBar("taskmanager", atTopEdge);
         }
+        onDragPointMoved: function (sx, sy) { shell.reportDragPoint("taskmanager", sx, sy) }
+        onDragDropped: shell.dropDrag("taskmanager")
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("taskmanager", anchorX, anchorY);
         }
@@ -548,6 +581,8 @@ Item {
         onSnapBarRequested: function (atTopEdge) {
             shell.requestSnapBar("terminal", atTopEdge);
         }
+        onDragPointMoved: function (sx, sy) { shell.reportDragPoint("terminal", sx, sy) }
+        onDragDropped: shell.dropDrag("terminal")
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("terminal", anchorX, anchorY);
         }
@@ -590,6 +625,8 @@ Item {
         onSnapBarRequested: function (atTopEdge) {
             shell.requestSnapBar("devicemanager", atTopEdge);
         }
+        onDragPointMoved: function (sx, sy) { shell.reportDragPoint("devicemanager", sx, sy) }
+        onDragDropped: shell.dropDrag("devicemanager")
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("devicemanager", anchorX, anchorY);
         }
@@ -682,6 +719,22 @@ Item {
         onZoneChosen: function (layout, zone, zoneRect) {
             shell.applySnap(shell.snapBarTarget, zoneRect);
         }
+    }
+
+    // --- edge drag preview ------------------------------------------------------------------------
+    // The translucent pane Windows draws where a window dropped against this edge would land.
+    Rectangle {
+        objectName: "edgePreview"
+        visible: shell.edgeZone !== null
+        z: 38
+        x: shell.edgeZone === null ? 0 : Math.round(shell.edgeZone.x * shell.width)
+        y: shell.edgeZone === null ? 0 : Math.round(shell.edgeZone.y * shell.workHeight)
+        width: shell.edgeZone === null ? 0 : Math.round(shell.edgeZone.w * shell.width)
+        height: shell.edgeZone === null ? 0 : Math.round(shell.edgeZone.h * shell.workHeight)
+        radius: Theme.radiusMedium
+        color: Theme.edgePreviewFill
+        border.width: 1
+        border.color: Theme.edgePreviewBorder
     }
 
     // --- snap assist ------------------------------------------------------------------------------

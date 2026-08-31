@@ -866,6 +866,78 @@
       "passed": true
     },
     {
+      "component": "edge drag",
+      "metric": "preview left",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "edge drag",
+      "metric": "preview top",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "edge drag",
+      "metric": "preview width",
+      "expected": 800.0,
+      "actual": 800.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "edge drag",
+      "metric": "preview height",
+      "expected": 952.0,
+      "actual": 952.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "edge drag corner",
+      "metric": "preview left",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "edge drag corner",
+      "metric": "preview top",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "edge drag corner",
+      "metric": "preview width",
+      "expected": 800.0,
+      "actual": 800.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "edge drag corner",
+      "metric": "preview height",
+      "expected": 476.0,
+      "actual": 476.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
       "component": "snapped window",
       "metric": "left",
       "expected": 0.0,
@@ -921,7 +993,7 @@
     }
   ],
   "failed": 0,
-  "total": 102,
+  "total": 110,
   "components": [
     "taskbar.png",
     "startPanel.png",

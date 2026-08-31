@@ -47,6 +47,10 @@ STATES = {
     "snapbar": {"snap_bar": True},
     "snapassist": {"snap_zone": (0, 0), "snap_window": "explorer",
                    "task_manager_open": True, "terminal_open": True},
+    # A window dragged against the middle of the left edge: the preview pane for the left half.
+    "edgedrag": {"drag_point": (2, 500), "drag_window": "explorer"},
+    # Same edge, but inside the top corner band: the preview pane for the upper-left quadrant.
+    "edgedragcorner": {"drag_point": (2, 40), "drag_window": "explorer"},
 }
 
 # Component crops for the evidence sheet: name -> (state, padding)
@@ -286,6 +290,18 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     add("snap assist", "grid centred in zone", 0,
         round((grid["left"] - assist["left"])
               - (assist["left"] + assist["width"] - (grid["left"] + grid["width"]))), 2)
+
+    # Edge drag: the preview pane covers exactly the zone the drop would give the window.
+    preview_half = geometry["edgedrag"]["edgePreview"]
+    add("edge drag", "preview left", 0, preview_half["left"], 1)
+    add("edge drag", "preview top", 0, preview_half["top"], 1)
+    add("edge drag", "preview width", WIDTH / 2, preview_half["width"], 1)
+    add("edge drag", "preview height", work_height, preview_half["height"], 1)
+    preview_corner = geometry["edgedragcorner"]["edgePreview"]
+    add("edge drag corner", "preview left", 0, preview_corner["left"], 1)
+    add("edge drag corner", "preview top", 0, preview_corner["top"], 1)
+    add("edge drag corner", "preview width", WIDTH / 2, preview_corner["width"], 1)
+    add("edge drag corner", "preview height", work_height / 2, preview_corner["height"], 1)
 
     # A snapped window really takes its zone: the left half of the work area, to the pixel.
     snapped = geometry["snapped"]["explorerWindow"]
