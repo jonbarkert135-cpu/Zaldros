@@ -803,6 +803,69 @@
       "passed": true
     },
     {
+      "component": "snap assist",
+      "metric": "left",
+      "expected": 800.0,
+      "actual": 800.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap assist",
+      "metric": "top",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap assist",
+      "metric": "width",
+      "expected": 800.0,
+      "actual": 800.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap assist",
+      "metric": "height",
+      "expected": 952.0,
+      "actual": 952.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap assist",
+      "metric": "cards offered",
+      "expected": 3.0,
+      "actual": 3.0,
+      "tolerance": 0.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap assist",
+      "metric": "preview aspect x100",
+      "expected": 178.0,
+      "actual": 177.0,
+      "tolerance": 4.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap assist",
+      "metric": "grid centred in zone",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
       "component": "snapped window",
       "metric": "left",
       "expected": 0.0,
@@ -858,7 +921,7 @@
     }
   ],
   "failed": 0,
-  "total": 95,
+  "total": 102,
   "components": [
     "taskbar.png",
     "startPanel.png",
@@ -870,6 +933,7 @@
     "contextMenu.png",
     "snapFlyout.png",
     "snapBar.png",
+    "snapAssist.png",
     "explorerWindow.png",
     "settingsWindow.png"
   ]

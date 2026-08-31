@@ -42,7 +42,7 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Snap bar: dragging a window to the top edge drops the same layout strip down under a hint
       line and the Win+Z badge; header band derived from Microsoft's own snap-bar capture
       (win11-reference.json → snap_bar), 9 parity checks (`snapbar` state)
-- [ ] Snap assist: after snapping one window, offer the remaining ones for the other zones
+- [x] Snap assist: after snapping one window, offer the remaining ones for the other zones
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files
 - [ ] Right-click context menus (Windows 11 rounded style)

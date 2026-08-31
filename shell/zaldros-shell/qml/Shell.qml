@@ -47,6 +47,23 @@ Item {
     // The snap bar at the top edge: which window is being dragged up there, if any.
     property bool snapBarOpen: false
     property string snapBarTarget: ""
+    // Snap Assist: after one window takes a zone, the free part of the screen offers the others.
+    property bool snapAssistOpen: false
+    property var snapAssistZone: ({ x: 0.5, y: 0, w: 0.5, h: 1 })
+    // The window that took the first zone: it is the one Snap Assist must not offer again.
+    property string snapAssistSource: ""
+
+    // One source for a window's human name and icon: the taskbar buttons, Snap Assist and Alt+Tab
+    // all read it, so a renamed window cannot end up called two different things.
+    readonly property var windowMeta: ({
+        explorer:      { name: "Проводник",             glyph: "folder" },
+        settings:      { name: "Параметры",             glyph: "settings" },
+        taskmanager:   { name: "Диспетчер задач",       glyph: "apps" },
+        terminal:      { name: "Командная строка",      glyph: "terminal" },
+        devicemanager: { name: "Диспетчер устройств",   glyph: "apps" }
+    })
+    function windowName(id) { return shell.windowMeta[id] ? shell.windowMeta[id].name : id }
+    function windowGlyph(id) { return shell.windowMeta[id] ? shell.windowMeta[id].glyph : "apps" }
 
     function isOpen(id) { return openWindows[id] === true && minimised[id] !== true }
     function windowItem(id) {
@@ -74,8 +91,40 @@ Item {
             shell.snapBarOpen = false;
         }
     }
-    // Called by the flyout and, in renders and tests, directly: layout/zone indices in, geometry out.
-    function applySnap(id, zone) {
+    // The largest rectangle of the work area the given zone leaves free: the strip left of it,
+    // right of it, above it or below it, whichever is biggest. For a half or a third that is the
+    // rest of the screen; for a quadrant it is the opposite full-height half, which is the zone
+    // Windows offers first as well. An L-shaped remainder is not modelled — one rectangle is
+    // enough to fill the layout one window at a time.
+    function freeZone(zone) {
+        var options = [{ x: 0, y: 0, w: zone.x, h: 1 },
+                       { x: zone.x + zone.w, y: 0, w: 1 - zone.x - zone.w, h: 1 },
+                       { x: 0, y: 0, w: 1, h: zone.y },
+                       { x: 0, y: zone.y + zone.h, w: 1, h: 1 - zone.y - zone.h }];
+        var best = null;
+        for (var i = 0; i < options.length; ++i) {
+            var area = options[i].w * options[i].h;
+            if (area > 0.0001 && (best === null || area > best.w * best.h))
+                best = options[i];
+        }
+        return best;
+    }
+    // The other windows Snap Assist may offer: open, not minimised away by us, not already holding
+    // a zone in this layout, and not the window that was just snapped.
+    function assistCandidates(exclude) {
+        var out = [];
+        for (var i = 0; i < shell.windowIds.length; ++i) {
+            var id = shell.windowIds[i];
+            if (id === exclude) continue;
+            if (shell.openWindows[id] !== true) continue;
+            if (shell.snapped[id]) continue;
+            out.push({ id: id, name: shell.windowName(id), glyph: shell.windowGlyph(id) });
+        }
+        return out;
+    }
+    // Put a window in a zone and nothing else. Snap Assist fills the second zone through this one,
+    // so choosing the second window completes the layout instead of asking for a third.
+    function snapInto(id, zone) {
         shell.maximised = shell.setFlag(shell.maximised, id, false);
         var next = {};
         for (var key in shell.snapped) next[key] = shell.snapped[key];
@@ -83,7 +132,19 @@ Item {
         shell.snapped = next;
         shell.snapOpen = false;
         shell.snapBarOpen = false;
+        shell.snapAssistOpen = false;
         shell.focusWindow(id);
+    }
+    // What the flyout, the snap bar and Win+Z call: snap, then offer the other windows the free
+    // part of the screen, which is what Windows 11 does the moment the first window lands.
+    function applySnap(id, zone) {
+        shell.snapInto(id, zone);
+        var free = shell.freeZone(zone);
+        if (free !== null && shell.assistCandidates(id).length > 0) {
+            shell.snapAssistZone = free;
+            shell.snapAssistSource = id;
+            shell.snapAssistOpen = true;
+        }
     }
     function clearSnap(id) {
         var next = {};
@@ -151,6 +212,7 @@ Item {
     function closeAllFlyouts() {
         shell.snapOpen = false;
         shell.snapBarOpen = false;
+        shell.snapAssistOpen = false;
         shell.startOpen = false;
         shell.quickOpen = false;
         shell.searchOpen = false;
@@ -622,6 +684,23 @@ Item {
         }
     }
 
+    // --- snap assist ------------------------------------------------------------------------------
+    // Fills the zones the chosen layout left free with the other open windows.
+    SnapAssist {
+        id: snapAssist
+        objectName: "snapAssist"
+        z: 39
+        visible: shell.snapAssistOpen
+        zone: shell.snapAssistZone
+        candidates: shell.snapAssistOpen ? shell.assistCandidates(shell.snapAssistSource) : []
+        x: Math.round(shell.snapAssistZone.x * shell.workWidth)
+        y: Math.round(shell.snapAssistZone.y * shell.workHeight)
+        width: Math.round(shell.snapAssistZone.w * shell.workWidth)
+        height: Math.round(shell.snapAssistZone.h * shell.workHeight)
+        onWindowChosen: function (id) { shell.snapInto(id, shell.snapAssistZone) }
+        onDismissed: shell.snapAssistOpen = false
+    }
+
     // --- quick settings ----------------------------------------------------------------------------
     QuickSettings {
         id: quickPanel
@@ -745,22 +824,25 @@ Item {
         searchActive: shell.searchOpen
         notificationsActive: shell.notificationsOpen
         windowButtons: [
-            { id: "explorer", name: "Проводник", glyph: "folder",
+            { id: "explorer", name: shell.windowName("explorer"), glyph: shell.windowGlyph("explorer"),
               running: shell.openWindows["explorer"] === true,
               active: shell.focusedWindow === "explorer" && shell.isOpen("explorer") },
-            { id: "settings", name: "Параметры", glyph: "settings",
+            { id: "settings", name: shell.windowName("settings"), glyph: shell.windowGlyph("settings"),
               running: shell.openWindows["settings"] === true,
               active: shell.focusedWindow === "settings" && shell.isOpen("settings") }
         ].concat(shell.openWindows["taskmanager"] === true
                  // A taskbar button appears only while the Task Manager runs — Explorer and
                  // Settings are pinned, this one is not, so the closed desktop is pixel-identical.
-                 ? [{ id: "taskmanager", name: "Диспетчер задач", glyph: "apps", running: true,
+                 ? [{ id: "taskmanager", name: shell.windowName("taskmanager"),
+                      glyph: shell.windowGlyph("taskmanager"), running: true,
                       active: shell.focusedWindow === "taskmanager" && shell.isOpen("taskmanager") }]
                  : []).concat(shell.openWindows["terminal"] === true
-                 ? [{ id: "terminal", name: "Командная строка", glyph: "terminal", running: true,
+                 ? [{ id: "terminal", name: shell.windowName("terminal"),
+                      glyph: shell.windowGlyph("terminal"), running: true,
                       active: shell.focusedWindow === "terminal" && shell.isOpen("terminal") }]
                  : []).concat(shell.openWindows["devicemanager"] === true
-                 ? [{ id: "devicemanager", name: "Диспетчер устройств", glyph: "apps", running: true,
+                 ? [{ id: "devicemanager", name: shell.windowName("devicemanager"),
+                      glyph: shell.windowGlyph("devicemanager"), running: true,
                       active: shell.focusedWindow === "devicemanager" && shell.isOpen("devicemanager") }]
                  : [])
         state: shell.backendState

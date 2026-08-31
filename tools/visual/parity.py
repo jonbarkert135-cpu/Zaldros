@@ -43,8 +43,10 @@ STATES = {
     "menu": {"context_open": True},
     "settings": {"focused_window": "settings"},
     "snap": {"snap_open": True},
-    "snapped": {"snap_zone": (0, 0), "snap_window": "explorer"},
+    "snapped": {"snap_zone": (0, 0), "snap_window": "explorer", "snap_assist": False},
     "snapbar": {"snap_bar": True},
+    "snapassist": {"snap_zone": (0, 0), "snap_window": "explorer",
+                   "task_manager_open": True, "terminal_open": True},
 }
 
 # Component crops for the evidence sheet: name -> (state, padding)
@@ -59,6 +61,7 @@ CROPS = {
     "contextMenu": ("menu", 12),
     "snapFlyout": ("snap", 12),
     "snapBar": ("snapbar", 12),
+    "snapAssist": ("snapassist", 0),
     "explorerWindow": ("desktop", 12),
     "settingsWindow": ("settings", 12),
 }
@@ -261,9 +264,31 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     add("snap bar", "centred on screen", 0,
         round(bar["left"] + bar["width"] / 2 - WIDTH / 2), 1)
 
+    # --- snap assist ----------------------------------------------------------------------------
+    # Snap Assist has no published Microsoft capture to measure, so what is checked here is the
+    # behaviour, not borrowed pixels: it covers exactly the zones the layout left free, it offers
+    # every other open window, and its cards keep the 16:9 aspect of the screen they stand for.
+    assist_state = geometry["snapassist"]
+    assist = assist_state["snapAssist"]
+    work_height = HEIGHT - reference["taskbar"]["height"]
+    add("snap assist", "left", WIDTH / 2, assist["left"], 1)
+    add("snap assist", "top", 0, assist["top"], 1)
+    add("snap assist", "width", WIDTH / 2, assist["width"], 1)
+    add("snap assist", "height", work_height, assist["height"], 1)
+    cards = [assist_state[f"snapAssistCard{index}"] for index in range(3)
+             if f"snapAssistCard{index}" in assist_state]
+    # Explorer took the zone; Settings, the Task Manager and the terminal are the other windows.
+    add("snap assist", "cards offered", 3, len(cards), 0)
+    preview = assist_state["snapAssistPreview0"]
+    add("snap assist", "preview aspect x100", 178,
+        round(100 * preview["width"] / preview["height"]), 4)
+    grid = assist_state["snapAssistGrid"]
+    add("snap assist", "grid centred in zone", 0,
+        round((grid["left"] - assist["left"])
+              - (assist["left"] + assist["width"] - (grid["left"] + grid["width"]))), 2)
+
     # A snapped window really takes its zone: the left half of the work area, to the pixel.
     snapped = geometry["snapped"]["explorerWindow"]
-    work_height = HEIGHT - reference["taskbar"]["height"]
     add("snapped window", "left", 0, snapped["left"], 1)
     add("snapped window", "top", 0, snapped["top"], 1)
     add("snapped window", "width", WIDTH / 2, snapped["width"], 1)

@@ -158,6 +158,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
            snap_open: bool = False, snap_window: str = "explorer",
            snap_zone: tuple[int, int] | None = None,
            snap_bar: bool = False, snap_bar_window: str = "explorer",
+           snap_assist: bool | None = None,
            geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -185,8 +186,9 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     root.setProperty("settingsPage", settings_page)
     if snap_zone is not None:
         # Snap the window the way a click on that thumbnail cell does, through the same QML path.
+        # Snap Assist follows a real snap, so it is on unless the caller asks for the bare frame.
         layout, zone = snap_zone
-        QMetaObject.invokeMethod(root, "applySnap",
+        QMetaObject.invokeMethod(root, "snapInto" if snap_assist is False else "applySnap",
                                  Q_ARG("QVariant", snap_window),
                                  Q_ARG("QVariant", _snap_zone_rect(root, layout, zone)))
     if snap_open:
@@ -248,7 +250,10 @@ NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskV
                "explorerWindow", "explorerTabStrip", "explorerNavBar", "explorerCommandBar",
                "explorerSidebar", "explorerFileList", "settingsWindow", "settingsRail",
                "settingsBody", "titleBar", "captionButtons", "snapFlyout", "snapBar",
-               "snapBarLayouts", "snapBarHint",
+               "snapBarLayouts", "snapBarHint", "snapAssist", "snapAssistGrid", "snapAssistScrim",
+               *(f"snapAssistCard{index}" for index in range(4)),
+               *(f"snapAssistTitle{index}" for index in range(4)),
+               *(f"snapAssistPreview{index}" for index in range(4)),
                *(f"snapThumb{index}" for index in range(6)),
                *(f"snapBarThumb{index}" for index in range(6)),
                *(f"snapZone{layout}_{zone}"

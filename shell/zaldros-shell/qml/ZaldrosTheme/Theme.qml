@@ -108,6 +108,12 @@ QtObject {
     readonly property int snapBarHeader:       34
     // How close to the top edge a dragged window has to come before the bar appears.
     readonly property int snapBarTrigger:      24
+    // Snap Assist: the grid of the other open windows that fills the zones the layout left free.
+    // DERIVED from the shell's own spacing scale — Microsoft publishes no Snap Assist capture with
+    // a known display scale, so these are not reference measurements (see SnapAssist.qml).
+    readonly property int snapAssistPadding:   16
+    readonly property int snapAssistGap:       12
+    readonly property int snapAssistCaption:   36
 
     // --- radii --------------------------------------------------------------------------------
     readonly property int radiusSmall:         4
@@ -139,6 +145,8 @@ QtObject {
     readonly property color surfaceElevated: dark ? "#383838" : "#fbfbfb"
     readonly property color surfaceCard:     dark ? "#2b2b2b" : "#fdfdfd"   // Settings row cards
     readonly property color surfaceAcrylic:  dark ? "#f7262626" : "#f9fafafa"
+    // Snap Assist scrim over the free zone (Windows blurs the desktop there; we have no blur yet).
+    readonly property color snapAssistScrim: dark ? "#d9202020" : "#e6f3f3f3"
     readonly property color taskbarBg:       dark ? "#212121" : "#f3f3f3"   // measured, opaque
     readonly property color mica:            dark ? "#202020" : "#f5f5f5"   // title bar / tab strip
     readonly property color border:          dark ? "#1fffffff" : "#14000000"
