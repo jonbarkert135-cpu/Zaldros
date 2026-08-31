@@ -722,6 +722,87 @@
       "passed": true
     },
     {
+      "component": "snap bar",
+      "metric": "panel width",
+      "expected": 672.0,
+      "actual": 672.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "panel height",
+      "expected": 122.0,
+      "actual": 122.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "layouts",
+      "expected": 6.0,
+      "actual": 6.0,
+      "tolerance": 0.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "header band",
+      "expected": 47.0,
+      "actual": 47.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "bottom padding",
+      "expected": 14.0,
+      "actual": 13.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "side padding",
+      "expected": 12.0,
+      "actual": 13.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "thumb width",
+      "expected": 96.0,
+      "actual": 96.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "thumb height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap bar",
+      "metric": "centred on screen",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
       "component": "snapped window",
       "metric": "left",
       "expected": 0.0,
@@ -777,7 +858,7 @@
     }
   ],
   "failed": 0,
-  "total": 86,
+  "total": 95,
   "components": [
     "taskbar.png",
     "startPanel.png",
@@ -788,6 +869,7 @@
     "gameBarFlyout.png",
     "contextMenu.png",
     "snapFlyout.png",
+    "snapBar.png",
     "explorerWindow.png",
     "settingsWindow.png"
   ]

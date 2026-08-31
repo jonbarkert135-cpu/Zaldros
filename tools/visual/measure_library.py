@@ -39,8 +39,10 @@ REFERENCE = ROOT / "system" / "theme" / "win11-reference.json"
 EXPLORER = "quick-access-update2.png"
 QUICK = "color-profile-quick-settings.png"
 SNAP = "WIN11_22H2_CML_JIT_TouchAssist_SnapLayouts_Flow-1_HERO_16x9_en-US_1920.png"
+SNAPBAR = "snap-bar1.png"          # library id snap-bar-2025: the drag-to-top snap bar
 TASKBAR_LOGICAL_HEIGHT = 48.0         # win11-reference.json → taskbar.height
 QUICK_PANEL_LOGICAL_WIDTH = 360.0     # win11-reference.json → quick_settings.width
+SNAP_THUMB_LOGICAL_HEIGHT = 62.0      # win11-reference.json → snap_layouts.thumb_height
 
 
 @dataclass
@@ -255,13 +257,62 @@ def measure_snap_bar(path: Path) -> list[Measurement]:
     ]
 
 
+def measure_snap_bar_hint(path: Path) -> list[Measurement]:
+    """The drag-to-top snap bar: the header band that carries the hint text and the Win+Z badge.
+
+    Microsoft never published this capture's display scale and a window overlaps its right half,
+    so its pixels are not logical pixels. What the two snap captures do share is the thumbnail
+    strip, so every number here is normalised by the strip height against the 62 px proven at
+    100 % scale, and only the vertical bands — which the overlapping window does not touch — are
+    taken from this shot. That is stated in the reference as a derivation, not as a measurement.
+    """
+    np, Image = _numpy()
+    grey = np.asarray(Image.open(path).convert("L")).astype(int)
+
+    # The panel is the one large flat near-white plate in the shot; the desktop behind it is darker
+    # and the overlapping window is brighter still. Find its rows, then its columns.
+    bright = (grey >= 235) & (grey <= 246)
+    rows = bright.sum(axis=1)
+    seed = int(rows.argmax())
+    panel_top = seed
+    while panel_top > 0 and rows[panel_top - 1] > 100:
+        panel_top -= 1
+    panel_bottom = seed
+    while panel_bottom < len(rows) - 1 and rows[panel_bottom + 1] > 100:
+        panel_bottom += 1
+    panel_left, panel_right = max(_runs(np.where(bright[seed])[0], join=2),
+                                  key=lambda run: run[1] - run[0])
+
+    # Inside the panel the layout cells are flat mid-grey plates; the rows they occupy are the strip.
+    cells = np.zeros_like(bright)
+    box = (slice(panel_top, panel_bottom + 1), slice(panel_left, panel_right + 1))
+    cells[box] = np.abs(grey[box] - 215) <= 5
+    strip_rows = np.where(cells.sum(axis=1) > 200)[0]
+    strip_top, strip_bottom = int(strip_rows[0]), int(strip_rows[-1])
+    strip_height = strip_bottom - strip_top + 1
+    scale = SNAP_THUMB_LOGICAL_HEIGHT / strip_height
+    first_cell = int(np.where(cells[(strip_top + strip_bottom) // 2])[0][0])
+
+    reference = json.loads(REFERENCE.read_text())["snap_bar"]
+    tolerance = float(reference["tolerance"])
+    return [
+        Measurement(SNAPBAR, "thumb strip height (unit)", float(strip_height), None, None),
+        Measurement(SNAPBAR, "header band", (strip_top - panel_top) * scale,
+                    reference["header_band"], tolerance),
+        Measurement(SNAPBAR, "bottom padding", (panel_bottom - strip_bottom) * scale,
+                    reference["bottom_padding"], tolerance),
+        Measurement(SNAPBAR, "side padding", (first_cell - panel_left) * scale,
+                    reference["side_padding"], tolerance),
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    needed = [EXPLORER, QUICK, SNAP]
+    needed = [EXPLORER, QUICK, SNAP, SNAPBAR]
     absent = [name for name in needed if not (CACHE / name).exists()]
     if absent:
         print("reference cache incomplete: " + ", ".join(absent), file=sys.stderr)
@@ -270,7 +321,8 @@ def main() -> int:
 
     measurements = (measure_explorer(CACHE / EXPLORER)
                     + measure_quick_settings(CACHE / QUICK)
-                    + measure_snap_bar(CACHE / SNAP))
+                    + measure_snap_bar(CACHE / SNAP)
+                    + measure_snap_bar_hint(CACHE / SNAPBAR))
     if args.json:
         print(json.dumps([asdict(m) for m in measurements], indent=2))
     else:

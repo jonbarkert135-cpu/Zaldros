@@ -44,6 +44,7 @@ STATES = {
     "settings": {"focused_window": "settings"},
     "snap": {"snap_open": True},
     "snapped": {"snap_zone": (0, 0), "snap_window": "explorer"},
+    "snapbar": {"snap_bar": True},
 }
 
 # Component crops for the evidence sheet: name -> (state, padding)
@@ -57,6 +58,7 @@ CROPS = {
     "gameBarFlyout": ("gamebar", 12),
     "contextMenu": ("menu", 12),
     "snapFlyout": ("snap", 12),
+    "snapBar": ("snapbar", 12),
     "explorerWindow": ("desktop", 12),
     "settingsWindow": ("settings", 12),
 }
@@ -236,6 +238,28 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
             add(f"snap zone {layout + 1}.{index + 1}", "height",
                 round(zone[3] * content_height) + snap["cell_gap"] * inside_y,
                 box["height"], snap["tolerance"])
+
+    # --- snap bar -------------------------------------------------------------------------------
+    bar_reference = reference["snap_bar"]
+    bar_state = geometry["snapbar"]
+    bar = bar_state["snapBar"]
+    bar_tolerance = bar_reference["tolerance"]
+    add("snap bar", "panel width", bar_reference["panel_width"], bar["width"], bar_tolerance)
+    add("snap bar", "panel height", bar_reference["panel_height"], bar["height"], bar_tolerance)
+    bar_thumbs = [bar_state[f"snapBarThumb{index}"] for index in range(snap["layouts"])]
+    add("snap bar", "layouts", snap["layouts"], len(bar_thumbs), 0)
+    add("snap bar", "header band", bar_reference["header_band"],
+        bar_thumbs[0]["top"] - bar["top"], bar_tolerance)
+    add("snap bar", "bottom padding", bar_reference["bottom_padding"],
+        bar["top"] + bar["height"] - (bar_thumbs[0]["top"] + bar_thumbs[0]["height"]),
+        bar_tolerance)
+    add("snap bar", "side padding", bar_reference["side_padding"],
+        bar_thumbs[0]["left"] - bar["left"], bar_tolerance)
+    add("snap bar", "thumb width", snap["thumb_width"], bar_thumbs[0]["width"], snap["tolerance"])
+    add("snap bar", "thumb height", snap["thumb_height"], bar_thumbs[0]["height"],
+        snap["tolerance"])
+    add("snap bar", "centred on screen", 0,
+        round(bar["left"] + bar["width"] / 2 - WIDTH / 2), 1)
 
     # A snapped window really takes its zone: the left half of the work area, to the pixel.
     snapped = geometry["snapped"]["explorerWindow"]

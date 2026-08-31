@@ -157,6 +157,7 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
            device_manager_open: bool = False, terminal_open: bool = False,
            snap_open: bool = False, snap_window: str = "explorer",
            snap_zone: tuple[int, int] | None = None,
+           snap_bar: bool = False, snap_bar_window: str = "explorer",
            geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -196,6 +197,10 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
         anchor_y = float(item.property("y")) + float(item.property("barHeight"))
         QMetaObject.invokeMethod(root, "openSnapMenu", Q_ARG("QVariant", snap_window),
                                  Q_ARG("QVariant", anchor_x), Q_ARG("QVariant", anchor_y))
+    if snap_bar:
+        # Exactly what a window dragged to the top edge reports.
+        QMetaObject.invokeMethod(root, "requestSnapBar", Q_ARG("QVariant", snap_bar_window),
+                                 Q_ARG("QVariant", True))
     if terminal_open:
         QMetaObject.invokeMethod(root, "toggleWindow", Q_ARG("QVariant", "terminal"))
         root.setProperty("focusedWindow", "terminal")
@@ -242,8 +247,10 @@ NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskV
                "searchFlyout", "notificationCentre", "quickPanel", "clipboardFlyout", "gameBarFlyout", "gameBarToolbar", "contextMenu",
                "explorerWindow", "explorerTabStrip", "explorerNavBar", "explorerCommandBar",
                "explorerSidebar", "explorerFileList", "settingsWindow", "settingsRail",
-               "settingsBody", "titleBar", "captionButtons", "snapFlyout",
+               "settingsBody", "titleBar", "captionButtons", "snapFlyout", "snapBar",
+               "snapBarLayouts", "snapBarHint",
                *(f"snapThumb{index}" for index in range(6)),
+               *(f"snapBarThumb{index}" for index in range(6)),
                *(f"snapZone{layout}_{zone}"
                  for layout, zones in enumerate((2, 2, 3, 4, 3, 3))
                  for zone in range(zones)))

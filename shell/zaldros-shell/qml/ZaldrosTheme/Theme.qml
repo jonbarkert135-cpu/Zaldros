@@ -102,6 +102,12 @@ QtObject {
     readonly property int snapThumbGap:       14
     readonly property int snapCellGap:         6
     readonly property int snapPadding:        13
+    // Snap bar (win11-reference.json → snap_bar): the header band above the same thumbnail strip
+    // is 47 px from the panel top, i.e. 34 px of header content above the 13 px padding. Derived
+    // from Microsoft's snap-bar capture by normalising it against the strip height.
+    readonly property int snapBarHeader:       34
+    // How close to the top edge a dragged window has to come before the bar appears.
+    readonly property int snapBarTrigger:      24
 
     // --- radii --------------------------------------------------------------------------------
     readonly property int radiusSmall:         4

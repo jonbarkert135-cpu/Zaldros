@@ -39,6 +39,9 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
       minimise/maximise/close on real windows
 - [x] Snap layouts: six Windows 11 layouts derived from Microsoft's own 22H2 capture, flyout on the
       maximise button and on Win+Z, 46 parity checks (`snap`/`snapped` states in parity.py)
+- [x] Snap bar: dragging a window to the top edge drops the same layout strip down under a hint
+      line and the Win+Z badge; header band derived from Microsoft's own snap-bar capture
+      (win11-reference.json → snap_bar), 9 parity checks (`snapbar` state)
 - [ ] Snap assist: after snapping one window, offer the remaining ones for the other zones
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files

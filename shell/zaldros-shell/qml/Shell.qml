@@ -44,6 +44,9 @@ Item {
     property string snapTarget: ""
     property real snapAnchorX: 0
     property real snapAnchorY: 0
+    // The snap bar at the top edge: which window is being dragged up there, if any.
+    property bool snapBarOpen: false
+    property string snapBarTarget: ""
 
     function isOpen(id) { return openWindows[id] === true && minimised[id] !== true }
     function windowItem(id) {
@@ -61,6 +64,16 @@ Item {
         shell.snapAnchorY = anchorY;
         shell.snapOpen = true;
     }
+    // Reported by a window that is being dragged: at the top edge the bar drops down, away from it
+    // the bar goes away again — but only for the window that opened it.
+    function requestSnapBar(id, atTopEdge) {
+        if (atTopEdge) {
+            shell.snapBarTarget = id;
+            shell.snapBarOpen = true;
+        } else if (shell.snapBarTarget === id) {
+            shell.snapBarOpen = false;
+        }
+    }
     // Called by the flyout and, in renders and tests, directly: layout/zone indices in, geometry out.
     function applySnap(id, zone) {
         shell.maximised = shell.setFlag(shell.maximised, id, false);
@@ -69,6 +82,7 @@ Item {
         next[id] = zone;
         shell.snapped = next;
         shell.snapOpen = false;
+        shell.snapBarOpen = false;
         shell.focusWindow(id);
     }
     function clearSnap(id) {
@@ -136,6 +150,7 @@ Item {
 
     function closeAllFlyouts() {
         shell.snapOpen = false;
+        shell.snapBarOpen = false;
         shell.startOpen = false;
         shell.quickOpen = false;
         shell.searchOpen = false;
@@ -341,6 +356,9 @@ Item {
             shell.clearSnap("settings");
             shell.maximised = shell.setFlag(shell.maximised, "settings", !maximized);
         }
+        onSnapBarRequested: function (atTopEdge) {
+            shell.requestSnapBar("settings", atTopEdge);
+        }
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("settings", anchorX, anchorY);
         }
@@ -381,6 +399,9 @@ Item {
             shell.clearSnap("explorer");
             shell.maximised = shell.setFlag(shell.maximised, "explorer", !maximized);
         }
+        onSnapBarRequested: function (atTopEdge) {
+            shell.requestSnapBar("explorer", atTopEdge);
+        }
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("explorer", anchorX, anchorY);
         }
@@ -413,6 +434,9 @@ Item {
         onMaximiseToggled: {
             shell.clearSnap("taskmanager");
             shell.maximised = shell.setFlag(shell.maximised, "taskmanager", !maximized);
+        }
+        onSnapBarRequested: function (atTopEdge) {
+            shell.requestSnapBar("taskmanager", atTopEdge);
         }
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("taskmanager", anchorX, anchorY);
@@ -459,6 +483,9 @@ Item {
             shell.clearSnap("terminal");
             shell.maximised = shell.setFlag(shell.maximised, "terminal", !maximized);
         }
+        onSnapBarRequested: function (atTopEdge) {
+            shell.requestSnapBar("terminal", atTopEdge);
+        }
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("terminal", anchorX, anchorY);
         }
@@ -497,6 +524,9 @@ Item {
         onMaximiseToggled: {
             shell.clearSnap("devicemanager");
             shell.maximised = shell.setFlag(shell.maximised, "devicemanager", !maximized);
+        }
+        onSnapBarRequested: function (atTopEdge) {
+            shell.requestSnapBar("devicemanager", atTopEdge);
         }
         onSnapMenuRequested: function (anchorX, anchorY) {
             shell.openSnapMenu("devicemanager", anchorX, anchorY);
@@ -575,6 +605,20 @@ Item {
         y: Math.min(shell.snapAnchorY + 8, shell.workHeight - height - Theme.flyoutGap)
         onZoneChosen: function (layout, zone, zoneRect) {
             shell.applySnap(shell.snapTarget, zoneRect);
+        }
+    }
+
+    // --- snap bar ---------------------------------------------------------------------------------
+    // Hangs from the top edge, centred, while a window is dragged up there.
+    SnapBar {
+        id: snapBar
+        objectName: "snapBar"
+        z: 40
+        visible: shell.snapBarOpen
+        x: Math.round((shell.width - width) / 2)
+        y: Theme.flyoutGap
+        onZoneChosen: function (layout, zone, zoneRect) {
+            shell.applySnap(shell.snapBarTarget, zoneRect);
         }
     }
 

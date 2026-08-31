@@ -47,6 +47,12 @@ Item {
     // The window cannot draw it (it would be clipped by the frame), so it reports the anchor point
     // — the bottom centre of the button in the shell's coordinates — and the shell draws it.
     signal snapMenuRequested(real anchorX, real anchorY)
+    // Windows 11 drops the snap bar down when a dragged window reaches the top edge of the screen.
+    // The window only reports whether it is up there; the shell owns the bar.
+    signal snapBarRequested(bool atTopEdge)
+    readonly property bool dragging: titleDrag.drag.active
+    onDraggingChanged: win.snapBarRequested(win.dragging && win.y <= Theme.snapBarTrigger)
+    onYChanged: if (win.dragging) win.snapBarRequested(win.y <= Theme.snapBarTrigger)
 
     // --- drop shadow: three offset plates, because MultiEffect needs a GPU we cannot assume ----
     Repeater {
@@ -83,6 +89,7 @@ Item {
             color: win.active ? Theme.mica : Qt.darker(Theme.mica, 1.08)
 
             MouseArea {
+                id: titleDrag
                 anchors.fill: parent
                 anchors.rightMargin: captionRow.width
                 onPressed: win.activateRequested()

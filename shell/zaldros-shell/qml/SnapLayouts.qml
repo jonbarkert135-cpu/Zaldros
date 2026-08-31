@@ -35,9 +35,16 @@ Item {
 
     signal zoneChosen(int layout, int zone, var zoneRect)
 
+    // The frame is the flyout's own panel; the snap bar draws its own and reuses only the strip.
+    property bool frameVisible: true
+    // Prefix for the objectNames, so a second instance stays findable on its own ("snapBarThumb0").
+    property string namePrefix: "snap"
+    // Extra room above the thumbnail strip: the snap bar puts its hint text and Win+Z badge there.
+    property int topInset: 0
+
     width: Theme.snapPadding * 2 + layouts.length * Theme.snapThumbWidth
            + (layouts.length - 1) * Theme.snapThumbGap
-    height: Theme.snapPadding * 2 + Theme.snapThumbHeight
+    height: Theme.snapPadding * 2 + Theme.snapThumbHeight + root.topInset
 
     // The interior boundaries of one layout along an axis. Windows takes the cell gap out of the
     // thumbnail at each boundary, which is why a half is 45 px wide in a 96 px thumbnail and not 48.
@@ -75,51 +82,54 @@ Item {
                  width: horizontal.size, height: vertical.size };
     }
 
+    // The panel plate. The snap bar hides it and draws its own, taller one around the same strip.
     Rectangle {
         anchors.fill: parent
+        visible: root.frameVisible
         radius: Theme.radiusMedium
         color: Theme.surfaceAcrylic
         border.width: 1
         border.color: Theme.border
+    }
 
-        Row {
-            anchors.centerIn: parent
-            spacing: Theme.snapThumbGap
+    Row {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: Theme.snapPadding + root.topInset
+        spacing: Theme.snapThumbGap
 
-            Repeater {
-                model: root.layouts.length
-                delegate: Item {
-                    id: thumb
-                    objectName: "snapThumb" + index
-                    readonly property int layoutIndex: index
-                    width: Theme.snapThumbWidth
-                    height: Theme.snapThumbHeight
+        Repeater {
+            model: root.layouts.length
+            delegate: Item {
+                id: thumb
+                objectName: root.namePrefix + "Thumb" + index
+                readonly property int layoutIndex: index
+                width: Theme.snapThumbWidth
+                height: Theme.snapThumbHeight
 
-                    Repeater {
-                        model: root.layouts[thumb.layoutIndex].length
-                        delegate: Rectangle {
-                            objectName: "snapZone" + thumb.layoutIndex + "_" + index
-                            readonly property var cell:
-                                root.cellRect(thumb.layoutIndex, index, thumb.width, thumb.height)
-                            x: cell.x
-                            y: cell.y
-                            width: cell.width
-                            height: cell.height
-                            radius: Theme.radiusSmall
-                            // Windows draws the cells as light plates on the dark panel; the one
-                            // under the pointer takes the accent.
-                            color: hover.containsMouse ? Theme.accent : Theme.surfaceElevated
-                            border.width: 1
-                            border.color: hover.containsMouse ? Theme.accent : Theme.borderStrong
+                Repeater {
+                    model: root.layouts[thumb.layoutIndex].length
+                    delegate: Rectangle {
+                        objectName: root.namePrefix + "Zone" + thumb.layoutIndex + "_" + index
+                        readonly property var cell:
+                            root.cellRect(thumb.layoutIndex, index, thumb.width, thumb.height)
+                        x: cell.x
+                        y: cell.y
+                        width: cell.width
+                        height: cell.height
+                        radius: Theme.radiusSmall
+                        // Windows draws the cells as light plates on the dark panel; the one
+                        // under the pointer takes the accent.
+                        color: hover.containsMouse ? Theme.accent : Theme.surfaceElevated
+                        border.width: 1
+                        border.color: hover.containsMouse ? Theme.accent : Theme.borderStrong
 
-                            MouseArea {
-                                id: hover
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onClicked: root.zoneChosen(
-                                    thumb.layoutIndex, index,
-                                    root.layouts[thumb.layoutIndex][index])
-                            }
+                        MouseArea {
+                            id: hover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: root.zoneChosen(
+                                thumb.layoutIndex, index,
+                                root.layouts[thumb.layoutIndex][index])
                         }
                     }
                 }
