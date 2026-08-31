@@ -1,0 +1,19 @@
+xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.
+
+xorriso : NOTE : Loading ISO image tree from LBA 0
+xorriso : UPDATE :     594 nodes read in 1 seconds
+xorriso : NOTE : Detected El-Torito boot information which currently is set to be discarded
+Drive current: -indev 'zaldros-legacy.iso'
+Media current: stdio file, overwriteable
+Media status : is written , is appendable
+Boot record  : El Torito , MBR protective-msdos-label grub2-mbr cyl-align-off GPT APM
+Media summary: 1 session, 1295213 data blocks, 2530m data, 77.8g free
+Volume id    : 'ZALDROS'
+El Torito catalog  : 1615  1
+El Torito cat path : /boot.catalog
+El Torito images   :   N  Pltf  B   Emul  Ld_seg  Hdpt  Ldsiz         LBA
+El Torito boot img :   1  BIOS  y   none  0x0000  0x00      4        2977
+El Torito boot img :   2  UEFI  y   none  0x0000  0x00   5760          72
+El Torito img path :   1  /boot/grub/i386-pc/eltorito.img
+El Torito img opts :   1  boot-info-table grub2-boot-info
+El Torito img path :   2  /efi.img
