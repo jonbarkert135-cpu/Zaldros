@@ -1,0 +1,6 @@
+cat: /tmp/tmp.cYtxtGHWSc/rootfs/etc/apt/sources.list: No such file or directory
+Types: deb
+URIs: http://archive.ubuntu.com/ubuntu
+Suites: resolute resolute-updates
+Components: main universe restricted multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg

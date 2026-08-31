@@ -1,0 +1,19 @@
+xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.
+
+Drive current: -outdev 'stdio:zaldros-services.iso'
+Media current: stdio file, overwriteable
+Media status : is blank
+Media summary: 0 sessions, 0 data blocks, 0 data, 78.5g free
+Added to ISO image: directory '/'='/tmp/grub.BG3obw'
+xorriso : UPDATE :     588 files added in 1 seconds
+Added to ISO image: directory '/'='/tmp/tmp.cYtxtGHWSc/iso'
+xorriso : UPDATE :     595 files added in 1 seconds
+xorriso : NOTE : Copying to System Area: 512 bytes from file '/usr/lib/grub/i386-pc/boot_hybrid.img'
+libisofs: NOTE : Automatically adjusted MBR geometry to 1023/179/32
+xorriso : UPDATE :  4.52% done
+xorriso : UPDATE :  70.77% done
+xorriso : UPDATE :  91.48% done
+ISO image produced: 1464204 sectors
+Written to medium : 1464204 sectors at LBA 0
+Writing to 'stdio:zaldros-services.iso' completed successfully.
+

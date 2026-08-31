@@ -1,0 +1,457 @@
+
+Start-Date: 2026-04-20  18:05:25
+Commandline: apt-get install --reinstall apt
+Reinstall: apt:amd64 (3.2.0)
+End-Date: 2026-04-20  18:05:26
+
+Start-Date: 2026-04-20  18:05:26
+Commandline: apt-get install --reinstall base-files
+Reinstall: base-files:amd64 (14ubuntu6)
+End-Date: 2026-04-20  18:05:26
+
+Start-Date: 2026-04-20  18:05:26
+Commandline: apt-get install --reinstall base-passwd
+Reinstall: base-passwd:amd64 (3.6.8)
+End-Date: 2026-04-20  18:05:27
+
+Start-Date: 2026-04-20  18:05:27
+Commandline: apt-get install --reinstall bash
+Reinstall: bash:amd64 (5.3-2ubuntu1)
+End-Date: 2026-04-20  18:05:28
+
+Start-Date: 2026-04-20  18:05:28
+Commandline: apt-get install --reinstall bsdutils
+Reinstall: bsdutils:amd64 (1:2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:28
+
+Start-Date: 2026-04-20  18:05:28
+Commandline: apt-get install --reinstall coreutils
+Reinstall: coreutils:amd64 (9.5-1ubuntu2+0.0.0~ubuntu25)
+End-Date: 2026-04-20  18:05:28
+
+Start-Date: 2026-04-20  18:05:28
+Commandline: apt-get install --reinstall coreutils-from-uutils
+Reinstall: coreutils-from-uutils:amd64 (0.0.0~ubuntu25)
+End-Date: 2026-04-20  18:05:28
+
+Start-Date: 2026-04-20  18:05:29
+Commandline: apt-get install --reinstall dash
+Reinstall: dash:amd64 (0.5.12-12ubuntu3)
+End-Date: 2026-04-20  18:05:29
+
+Start-Date: 2026-04-20  18:05:29
+Commandline: apt-get install --reinstall debconf
+Reinstall: debconf:amd64 (1.5.92)
+End-Date: 2026-04-20  18:05:29
+
+Start-Date: 2026-04-20  18:05:29
+Commandline: apt-get install --reinstall debianutils
+Reinstall: debianutils:amd64 (5.23.2build1)
+End-Date: 2026-04-20  18:05:30
+
+Start-Date: 2026-04-20  18:05:30
+Commandline: apt-get install --reinstall diffutils
+Reinstall: diffutils:amd64 (1:3.12-1)
+End-Date: 2026-04-20  18:05:30
+
+Start-Date: 2026-04-20  18:05:30
+Commandline: apt-get install --reinstall dpkg
+Reinstall: dpkg:amd64 (1.23.7ubuntu1)
+End-Date: 2026-04-20  18:05:30
+
+Start-Date: 2026-04-20  18:05:31
+Commandline: apt-get install --reinstall e2fsprogs
+Reinstall: e2fsprogs:amd64 (1.47.2-3ubuntu4)
+End-Date: 2026-04-20  18:05:31
+
+Start-Date: 2026-04-20  18:05:31
+Commandline: apt-get install --reinstall findutils
+Reinstall: findutils:amd64 (4.10.0-3build2)
+End-Date: 2026-04-20  18:05:31
+
+Start-Date: 2026-04-20  18:05:32
+Commandline: apt-get install --reinstall gcc-16-base:amd64
+Reinstall: gcc-16-base:amd64 (16-20260322-1ubuntu1)
+End-Date: 2026-04-20  18:05:32
+
+Start-Date: 2026-04-20  18:05:32
+Commandline: apt-get install --reinstall gnu-coreutils
+Reinstall: gnu-coreutils:amd64 (9.7-3ubuntu2)
+End-Date: 2026-04-20  18:05:32
+
+Start-Date: 2026-04-20  18:05:32
+Commandline: apt-get install --reinstall gpgv
+Reinstall: gpgv:amd64 (2.4.8-4ubuntu3)
+End-Date: 2026-04-20  18:05:32
+
+Start-Date: 2026-04-20  18:05:33
+Commandline: apt-get install --reinstall grep
+Reinstall: grep:amd64 (3.12-1)
+End-Date: 2026-04-20  18:05:33
+
+Start-Date: 2026-04-20  18:05:33
+Commandline: apt-get install --reinstall gzip
+Reinstall: gzip:amd64 (1.14-1~exp2ubuntu1)
+End-Date: 2026-04-20  18:05:33
+
+Start-Date: 2026-04-20  18:05:33
+Commandline: apt-get install --reinstall hostname
+Reinstall: hostname:amd64 (3.25build1)
+End-Date: 2026-04-20  18:05:33
+
+Start-Date: 2026-04-20  18:05:34
+Commandline: apt-get install --reinstall init-system-helpers
+Reinstall: init-system-helpers:amd64 (1.69)
+End-Date: 2026-04-20  18:05:34
+
+Start-Date: 2026-04-20  18:05:34
+Commandline: apt-get install --reinstall libacl1:amd64
+Reinstall: libacl1:amd64 (2.3.2-2)
+End-Date: 2026-04-20  18:05:34
+
+Start-Date: 2026-04-20  18:05:34
+Commandline: apt-get install --reinstall libapt-pkg7.0:amd64
+Reinstall: libapt-pkg7.0:amd64 (3.2.0)
+End-Date: 2026-04-20  18:05:34
+
+Start-Date: 2026-04-20  18:05:35
+Commandline: apt-get install --reinstall libattr1:amd64
+Reinstall: libattr1:amd64 (1:2.5.2-4)
+End-Date: 2026-04-20  18:05:35
+
+Start-Date: 2026-04-20  18:05:35
+Commandline: apt-get install --reinstall libaudit-common
+Reinstall: libaudit-common:amd64 (1:4.1.2-1build1)
+End-Date: 2026-04-20  18:05:35
+
+Start-Date: 2026-04-20  18:05:35
+Commandline: apt-get install --reinstall libaudit1:amd64
+Reinstall: libaudit1:amd64 (1:4.1.2-1build1)
+End-Date: 2026-04-20  18:05:35
+
+Start-Date: 2026-04-20  18:05:36
+Commandline: apt-get install --reinstall libblkid1:amd64
+Reinstall: libblkid1:amd64 (2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:36
+
+Start-Date: 2026-04-20  18:05:36
+Commandline: apt-get install --reinstall libbsd0:amd64
+Reinstall: libbsd0:amd64 (0.12.2-2build2)
+End-Date: 2026-04-20  18:05:36
+
+Start-Date: 2026-04-20  18:05:36
+Commandline: apt-get install --reinstall libbz2-1.0:amd64
+Reinstall: libbz2-1.0:amd64 (1.0.8-6build2)
+End-Date: 2026-04-20  18:05:36
+
+Start-Date: 2026-04-20  18:05:37
+Commandline: apt-get install --reinstall libc-bin
+Reinstall: libc-bin:amd64 (2.43-2ubuntu2)
+End-Date: 2026-04-20  18:05:37
+
+Start-Date: 2026-04-20  18:05:37
+Commandline: apt-get install --reinstall libc-gconv-modules-extra:amd64
+Reinstall: libc-gconv-modules-extra:amd64 (2.43-2ubuntu2)
+End-Date: 2026-04-20  18:05:37
+
+Start-Date: 2026-04-20  18:05:38
+Commandline: apt-get install --reinstall libc6:amd64
+Reinstall: libc6:amd64 (2.43-2ubuntu2)
+End-Date: 2026-04-20  18:05:38
+
+Start-Date: 2026-04-20  18:05:38
+Commandline: apt-get install --reinstall libcap-ng0:amd64
+Reinstall: libcap-ng0:amd64 (0.8.5-4build5)
+End-Date: 2026-04-20  18:05:38
+
+Start-Date: 2026-04-20  18:05:39
+Commandline: apt-get install --reinstall libcom-err2:amd64
+Reinstall: libcom-err2:amd64 (1.47.2-3ubuntu4)
+End-Date: 2026-04-20  18:05:39
+
+Start-Date: 2026-04-20  18:05:39
+Commandline: apt-get install --reinstall libcrypt1:amd64
+Reinstall: libcrypt1:amd64 (1:4.5.1-1)
+End-Date: 2026-04-20  18:05:39
+
+Start-Date: 2026-04-20  18:05:39
+Commandline: apt-get install --reinstall libdb5.3t64:amd64
+Reinstall: libdb5.3t64:amd64 (5.3.28+dfsg2-10ubuntu1)
+End-Date: 2026-04-20  18:05:39
+
+Start-Date: 2026-04-20  18:05:40
+Commandline: apt-get install --reinstall libdebconfclient0:amd64
+Reinstall: libdebconfclient0:amd64 (0.280ubuntu1)
+End-Date: 2026-04-20  18:05:40
+
+Start-Date: 2026-04-20  18:05:40
+Commandline: apt-get install --reinstall libext2fs2t64:amd64
+Reinstall: libext2fs2t64:amd64 (1.47.2-3ubuntu4)
+End-Date: 2026-04-20  18:05:40
+
+Start-Date: 2026-04-20  18:05:40
+Commandline: apt-get install --reinstall libgcc-s1:amd64
+Reinstall: libgcc-s1:amd64 (16-20260322-1ubuntu1)
+End-Date: 2026-04-20  18:05:40
+
+Start-Date: 2026-04-20  18:05:41
+Commandline: apt-get install --reinstall libgcrypt20:amd64
+Reinstall: libgcrypt20:amd64 (1.12.0-2)
+End-Date: 2026-04-20  18:05:41
+
+Start-Date: 2026-04-20  18:05:41
+Commandline: apt-get install --reinstall libgmp10:amd64
+Reinstall: libgmp10:amd64 (2:6.3.0+dfsg-5ubuntu2)
+End-Date: 2026-04-20  18:05:41
+
+Start-Date: 2026-04-20  18:05:41
+Commandline: apt-get install --reinstall libgpg-error0:amd64
+Reinstall: libgpg-error0:amd64 (1.58-2)
+End-Date: 2026-04-20  18:05:41
+
+Start-Date: 2026-04-20  18:05:42
+Commandline: apt-get install --reinstall liblz4-1:amd64
+Reinstall: liblz4-1:amd64 (1.10.0-8)
+End-Date: 2026-04-20  18:05:42
+
+Start-Date: 2026-04-20  18:05:42
+Commandline: apt-get install --reinstall liblzma5:amd64
+Reinstall: liblzma5:amd64 (5.8.3-1)
+End-Date: 2026-04-20  18:05:42
+
+Start-Date: 2026-04-20  18:05:42
+Commandline: apt-get install --reinstall libmd0:amd64
+Reinstall: libmd0:amd64 (1.1.0-2build4)
+End-Date: 2026-04-20  18:05:42
+
+Start-Date: 2026-04-20  18:05:43
+Commandline: apt-get install --reinstall libmount1:amd64
+Reinstall: libmount1:amd64 (2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:43
+
+Start-Date: 2026-04-20  18:05:43
+Commandline: apt-get install --reinstall libncursesw6:amd64
+Reinstall: libncursesw6:amd64 (6.6+20251231-1)
+End-Date: 2026-04-20  18:05:43
+
+Start-Date: 2026-04-20  18:05:44
+Commandline: apt-get install --reinstall libpam-modules:amd64
+Reinstall: libpam-modules:amd64 (1.7.0-5ubuntu3)
+End-Date: 2026-04-20  18:05:44
+
+Start-Date: 2026-04-20  18:05:44
+Commandline: apt-get install --reinstall libpam-modules-bin
+Reinstall: libpam-modules-bin:amd64 (1.7.0-5ubuntu3)
+End-Date: 2026-04-20  18:05:44
+
+Start-Date: 2026-04-20  18:05:44
+Commandline: apt-get install --reinstall libpam-runtime
+Reinstall: libpam-runtime:amd64 (1.7.0-5ubuntu3)
+End-Date: 2026-04-20  18:05:45
+
+Start-Date: 2026-04-20  18:05:45
+Commandline: apt-get install --reinstall libpam0g:amd64
+Reinstall: libpam0g:amd64 (1.7.0-5ubuntu3)
+End-Date: 2026-04-20  18:05:45
+
+Start-Date: 2026-04-20  18:05:45
+Commandline: apt-get install --reinstall libpcre2-8-0:amd64
+Reinstall: libpcre2-8-0:amd64 (10.46-1build1)
+End-Date: 2026-04-20  18:05:46
+
+Start-Date: 2026-04-20  18:05:46
+Commandline: apt-get install --reinstall libproc2-0:amd64
+Reinstall: libproc2-0:amd64 (2:4.0.4-9ubuntu1)
+End-Date: 2026-04-20  18:05:46
+
+Start-Date: 2026-04-20  18:05:46
+Commandline: apt-get install --reinstall libseccomp2:amd64
+Reinstall: libseccomp2:amd64 (2.6.0-2ubuntu5)
+End-Date: 2026-04-20  18:05:46
+
+Start-Date: 2026-04-20  18:05:47
+Commandline: apt-get install --reinstall libselinux1:amd64
+Reinstall: libselinux1:amd64 (3.9-4build1)
+End-Date: 2026-04-20  18:05:47
+
+Start-Date: 2026-04-20  18:05:47
+Commandline: apt-get install --reinstall libsemanage-common
+Reinstall: libsemanage-common:amd64 (3.9-1build1)
+End-Date: 2026-04-20  18:05:47
+
+Start-Date: 2026-04-20  18:05:47
+Commandline: apt-get install --reinstall libsemanage2:amd64
+Reinstall: libsemanage2:amd64 (3.9-1build1)
+End-Date: 2026-04-20  18:05:47
+
+Start-Date: 2026-04-20  18:05:48
+Commandline: apt-get install --reinstall libsepol2:amd64
+Reinstall: libsepol2:amd64 (3.9-2)
+End-Date: 2026-04-20  18:05:48
+
+Start-Date: 2026-04-20  18:05:48
+Commandline: apt-get install --reinstall libsmartcols1:amd64
+Reinstall: libsmartcols1:amd64 (2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:48
+
+Start-Date: 2026-04-20  18:05:48
+Commandline: apt-get install --reinstall libss2:amd64
+Reinstall: libss2:amd64 (1.47.2-3ubuntu4)
+End-Date: 2026-04-20  18:05:48
+
+Start-Date: 2026-04-20  18:05:49
+Commandline: apt-get install --reinstall libssl3t64:amd64
+Reinstall: libssl3t64:amd64 (3.5.5-1ubuntu3)
+End-Date: 2026-04-20  18:05:49
+
+Start-Date: 2026-04-20  18:05:49
+Commandline: apt-get install --reinstall libstdc++6:amd64
+Reinstall: libstdc++6:amd64 (16-20260322-1ubuntu1)
+End-Date: 2026-04-20  18:05:49
+
+Start-Date: 2026-04-20  18:05:50
+Commandline: apt-get install --reinstall libsystemd0:amd64
+Reinstall: libsystemd0:amd64 (259.5-0ubuntu3)
+End-Date: 2026-04-20  18:05:50
+
+Start-Date: 2026-04-20  18:05:50
+Commandline: apt-get install --reinstall libtinfo6:amd64
+Reinstall: libtinfo6:amd64 (6.6+20251231-1)
+End-Date: 2026-04-20  18:05:50
+
+Start-Date: 2026-04-20  18:05:50
+Commandline: apt-get install --reinstall libudev1:amd64
+Reinstall: libudev1:amd64 (259.5-0ubuntu3)
+End-Date: 2026-04-20  18:05:50
+
+Start-Date: 2026-04-20  18:05:51
+Commandline: apt-get install --reinstall libuuid1:amd64
+Reinstall: libuuid1:amd64 (2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:51
+
+Start-Date: 2026-04-20  18:05:51
+Commandline: apt-get install --reinstall libxxhash0:amd64
+Reinstall: libxxhash0:amd64 (0.8.3-2build1)
+End-Date: 2026-04-20  18:05:51
+
+Start-Date: 2026-04-20  18:05:51
+Commandline: apt-get install --reinstall libzstd1:amd64
+Reinstall: libzstd1:amd64 (1.5.7+dfsg-3)
+End-Date: 2026-04-20  18:05:51
+
+Start-Date: 2026-04-20  18:05:52
+Commandline: apt-get install --reinstall login
+Reinstall: login:amd64 (1:4.16.0-2+really2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:52
+
+Start-Date: 2026-04-20  18:05:52
+Commandline: apt-get install --reinstall login.defs
+Reinstall: login.defs:amd64 (1:4.17.4-2ubuntu3)
+End-Date: 2026-04-20  18:05:52
+
+Start-Date: 2026-04-20  18:05:52
+Commandline: apt-get install --reinstall logsave
+Reinstall: logsave:amd64 (1.47.2-3ubuntu4)
+End-Date: 2026-04-20  18:05:52
+
+Start-Date: 2026-04-20  18:05:53
+Commandline: apt-get install --reinstall mawk
+Reinstall: mawk:amd64 (1.3.4.20260129-1)
+End-Date: 2026-04-20  18:05:53
+
+Start-Date: 2026-04-20  18:05:53
+Commandline: apt-get install --reinstall mount
+Reinstall: mount:amd64 (2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:53
+
+Start-Date: 2026-04-20  18:05:53
+Commandline: apt-get install --reinstall ncurses-base
+Reinstall: ncurses-base:amd64 (6.6+20251231-1)
+End-Date: 2026-04-20  18:05:53
+
+Start-Date: 2026-04-20  18:05:54
+Commandline: apt-get install --reinstall ncurses-bin
+Reinstall: ncurses-bin:amd64 (6.6+20251231-1)
+End-Date: 2026-04-20  18:05:54
+
+Start-Date: 2026-04-20  18:05:54
+Commandline: apt-get install --reinstall openssl-provider-legacy
+Reinstall: openssl-provider-legacy:amd64 (3.5.5-1ubuntu3)
+End-Date: 2026-04-20  18:05:54
+
+Start-Date: 2026-04-20  18:05:54
+Commandline: apt-get install --reinstall passwd
+Reinstall: passwd:amd64 (1:4.17.4-2ubuntu3)
+End-Date: 2026-04-20  18:05:54
+
+Start-Date: 2026-04-20  18:05:55
+Commandline: apt-get install --reinstall perl-base
+Reinstall: perl-base:amd64 (5.40.1-7build1)
+End-Date: 2026-04-20  18:05:55
+
+Start-Date: 2026-04-20  18:05:55
+Commandline: apt-get install --reinstall procps
+Reinstall: procps:amd64 (2:4.0.4-9ubuntu1)
+End-Date: 2026-04-20  18:05:56
+
+Start-Date: 2026-04-20  18:05:56
+Commandline: apt-get install --reinstall rust-coreutils
+Reinstall: rust-coreutils:amd64 (0.8.0-0ubuntu3)
+End-Date: 2026-04-20  18:05:57
+
+Start-Date: 2026-04-20  18:05:57
+Commandline: apt-get install --reinstall sed
+Reinstall: sed:amd64 (4.9-2build3)
+End-Date: 2026-04-20  18:05:57
+
+Start-Date: 2026-04-20  18:05:57
+Commandline: apt-get install --reinstall sensible-utils
+Reinstall: sensible-utils:amd64 (0.0.26build1)
+End-Date: 2026-04-20  18:05:57
+
+Start-Date: 2026-04-20  18:05:58
+Commandline: apt-get install --reinstall sysvinit-utils
+Reinstall: sysvinit-utils:amd64 (3.15-5ubuntu1)
+End-Date: 2026-04-20  18:05:58
+
+Start-Date: 2026-04-20  18:05:58
+Commandline: apt-get install --reinstall tar
+Reinstall: tar:amd64 (1.35+dfsg-4)
+End-Date: 2026-04-20  18:05:58
+
+Start-Date: 2026-04-20  18:05:58
+Commandline: apt-get install --reinstall ubuntu-keyring
+Reinstall: ubuntu-keyring:amd64 (2023.11.28.1build1)
+End-Date: 2026-04-20  18:05:58
+
+Start-Date: 2026-04-20  18:05:59
+Commandline: apt-get install --reinstall util-linux
+Reinstall: util-linux:amd64 (2.41.3-3ubuntu2)
+End-Date: 2026-04-20  18:05:59
+
+Start-Date: 2026-04-20  18:05:59
+Commandline: apt-get install --reinstall zlib1g:amd64
+Reinstall: zlib1g:amd64 (1:1.3.dfsg+really1.3.1-1ubuntu3)
+End-Date: 2026-04-20  18:05:59
+
+Start-Date: 2026-08-31  17:23:31
+Commandline: apt-get install -y --no-install-recommends ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami kwin-wayland plasma-nm plasma-pa powerdevil kscreen kde-spectacle xdg-desktop-portal xdg-desktop-portal-kde
+Install: libkf6pty-data:amd64 (6.24.0-0ubuntu1, automatic), fontconfig:amd64 (2.17.1-3ubuntu1, automatic), libvulkan1:amd64 (1.4.341.0-1, automatic), lsb-release:amd64 (12.1-2build1, automatic), libkirigamidelegates6:amd64 (6.24.0-0ubuntu1, automatic), libqt6multimediawidgets6:amd64 (6.10.2-2, automatic), cifs-utils:amd64 (2:7.4-1ubuntu0.26.04.3, automatic), libddcutil5:amd64 (2.2.5-1, automatic), qml6-module-qt-labs-folderlistmodel:amd64 (6.10.2+dfsg-3, automatic), libopenblas0:amd64 (0.3.32+ds-5, automatic), libhwy1t64:amd64 (1.3.0-2, automatic), libxcb-present0:amd64 (1.17.0-2ubuntu1, automatic), libkf6wallet-data:amd64 (6.24.0-0ubuntu1, automatic), libkeyutils1:amd64 (1.6.3-6ubuntu3, automatic), libxtables12:amd64 (1.8.11-2ubuntu3, automatic), libpolkit-agent-1-0:amd64 (127-2ubuntu1, automatic), libv4lconvert0t64:amd64 (1.32.0-2ubuntu1, automatic), libgomp1:amd64 (16-20260322-1ubuntu1, automatic), initramfs-tools-core:amd64 (0.151ubuntu1, automatic), libzxing3:amd64 (2.3.0-5, automatic), libkf6authcore6:amd64 (6.24.0-0ubuntu1, automatic), libpulse0:amd64 (1:17.0+dfsg1-2ubuntu4, automatic), libwebpmux3:amd64 (1.5.0-0.1build1, automatic), libb2-1:amd64 (0.98.1-1.1build2, automatic), netplan-generator:amd64 (1.2-1ubuntu5, automatic), qml6-module-qtquick-window:amd64 (6.10.2+dfsg-3), libkf6widgetsaddons6:amd64 (6.24.0-0ubuntu1, automatic), libkf6su-bin:amd64 (6.24.0-0ubuntu1, automatic), libimobiledevice-1.0-6:amd64 (1.4.0-1build1, automatic), debconf-i18n:amd64 (1.5.92, automatic), console-setup:amd64 (1.237ubuntu3.1, automatic), libkf6coreaddons6:amd64 (6.24.0-0ubuntu1, automatic), libtss2-esys-3.0.2-0t64:amd64 (4.1.3-6, automatic), libgpgmepp7:amd64 (2.0.0-2, automatic), udev:amd64 (259.5-0ubuntu3.4, automatic), libvpl2:amd64 (1:2.16.0-1, automatic), libserd-0-0:amd64 (0.32.6-1, automatic), libqt6webenginecore6-bin:amd64 (6.10.2+dfsg-1, automatic), libxxf86vm1:amd64 (1:1.1.4-2, automatic), libsnapd-glib-2-1:amd64 (1.72-0ubuntu3, automatic), libcodec2-1.2:amd64 (1.2.0-4, automatic), kirigami-addons-data:amd64 (1.11.0-2ubuntu2, automatic), libsecret-1-0:amd64 (0.21.7-2build1, automatic), python3.14:amd64 (3.14.4-1ubuntu0.1, automatic), libltdl7:amd64 (2.5.4-9, automatic), qml6-module-org-kde-prison:amd64 (6.24.0-0ubuntu1, automatic), libmm-glib0:amd64 (1.25.95-1ubuntu1, automatic), libxcb-util1:amd64 (0.4.1-1build1, automatic), libkf6idletime6:amd64 (6.24.0-0ubuntu1, automatic), libkf6solid-data:amd64 (6.24.0-0ubuntu1, automatic), librubberband3:amd64 (4.0.0+dfsg-2ubuntu1, automatic), libstoken1t64:amd64 (0.93-1, automatic), libexiv2-data:amd64 (0.28.8+dfsg-1, automatic), linux-firmware-intel-graphics:amd64 (20260319.git217ca6e4-0ubuntu2.1, automatic), libffi8:amd64 (3.5.2-4, automatic), libsharpyuv0:amd64 (1.5.0-0.1build1, automatic), linux-main-modules-zfs-7.0.0-30-generic:amd64 (7.0.0-30.30, automatic), libgssapi-krb5-2:amd64 (1.22.1-2ubuntu4.1, automatic), netbase:amd64 (6.5build1, automatic), libwacom9:amd64 (2.18.0-1, automatic), libimobiledevice-glue-1.0-0:amd64 (1.3.2-2build1, automatic), dhcpcd-base:amd64 (1:10.3.0-7, automatic), readline-common:amd64 (8.3-4, automatic), libnghttp2-14:amd64 (1.68.0-2ubuntu0.2, automatic), libkf6package6:amd64 (6.24.0-0ubuntu1, automatic), libkaccounts6-2:amd64 (4:25.12.3-0ubuntu1, automatic), qt6-wayland:amd64 (6.10.2-4), libkf6newstuffwidgets6:amd64 (6.24.0-0ubuntu1, automatic), libtss2-tcti-cmd0t64:amd64 (4.1.3-6, automatic), libkf6service6:amd64 (6.24.0-0ubuntu1, automatic), iputils-ping:amd64 (3:20250605-1ubuntu1, automatic), libglx-mesa0:amd64 (26.0.8-1ubuntu0.3, automatic), libtwolame0:amd64 (0.4.0-2build4, automatic), libkf6su-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6textwidgets-data:amd64 (6.24.0-0ubuntu1, automatic), libzvbi-common:amd64 (0.2.44-1ubuntu2, automatic), qml6-module-org-kde-iconthemes:amd64 (6.24.0-0ubuntu2, automatic), libkf6purposewidgets6:amd64 (6.24.0-0ubuntu1, automatic), libtheoraenc2:amd64 (1.2.0+dfsg-6, automatic), libkf6kcmutils6:amd64 (6.24.0-0ubuntu1, automatic), libqt6quickwidgets6:amd64 (6.10.2+dfsg-3, automatic), libkf6bookmarkswidgets6:amd64 (6.24.0-0ubuntu1, automatic), libaccounts-qt6-1:amd64 (1.17-4ubuntu2, automatic), libkf6itemviews6:amd64 (6.24.0-0ubuntu1, automatic), python3-pyside6.qtdbus:amd64 (6.10.2-6ubuntu1), libdatrie1:amd64 (0.2.14-1, automatic), libthai0:amd64 (0.1.30-1, automatic), libquickcharts1:amd64 (6.24.0-0ubuntu1, automatic), qml6-module-qtqml-workerscript:amd64 (6.10.2+dfsg-3, automatic), libssh-4:amd64 (0.11.3-1ubuntu2.1, automatic), bubblewrap:amd64 (0.11.1-1ubuntu0.1, automatic), libwacom-common:amd64 (2.18.0-1, automatic), libpackagekitqt6-2:amd64 (1.1.4-1, automatic), xkb-data:amd64 (2.46-2, automatic), qml6-module-qt-labs-qmlmodels:amd64 (6.10.2+dfsg-3, automatic), libxrender1:amd64 (1:0.9.12-1build1, automatic), dbus-user-session:amd64 (1.16.2-2ubuntu4), libldap2:amd64 (2.6.10+dfsg-1ubuntu5, automatic), libkf6sonnetcore6:amd64 (6.24.0-0ubuntu1, automatic), libkf6svg6:amd64 (6.24.0-0ubuntu1, automatic), libglvnd0:amd64 (1.7.0-3, automatic), qml6-module-org-kde-kirigamiaddons-components:amd64 (1.11.0-2ubuntu2, automatic), qml6-module-qtqml-models:amd64 (6.10.2+dfsg-3, automatic), libproxy1v5:amd64 (0.5.12-1, automatic), libqt6wlshellintegration6:amd64 (6.10.2+dfsg-7, automatic), libkdecorations3-6:amd64 (4:6.6.4-0ubuntu1, automatic), libsensors-config:amd64 (1:3.6.2-2build1, automatic), libtirpc3t64:amd64 (1.3.7-0.1, automatic), casper:amd64 (26.04.2), gpg:amd64 (2.4.8-4ubuntu3, automatic), libkf6notifyconfig6:amd64 (6.24.0-0ubuntu1, automatic), libqt6quicktemplates2-6:amd64 (6.10.2+dfsg-3, automatic), libqt6quickshapes6:amd64 (6.10.2+dfsg-3, automatic), libtirpc-common:amd64 (1.3.7-0.1, automatic), libxcb-image0:amd64 (0.4.0-2build2, automatic), libtss2-sys1t64:amd64 (4.1.3-6, automatic), tzdata:amd64 (2026c-0ubuntu0.26.04.1, automatic), libx11-xcb1:amd64 (2:1.8.13-1, automatic), libxshmfence1:amd64 (1.3.3-1build1, automatic), libkf6dbusaddons6:amd64 (6.24.0-0ubuntu1, automatic), libkf6wallet6:amd64 (6.24.0-0ubuntu1, automatic), libdecor-0-0:amd64 (0.2.5-1, automatic), kwin-wayland:amd64 (4:6.6.6-0ubuntu0.1), libmagic-mgc:amd64 (1:5.46-5build2, automatic), libpango-1.0-0:amd64 (1.57.0-1, automatic), iucode-tool:amd64 (2.3.1-3build2, automatic), python3-pyside6.qtnetwork:amd64 (6.10.2-6ubuntu1, automatic), libunistring5:amd64 (1.3-2build1, automatic), libkirigamitemplates6:amd64 (6.24.0-0ubuntu1, automatic), kbd:amd64 (2.7.1-2ubuntu2, automatic), libidn2-0:amd64 (2.3.8-4build1, automatic), libexiv2-28:amd64 (0.28.8+dfsg-1, automatic), python3-cffi-backend:amd64 (2.0.0-3build1, automatic), libldap-common:amd64 (2.6.10+dfsg-1ubuntu5, automatic), libwavpack1:amd64 (5.9.0-1, automatic), libkirigamilayouts6:amd64 (6.24.0-0ubuntu1, automatic), libflac14:amd64 (1.5.0+ds-5, automatic), libtasn1-6:amd64 (4.21.0-2, automatic), libxcb-composite0:amd64 (1.17.0-2ubuntu1, automatic), libsrt1.5-gnutls:amd64 (1.5.4-3, automatic), libdisplay-info3:amd64 (0.3.0-1, automatic), libkf6prisonscanner6:amd64 (6.24.0-0ubuntu1, automatic), libxcb-icccm4:amd64 (0.4.2-1build1, automatic), python3-minimal:amd64 (3.14.3-0ubuntu2, automatic), chrony:amd64 (4.8-2ubuntu1, automatic), sudo-common:amd64 (1.2ubuntu, automatic), libxkbfile1:amd64 (1:1.1.0-1build5, automatic), libpam-systemd:amd64 (259.5-0ubuntu3.4, automatic), libkpipewiredmabuf6:amd64 (6.6.4-0ubuntu1, automatic), libkf6i18n-data:amd64 (6.24.0-0ubuntu1, automatic), pipewire-pulse:amd64 (1.6.2-1ubuntu1.1), libkf6baloo6:amd64 (6.24.0-0ubuntu1, automatic), qml6-module-org-kde-config:amd64 (6.24.0-0ubuntu1, automatic), liblzo2-2:amd64 (2.10-3build2, automatic), libwayland-cursor0:amd64 (1.24.0-2, automatic), kscreen:amd64 (4:6.6.5-0ubuntu0.1), libmbedcrypto16:amd64 (3.6.5-0.1ubuntu2, automatic), libkf6kiogui6:amd64 (6.24.0-0ubuntu1, automatic), libkf6kcmutils-data:amd64 (6.24.0-0ubuntu1, automatic), libkirigamiprivate6:amd64 (6.24.0-0ubuntu1, automatic), libx264-165:amd64 (2:0.165.3222+gitb35605ac-3build1, automatic), libshine3:amd64 (3.1.1-3build1, automatic), libkf6configwidgets-data:amd64 (6.24.0-0ubuntu1, automatic), libepub0:amd64 (0.2.2-8, automatic), libts0t64:amd64 (1.22-1.1build2, automatic), libkf6userfeedbackwidgets6:amd64 (6.24.0-0ubuntu1, automatic), usb.ids:amd64 (2025.12.13-1, automatic), libkpipewire6:amd64 (6.6.4-0ubuntu1, automatic), libharfbuzz-subset0:amd64 (12.3.2-2, automatic), libaom3:amd64 (3.13.1-2, automatic), libhogweed6t64:amd64 (3.10.2-1, automatic), libkf6filemetadata-bin:amd64 (6.24.0-0ubuntu1, automatic), libjpeg-turbo8:amd64 (2.1.5-4ubuntu4, automatic), libkpipewirerecord6:amd64 (6.6.4-0ubuntu1, automatic), libqt6quick6:amd64 (6.10.2+dfsg-3, automatic), libkf6windowsystem-data:amd64 (6.24.0-0ubuntu1, automatic), libv4l-0t64:amd64 (1.32.0-2ubuntu1, automatic), libkf6kiowidgets6:amd64 (6.24.0-0ubuntu1, automatic), ucf:amd64 (3.0052ubuntu1, automatic), libqt6network6:amd64 (6.10.2+dfsg-7, automatic), libavahi-common-data:amd64 (0.8-18ubuntu1.1, automatic), libheif1:amd64 (1.21.2-3ubuntu0.4, automatic), libcap2-bin:amd64 (1:2.75-10ubuntu2, automatic), libkf6configwidgets6:amd64 (6.24.0-0ubuntu1, automatic), libkf6doctools6:amd64 (6.24.0-0ubuntu1, automatic), libkf6auth-data:amd64 (6.24.0-0ubuntu1, automatic), whiptail:amd64 (0.52.25-1ubuntu3, automatic), libpsl5t64:amd64 (0.21.2-1.1build2, automatic), kwallet6:amd64 (6.24.0-0ubuntu1, automatic), libass9:amd64 (1:0.17.4-2, automatic), libsasl2-2:amd64 (2.1.28+dfsg1-9ubuntu3, automatic), libxcb-dri3-0:amd64 (1.17.0-2ubuntu1, automatic), libplasmaactivities7:amd64 (6.6.4-0ubuntu1, automatic), libx265-215:amd64 (4.1-4, automatic), libcairo2:amd64 (1.18.4-3, automatic), libgbm1:amd64 (26.0.8-1ubuntu0.3, automatic), libpciaccess0:amd64 (0.18.1-1ubuntu4.1, automatic), libbluray3:amd64 (1:1.4.1-1, automatic), libkf6colorscheme6:amd64 (6.24.0-0ubuntu1, automatic), libkf6codecs-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6guiaddons-data:amd64 (6.24.0-0ubuntu1.1, automatic), libvorbisfile3:amd64 (1.3.7-3build2, automatic), libexpat1:amd64 (2.7.4-1, automatic), libp11-kit0:amd64 (0.26.2-2, automatic), python3-netplan:amd64 (1.2-1ubuntu5, automatic), linux-modules-7.0.0-30-generic:amd64 (7.0.0-30.30, automatic), kio6:amd64 (6.24.0-0ubuntu1, automatic), qml6-module-org-kde-kitemmodels:amd64 (6.24.0-0ubuntu1, automatic), libqt6shadertools6:amd64 (6.10.2-1, automatic), libplasmaactivities-data:amd64 (6.6.4-0ubuntu1, automatic), libdv4t64:amd64 (1.0.0-17.1build2, automatic), initramfs-tools-bin:amd64 (0.151ubuntu1, automatic), xdg-desktop-portal-kde:amd64 (6.6.6-0ubuntu0.1), libtss2-tcti-libtpms0t64:amd64 (4.1.3-6, automatic), libdeflate0:amd64 (1.23-2ubuntu1, automatic), libpyside6-py3-6.10:amd64 (6.10.2-6ubuntu1, automatic), libqrencode4:amd64 (4.1.1-2build1, automatic), linux-firmware-intel-wireless:amd64 (20260319.git217ca6e4-0ubuntu2.1, automatic), libjpeg8:amd64 (8c-2ubuntu12, automatic), libpython3.14-minimal:amd64 (3.14.4-1ubuntu0.1, automatic), x11-common:amd64 (1:7.7+26ubuntu1, automatic), kwayland6-data:amd64 (4:6.6.4-0ubuntu1, automatic), libiec61883-0:amd64 (1.2.0-8, automatic), kmod:amd64 (34.2-2ubuntu2, automatic), linux-firmware-amd-misc:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), libxcb-record0:amd64 (1.17.0-2ubuntu1, automatic), sse3-support:amd64 (27ubuntu2, automatic), qml6-module-org-kde-kirigamiaddons-treeview:amd64 (1.11.0-2ubuntu2, automatic), libbs2b0:amd64 (3.1.0+dfsg-8build1, automatic), libfftw3-double3:amd64 (3.3.10-2fakesync1build3, automatic), libqt5x11extras5:amd64 (5.15.18-1, automatic), libwayland-server0:amd64 (1.24.0-2, automatic), libkf6coreaddons-data:amd64 (6.24.0-0ubuntu1, automatic), libglx0:amd64 (1.7.0-3, automatic), libqt6core6t64:amd64 (6.10.2+dfsg-7, automatic), dbus-daemon:amd64 (1.16.2-2ubuntu4, automatic), libopencv-imgproc410:amd64 (4.10.0+dfsg-7ubuntu5, automatic), libgme0:amd64 (0.6.4-1, automatic), libxml2-16:amd64 (2.15.2+dfsg-0.1ubuntu0.1, automatic), libdav1d7:amd64 (1.5.3-1, automatic), libcaca0:amd64 (0.99.beta20-6ubuntu2.1, automatic), libqaccessibilityclient-qt6-0:amd64 (0.6.0-4ubuntu1, automatic), libqt6qml6:amd64 (6.10.2+dfsg-3, automatic), libjansson4:amd64 (2.14-2build4, automatic), libfribidi0:amd64 (1.0.16-5, automatic), mesa-libgallium:amd64 (26.0.8-1ubuntu0.3, automatic), libkf6colorscheme-data:amd64 (6.24.0-0ubuntu1, automatic), libraw1394-11:amd64 (2.1.2-2build4, automatic), librtmp1:amd64 (2.4+20151223.gitfa8646d.1-3, automatic), liblua5.4-0:amd64 (5.4.8-1build1, automatic), libpowerdevilcore2:amd64 (4:6.6.6-0ubuntu0.1, automatic), libkf6sonnet-data:amd64 (6.24.0-0ubuntu1, automatic), libgpm2:amd64 (1.20.7-12build1, automatic), vim-common:amd64 (2:9.1.2141-1ubuntu4.8, automatic), libkirigamicontrols6:amd64 (6.24.0-0ubuntu1, automatic), libwebpdemux2:amd64 (1.5.0-0.1build1, automatic), user-session-migration:amd64 (0.5.1, automatic), libtiff6:amd64 (4.7.0-3ubuntu5, automatic), libgfortran5:amd64 (16-20260322-1ubuntu1, automatic), libinput10:amd64 (1.31.1-1ubuntu1.1, automatic), libkf6statusnotifieritem-data:amd64 (6.24.0-0ubuntu1, automatic), libpixman-1-0:amd64 (0.46.4-1, automatic), linux-image-7.0.0-30-generic:amd64 (7.0.0-30.30, automatic), libkf6windowsystem6:amd64 (6.24.0-0ubuntu1, automatic), libplist-2.0-4:amd64 (2.7.0+git20250820-1build1, automatic), libvidstab1.1:amd64 (1.1.0-2.1, automatic), libfreetype6:amd64 (2.14.2+dfsg-1ubuntu0.1, automatic), libqt6widgets6:amd64 (6.10.2+dfsg-7, automatic), pci.ids:amd64 (0.0~2026.02.12-1, automatic), libva-x11-2:amd64 (2.23.0-1ubuntu1, automatic), librist4:amd64 (0.2.11+dfsg-1build1, automatic), libgsm1:amd64 (1.0.23-2, automatic), libcjson1:amd64 (1.7.19-2, automatic), libshout3:amd64 (2.4.6-1build3, automatic), libxau6:amd64 (1:1.0.11-1build2, automatic), libxaw7:amd64 (2:1.0.16-1build1, automatic), file:amd64 (1:5.46-5build2, automatic), libminizip1t64:amd64 (1:1.3.dfsg+really1.3.1-1ubuntu3.1, automatic), libkf6parts-data:amd64 (6.24.0-0ubuntu1, automatic), libpopt0:amd64 (1.19+dfsg-2build1, automatic), libqt6quickcontrols2-6:amd64 (6.10.2+dfsg-3, automatic), libxcb1:amd64 (1.17.0-2ubuntu1, automatic), libapparmor1:amd64 (5.0.2-0ubuntu1~26.04.1, automatic), libwbclient0:amd64 (2:4.23.6+dfsg-1ubuntu2.2, automatic), libllvm21:amd64 (1:21.1.8-6ubuntu1, automatic), libxcomposite1:amd64 (1:0.4.6-1build1, automatic), libnuma1:amd64 (2.0.19-1build1, automatic), libreadline8t64:amd64 (8.3-4, automatic), libplasmaquick7:amd64 (6.6.6-0ubuntu0.1, automatic), libkf6completion-data:amd64 (6.24.0-0ubuntu1, automatic), libtomcrypt1:amd64 (1.18.2+dfsg-7build2, automatic), libsvtav1enc2:amd64 (2.3.0+dfsg-1build1, automatic), libkf6package-data:amd64 (6.24.0-0ubuntu1, automatic), python3:amd64 (3.14.3-0ubuntu2), linux-firmware-nvidia-graphics:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), libdbus-1-3:amd64 (1.16.2-2ubuntu4, automatic), wireless-regdb:amd64 (2026.02.04-0ubuntu1, automatic), pipewire:amd64 (1.6.2-1ubuntu1.1), libxdamage1:amd64 (1:1.1.7-1, automatic), libusbmuxd-2.0-7:amd64 (2.1.1-1, automatic), libgdk-pixbuf-2.0-0:amd64 (2.44.5+dfsg-4ubuntu1, automatic), linux-firmware-mediatek:amd64 (20260319.git217ca6e4-0ubuntu1.2, automatic), libkf6i18n6:amd64 (6.24.0-0ubuntu1, automatic), dbus-bin:amd64 (1.16.2-2ubuntu4, automatic), libkirigami6:amd64 (6.24.0-0ubuntu1, automatic), libkf6codecs6:amd64 (6.24.0-0ubuntu1, automatic), gnupg:amd64 (2.4.8-4ubuntu3, automatic), libsasl2-modules-db:amd64 (2.1.28+dfsg1-9ubuntu3, automatic), libkf6bluezqt6:amd64 (6.24.0-0ubuntu1, automatic), dracut-install:amd64 (110-11, automatic), powerdevil:amd64 (4:6.6.6-0ubuntu0.1), libkrb5support0:amd64 (1.22.1-2ubuntu4.1, automatic), libkf6bluezqt-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6userfeedbackcore6:amd64 (6.24.0-0ubuntu1, automatic), libkf6modemmanagerqt6:amd64 (6.23.0-0ubuntu1, automatic), libcairo-gobject2:amd64 (1.18.4-3, automatic), libopencv-core410:amd64 (4.10.0+dfsg-7ubuntu5, automatic), libkf6jobwidgets6:amd64 (6.24.0-0ubuntu1, automatic), liblerc4:amd64 (4.0.0+ds-5ubuntu2, automatic), libbpf1:amd64 (1:1.6.3-1ubuntu1, automatic), libmnl0:amd64 (1.0.5-3build1, automatic), isa-support:amd64 (27ubuntu2, automatic), libxmu6:amd64 (2:1.1.3-4, automatic), libqt6webengine6-data:amd64 (6.10.2+dfsg-1, automatic), libkf6solid6:amd64 (6.24.0-0ubuntu1, automatic), libkquickimageeditor1:amd64 (0.6.0-2ubuntu0.1, automatic), qml6-module-org-kde-kquickimageeditor:amd64 (0.6.0-2ubuntu0.1, automatic), libgraphite2-3:amd64 (1.3.14-11ubuntu1.1, automatic), linux-firmware-qualcomm-wireless:amd64 (20260319.git217ca6e4-0ubuntu1.2, automatic), libkf6bookmarks-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6kcmutilsquick6:amd64 (6.24.0-0ubuntu1, automatic), less:amd64 (668-1build1, automatic), python-apt-common:amd64 (3.1.0ubuntu1.1, automatic), libqt6dbus6:amd64 (6.10.2+dfsg-7, automatic), libdconf1:amd64 (0.49.0-4, automatic), libxpm4:amd64 (1:3.5.17-1ubuntu0.26.04.1, automatic), libfontconfig1:amd64 (2.17.1-3ubuntu1, automatic), libdouble-conversion3:amd64 (3.4.0-1, automatic), libcups2t64:amd64 (2.4.16-1ubuntu1.3, automatic), qml6-module-org-kde-kcmutils:amd64 (6.24.0-0ubuntu1, automatic), libkf6runner6:amd64 (6.24.0-0ubuntu1, automatic), libgpgme45:amd64 (2.0.1-2build1, automatic), libvdpau1:amd64 (1.5-4, automatic), psmisc:amd64 (23.7-2ubuntu2, automatic), systemd:amd64 (259.5-0ubuntu3.4, automatic), libdmtx0t64:amd64 (0.7.8-1, automatic), gpg-agent:amd64 (2.4.8-4ubuntu3, automatic), console-setup-linux:amd64 (1.237ubuntu3.1, automatic), libtbbbind-2-5:amd64 (2022.3.0-2, automatic), libxss1:amd64 (1:1.2.3-1build4, automatic), libxcvt0:amd64 (0.1.3-1build1, automatic), shared-mime-info:amd64 (2.4-5build3, automatic), libclang1-21:amd64 (1:21.1.8-6ubuntu1, automatic), libqt6webchannel6:amd64 (6.10.2-1, automatic), dolphin:amd64 (4:25.12.3-0ubuntu1), dolphin-data:amd64 (4:25.12.3-0ubuntu1, automatic), liblocale-gettext-perl:amd64 (1.07-8, automatic), libnettle8t64:amd64 (3.10.2-1, automatic), libkf6globalaccel6:amd64 (6.24.0-0ubuntu1, automatic), glib-networking-common:amd64 (2.80.1-1build2, automatic), fdisk:amd64 (2.41.3-3ubuntu2.2, automatic), libkf6purpose-data:amd64 (6.24.0-0ubuntu1, automatic), libgl1-mesa-dri:amd64 (26.0.8-1ubuntu0.3, automatic), linux-firmware-intel-misc:amd64 (20260319.git217ca6e4-0ubuntu1.2, automatic), libcurl3t64-gnutls:amd64 (8.18.0-1ubuntu2.4, automatic), libyaml-0-2:amd64 (0.2.5-2build3, automatic), libxmlsec1-openssl1:amd64 (1.3.9-1, automatic), libheif-plugin-aomdec:amd64 (1.21.2-3ubuntu0.4, automatic), libasound2t64:amd64 (1.2.15.3-1ubuntu1.1, automatic), libkf6su6:amd64 (6.24.0-0ubuntu1, automatic), libarchive13t64:amd64 (3.8.5-1ubuntu2.2, automatic), qml6-module-qtmultimedia:amd64 (6.10.2-2, automatic), libxrandr2:amd64 (2:1.5.4-1build1, automatic), libjxl0.11:amd64 (0.11.1-6ubuntu4.2, automatic), libtss2-tcti-spi-helper0t64:amd64 (4.1.3-6, automatic), libxfont2:amd64 (1:2.0.6-2ubuntu0.2, automatic), libqt6printsupport6:amd64 (6.10.2+dfsg-7, automatic), libfontenc1:amd64 (1:1.1.8-1build2, automatic), fontconfig-config:amd64 (2.17.1-3ubuntu1, automatic), libfdisk1:amd64 (2.41.3-3ubuntu2.2, automatic), libkf6syndication6:amd64 (6.24.0-0ubuntu1, automatic), libkf6balooengine6:amd64 (6.24.0-0ubuntu1, automatic), libmp3lame0:amd64 (3.101~svn6525+dfsg-2, automatic), libkf6baloowidgets6:amd64 (4:25.12.3-0ubuntu1, automatic), libassuan9:amd64 (3.0.2-2build1, automatic), libsoxr0:amd64 (0.1.3-4.1, automatic), libfftw3-single3:amd64 (3.3.10-2fakesync1build3, automatic), libdrm-common:amd64 (2.4.131-1, automatic), libx11-data:amd64 (2:1.8.13-1, automatic), eject:amd64 (2.41.3-3ubuntu2.2, automatic), libsoup-3.0-0:amd64 (3.6.6-1, automatic), usbutils:amd64 (1:019-1, automatic), libgudev-1.0-0:amd64 (1:238-7build1, automatic), libkf6purpose6:amd64 (6.24.0-0ubuntu1, automatic), libkirigamidialogs6:amd64 (6.24.0-0ubuntu1, automatic), libkf6iconwidgets6:amd64 (6.24.0-0ubuntu2, automatic), libavc1394-0:amd64 (0.5.4-5build4, automatic), libsodium23:amd64 (1.0.18-2, automatic), libcap2:amd64 (1:2.75-10ubuntu2, automatic), libssh2-1t64:amd64 (1.11.1-1ubuntu0.26.04.3, automatic), libqt5gui5t64:amd64 (5.15.18+dfsg-1ubuntu1, automatic), libudfread3:amd64 (1.2.0-2, automatic), linux-firmware-realtek:amd64 (20260319.git217ca6e4-0ubuntu1.2, automatic), libfuse3-4:amd64 (3.18.2-1, automatic), libkscreenlocker6:amd64 (6.6.5-0ubuntu0.1, automatic), libjson-glib-1.0-common:amd64 (1.10.8+ds-2, automatic), libpulse-mainloop-glib0:amd64 (1:17.0+dfsg1-2ubuntu4, automatic), qml6-module-qtquick-shapes:amd64 (6.10.2+dfsg-3, automatic), locales:amd64 (2.43-2ubuntu2.3, automatic), libkirigamiprimitives6:amd64 (6.24.0-0ubuntu1, automatic), libqt6gui6:amd64 (6.10.2+dfsg-7, automatic), libpcre2-16-0:amd64 (10.46-1build1, automatic), libkf6notifications6:amd64 (6.24.0-0ubuntu1, automatic), klibc-utils:amd64 (2.0.14-1ubuntu2, automatic), libsnappy1v5:amd64 (1.2.2-2, automatic), libopus0:amd64 (1.6.1-1, automatic), libxt6t64:amd64 (1:1.2.1-1.3build1, automatic), libkf6notifyconfig-data:amd64 (6.24.0-0ubuntu1, automatic), libpangocairo-1.0-0:amd64 (1.57.0-1, automatic), libqt6multimedia6:amd64 (6.10.2-2, automatic), libndp0:amd64 (1.9-1build1, automatic), libxkbcommon0:amd64 (1.13.1-1, automatic), libnorm1t64:amd64 (1.5.9+dfsg-4, automatic), libxtst6:amd64 (2:1.2.5-1build1, automatic), libuv1t64:amd64 (1.51.0-2ubuntu1, automatic), libkrb5-3:amd64 (1.22.1-2ubuntu4.1, automatic), glib-networking-services:amd64 (2.80.1-1build2, automatic), lzma:amd64 (25.00+dfsg-1, automatic), libmysofa1:amd64 (1.3.3+dfsg-1ubuntu2, automatic), libkf6itemmodels6:amd64 (6.24.0-0ubuntu1, automatic), libkf6service-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6notifications-data:amd64 (6.24.0-0ubuntu1, automatic), sudo-rs:amd64 (0.2.13-0ubuntu1, automatic), libpcsclite1:amd64 (2.4.1-1, automatic), libavcodec62:amd64 (7:8.0.1-3ubuntu2, automatic), libzimg2:amd64 (3.0.6+ds1-1, automatic), libxcb-render0:amd64 (1.17.0-2ubuntu1, automatic), linux-firmware-qlogic:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), qml6-module-qtcore:amd64 (6.10.2+dfsg-3, automatic), glycin-loaders:amd64 (2.1.1+ds-0ubuntu1, automatic), libkirigamiplatform6:amd64 (6.24.0-0ubuntu1, automatic), linux-base:amd64 (4.15ubuntu5, automatic), xserver-common:amd64 (2:21.1.22-1ubuntu1, automatic), libkf6configcore6:amd64 (6.24.0-0ubuntu1, automatic), libusb-1.0-0:amd64 (2:1.0.29-2build1, automatic), xwayland:amd64 (2:24.1.10-1, automatic), libvisual-0.4-0:amd64 (0.4.2-4, automatic), libtext-charwidth-perl:amd64 (0.04-11build4, automatic), libzvbi0t64:amd64 (0.2.44-1ubuntu2, automatic), qml6-module-qtquick-dialogs:amd64 (6.10.2+dfsg-3, automatic), gsettings-desktop-schemas:amd64 (50.0-1ubuntu2, automatic), libkirigamilayoutsprivate6:amd64 (6.24.0-0ubuntu1, automatic), libkf6userfeedback-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6pty6:amd64 (6.24.0-0ubuntu1, automatic), media-types:amd64 (14.0.0build1, automatic), libdvdread8t64:amd64 (7.0.1-1, automatic), gstreamer1.0-plugins-good:amd64 (1.28.2-2ubuntu0.1, automatic), libqt6xml6:amd64 (6.10.2+dfsg-7, automatic), libteamdctl0:amd64 (1.31-1build4, automatic), kded6:amd64 (6.24.0-0ubuntu1, automatic), uuid-runtime:amd64 (2.41.3-3ubuntu2.2, automatic), libpython3.14-stdlib:amd64 (3.14.4-1ubuntu0.1, automatic), gstreamer1.0-plugins-base:amd64 (1.28.2-1, automatic), libkf6sonnetui6:amd64 (6.24.0-0ubuntu1, automatic), konsole:amd64 (4:25.12.3-0ubuntu1), libavfilter11:amd64 (7:8.0.1-3ubuntu2, automatic), libklibc:amd64 (2.0.14-1ubuntu2, automatic), vim-tiny:amd64 (2:9.1.2141-1ubuntu4.8, automatic), libshiboken6-py3-6.10:amd64 (6.10.2-6ubuntu1, automatic), qml6-module-qtquick-layouts:amd64 (6.10.2+dfsg-3, automatic), libtag2:amd64 (2.2.1-3, automatic), libice6:amd64 (2:1.1.1-1build1, automatic), libappimage1.0abi1t64:amd64 (1.0.4-5-7build1, automatic), network-manager:amd64 (1.54.3-2ubuntu3), libpoppler156:amd64 (26.01.0-2ubuntu0.1, automatic), libkwin6:amd64 (4:6.6.6-0ubuntu0.1, automatic), libkf6xmlgui-data:amd64 (6.24.0-0ubuntu1, automatic), libvorbisenc2:amd64 (1.3.7-3build2, automatic), fuse3:amd64 (3.18.2-1, automatic), libasyncns0:amd64 (0.8-7, automatic), libunibreak6:amd64 (6.1-3build1, automatic), busybox-initramfs:amd64 (1:1.37.0-7ubuntu1, automatic), libnss3:amd64 (2:3.120-1ubuntu2.1, automatic), libk5crypto3:amd64 (1.22.1-2ubuntu4.1, automatic), libpangoft2-1.0-0:amd64 (1.57.0-1, automatic), libqt6webenginewidgets6:amd64 (6.10.2+dfsg-1, automatic), libaccounts-glib0:amd64 (1.27-3, automatic), glycin-thumbnailers:amd64 (2.1.1+ds-0ubuntu1, automatic), libtheora1:amd64 (1.2.0+dfsg-6, automatic), linux-firmware-qualcomm-misc:amd64 (20260319.git217ca6e4-0ubuntu2.1, automatic), libxvidcore4:amd64 (2:1.3.7-3, automatic), libpolkit-gobject-1-0:amd64 (127-2ubuntu1, automatic), libkf6jobwidgets-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6breezeicons6:amd64 (6.24.0-0ubuntu1, automatic), linux-firmware-mellanox-spectrum:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), libtdb1:amd64 (2:1.4.14+samba4.23.6+dfsg-1ubuntu2.2, automatic), libqt6webenginecore6:amd64 (6.10.2+dfsg-1, automatic), libsquashfuse0:amd64 (0.5.2-0.3, automatic), libkf6screen8:amd64 (4:6.6.4-0ubuntu1, automatic), libxcb-keysyms1:amd64 (0.4.1-1build1, automatic), python3-apt:amd64 (3.1.0ubuntu1.1, automatic), dmsetup:amd64 (2:1.02.205-2ubuntu3, automatic), libsndfile1:amd64 (1.2.2-4, automatic), qml6-module-qtquick-tooling:amd64 (6.10.2+dfsg-3, automatic), python3-pyside6.qtgui:amd64 (6.10.2-6ubuntu1, automatic), libopengl0:amd64 (1.7.0-3, automatic), libavutil60:amd64 (7:8.0.1-3ubuntu2, automatic), libqt5widgets5t64:amd64 (5.15.18+dfsg-1ubuntu1, automatic), liborc-0.4-0t64:amd64 (1:0.4.42-2, automatic), libsqlite3-0:amd64 (3.46.1-9ubuntu0.2, automatic), libtext-wrapi18n-perl:amd64 (0.06-10, automatic), libkf6service-bin:amd64 (6.24.0-0ubuntu1, automatic), libkirigamipolyfill6:amd64 (6.24.0-0ubuntu1, automatic), libqmobipocket6-3:amd64 (4:25.12.3-0ubuntu1, automatic), pinentry-curses:amd64 (1.3.2-3ubuntu1, automatic), finalrd:amd64 (9build2, automatic), libwebp7:amd64 (1.5.0-0.1build1, automatic), libwebrtc-audio-processing-1-3:amd64 (1.3-3build2, automatic), libkpipewire-data:amd64 (6.6.4-0ubuntu1, automatic), libjson-c5:amd64 (0.18+ds-3, automatic), gpgsm:amd64 (2.4.8-4ubuntu3, automatic), pipewire-bin:amd64 (1.6.2-1ubuntu1.1, automatic), qml6-module-qtquick:amd64 (6.10.2+dfsg-3, automatic), libxslt1.1:amd64 (1.1.45-0.1, automatic), libxcb-cursor0:amd64 (0.1.6-1, automatic), libswscale9:amd64 (7:8.0.1-3ubuntu2, automatic), linux-image-generic:amd64 (7.0.0-30.30), fonts-dejavu-mono:amd64 (2.37-8build1, automatic), libxdgutilsbasedir1.0.1:amd64 (1.0.1-3.2, automatic), libtss2-tctildr0t64:amd64 (4.1.3-6, automatic), dbus-session-bus-common:amd64 (1.16.2-2ubuntu4, automatic), libkf6filemetadata3:amd64 (6.24.0-0ubuntu1, automatic), libspeex1:amd64 (1.2.1-3build1, automatic), x11-xkb-utils:amd64 (7.7+9build1, automatic), libasound2-data:amd64 (1.2.15.3-1ubuntu1.1, automatic), adduser:amd64 (3.153ubuntu1, automatic), user-setup:amd64 (1.107ubuntu2, automatic), libxcb-res0:amd64 (1.17.0-2ubuntu1, automatic), distro-info-data:amd64 (0.72-0ubuntu0.26.04.1, automatic), libqt5svg5:amd64 (5.15.18-1, automatic), 3cpio:amd64 (0.14.0-1ubuntu1, automatic), libthai-data:amd64 (0.1.30-1, automatic), linux-firmware:amd64 (20260319.git217ca6e4.1ubuntu, automatic), python3-pyside6.qtqml:amd64 (6.10.2-6ubuntu1, automatic), libgstreamer1.0-0:amd64 (1.28.2-1, automatic), libkf6attica6:amd64 (6.24.0-0ubuntu1, automatic), libavahi-common3:amd64 (0.8-18ubuntu1.1, automatic), liboeffis1:amd64 (1.5.0-3, automatic), qml6-module-qtqml:amd64 (6.10.2+dfsg-3, automatic), ca-certificates:amd64 (20260601~26.04.1), librsvg2-2:amd64 (2.61.3+dfsg-3, automatic), qml6-module-org-kde-bluezqt:amd64 (6.24.0-0ubuntu1, automatic), libsamplerate0:amd64 (0.2.2-4build2, automatic), ocl-icd-libopencl1:amd64 (2.3.4-1, automatic), python3-pyside6.qtsvg:amd64 (6.10.2-6ubuntu1), libkf6iconthemes-data:amd64 (6.24.0-0ubuntu2, automatic), libkf6xmlgui6:amd64 (6.24.0-0ubuntu1, automatic), libtss2-tcti-mssim0t64:amd64 (4.1.3-6, automatic), qml6-module-qt5compat-graphicaleffects:amd64 (6.10.2-1, automatic), libkf6bookmarks6:amd64 (6.24.0-0ubuntu1, automatic), libqt6core5compat6:amd64 (6.10.2-1, automatic), libsignon-qt6-1:amd64 (8.61+git20231015.c8ad982-8, automatic), libxcb-glx0:amd64 (1.17.0-2ubuntu1, automatic), libqt5dbus5t64:amd64 (5.15.18+dfsg-1ubuntu1, automatic), libqt6uitools6:amd64 (6.10.2-1, automatic), libkf6prison6:amd64 (6.24.0-0ubuntu1, automatic), libqt6svg6:amd64 (6.10.2-2, automatic), plasma-nm:amd64 (4:6.6.6-0ubuntu0.1), plasma-pa:amd64 (4:6.6.5-0ubuntu0.1), libkf6kiocore6:amd64 (6.24.0-0ubuntu1, automatic), libkf6networkmanagerqt6:amd64 (6.24.0-0ubuntu1, automatic), libqt5network5t64:amd64 (5.15.18+dfsg-1ubuntu1, automatic), libkf6configqml6:amd64 (6.24.0-0ubuntu1, automatic), libbluetooth3:amd64 (5.85-4ubuntu0.1, automatic), libkf6filemetadata-data:amd64 (6.24.0-0ubuntu1, automatic), libogg0:amd64 (1.3.6-2, automatic), libboost-filesystem1.90.0:amd64 (1.90.0-6ubuntu1, automatic), libsord-0-0:amd64 (0.16.20-1, automatic), libkf6guiaddons6:amd64 (6.24.0-0ubuntu1.1, automatic), libqt6waylandcompositor6:amd64 (6.10.2-4, automatic), libkf6dbusaddons-data:amd64 (6.24.0-0ubuntu1, automatic), libqt6qmlmeta6:amd64 (6.10.2+dfsg-3, automatic), libjbig0:amd64 (2.1-6.1ubuntu3, automatic), qml6-module-org-kde-coreaddons:amd64 (6.24.0-0ubuntu1, automatic), libdolphinvcs6:amd64 (4:25.12.3-0ubuntu1, automatic), libflite1:amd64 (2.2-7build1, automatic), distro-info:amd64 (1.15, automatic), libopenjp2-7:amd64 (2.5.4-1ubuntu0.1, automatic), libwayland-egl1:amd64 (1.24.0-2, automatic), python3-pyside6.qtwidgets:amd64 (6.10.2-6ubuntu1, automatic), libcdparanoia0:amd64 (3.10.2+debian-14ubuntu2, automatic), libkf6config-data:amd64 (6.24.0-0ubuntu1, automatic), libpython3-stdlib:amd64 (3.14.3-0ubuntu2, automatic), kwin-style-aurorae:amd64 (6.6.6-0ubuntu0.1), qml6-module-org-kde-kirigamiaddons-delegates:amd64 (1.11.0-2ubuntu2, automatic), libxcb-shape0:amd64 (1.17.0-2ubuntu1, automatic), python3-pyside6.qtopengl:amd64 (6.10.2-6ubuntu1, automatic), libplacebo360:amd64 (7.360.0-3, automatic), qml6-module-org-kde-desktop:amd64 (6.24.0-0ubuntu1, automatic), libzix-0-0:amd64 (0.8.0-1, automatic), libvorbis0a:amd64 (1.3.7-3build2, automatic), libzip5:amd64 (1.11.4-2, automatic), libkf6newstuffcore6:amd64 (6.24.0-0ubuntu1, automatic), libvpx12:amd64 (1.16.0-3, automatic), libkf6walletbackend6:amd64 (6.24.0-0ubuntu1, automatic), sound-theme-freedesktop:amd64 (0.8-7build1, automatic), python3-yaml:amd64 (6.0.3-1build1, automatic), libjson-glib-1.0-0:amd64 (1.10.8+ds-2, automatic), liblayershellqtinterface6:amd64 (6.6.4-0ubuntu1, automatic), libqt6waylandclient6:amd64 (6.10.2+dfsg-7, automatic), libspa-0.2-modules:amd64 (1.6.2-1ubuntu1.1, automatic), libbrotli1:amd64 (1.2.0-3build1, automatic), libtommath1:amd64 (1.3.0-1build1, automatic), libtbbmalloc2:amd64 (2022.3.0-2, automatic), libzmq5:amd64 (4.3.5-1build3, automatic), libdrm-amdgpu1:amd64 (2.4.131-1, automatic), libqt6texttospeech6:amd64 (6.10.2-1, automatic), dconf-gsettings-backend:amd64 (0.49.0-4, automatic), libkf6pulseaudioqt5:amd64 (1.7.0-1build1, automatic), libdrm2:amd64 (2.4.131-1, automatic), qml6-module-org-kde-ksvg:amd64 (6.24.0-0ubuntu1, automatic), libchromaprint1:amd64 (1.6.0-2build1, automatic), qml6-module-org-kde-kirigami:amd64 (6.24.0-0ubuntu1), libkf6qqc2desktopstyle-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6archive-data:amd64 (6.24.0-0ubuntu1, automatic), libsensors5:amd64 (1:3.6.2-2build1, automatic), liblmdb0:amd64 (0.9.31-1build2, automatic), kde-spectacle:amd64 (4:6.6.6-0ubuntu0.1), sudo:amd64 (1.9.17p2-1ubuntu3, automatic), libqt6qmlmodels6:amd64 (6.10.2+dfsg-3, automatic), libxcb-randr0:amd64 (1.17.0-2ubuntu1, automatic), libkf6crash6:amd64 (6.24.0-0ubuntu1, automatic), libxdgutilsdesktopentry1.0.1:amd64 (1.0.1-3.2, automatic), libsystemd-shared:amd64 (259.5-0ubuntu3.4, automatic), libswresample6:amd64 (7:8.0.1-3ubuntu2, automatic), librabbitmq4:amd64 (0.15.0-1ubuntu0.26.04.1, automatic), netplan.io:amd64 (1.2-1ubuntu5, automatic), libxcb-damage0:amd64 (1.17.0-2ubuntu1, automatic), libpipewire-0.3-0t64:amd64 (1.6.2-1ubuntu1.1, automatic), keyboard-configuration:amd64 (1.237ubuntu3.1, automatic), libxcb-xkb1:amd64 (1.17.0-2ubuntu1, automatic), libqt6openglwidgets6:amd64 (6.10.2+dfsg-7, automatic), libkmod2:amd64 (34.2-2ubuntu2, automatic), libkwaylandclient6:amd64 (4:6.6.4-0ubuntu1, automatic), baloo6:amd64 (6.24.0-0ubuntu1, automatic), libxext6:amd64 (2:1.3.4-1build3, automatic), initramfs-tools:amd64 (0.151ubuntu1, automatic), qml6-module-qtquick-effects:amd64 (6.10.2+dfsg-3, automatic), libsoup-3.0-common:amd64 (3.6.6-1, automatic), libxcb-dpms0:amd64 (1.17.0-2ubuntu1, automatic), plasma-desktoptheme:amd64 (6.6.6-0ubuntu0.1, automatic), libgnutls30t64:amd64 (3.8.12-2ubuntu1.1, automatic), tpm-udev:amd64 (4.1.3-6, automatic), linux-firmware-misc:amd64 (20260319.git217ca6e4-0ubuntu2.2, automatic), libdvdnav4:amd64 (7.0.0-2, automatic), dirmngr:amd64 (2.4.8-4ubuntu3, automatic), libksba8:amd64 (1.6.7-2build1, automatic), libharfbuzz0b:amd64 (12.3.2-2, automatic), qt-style-kvantum-themes:amd64 (1.1.5-1, automatic), libtext-iconv-perl:amd64 (1.7-8.1, automatic), systemd-sysv:amd64 (259.5-0ubuntu3.4), libkscreen-bin:amd64 (4:6.6.4-0ubuntu1, automatic), libsecret-common:amd64 (0.21.7-2build1, automatic), qml6-module-org-kde-quickcharts:amd64 (6.24.0-0ubuntu1, automatic), fonts-dejavu-core:amd64 (2.37-8build1), libplasma7:amd64 (6.6.6-0ubuntu0.1, automatic), libkf6globalaccel-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6kiofilewidgets6:amd64 (6.24.0-0ubuntu1, automatic), libtss2-tcti-device0t64:amd64 (4.1.3-6, automatic), libhwloc15:amd64 (2.13.0-2, automatic), libavformat62:amd64 (7:8.0.1-3ubuntu2, automatic), libaa1:amd64 (1.4p5-51.1build1, automatic), liblilv-0-0:amd64 (0.26.2-1, automatic), libnpth0t64:amd64 (1.8-3build1, automatic), libmpg123-0t64:amd64 (1.33.3-2, automatic), libglycin-2-0:amd64 (2.1.1+ds-0ubuntu1, automatic), qml6-module-sso-onlineaccounts:amd64 (0.7+git20231028.05e79eb-7, automatic), libslang2:amd64 (2.3.3-5build1, automatic), libtheoradec2:amd64 (1.2.0+dfsg-6, automatic), libegl-mesa0:amd64 (26.0.8-1ubuntu0.3, automatic), libduktape207:amd64 (2.7.0+tests-0ubuntu4, automatic), libxcb-render-util0:amd64 (0.3.10-1build1, automatic), konsole-kpart:amd64 (4:25.12.3-0ubuntu1, automatic), libpskc0t64:amd64 (2.6.14-1, automatic), libva-drm2:amd64 (2.23.0-1ubuntu1, automatic), libpipewire-0.3-modules:amd64 (1.6.2-1ubuntu1.1, automatic), libkf6textwidgets6:amd64 (6.24.0-0ubuntu1, automatic), libkdecorations3private2:amd64 (4:6.6.4-0ubuntu1, automatic), libxcb-shm0:amd64 (1.17.0-2ubuntu1, automatic), libei1:amd64 (1.5.0-3, automatic), libpoppler-qt6-3t64:amd64 (26.01.0-2ubuntu0.1, automatic), libplymouth5:amd64 (24.004.60+git20250831.4a3c171d-0ubuntu8, automatic), amd64-microcode:amd64 (3.20251202.1ubuntu2, automatic), qml6-module-org-kde-kquickcontrolsaddons:amd64 (6.24.0-0ubuntu1, automatic), libqt6opengl6:amd64 (6.10.2+dfsg-7, automatic), dconf-service:amd64 (0.49.0-4, automatic), libgl1:amd64 (1.7.0-3, automatic), libegl1:amd64 (1.7.0-3, automatic), libinih1:amd64 (61-1ubuntu1, automatic), python3.14-minimal:amd64 (3.14.4-1ubuntu0.1, automatic), libkf6widgetsaddons-data:amd64 (6.24.0-0ubuntu1, automatic), libtss2-mu-4.0.1-0t64:amd64 (4.1.3-6, automatic), wireplumber:amd64 (0.5.13-1ubuntu1), kio-fuse:amd64 (5.1.1-1, automatic), libkf6purpose-bin:amd64 (6.24.0-0ubuntu1, automatic), libmd4c0:amd64 (0.5.2-2build1, automatic), libqcoro6dbus0t64:amd64 (0.13.0-1ubuntu2, automatic), kde-cli-tools-data:amd64 (4:6.6.4-0ubuntu1, automatic), libkf6iconthemes6:amd64 (6.24.0-0ubuntu2, automatic), libkf6archive6:amd64 (6.24.0-0ubuntu1, automatic), libx11-6:amd64 (2:1.8.13-1, automatic), ethtool:amd64 (1:6.19-1, automatic), libgstreamer-plugins-base1.0-0:amd64 (1.28.2-1, automatic), libkf6statusnotifieritem6:amd64 (6.24.0-0ubuntu1, automatic), libpolkit-qt6-1-1:amd64 (0.200.0-4ubuntu1, automatic), localechooser-data:amd64 (2.89ubuntu7, automatic), linux-firmware-netronome:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), linux-firmware-marvell-prestera:amd64 (20260319.git217ca6e4-0ubuntu1.2, automatic), libxmlsec1-1:amd64 (1.3.9-1, automatic), libwayland-client0:amd64 (1.24.0-2, automatic), libopenmpt0t64:amd64 (0.8.4-1, automatic), init:amd64 (1.69, automatic), libqt6qmlworkerscript6:amd64 (6.10.2+dfsg-3, automatic), libqca-qt6-2:amd64 (2.3.10-2, automatic), libmagic1t64:amd64 (1:5.46-5build2, automatic), libxkbcommon-x11-0:amd64 (1.13.1-1, automatic), liblcms2-2:amd64 (2.17-1ubuntu0.2, automatic), libroc0.4:amd64 (0.4.0+dfsg-5ubuntu3.1, automatic), libpng16-16t64:amd64 (1.6.57-1, automatic), dbus-system-bus-common:amd64 (1.16.2-2ubuntu4, automatic), qt6-style-kvantum:amd64 (1.1.5-1), libtss2-tcti-swtpm0t64:amd64 (4.1.3-6, automatic), qml6-module-qtquick-templates:amd64 (6.10.2+dfsg-3, automatic), libkf6completion6:amd64 (6.24.0-0ubuntu1, automatic), libkf6newstuff-data:amd64 (6.24.0-0ubuntu1, automatic), libnm0:amd64 (1.54.3-2ubuntu3, automatic), libtalloc2:amd64 (2:2.4.3+samba4.23.6+dfsg-1ubuntu2.2, automatic), libkf6configgui6:amd64 (6.24.0-0ubuntu1, automatic), libxcb-xinerama0:amd64 (1.17.0-2ubuntu1, automatic), dbus:amd64 (1.16.2-2ubuntu4, automatic), libepoxy0:amd64 (1.5.10-2build1, automatic), libxcb-xinput0:amd64 (1.17.0-2ubuntu1, automatic), libelf1t64:amd64 (0.194-4, automatic), libpgm-5.3-0t64:amd64 (5.3.128~dfsg-2.1build2, automatic), libxcb-sync1:amd64 (1.17.0-2ubuntu1, automatic), libedit2:amd64 (3.1-20251016-1, automatic), libicu78:amd64 (78.2-2ubuntu1, automatic), libkf6i18nqml6:amd64 (6.24.0-0ubuntu1, automatic), qml6-module-qtquick-controls:amd64 (6.10.2+dfsg-3), iproute2:amd64 (6.19.0-1ubuntu1.1, automatic), libnetplan1:amd64 (1.2-1ubuntu5, automatic), libspeexdsp1:amd64 (1.2.1-3build1, automatic), libavahi-client3:amd64 (0.8-18ubuntu1.1, automatic), gpgconf:amd64 (2.4.8-4ubuntu3, automatic), qt-style-kvantum:amd64 (1.1.5-1, automatic), glib-networking:amd64 (2.80.1-1build2, automatic), libdevmapper1.02.1:amd64 (2:1.02.205-2ubuntu3, automatic), libsm6:amd64 (2:1.2.6-1build1, automatic), libopenconnect5:amd64 (9.12-3.3, automatic), libnewt0.52:amd64 (0.52.25-1ubuntu3, automatic), libkglobalacceld0:amd64 (6.6.5-0ubuntu0.1, automatic), libcanberra0:amd64 (0.30-18ubuntu3, automatic), xdg-desktop-portal:amd64 (1.21.1+ds-1ubuntu3), python3-pyside6.qtquick:amd64 (6.10.2-6ubuntu1), qml6-module-org-kde-networkmanager:amd64 (6.24.0-0ubuntu1, automatic), linux-firmware-amd-graphics:amd64 (20260319.git217ca6e4-0ubuntu3.1, automatic), libva2:amd64 (2.23.0-1ubuntu1, automatic), libdrm-intel1:amd64 (2.4.131-1, automatic), netcat-openbsd:amd64 (1.234-1, automatic), intel-microcode:amd64 (3.20260210.1ubuntu2, automatic), libquickchartscontrols1:amd64 (6.24.0-0ubuntu1, automatic), libinireader0:amd64 (61-1ubuntu1, automatic), libkf6parts6:amd64 (6.24.0-0ubuntu1, automatic), libxfixes3:amd64 (1:6.0.0-2build2, automatic), powerdevil-data:amd64 (4:6.6.6-0ubuntu0.1, automatic), libxdmcp6:amd64 (1:1.1.5-2, automatic), libatomic1:amd64 (16-20260322-1ubuntu1, automatic), libncurses6:amd64 (6.6+20251231-1, automatic), libkirigami-data:amd64 (6.24.0-0ubuntu1, automatic), libkf6itemviews-data:amd64 (6.24.0-0ubuntu1, automatic), libxi6:amd64 (2:1.8.2-2, automatic), ubuntu-minimal:amd64 (1.570.3), libkworkspace6-6:amd64 (4:6.6.6-0ubuntu0.1, automatic), linux-firmware-marvell-wireless:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), libopenblas0-pthread:amd64 (0.3.32+ds-5, automatic), linux-firmware-qualcomm-graphics:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), libqt5core5t64:amd64 (5.15.18+dfsg-1ubuntu1, automatic), kde-cli-tools:amd64 (4:6.6.4-0ubuntu1, automatic), python3-pyside6.qtcore:amd64 (6.10.2-6ubuntu1, automatic), iso-codes:amd64 (4.20.1-1, automatic), qml6-module-org-kde-sonnet:amd64 (6.24.0-0ubuntu1, automatic), libkscreen-data:amd64 (4:6.6.4-0ubuntu1, automatic), openssl:amd64 (3.5.5-1ubuntu3.5, automatic), libglib2.0-0t64:amd64 (2.88.0-1, automatic), linux-firmware-broadcom-wireless:amd64 (20260319.git217ca6e4-0ubuntu1.1, automatic), libinput-bin:amd64 (1.31.1-1ubuntu1.1, automatic), libtbb12:amd64 (2022.3.0-2, automatic), librav1e0.8:amd64 (0.8.1-7, automatic), libkf6screendpms8:amd64 (4:6.6.4-0ubuntu1, automatic), mobile-broadband-provider-info:amd64 (20251101-1build1, automatic), libqt6positioning6:amd64 (6.10.2-1, automatic), libmtdev1t64:amd64 (1.1.7-1build1, automatic), libxcb-xfixes0:amd64 (1.17.0-2ubuntu1, automatic), ubuntu-pro-client:amd64 (37.2ubuntu0.1, automatic), libwireplumber-0.5-0:amd64 (0.5.13-1ubuntu1, automatic), libnspr4:amd64 (2:4.38.2-1ubuntu1, automatic), libevdev2:amd64 (1.13.6+dfsg-1, automatic), libkf6kcmutilscore6:amd64 (6.24.0-0ubuntu1, automatic), libsratom-0-0:amd64 (0.6.20-1, automatic), libgdk-pixbuf2.0-common:amd64 (2.44.5+dfsg-4ubuntu1, automatic)
+Upgrade: libsmartcols1:amd64 (2.41.3-3ubuntu2, 2.41.3-3ubuntu2.2), openssl-provider-legacy:amd64 (3.5.5-1ubuntu3, 3.5.5-1ubuntu3.5), libsystemd0:amd64 (259.5-0ubuntu3, 259.5-0ubuntu3.4), libmount1:amd64 (2.41.3-3ubuntu2, 2.41.3-3ubuntu2.2), libc-gconv-modules-extra:amd64 (2.43-2ubuntu2, 2.43-2ubuntu2.3), util-linux:amd64 (2.41.3-3ubuntu2, 2.41.3-3ubuntu2.2), libudev1:amd64 (259.5-0ubuntu3, 259.5-0ubuntu3.4), libc6:amd64 (2.43-2ubuntu2, 2.43-2ubuntu2.3), libuuid1:amd64 (2.41.3-3ubuntu2, 2.41.3-3ubuntu2.2), login:amd64 (1:4.16.0-2+really2.41.3-3ubuntu2, 1:4.16.0-2+really2.41.3-3ubuntu2.2), mount:amd64 (2.41.3-3ubuntu2, 2.41.3-3ubuntu2.2), libc-bin:amd64 (2.43-2ubuntu2, 2.43-2ubuntu2.3), libssl3t64:amd64 (3.5.5-1ubuntu3, 3.5.5-1ubuntu3.5), libblkid1:amd64 (2.41.3-3ubuntu2, 2.41.3-3ubuntu2.2), zlib1g:amd64 (1:1.3.dfsg+really1.3.1-1ubuntu3, 1:1.3.dfsg+really1.3.1-1ubuntu3.1), bsdutils:amd64 (1:2.41.3-3ubuntu2, 1:2.41.3-3ubuntu2.2)
+End-Date: 2026-08-31  17:24:27
+
+Start-Date: 2026-08-31  17:24:28
+Commandline: apt-get install -y --no-install-recommends kglobalacceld
+Install: kglobalacceld:amd64 (6.6.5-0ubuntu0.1)
+End-Date: 2026-08-31  17:24:28
+
+Start-Date: 2026-08-31  17:24:30
+Commandline: apt-get install -y --no-install-recommends libglib2.0-bin
+Install: libglib2.0-bin:amd64 (2.88.0-1), libglib2.0-data:amd64 (2.88.0-1, automatic)
+End-Date: 2026-08-31  17:24:30
+
+Start-Date: 2026-08-31  17:24:32
+Commandline: apt-get install -y --no-install-recommends git ca-certificates gtk-update-icon-cache xz-utils
+Install: libperl5.40:amd64 (5.40.1-7ubuntu0.1, automatic), libgdbm-compat4t64:amd64 (1.26-1build1, automatic), git:amd64 (1:2.53.0-1ubuntu1), perl:amd64 (5.40.1-7ubuntu0.1, automatic), libgdbm6t64:amd64 (1.26-1build1, automatic), xz-utils:amd64 (5.8.3-1), liberror-perl:amd64 (0.17030-1, automatic), gtk-update-icon-cache:amd64 (4.22.4+ds-0ubuntu0.1), perl-modules-5.40:amd64 (5.40.1-7ubuntu0.1, automatic), git-man:amd64 (1:2.53.0-1ubuntu1, automatic)
+Upgrade: perl-base:amd64 (5.40.1-7build1, 5.40.1-7ubuntu0.1)
+End-Date: 2026-08-31  17:24:33
