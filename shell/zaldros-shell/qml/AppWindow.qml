@@ -18,6 +18,10 @@ Item {
     signal backRequested()
     property bool active: true
     property bool maximized: false
+    // Snapped into a layout zone (Windows 11 snap layouts). A snapped window is not draggable:
+    // its geometry belongs to the zone until it is maximised or restored, exactly like a maximised
+    // one. Double-clicking the title bar takes it out of the zone.
+    property bool snapped: false
     property bool showTitleText: true
     // Windows 11 apps with tabs (Explorer) put the tab strip *in* the title bar and grow it to
     // 40 px; everything else keeps the 32 px bar. [{ title, glyph }]
@@ -39,6 +43,10 @@ Item {
     signal minimiseRequested()
     signal maximiseToggled()
     signal closeRequested()
+    // Windows 11 opens the snap layouts flyout when the pointer rests on the maximise button.
+    // The window cannot draw it (it would be clipped by the frame), so it reports the anchor point
+    // — the bottom centre of the button in the shell's coordinates — and the shell draws it.
+    signal snapMenuRequested(real anchorX, real anchorY)
 
     // --- drop shadow: three offset plates, because MultiEffect needs a GPU we cannot assume ----
     Repeater {
@@ -79,7 +87,7 @@ Item {
                 anchors.rightMargin: captionRow.width
                 onPressed: win.activateRequested()
                 onDoubleClicked: win.maximiseToggled()
-                drag.target: win.maximized ? null : win
+                drag.target: (win.maximized || win.snapped) ? null : win
                 drag.minimumX: 0
                 drag.minimumY: 0
                 drag.maximumX: win.parent ? win.parent.width - win.width : 0
@@ -238,11 +246,27 @@ Item {
                                    ? "#ffffff"
                                    : (win.active ? Theme.textPrimary : Theme.textSecondary)
                         }
+                        // Windows 11 opens the snap flyout after the pointer has rested on the
+                        // maximise button; a click before that still maximises, as it should.
+                        Timer {
+                            id: snapDelay
+                            interval: 400
+                            onTriggered: {
+                                var point = captionRow.mapToItem(win.parent, 0, 0);
+                                win.snapMenuRequested(point.x + btnArea.parent.x
+                                                      + Theme.captionWidth / 2,
+                                                      point.y + win.barHeight);
+                            }
+                        }
+
                         MouseArea {
                             id: btnArea
                             anchors.fill: parent
                             hoverEnabled: true
+                            onEntered: if (modelData.a === "max") snapDelay.restart()
+                            onExited: snapDelay.stop()
                             onClicked: {
+                                snapDelay.stop();
                                 if (modelData.a === "min") win.minimiseRequested();
                                 else if (modelData.a === "max") win.maximiseToggled();
                                 else win.closeRequested();

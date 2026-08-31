@@ -42,6 +42,8 @@ STATES = {
     "gamebar": {"game_bar_open": True},
     "menu": {"context_open": True},
     "settings": {"focused_window": "settings"},
+    "snap": {"snap_open": True},
+    "snapped": {"snap_zone": (0, 0), "snap_window": "explorer"},
 }
 
 # Component crops for the evidence sheet: name -> (state, padding)
@@ -54,6 +56,7 @@ CROPS = {
     "clipboardFlyout": ("clipboard", 12),
     "gameBarFlyout": ("gamebar", 12),
     "contextMenu": ("menu", 12),
+    "snapFlyout": ("snap", 12),
     "explorerWindow": ("desktop", 12),
     "settingsWindow": ("settings", 12),
 }
@@ -201,6 +204,46 @@ def collect_checks(geometry: dict[str, dict], reference: dict) -> list[Check]:
     # Windows centres the bar on the screen; so do we, and the render proves it rather than the code
     add("game bar", "bar centred", WIDTH / 2, toolbar["left"] + toolbar["width"] / 2,
         game_bar["tolerance"])
+
+    # --- snap layouts ---------------------------------------------------------------------------
+    snap = reference["snap_layouts"]
+    snap_state = geometry["snap"]
+    flyout = snap_state["snapFlyout"]
+    add("snap layouts", "panel width", snap["panel_width"], flyout["width"], snap["tolerance"])
+    add("snap layouts", "panel height", snap["panel_height"], flyout["height"], snap["tolerance"])
+    thumbs = [snap_state[f"snapThumb{index}"] for index in range(snap["layouts"])]
+    add("snap layouts", "layouts", snap["layouts"], len(thumbs), 0)
+    add("snap layouts", "thumb width", snap["thumb_width"], thumbs[0]["width"], snap["tolerance"])
+    add("snap layouts", "thumb height", snap["thumb_height"], thumbs[0]["height"],
+        snap["tolerance"])
+    add("snap layouts", "thumb gap", snap["thumb_gap"],
+        thumbs[1]["left"] - (thumbs[0]["left"] + thumbs[0]["width"]), snap["tolerance"])
+    add("snap layouts", "padding", snap["padding"], thumbs[0]["left"] - flyout["left"],
+        snap["tolerance"])
+    # Every zone of every layout, against the cell rectangles measured in the Windows capture.
+    for layout, zones in enumerate(snap["zones"]):
+        columns = sorted({zone[0] for zone in zones if zone[0] > 0})
+        rows = sorted({zone[1] for zone in zones if zone[1] > 0})
+        content_width = snap["thumb_width"] - snap["cell_gap"] * len(columns)
+        content_height = snap["thumb_height"] - snap["cell_gap"] * len(rows)
+        for index, zone in enumerate(zones):
+            box = snap_state[f"snapZone{layout}_{index}"]
+            inside_x = sum(1 for edge in columns if zone[0] < edge < zone[0] + zone[2] - 0.0001)
+            inside_y = sum(1 for edge in rows if zone[1] < edge < zone[1] + zone[3] - 0.0001)
+            add(f"snap zone {layout + 1}.{index + 1}", "width",
+                round(zone[2] * content_width) + snap["cell_gap"] * inside_x,
+                box["width"], snap["tolerance"])
+            add(f"snap zone {layout + 1}.{index + 1}", "height",
+                round(zone[3] * content_height) + snap["cell_gap"] * inside_y,
+                box["height"], snap["tolerance"])
+
+    # A snapped window really takes its zone: the left half of the work area, to the pixel.
+    snapped = geometry["snapped"]["explorerWindow"]
+    work_height = HEIGHT - reference["taskbar"]["height"]
+    add("snapped window", "left", 0, snapped["left"], 1)
+    add("snapped window", "top", 0, snapped["top"], 1)
+    add("snapped window", "width", WIDTH / 2, snapped["width"], 1)
+    add("snapped window", "height", work_height, snapped["height"], 1)
 
     menu = reference["context_menu"]
     menu_box = geometry["menu"]["contextMenu"]

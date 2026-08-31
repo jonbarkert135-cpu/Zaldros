@@ -134,6 +134,20 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
 _KEEPALIVE: list = []  # QML context properties must outlive the call; Python must hold a reference
 
 
+CAPTION_WIDTH = 46.0        # win11-reference.json → window.caption_button_width
+
+_WINDOW_OBJECTS = {"explorer": "explorerWindow", "settings": "settingsWindow",
+                   "taskmanager": "taskManagerWindow", "terminal": "terminalWindow",
+                   "devicemanager": "deviceManagerWindow"}
+
+
+def _snap_zone_rect(root, layout: int, zone: int) -> dict:
+    """The zone fractions the flyout would hand to applySnap, read out of the QML itself."""
+    flyout = root.findChild(QObject, "snapFlyout")
+    layouts = flyout.property("layouts").toVariant()
+    return layouts[layout][zone]
+
+
 def render(output: str, start_open: bool = False, width: int = 1600, height: int = 1000,
            locale: str = "ru", quick_open: bool = False, context_open: bool = False,
            light: bool = False, search_open: bool = False, notifications_open: bool = False,
@@ -141,6 +155,8 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
            focused_window: str = "explorer", settings_page: int = 1,
            task_manager_open: bool = False, task_manager_page: int = 0,
            device_manager_open: bool = False, terminal_open: bool = False,
+           snap_open: bool = False, snap_window: str = "explorer",
+           snap_zone: tuple[int, int] | None = None,
            geometry_output: str | None = None) -> str:
     """Render one frame to `output`. Returns the path. Raises if QML did not load."""
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -166,6 +182,20 @@ def render(output: str, start_open: bool = False, width: int = 1600, height: int
     root.setProperty("contextOpen", context_open)
     root.setProperty("focusedWindow", focused_window)
     root.setProperty("settingsPage", settings_page)
+    if snap_zone is not None:
+        # Snap the window the way a click on that thumbnail cell does, through the same QML path.
+        layout, zone = snap_zone
+        QMetaObject.invokeMethod(root, "applySnap",
+                                 Q_ARG("QVariant", snap_window),
+                                 Q_ARG("QVariant", _snap_zone_rect(root, layout, zone)))
+    if snap_open:
+        # Anchored like the flyout the maximise button of that window opens.
+        item = root.findChild(QObject, f"{_WINDOW_OBJECTS[snap_window]}")
+        anchor_x = (float(item.property("x")) + float(item.property("width"))
+                    - CAPTION_WIDTH * 1.5)
+        anchor_y = float(item.property("y")) + float(item.property("barHeight"))
+        QMetaObject.invokeMethod(root, "openSnapMenu", Q_ARG("QVariant", snap_window),
+                                 Q_ARG("QVariant", anchor_x), Q_ARG("QVariant", anchor_y))
     if terminal_open:
         QMetaObject.invokeMethod(root, "toggleWindow", Q_ARG("QVariant", "terminal"))
         root.setProperty("focusedWindow", "terminal")
@@ -212,7 +242,26 @@ NAMED_ITEMS = ("taskbar", "taskbarGroup", "startButton", "taskbarSearch", "taskV
                "searchFlyout", "notificationCentre", "quickPanel", "clipboardFlyout", "gameBarFlyout", "gameBarToolbar", "contextMenu",
                "explorerWindow", "explorerTabStrip", "explorerNavBar", "explorerCommandBar",
                "explorerSidebar", "explorerFileList", "settingsWindow", "settingsRail",
-               "settingsBody", "titleBar", "captionButtons")
+               "settingsBody", "titleBar", "captionButtons", "snapFlyout",
+               *(f"snapThumb{index}" for index in range(6)),
+               *(f"snapZone{layout}_{zone}"
+                 for layout, zones in enumerate((2, 2, 3, 4, 3, 3))
+                 for zone in range(zones)))
+
+
+def _named_items(item, found: dict) -> dict:
+    """Every named item in the visual tree, by objectName.
+
+    findChild() is not enough: items created by a Repeater or a Loader have no QObject parent, so
+    they are invisible to it while being perfectly real on screen — the snap layout thumbnails are
+    exactly that. The visual tree (childItems) sees them.
+    """
+    for child in item.childItems():
+        name = child.objectName()
+        if name and name not in found:
+            found[name] = child
+        _named_items(child, found)
+    return found
 
 
 def hit_boxes(view: QQuickView) -> dict:
@@ -226,8 +275,9 @@ def hit_boxes(view: QQuickView) -> dict:
     root = view.rootObject()
     if root is None:
         return boxes
+    items = _named_items(root, {})
     for name in NAMED_ITEMS:
-        item = root.findChild(QObject, name)
+        item = items.get(name) or root.findChild(QObject, name)
         if item is None:
             continue
         width = float(item.property("width") or 0)

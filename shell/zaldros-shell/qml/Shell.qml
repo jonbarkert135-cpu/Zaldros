@@ -37,7 +37,66 @@ Item {
     property var minimised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false, terminal: false })
     property var maximised: ({ explorer: false, settings: false, taskmanager: false, devicemanager: false, terminal: false })
 
+    // Snap layouts. A snapped window keeps a zone — fractions of the work area — instead of its
+    // designed geometry; maximising or snapping again replaces it, restoring clears it.
+    property var snapped: ({})
+    property bool snapOpen: false
+    property string snapTarget: ""
+    property real snapAnchorX: 0
+    property real snapAnchorY: 0
+
     function isOpen(id) { return openWindows[id] === true && minimised[id] !== true }
+    function windowItem(id) {
+        if (id === "settings") return settingsWindow;
+        if (id === "explorer") return explorerWindow;
+        if (id === "taskmanager") return taskManagerWindow;
+        if (id === "terminal") return terminalWindow;
+        if (id === "devicemanager") return deviceManagerWindow;
+        return null;
+    }
+
+    function openSnapMenu(id, anchorX, anchorY) {
+        shell.snapTarget = id;
+        shell.snapAnchorX = anchorX;
+        shell.snapAnchorY = anchorY;
+        shell.snapOpen = true;
+    }
+    // Called by the flyout and, in renders and tests, directly: layout/zone indices in, geometry out.
+    function applySnap(id, zone) {
+        shell.maximised = shell.setFlag(shell.maximised, id, false);
+        var next = {};
+        for (var key in shell.snapped) next[key] = shell.snapped[key];
+        next[id] = zone;
+        shell.snapped = next;
+        shell.snapOpen = false;
+        shell.focusWindow(id);
+    }
+    function clearSnap(id) {
+        var next = {};
+        for (var key in shell.snapped) if (key !== id) next[key] = shell.snapped[key];
+        shell.snapped = next;
+    }
+    // Window geometry, in one place: a snapped zone wins, then maximised, then the designed size.
+    function winX(id, x, w) {
+        var zone = shell.snapped[id];
+        if (zone) return Math.round(zone.x * shell.workWidth);
+        return shell.maximised[id] === true ? 0 : shell.placedX(x, w);
+    }
+    function winY(id, y, h) {
+        var zone = shell.snapped[id];
+        if (zone) return Math.round(zone.y * shell.workHeight);
+        return shell.maximised[id] === true ? 0 : shell.placedY(y, h);
+    }
+    function winWidth(id, w) {
+        var zone = shell.snapped[id];
+        if (zone) return Math.round(zone.w * shell.workWidth);
+        return shell.maximised[id] === true ? shell.width : shell.placedWidth(w);
+    }
+    function winHeight(id, h) {
+        var zone = shell.snapped[id];
+        if (zone) return Math.round(zone.h * shell.workHeight);
+        return shell.maximised[id] === true ? shell.workHeight : shell.placedHeight(h);
+    }
     function focusWindow(id) {
         var next = {};
         for (var key in shell.minimised) next[key] = shell.minimised[key];
@@ -76,6 +135,7 @@ Item {
     }
 
     function closeAllFlyouts() {
+        shell.snapOpen = false;
         shell.startOpen = false;
         shell.quickOpen = false;
         shell.searchOpen = false;
@@ -155,6 +215,25 @@ Item {
             var index = live.indexOf(shell.focusedWindow);
             shell.focusWindow(live[(index + 1) % live.length]);
             shell.startOpen = false;
+        }
+    }
+
+    // Win+Z — snap layouts for the focused window, anchored where its maximise button is.
+    Shortcut {
+        sequences: ["Meta+Z"]
+        context: Qt.ApplicationShortcut
+        onActivated: {
+            if (shell.snapOpen) { shell.snapOpen = false; return }
+            var id = shell.focusedWindow;
+            if (!shell.isOpen(id))
+                return;
+            var item = shell.windowItem(id);
+            if (item === null)
+                return;
+            shell.closeAllFlyouts();
+            // The maximise button is the middle of the three caption buttons on the right edge.
+            shell.openSnapMenu(id, item.x + item.width - Theme.captionWidth * 1.5,
+                               item.y + item.barHeight);
         }
     }
 
@@ -250,14 +329,21 @@ Item {
         visible: shell.isOpen("settings")
         active: shell.focusedWindow === "settings"
         maximized: shell.maximised["settings"] === true
+        snapped: shell.snapped["settings"] !== undefined
         z: shell.focusedWindow === "settings" ? 12 : 10
-        x: maximized ? 0 : shell.placedX(220, 940)
-        y: maximized ? 0 : shell.placedY(90, 620)
-        width: maximized ? shell.width : shell.placedWidth(940)
-        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(620)
+        x: shell.winX("settings", 220, 940)
+        y: shell.winY("settings", 90, 620)
+        width: shell.winWidth("settings", 940)
+        height: shell.winHeight("settings", 620)
         onActivateRequested: shell.focusWindow("settings")
         onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "settings", true)
-        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "settings", !maximized)
+        onMaximiseToggled: {
+            shell.clearSnap("settings");
+            shell.maximised = shell.setFlag(shell.maximised, "settings", !maximized);
+        }
+        onSnapMenuRequested: function (anchorX, anchorY) {
+            shell.openSnapMenu("settings", anchorX, anchorY);
+        }
         onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "settings", false)
 
         Settings {
@@ -283,14 +369,21 @@ Item {
         visible: shell.isOpen("explorer")
         active: shell.focusedWindow === "explorer"
         maximized: shell.maximised["explorer"] === true
+        snapped: shell.snapped["explorer"] !== undefined
         z: shell.focusedWindow === "explorer" ? 12 : 10
-        x: maximized ? 0 : shell.placedX(340, 1000)
-        y: maximized ? 0 : shell.placedY(150, 640)
-        width: maximized ? shell.width : shell.placedWidth(1000)
-        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(640)
+        x: shell.winX("explorer", 340, 1000)
+        y: shell.winY("explorer", 150, 640)
+        width: shell.winWidth("explorer", 1000)
+        height: shell.winHeight("explorer", 640)
         onActivateRequested: shell.focusWindow("explorer")
         onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "explorer", true)
-        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "explorer", !maximized)
+        onMaximiseToggled: {
+            shell.clearSnap("explorer");
+            shell.maximised = shell.setFlag(shell.maximised, "explorer", !maximized);
+        }
+        onSnapMenuRequested: function (anchorX, anchorY) {
+            shell.openSnapMenu("explorer", anchorX, anchorY);
+        }
         onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "explorer", false)
 
         Explorer {
@@ -309,14 +402,21 @@ Item {
         visible: shell.isOpen("taskmanager")
         active: shell.focusedWindow === "taskmanager"
         maximized: shell.maximised["taskmanager"] === true
+        snapped: shell.snapped["taskmanager"] !== undefined
         z: shell.focusedWindow === "taskmanager" ? 12 : 10
-        x: maximized ? 0 : shell.placedX(300, 1020)
-        y: maximized ? 0 : shell.placedY(120, 660)
-        width: maximized ? shell.width : shell.placedWidth(1020)
-        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(660)
+        x: shell.winX("taskmanager", 300, 1020)
+        y: shell.winY("taskmanager", 120, 660)
+        width: shell.winWidth("taskmanager", 1020)
+        height: shell.winHeight("taskmanager", 660)
         onActivateRequested: shell.focusWindow("taskmanager")
         onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "taskmanager", true)
-        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "taskmanager", !maximized)
+        onMaximiseToggled: {
+            shell.clearSnap("taskmanager");
+            shell.maximised = shell.setFlag(shell.maximised, "taskmanager", !maximized);
+        }
+        onSnapMenuRequested: function (anchorX, anchorY) {
+            shell.openSnapMenu("taskmanager", anchorX, anchorY);
+        }
         onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "taskmanager", false)
 
         TaskManager {
@@ -347,14 +447,21 @@ Item {
         visible: shell.isOpen("terminal")
         active: shell.focusedWindow === "terminal"
         maximized: shell.maximised["terminal"] === true
+        snapped: shell.snapped["terminal"] !== undefined
         z: shell.focusedWindow === "terminal" ? 12 : 10
-        x: maximized ? 0 : shell.placedX(360, 980)
-        y: maximized ? 0 : shell.placedY(170, 600)
-        width: maximized ? shell.width : shell.placedWidth(980)
-        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(600)
+        x: shell.winX("terminal", 360, 980)
+        y: shell.winY("terminal", 170, 600)
+        width: shell.winWidth("terminal", 980)
+        height: shell.winHeight("terminal", 600)
         onActivateRequested: shell.focusWindow("terminal")
         onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "terminal", true)
-        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "terminal", !maximized)
+        onMaximiseToggled: {
+            shell.clearSnap("terminal");
+            shell.maximised = shell.setFlag(shell.maximised, "terminal", !maximized);
+        }
+        onSnapMenuRequested: function (anchorX, anchorY) {
+            shell.openSnapMenu("terminal", anchorX, anchorY);
+        }
         onCloseRequested: {
             shell.openWindows = shell.setFlag(shell.openWindows, "terminal", false);
             // Closing the window kills the shells it owns: an invisible pty is a leak, and a
@@ -379,14 +486,21 @@ Item {
         visible: shell.isOpen("devicemanager")
         active: shell.focusedWindow === "devicemanager"
         maximized: shell.maximised["devicemanager"] === true
+        snapped: shell.snapped["devicemanager"] !== undefined
         z: shell.focusedWindow === "devicemanager" ? 12 : 10
-        x: maximized ? 0 : shell.placedX(280, 1040)
-        y: maximized ? 0 : shell.placedY(110, 640)
-        width: maximized ? shell.width : shell.placedWidth(1040)
-        height: maximized ? shell.height - Theme.taskbarHeight : shell.placedHeight(640)
+        x: shell.winX("devicemanager", 280, 1040)
+        y: shell.winY("devicemanager", 110, 640)
+        width: shell.winWidth("devicemanager", 1040)
+        height: shell.winHeight("devicemanager", 640)
         onActivateRequested: shell.focusWindow("devicemanager")
         onMinimiseRequested: shell.minimised = shell.setFlag(shell.minimised, "devicemanager", true)
-        onMaximiseToggled: shell.maximised = shell.setFlag(shell.maximised, "devicemanager", !maximized)
+        onMaximiseToggled: {
+            shell.clearSnap("devicemanager");
+            shell.maximised = shell.setFlag(shell.maximised, "devicemanager", !maximized);
+        }
+        onSnapMenuRequested: function (anchorX, anchorY) {
+            shell.openSnapMenu("devicemanager", anchorX, anchorY);
+        }
         onCloseRequested: shell.openWindows = shell.setFlag(shell.openWindows, "devicemanager", false)
 
         DeviceManager {
@@ -444,6 +558,23 @@ Item {
         onAppLaunched: function(row) {
             shell.backendInstalled.launchRow(row);
             shell.searchOpen = false;
+        }
+    }
+
+    // --- snap layouts ------------------------------------------------------------------------------
+    // Opens under the maximise button of the window that asked for it (Win+Z uses the focused one)
+    // and stays inside the screen, which is what Windows does near the right edge.
+    SnapLayouts {
+        id: snapFlyout
+        objectName: "snapFlyout"
+        z: 40
+        visible: shell.snapOpen
+        x: Math.max(Theme.flyoutGap,
+                    Math.min(shell.snapAnchorX - width / 2,
+                             shell.width - width - Theme.flyoutGap))
+        y: Math.min(shell.snapAnchorY + 8, shell.workHeight - height - Theme.flyoutGap)
+        onZoneChosen: function (layout, zone, zoneRect) {
+            shell.applySnap(shell.snapTarget, zoneRect);
         }
     }
 

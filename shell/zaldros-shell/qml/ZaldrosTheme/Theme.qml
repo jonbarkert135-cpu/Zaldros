@@ -94,6 +94,15 @@ QtObject {
     readonly property int menuItemHeight:     32
     readonly property int menuPadding:         4
 
+    // Snap layouts (win11-reference.json → snap_layouts), measured from Microsoft's own 22H2
+    // capture at 100 % scale: six 96x62 thumbnails on a 14 px gap, 6 px between the cells inside
+    // one thumbnail, 13 px panel padding.
+    readonly property int snapThumbWidth:     96
+    readonly property int snapThumbHeight:    62
+    readonly property int snapThumbGap:       14
+    readonly property int snapCellGap:         6
+    readonly property int snapPadding:        13
+
     // --- radii --------------------------------------------------------------------------------
     readonly property int radiusSmall:         4
     readonly property int radiusMedium:        8

@@ -34,9 +34,12 @@ Explorer → Settings → hardware → installer/updates → compatibility → p
 - [x] Build the ISO the AnduinOS way (Ubuntu base rootfs + squashfs + xorriso, no container
       runtime): `build/iso/build-iso.sh`, three variants built in CI, `iso-full` ≈ 2.83 GiB
 - [ ] Window management: Alt+Tab (own KWin script — run #37 proved the shortcut fires and switches;
-      the switcher is a QML script since ADR-0025 and now draws its own overlay — unproven on a
-      live session until the next `iso` run reports `switcher_overlay_fraction` > 0), snap layouts,
+      the switcher is a QML script since ADR-0025 and now draws its own overlay — proven on a
+      live session by iso run 33330825444: Alt+Tab and the Meta+Tab grid both PASS),
       minimise/maximise/close on real windows
+- [x] Snap layouts: six Windows 11 layouts derived from Microsoft's own 22H2 capture, flyout on the
+      maximise button and on Win+Z, 46 parity checks (`snap`/`snapped` states in parity.py)
+- [ ] Snap assist: after snapping one window, offer the remaining ones for the other zones
 - [ ] Autostart the shell in a session (login → desktop)
 - [ ] Search: applications first, then settings, then files
 - [ ] Right-click context menus (Windows 11 rounded style)

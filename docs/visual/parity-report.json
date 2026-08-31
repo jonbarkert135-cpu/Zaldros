@@ -353,6 +353,411 @@
       "passed": true
     },
     {
+      "component": "snap layouts",
+      "metric": "panel width",
+      "expected": 672.0,
+      "actual": 672.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap layouts",
+      "metric": "panel height",
+      "expected": 88.0,
+      "actual": 88.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap layouts",
+      "metric": "layouts",
+      "expected": 6.0,
+      "actual": 6.0,
+      "tolerance": 0.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap layouts",
+      "metric": "thumb width",
+      "expected": 96.0,
+      "actual": 96.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap layouts",
+      "metric": "thumb height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap layouts",
+      "metric": "thumb gap",
+      "expected": 14.0,
+      "actual": 14.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap layouts",
+      "metric": "padding",
+      "expected": 13.0,
+      "actual": 13.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 1.1",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 1.1",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 1.2",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 1.2",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 2.1",
+      "metric": "width",
+      "expected": 60.0,
+      "actual": 60.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 2.1",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 2.2",
+      "metric": "width",
+      "expected": 30.0,
+      "actual": 30.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 2.2",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 3.1",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 3.1",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 3.2",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 3.2",
+      "metric": "height",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 3.3",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 3.3",
+      "metric": "height",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.1",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.1",
+      "metric": "height",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.2",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.2",
+      "metric": "height",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.3",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.3",
+      "metric": "height",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.4",
+      "metric": "width",
+      "expected": 45.0,
+      "actual": 45.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 4.4",
+      "metric": "height",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 5.1",
+      "metric": "width",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 5.1",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 5.2",
+      "metric": "width",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 5.2",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 5.3",
+      "metric": "width",
+      "expected": 28.0,
+      "actual": 28.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 5.3",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 6.1",
+      "metric": "width",
+      "expected": 21.0,
+      "actual": 21.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 6.1",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 6.2",
+      "metric": "width",
+      "expected": 42.0,
+      "actual": 42.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 6.2",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 6.3",
+      "metric": "width",
+      "expected": 21.0,
+      "actual": 21.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snap zone 6.3",
+      "metric": "height",
+      "expected": 62.0,
+      "actual": 62.0,
+      "tolerance": 2.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snapped window",
+      "metric": "left",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snapped window",
+      "metric": "top",
+      "expected": 0.0,
+      "actual": 0.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snapped window",
+      "metric": "width",
+      "expected": 800.0,
+      "actual": 800.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
+      "component": "snapped window",
+      "metric": "height",
+      "expected": 952.0,
+      "actual": 952.0,
+      "tolerance": 1.0,
+      "comparator": "eq",
+      "passed": true
+    },
+    {
       "component": "context menu",
       "metric": "min width",
       "expected": 300.0,
@@ -372,7 +777,7 @@
     }
   ],
   "failed": 0,
-  "total": 41,
+  "total": 86,
   "components": [
     "taskbar.png",
     "startPanel.png",
@@ -382,6 +787,7 @@
     "clipboardFlyout.png",
     "gameBarFlyout.png",
     "contextMenu.png",
+    "snapFlyout.png",
     "explorerWindow.png",
     "settingsWindow.png"
   ]

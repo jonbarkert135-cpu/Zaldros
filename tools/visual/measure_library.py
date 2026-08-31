@@ -14,6 +14,8 @@ Only captures whose display scale can be proven are measured:
 * quick-access-update2.png — File Explorer with a file context menu. The three caption glyphs sit
   46 px apart, which is the Windows 11 caption button width in logical pixels, so this capture is
   at 100 % scale and pixels are logical pixels.
+* WIN11_22H2_...SnapLayouts...1920.png — the 22H2 snap bar. Its taskbar is 47 px tall against a
+  documented 48, so the capture is at 100 % scale and the snap thumbnails are logical pixels.
 * color-profile-quick-settings.png — the Quick Settings flyout. Its panel is 538 px wide against a
   documented 360 logical px, i.e. 150 % scale; every other value in the panel is divided by 1.5.
 
@@ -36,6 +38,8 @@ REFERENCE = ROOT / "system" / "theme" / "win11-reference.json"
 
 EXPLORER = "quick-access-update2.png"
 QUICK = "color-profile-quick-settings.png"
+SNAP = "WIN11_22H2_CML_JIT_TouchAssist_SnapLayouts_Flow-1_HERO_16x9_en-US_1920.png"
+TASKBAR_LOGICAL_HEIGHT = 48.0         # win11-reference.json → taskbar.height
 QUICK_PANEL_LOGICAL_WIDTH = 360.0     # win11-reference.json → quick_settings.width
 
 
@@ -163,20 +167,110 @@ def measure_quick_settings(path: Path) -> list[Measurement]:
     ]
 
 
+def measure_snap_bar(path: Path) -> list[Measurement]:
+    """The snap bar: six layout thumbnails.
+
+    The capture is proven to be at 100 % scale by its own taskbar (48 logical px), so the
+    thumbnails are measured in raw pixels — no scale division that could hide a drift.
+    """
+    np, Image = _numpy()
+    image = np.asarray(Image.open(path).convert("RGB")).astype(int)
+    height = image.shape[0]
+
+    # Taskbar: the flat band at the bottom of the left edge, away from every window.
+    column = image[:, 5]
+    edge = column[-1]
+    taskbar_top = height - 1
+    while taskbar_top > height - 120 and np.abs(column[taskbar_top] - edge).sum() < 40:
+        taskbar_top -= 1
+    taskbar_height = height - 1 - taskbar_top
+
+    # The thumbnails are flat mid-grey plates (the selected one is the accent blue).
+    grey = image.mean(axis=2)
+    saturation = image.max(axis=2) - image.min(axis=2)
+    cells = ((grey > 50) & (grey < 110) & (saturation < 20)) | \
+            ((image[:, :, 2] > 200) & (image[:, :, 0] < 150))
+
+    # A row through the upper half of the bar: every run is one thumbnail column.
+    runs = [run for run in _runs(np.where(cells[40])[0], join=1) if run[1] - run[0] >= 15]
+    # Group runs into layouts: inside a thumbnail the gap is the cell gap, between thumbnails wider.
+    gaps = [runs[i + 1][0] - runs[i][1] for i in range(len(runs) - 1)]
+    split = (min(gaps) + max(gaps)) / 2
+    layouts: list[list[tuple[int, int]]] = [[runs[0]]]
+    for index, gap in enumerate(gaps):
+        (layouts.append([runs[index + 1]]) if gap > split
+         else layouts[-1].append(runs[index + 1]))
+
+    thumb_widths = [group[-1][1] - group[0][0] + 1 for group in layouts]
+    thumb_gaps = [layouts[i + 1][0][0] - layouts[i][-1][1] - 1 for i in range(len(layouts) - 1)]
+    cell_gaps = [group[i + 1][0] - group[i][1] - 1
+                 for group in layouts for i in range(len(group) - 1)]
+
+    # Thumbnail height from the last layout, the one no window overlaps in this capture.
+    centre = (layouts[-1][0][0] + layouts[-1][0][1]) // 2
+    top, bottom = [run for run in _runs(np.where(cells[:, centre])[0], join=1)
+                   if run[1] - run[0] >= 20][0]
+
+    # Panel: the dark plate behind the thumbnails, matched by its own colour on the row above them
+    # — matching "anything but the wallpaper" also catches the windows behind the bar.
+    above = top - 6
+    first, last = layouts[0][0][0], layouts[-1][-1][1]
+    same = np.abs(image[above] - image[above, first + 2]).sum(axis=1) < 30
+    panel = [run for run in _runs(np.where(same)[0], join=2) if run[0] <= first + 2 <= run[1]][0]
+
+    reference = json.loads(REFERENCE.read_text())["snap_layouts"]
+    tolerance = float(reference["tolerance"])
+
+    # The zones themselves: a thumbnail's column widths divided by its content width are the
+    # fractions of the screen each zone gets. This is where the six layouts come from.
+    zone_checks: list[Measurement] = []
+    for index, group in enumerate(layouts):
+        content = (group[-1][1] - group[0][0] + 1) - reference["cell_gap"] * (len(group) - 1)
+        measured = [round((end - start + 1) / content, 3) for start, end in group]
+        expected = sorted({(zone[0], zone[2]) for zone in reference["zones"][index]})
+        zone_checks.append(Measurement(
+            SNAP, f"layout {index + 1} columns",
+            float(len(measured)), float(len(expected)), 0.0))
+        for column, ((_, width), fraction) in enumerate(zip(expected, measured)):
+            zone_checks.append(Measurement(
+                SNAP, f"layout {index + 1} column {column + 1}",
+                fraction, round(width, 3), 0.02))
+
+    return zone_checks + [
+        Measurement(SNAP, "taskbar height (scale proof)", float(taskbar_height),
+                    TASKBAR_LOGICAL_HEIGHT, 2.0),
+        Measurement(SNAP, "layouts", float(len(layouts)), reference["layouts"], 0.0),
+        Measurement(SNAP, "thumb width", float(np.median(thumb_widths)),
+                    reference["thumb_width"], tolerance),
+        Measurement(SNAP, "thumb height", float(bottom - top + 1),
+                    reference["thumb_height"], tolerance),
+        Measurement(SNAP, "thumb gap", float(np.median(thumb_gaps)),
+                    reference["thumb_gap"], tolerance),
+        Measurement(SNAP, "cell gap", float(np.median(cell_gaps)),
+                    reference["cell_gap"], tolerance),
+        Measurement(SNAP, "panel padding", float(first - panel[0]),
+                    reference["padding"], tolerance),
+        Measurement(SNAP, "panel width", float(panel[1] - panel[0] + 1),
+                    reference["panel_width"], tolerance),
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    needed = [EXPLORER, QUICK]
+    needed = [EXPLORER, QUICK, SNAP]
     absent = [name for name in needed if not (CACHE / name).exists()]
     if absent:
         print("reference cache incomplete: " + ", ".join(absent), file=sys.stderr)
         print("run: python3 tools/visual/fetch_references.py", file=sys.stderr)
         return 2
 
-    measurements = measure_explorer(CACHE / EXPLORER) + measure_quick_settings(CACHE / QUICK)
+    measurements = (measure_explorer(CACHE / EXPLORER)
+                    + measure_quick_settings(CACHE / QUICK)
+                    + measure_snap_bar(CACHE / SNAP))
     if args.json:
         print(json.dumps([asdict(m) for m in measurements], indent=2))
     else:
