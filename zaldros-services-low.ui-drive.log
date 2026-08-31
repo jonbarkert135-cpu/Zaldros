@@ -1,0 +1,104 @@
+{
+  "start_open": {
+    "status": "PASS",
+    "seconds": 1.507,
+    "screen_changed": true,
+    "changed_fraction": 0.45427,
+    "screenshot": "start_open-after.ppm"
+  },
+  "start_close": {
+    "status": "PASS",
+    "seconds": 1.507,
+    "screen_changed": true,
+    "changed_fraction": 0.45427,
+    "screenshot": "start_close-after.ppm"
+  },
+  "taskbar_response": {
+    "status": "PASS",
+    "seconds": 1.508,
+    "screen_changed": true,
+    "changed_fraction": 0.0026,
+    "screenshot": "taskbar_response-after.ppm",
+    "target": {
+      "x": 328,
+      "y": 776,
+      "left": 306,
+      "top": 752,
+      "width": 44,
+      "height": 48
+    }
+  },
+  "alt_tab": {
+    "status": "PASS",
+    "switched": true,
+    "switched_fraction": 0.47491,
+    "switcher_visible": true,
+    "switcher_fraction": 0.64367,
+    "switcher_overlay_fraction": 0.94368,
+    "held_equals_after": false,
+    "note": "measured with the guest's Dolphin window open. switcher_visible requires the held frame to differ from both neighbours; when held == after, no switcher was on screen while Alt was down and only the window change is proven.",
+    "seconds": 2.615,
+    "screenshot": "alt_tab-after.ppm",
+    "held_screenshot": "alt_tab-held.ppm",
+    "second_window": {
+      "ready": true,
+      "caption": "Home — Dolphin",
+      "windows": [
+        "__main__.py",
+        "Home — Dolphin"
+      ],
+      "waited_seconds": 44.0
+    },
+    "guest_test_finished": true,
+    "waited_for_guest_seconds": 2.0
+  },
+  "task_view": {
+    "status": "PASS",
+    "switched": true,
+    "switched_fraction": 0.47491,
+    "switcher_visible": false,
+    "switcher_fraction": 0.47491,
+    "switcher_overlay_fraction": 0.0,
+    "held_equals_after": true,
+    "note": "measured with the guest's Dolphin window open. switcher_visible requires the held frame to differ from both neighbours; when held == after, no switcher was on screen while Alt was down and only the window change is proven.",
+    "seconds": 2.615,
+    "screenshot": "task_view-after.ppm",
+    "held_screenshot": "task_view-held.ppm"
+  },
+  "shortcut_probes": {
+    "status": "INFO",
+    "pressed": {
+      "meta_f9": {
+        "keys": [
+          "meta_l",
+          "f9"
+        ],
+        "sent": true
+      },
+      "alt_f9": {
+        "keys": [
+          "alt",
+          "f9"
+        ],
+        "sent": true
+      },
+      "ctrl_shift_f9": {
+        "keys": [
+          "ctrl",
+          "shift",
+          "f9"
+        ],
+        "sent": true
+      },
+      "meta_f10": {
+        "keys": [
+          "meta_l",
+          "f10"
+        ],
+        "sent": true
+      }
+    },
+    "note": "the verdict is in the guest's late report: each ZALDROS-PROBE line means that combination reached a global shortcut"
+  },
+  "qmp_errors": []
+}
