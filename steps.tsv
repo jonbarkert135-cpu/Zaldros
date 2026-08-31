@@ -1,0 +1,12 @@
+apt-update	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs env DEBIAN_FRONTEND=noninteractive apt-get update
+apt-install	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami plasma-desktop plasma-workspace kwin-wayland kde-spectacle ffmpeg xdg-desktop-portal xdg-desktop-portal-kde
+apt-accel	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  --no-install-recommends kglobalacceld \
+  || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kglobalaccel-bin \
+  || echo "no global shortcut daemon available in this suite"
+apt-dbus	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  --no-install-recommends libglib2.0-bin || echo "no gdbus in this suite"
+accel-path	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c mkdir -p /etc/zaldros; dpkg -L kglobalacceld kglobalaccel-bin 2>/dev/null | grep -E "/(kglobalacceld|kglobalaccel5|kglobalaccel6)$" | head -1 > /etc/zaldros/accel-path; echo "global shortcut daemon: $(cat /etc/zaldros/accel-path)"
+theme	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c apt-get install -y --no-install-recommends git ca-certificates gtk-update-icon-cache xz-utils   && /opt/zaldros/theme/fetch-sources.sh /usr/src   && /opt/zaldros/theme/install-visual-theme.sh --dest / --assets /opt/zaldros/assets --variant dark
+grub-mkrescue	0	grub-mkrescue -o zaldros-full.iso /tmp/tmp.jAJiKfPk6v/iso -- -volid ZALDROS
+el-torito	0	verify-iso.py --el-torito-report /home/runner/work/Zaldros/Zaldros/build-debug-full/el-torito.txt

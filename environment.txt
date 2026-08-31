@@ -1,0 +1,147 @@
+=== exit code: 0
+=== date: 2026-08-31T17:25:37+00:00
+=== uname -a
+Linux runnervmgx7h7 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+=== host /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.4 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.4 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+=== df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       145G   68G   77G  48% /
+tmpfs           7.9G     0  7.9G   0% /dev/shm
+tmpfs           3.2G 1012K  3.2G   1% /run
+tmpfs           5.0M     0  5.0M   0% /run/lock
+efivarfs        128M   32K  128M   1% /sys/firmware/efi/efivars
+/dev/sda16      881M   64M  756M   8% /boot
+/dev/sda15      105M  6.2M   99M   6% /boot/efi
+tmpfs           1.6G   12K  1.6G   1% /run/user/1001
+=== free -h
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       1.0Gi       1.7Gi        44Mi        13Gi        14Gi
+Swap:          3.0Gi          0B       3.0Gi
+=== mount
+/dev/sda1 on / type ext4 (rw,relatime,discard,errors=remount-ro,commit=30)
+devtmpfs on /dev type devtmpfs (rw,nosuid,noexec,relatime,size=8181664k,nr_inodes=2045416,mode=755,inode64)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,inode64)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,nodev,size=3274692k,nr_inodes=819200,mode=755,inode64)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k,inode64)
+cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot)
+none on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=32,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=2910)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,nosuid,nodev,relatime,pagesize=2M)
+mqueue on /dev/mqueue type mqueue (rw,nosuid,nodev,noexec,relatime)
+debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+fusectl on /sys/fs/fuse/connections type fusectl (rw,nosuid,nodev,noexec,relatime)
+configfs on /sys/kernel/config type configfs (rw,nosuid,nodev,noexec,relatime)
+/dev/sda16 on /boot type ext4 (rw,relatime,discard)
+/dev/sda15 on /boot/efi type vfat (rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro)
+binfmt_misc on /proc/sys/fs/binfmt_misc type binfmt_misc (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /run/user/1001 type tmpfs (rw,nosuid,nodev,relatime,size=1637344k,nr_inodes=409336,mode=700,uid=1001,gid=1001,inode64)
+=== dpkg --print-architecture (host)
+amd64
+=== rootfs: /tmp/tmp.jAJiKfPk6v/rootfs
+total 68
+drwxr-xr-x 17 root root 4096 Aug 31 17:21 .
+drwx------  4 root root 4096 Aug 31 17:23 ..
+lrwxrwxrwx  1 root root    7 Apr 20 08:46 bin -> usr/bin
+drwxr-xr-x  2 root root 4096 Aug 31 17:23 boot
+drwxr-xr-x  2 root root 4096 Apr 20 18:06 dev
+drwxr-xr-x 85 root root 4096 Aug 31 17:23 etc
+drwxr-xr-x  3 root root 4096 Aug 31 17:23 home
+lrwxrwxrwx  1 root root    7 Apr 20 08:46 lib -> usr/lib
+lrwxrwxrwx  1 root root    9 Apr 20 08:46 lib64 -> usr/lib64
+drwxr-xr-x  2 root root 4096 Apr 20 18:05 media
+drwxr-xr-x  2 root root 4096 Apr 20 18:05 mnt
+drwxr-xr-x  3 root root 4096 Aug 31 17:23 opt
+drwxr-xr-x  2 root root 4096 Apr 20 08:46 proc
+drwx------  3 root root 4096 Aug 31 17:22 root
+drwxr-xr-x 13 root root 4096 Aug 31 17:23 run
+lrwxrwxrwx  1 root root    8 Apr 20 08:46 sbin -> usr/sbin
+drwxr-xr-x  2 root root 4096 Apr 20 18:05 srv
+drwxr-xr-x  2 root root 4096 Apr 20 08:46 sys
+drwxrwxrwt  2 root root 4096 Aug 31 17:23 tmp
+drwxr-xr-x 12 root root 4096 Apr 20 18:05 usr
+drwxr-xr-x 11 root root 4096 Apr 20 18:06 var
+=== rootfs size
+4.3G	/tmp/tmp.jAJiKfPk6v/rootfs
+=== rootfs /etc/os-release
+PRETTY_NAME="Ubuntu 26.04 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+VERSION="26.04 (Resolute Raccoon)"
+VERSION_CODENAME=resolute
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=resolute
+LOGO=ubuntu-logo
+=== rootfs dpkg --print-architecture
+amd64
+=== rootfs /etc/resolv.conf
+# This is /run/systemd/resolve/stub-resolv.conf managed by man:systemd-resolved(8).
+# Do not edit.
+#
+# This file might be symlinked as /etc/resolv.conf. If you're looking at
+# /etc/resolv.conf and seeing this text, you have followed the symlink.
+#
+# This is a dynamic resolv.conf file for connecting local clients to the
+# internal DNS stub resolver of systemd-resolved. This file lists all
+# configured search domains.
+#
+# Run "resolvectl status" to see details about the uplink DNS servers
+# currently in use.
+#
+# Third party programs should typically not access this file directly, but only
+# through the symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a
+# different way, replace this symlink by a static file or a different symlink.
+#
+# See man:systemd-resolved.service(8) for details about the supported modes of
+# operation for /etc/resolv.conf.
+
+nameserver 127.0.0.53
+options edns0 trust-ad
+search bnlpituzlinuhcoumus5oxubwg.bx.internal.cloudapp.net
+=== rootfs DNS check
+2620:2d:4000:1::102 archive.ubuntu.com
+2620:2d:4000:1::103 archive.ubuntu.com
+2620:2d:4002:1::103 archive.ubuntu.com
+2620:2d:4000:1::101 archive.ubuntu.com
+2620:2d:4002:1::102 archive.ubuntu.com
+2a06:bc80:0:1000::18 archive.ubuntu.com
+2a06:bc80:0:1000::17 archive.ubuntu.com
+2620:2d:4002:1::101 archive.ubuntu.com
+2a06:bc80:0:1000::16 archive.ubuntu.com
+=== step exit codes (name / rc / command)
+apt-update	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs env DEBIAN_FRONTEND=noninteractive apt-get update
+apt-install	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami plasma-desktop plasma-workspace kwin-wayland kde-spectacle ffmpeg xdg-desktop-portal xdg-desktop-portal-kde
+apt-accel	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  --no-install-recommends kglobalacceld \
+  || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kglobalaccel-bin \
+  || echo "no global shortcut daemon available in this suite"
+apt-dbus	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  --no-install-recommends libglib2.0-bin || echo "no gdbus in this suite"
+accel-path	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c mkdir -p /etc/zaldros; dpkg -L kglobalacceld kglobalaccel-bin 2>/dev/null | grep -E "/(kglobalacceld|kglobalaccel5|kglobalaccel6)$" | head -1 > /etc/zaldros/accel-path; echo "global shortcut daemon: $(cat /etc/zaldros/accel-path)"
+theme	0	chroot /tmp/tmp.jAJiKfPk6v/rootfs sh -c apt-get install -y --no-install-recommends git ca-certificates gtk-update-icon-cache xz-utils   && /opt/zaldros/theme/fetch-sources.sh /usr/src   && /opt/zaldros/theme/install-visual-theme.sh --dest / --assets /opt/zaldros/assets --variant dark
+grub-mkrescue	0	grub-mkrescue -o zaldros-full.iso /tmp/tmp.jAJiKfPk6v/iso -- -volid ZALDROS
+el-torito	0	verify-iso.py --el-torito-report /home/runner/work/Zaldros/Zaldros/build-debug-full/el-torito.txt
