@@ -1,0 +1,694 @@
+{
+  "variant": "full",
+  "steps": {
+    "desktop_ready": {
+      "status": "PASS",
+      "seconds": 0.51,
+      "cpu_percent": {
+        "kwin_wayland": 0.0,
+        "python3": 0.0
+      },
+      "rss_mib": {
+        "kwin_wayland": 255.2,
+        "python3": 364.8
+      }
+    },
+    "app_launch_explorer": {
+      "status": "PASS",
+      "seconds": 1.532,
+      "cpu_percent": {
+        "kwin_wayland": 56.1,
+        "python3": 3.9
+      },
+      "rss_mib": {
+        "kwin_wayland": 268.5,
+        "python3": 364.8
+      },
+      "caption": "Home — Dolphin"
+    },
+    "screenshot": {
+      "status": "PASS",
+      "seconds": 0.67,
+      "cpu_percent": {
+        "kwin_wayland": 68.7,
+        "python3": 0.0
+      },
+      "rss_mib": {
+        "kwin_wayland": 270.2,
+        "python3": 364.8
+      },
+      "tool": "spectacle",
+      "bytes": 307331
+    },
+    "window_move": {
+      "status": "PASS",
+      "seconds": 1.018,
+      "cpu_percent": {
+        "kwin_wayland": 10.8,
+        "python3": 0.0
+      },
+      "rss_mib": {
+        "kwin_wayland": 272.3,
+        "python3": 364.8
+      }
+    },
+    "minimize": {
+      "status": "PASS",
+      "seconds": 1.018,
+      "cpu_percent": {
+        "kwin_wayland": 11.8,
+        "python3": 3.9
+      },
+      "rss_mib": {
+        "kwin_wayland": 274.6,
+        "python3": 364.8
+      }
+    },
+    "restore": {
+      "status": "PASS",
+      "seconds": 1.018,
+      "cpu_percent": {
+        "kwin_wayland": 4.9,
+        "python3": 0.0
+      },
+      "rss_mib": {
+        "kwin_wayland": 275.0,
+        "python3": 364.8
+      }
+    },
+    "start_open": {
+      "status": "BLOCKED",
+      "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"
+    },
+    "start_close": {
+      "status": "BLOCKED",
+      "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"
+    },
+    "alt_tab": {
+      "status": "BLOCKED",
+      "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"
+    },
+    "taskbar_response": {
+      "status": "BLOCKED",
+      "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"
+    },
+    "frame_stability": {
+      "status": "BLOCKED",
+      "why": "QEMU renders through llvmpipe/virtio-gpu: frame timings would measure the emulator, not the compositor"
+    }
+  },
+  "processes": {
+    "kwin_wayland": {
+      "running": true,
+      "rss_mib": 275.0
+    },
+    "plasmashell": {
+      "running": false,
+      "rss_mib": 0
+    },
+    "python3": {
+      "running": true,
+      "rss_mib": 364.8
+    }
+  },
+  "geometry": {
+    "screen": {
+      "width": 1280,
+      "height": 800
+    },
+    "items": {
+      "taskbar": {
+        "x": 640,
+        "y": 776,
+        "left": 0,
+        "top": 752,
+        "width": 1280,
+        "height": 48
+      },
+      "taskbarGroup": {
+        "x": 640,
+        "y": 776,
+        "left": 306,
+        "top": 752,
+        "width": 668,
+        "height": 48
+      },
+      "startButton": {
+        "x": 328,
+        "y": 776,
+        "left": 306,
+        "top": 752,
+        "width": 44,
+        "height": 48
+      },
+      "taskbarSearch": {
+        "x": 464,
+        "y": 776,
+        "left": 350,
+        "top": 752,
+        "width": 228,
+        "height": 48
+      },
+      "taskViewButton": {
+        "x": 600,
+        "y": 776,
+        "left": 578,
+        "top": 752,
+        "width": 44,
+        "height": 48
+      },
+      "widgetsButton": {
+        "x": 68,
+        "y": 776,
+        "left": 12,
+        "top": 756,
+        "width": 113,
+        "height": 40
+      },
+      "weatherIcon": {
+        "x": 32,
+        "y": 776,
+        "left": 20,
+        "top": 764,
+        "width": 24,
+        "height": 24
+      },
+      "weatherTemperature": {
+        "x": 57,
+        "y": 768,
+        "left": 52,
+        "top": 760,
+        "width": 10,
+        "height": 16
+      },
+      "weatherCondition": {
+        "x": 79,
+        "y": 784,
+        "left": 52,
+        "top": 776,
+        "width": 55,
+        "height": 15
+      },
+      "trayGroup": {
+        "x": 1139,
+        "y": 776,
+        "left": 1011,
+        "top": 752,
+        "width": 257,
+        "height": 48
+      },
+      "trayQuickButton": {
+        "x": 1124,
+        "y": 776,
+        "left": 1085,
+        "top": 752,
+        "width": 78,
+        "height": 48
+      },
+      "clock": {
+        "x": 1201,
+        "y": 776,
+        "left": 1163,
+        "top": 752,
+        "width": 77,
+        "height": 48
+      },
+      "notificationButton": {
+        "x": 1254,
+        "y": 776,
+        "left": 1240,
+        "top": 752,
+        "width": 28,
+        "height": 48
+      },
+      "startPanel": {
+        "x": 640,
+        "y": 377,
+        "left": 320,
+        "top": 14,
+        "width": 640,
+        "height": 726
+      },
+      "startSearch": {
+        "x": 640,
+        "y": 65,
+        "left": 352,
+        "top": 46,
+        "width": 576,
+        "height": 38
+      },
+      "startPinnedGrid": {
+        "x": 640,
+        "y": 270,
+        "left": 352,
+        "top": 144,
+        "width": 576,
+        "height": 252
+      },
+      "startFooter": {
+        "x": 640,
+        "y": 708,
+        "left": 320,
+        "top": 676,
+        "width": 640,
+        "height": 64
+      },
+      "searchFlyout": {
+        "x": 640,
+        "y": 457,
+        "left": 320,
+        "top": 174,
+        "width": 640,
+        "height": 566
+      },
+      "notificationCentre": {
+        "x": 1088,
+        "y": 542,
+        "left": 908,
+        "top": 344,
+        "width": 360,
+        "height": 396
+      },
+      "quickPanel": {
+        "x": 1088,
+        "y": 586,
+        "left": 908,
+        "top": 432,
+        "width": 360,
+        "height": 308
+      },
+      "clipboardFlyout": {
+        "x": 192,
+        "y": 674,
+        "left": 12,
+        "top": 607,
+        "width": 360,
+        "height": 133
+      },
+      "gameBarFlyout": {
+        "x": 165,
+        "y": 118,
+        "left": 12,
+        "top": 12,
+        "width": 306,
+        "height": 212
+      },
+      "gameBarToolbar": {
+        "x": 640,
+        "y": 39,
+        "left": 378,
+        "top": 12,
+        "width": 523,
+        "height": 54
+      },
+      "contextMenu": {
+        "x": 166,
+        "y": 135,
+        "left": 0,
+        "top": 0,
+        "width": 342,
+        "height": 278
+      },
+      "explorerWindow": {
+        "x": 640,
+        "y": 376,
+        "left": 140,
+        "top": 56,
+        "width": 1000,
+        "height": 640
+      },
+      "explorerNavBar": {
+        "x": 640,
+        "y": 120,
+        "left": 140,
+        "top": 96,
+        "width": 1000,
+        "height": 48
+      },
+      "explorerCommandBar": {
+        "x": 640,
+        "y": 168,
+        "left": 140,
+        "top": 144,
+        "width": 1000,
+        "height": 48
+      },
+      "explorerSidebar": {
+        "x": 235,
+        "y": 431,
+        "left": 140,
+        "top": 192,
+        "width": 190,
+        "height": 478
+      },
+      "explorerFileList": {
+        "x": 736,
+        "y": 446,
+        "left": 331,
+        "top": 222,
+        "width": 809,
+        "height": 448
+      },
+      "settingsWindow": {
+        "x": 690,
+        "y": 400,
+        "left": 220,
+        "top": 90,
+        "width": 940,
+        "height": 620
+      },
+      "settingsRail": {
+        "x": 380,
+        "y": 416,
+        "left": 220,
+        "top": 122,
+        "width": 320,
+        "height": 588
+      },
+      "settingsBody": {
+        "x": 850,
+        "y": 416,
+        "left": 540,
+        "top": 122,
+        "width": 620,
+        "height": 588
+      },
+      "titleBar": {
+        "x": 690,
+        "y": 106,
+        "left": 220,
+        "top": 90,
+        "width": 940,
+        "height": 32
+      },
+      "captionButtons": {
+        "x": 1091,
+        "y": 106,
+        "left": 1022,
+        "top": 90,
+        "width": 138,
+        "height": 32
+      },
+      "snapFlyout": {
+        "x": 348,
+        "y": 52,
+        "left": 12,
+        "top": 8,
+        "width": 672,
+        "height": 88
+      },
+      "snapBar": {
+        "x": 640,
+        "y": 73,
+        "left": 304,
+        "top": 12,
+        "width": 672,
+        "height": 122
+      },
+      "snapBarLayouts": {
+        "x": 640,
+        "y": 73,
+        "left": 304,
+        "top": 12,
+        "width": 672,
+        "height": 122
+      },
+      "snapBarHint": {
+        "x": 514,
+        "y": 42,
+        "left": 343,
+        "top": 32,
+        "width": 343,
+        "height": 19
+      },
+      "snapAssist": {
+        "x": 960,
+        "y": 376,
+        "left": 640,
+        "top": 0,
+        "width": 640,
+        "height": 752
+      },
+      "snapAssistGrid": {
+        "x": 960,
+        "y": 376,
+        "left": 960,
+        "top": 376,
+        "width": 0,
+        "height": 0
+      },
+      "snapAssistScrim": {
+        "x": 960,
+        "y": 376,
+        "left": 640,
+        "top": 0,
+        "width": 640,
+        "height": 752
+      },
+      "edgePreview": {
+        "x": 0,
+        "y": 0,
+        "left": 0,
+        "top": 0,
+        "width": 0,
+        "height": 0
+      },
+      "snapThumb0": {
+        "x": 73,
+        "y": 52,
+        "left": 25,
+        "top": 21,
+        "width": 96,
+        "height": 62
+      },
+      "snapThumb1": {
+        "x": 183,
+        "y": 52,
+        "left": 135,
+        "top": 21,
+        "width": 96,
+        "height": 62
+      },
+      "snapThumb2": {
+        "x": 293,
+        "y": 52,
+        "left": 245,
+        "top": 21,
+        "width": 96,
+        "height": 62
+      },
+      "snapThumb3": {
+        "x": 403,
+        "y": 52,
+        "left": 355,
+        "top": 21,
+        "width": 96,
+        "height": 62
+      },
+      "snapThumb4": {
+        "x": 513,
+        "y": 52,
+        "left": 465,
+        "top": 21,
+        "width": 96,
+        "height": 62
+      },
+      "snapThumb5": {
+        "x": 623,
+        "y": 52,
+        "left": 575,
+        "top": 21,
+        "width": 96,
+        "height": 62
+      },
+      "snapBarThumb0": {
+        "x": 365,
+        "y": 90,
+        "left": 317,
+        "top": 59,
+        "width": 96,
+        "height": 62
+      },
+      "snapBarThumb1": {
+        "x": 475,
+        "y": 90,
+        "left": 427,
+        "top": 59,
+        "width": 96,
+        "height": 62
+      },
+      "snapBarThumb2": {
+        "x": 585,
+        "y": 90,
+        "left": 537,
+        "top": 59,
+        "width": 96,
+        "height": 62
+      },
+      "snapBarThumb3": {
+        "x": 695,
+        "y": 90,
+        "left": 647,
+        "top": 59,
+        "width": 96,
+        "height": 62
+      },
+      "snapBarThumb4": {
+        "x": 805,
+        "y": 90,
+        "left": 757,
+        "top": 59,
+        "width": 96,
+        "height": 62
+      },
+      "snapBarThumb5": {
+        "x": 915,
+        "y": 90,
+        "left": 867,
+        "top": 59,
+        "width": 96,
+        "height": 62
+      },
+      "snapZone0_0": {
+        "x": 48,
+        "y": 52,
+        "left": 25,
+        "top": 21,
+        "width": 45,
+        "height": 62
+      },
+      "snapZone0_1": {
+        "x": 98,
+        "y": 52,
+        "left": 76,
+        "top": 21,
+        "width": 45,
+        "height": 62
+      },
+      "snapZone1_0": {
+        "x": 165,
+        "y": 52,
+        "left": 135,
+        "top": 21,
+        "width": 60,
+        "height": 62
+      },
+      "snapZone1_1": {
+        "x": 216,
+        "y": 52,
+        "left": 201,
+        "top": 21,
+        "width": 30,
+        "height": 62
+      },
+      "snapZone2_0": {
+        "x": 268,
+        "y": 52,
+        "left": 245,
+        "top": 21,
+        "width": 45,
+        "height": 62
+      },
+      "snapZone2_1": {
+        "x": 318,
+        "y": 35,
+        "left": 296,
+        "top": 21,
+        "width": 45,
+        "height": 28
+      },
+      "snapZone2_2": {
+        "x": 318,
+        "y": 69,
+        "left": 296,
+        "top": 55,
+        "width": 45,
+        "height": 28
+      },
+      "snapZone3_0": {
+        "x": 378,
+        "y": 35,
+        "left": 355,
+        "top": 21,
+        "width": 45,
+        "height": 28
+      },
+      "snapZone3_1": {
+        "x": 428,
+        "y": 35,
+        "left": 406,
+        "top": 21,
+        "width": 45,
+        "height": 28
+      },
+      "snapZone3_2": {
+        "x": 378,
+        "y": 69,
+        "left": 355,
+        "top": 55,
+        "width": 45,
+        "height": 28
+      },
+      "snapZone3_3": {
+        "x": 428,
+        "y": 69,
+        "left": 406,
+        "top": 55,
+        "width": 45,
+        "height": 28
+      },
+      "snapZone4_0": {
+        "x": 479,
+        "y": 52,
+        "left": 465,
+        "top": 21,
+        "width": 28,
+        "height": 62
+      },
+      "snapZone4_1": {
+        "x": 513,
+        "y": 52,
+        "left": 499,
+        "top": 21,
+        "width": 28,
+        "height": 62
+      },
+      "snapZone4_2": {
+        "x": 547,
+        "y": 52,
+        "left": 533,
+        "top": 21,
+        "width": 28,
+        "height": 62
+      },
+      "snapZone5_0": {
+        "x": 586,
+        "y": 52,
+        "left": 575,
+        "top": 21,
+        "width": 21,
+        "height": 62
+      },
+      "snapZone5_1": {
+        "x": 623,
+        "y": 52,
+        "left": 602,
+        "top": 21,
+        "width": 42,
+        "height": 62
+      },
+      "snapZone5_2": {
+        "x": 660,
+        "y": 52,
+        "left": 650,
+        "top": 21,
+        "width": 21,
+        "height": 62
+      }
+    }
+  },
+  "dbus_diag": {
+    "loadScript": "method return time=1788197588.024227 sender=:1.9 -> destination=:1.47 serial=219 reply_serial=2\n   int32 10",
+    "start": "method return time=1788197588.028733 sender=:1.9 -> destination=:1.48 serial=220 reply_serial=2"
+  }
+}
