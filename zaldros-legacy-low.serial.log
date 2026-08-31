@@ -1,0 +1,891 @@
+[2J[01;01H[=3h[2J[01;01H[2J[01;01H[=3h[2J[01;01H[2J[01;01H[=3h[2J[01;01HBdsDxe: loading Boot0001 "UEFI QEMU DVD-ROM QM00005 " from PciRoot(0x0)/Pci(0x1F,0x2)/Sata(0x2,0xFFFF,0x0)
+BdsDxe: starting Boot0001 "UEFI QEMU DVD-ROM QM00005 " from PciRoot(0x0)/Pci(0x1F,0x2)/Sata(0x2,0xFFFF,0x0)
+[H[J[1;1HGRUB: Zaldros legacy menu loadedGRUB: Zaldros legacy menu loaded
+
+[?25l[m[H[J[1;1H[2;30HGNU GRUB  version 2.12
+
+[m[4;2H+----------------------------------------------------------------------------+[5;2H|[5;79H|[6;2H|[6;79H|[7;2H|[7;79H|[8;2H|[8;79H|[9;2H|[9;79H|[10;2H|[10;79H|[11;2H|[11;79H|[12;2H|[12;79H|[13;2H|[13;79H|[14;2H|[14;79H|[15;2H|[15;79H|[16;2H|[16;79H|[17;2H+----------------------------------------------------------------------------+[m[18;2H[19;2H[m     Use the ^ and v keys to select which entry is highlighted.          
+      Press enter to boot the selected OS, `e' to edit the commands       
+      before booting or `c' for a command-line.                           [5;80H [7m[5;3H*Zaldros OS (legacy)                                                        [m[5;78H[m[m[6;3H                                                                            [m[6;78H[m[m[7;3H                                                                            [m[7;78H[m[m[8;3H                                                                            [m[8;78H[m[m[9;3H                                                                            [m[9;78H[m[m[10;3H                                                                            [m[10;78H[m[m[11;3H                                                                            [m[11;78H[m[m[12;3H                                                                            [m[12;78H[m[m[13;3H                                                                            [m[13;78H[m[m[14;3H                                                                            [m[14;78H[m[m[15;3H                                                                            [m[15;78H[m[m[16;3H                                                                            [m[16;78H[m[16;80H [5;78H[0m[30m[40m[2J[01;01H[0m[37m[40m[02;40HGNU GRUB  version 2.12
+
+[04;02H┌────────────────────────────────────────────────────────────────────────────────────────────────┐[05;02H││[06;02H││[07;02H││[08;02H││[09;02H││[10;02H││[11;02H││[12;02H││[13;02H││[14;02H││[15;02H││[16;02H││[17;02H││[18;02H││[19;02H││[20;02H││[21;02H││[22;02H││[23;02H││[24;02H└────────────────────────────────────────────────────────────────────────────────────────────────┘[25;02H[26;02H     Use the ▲ and ▼ keys to select which entry is highlighted.                              
+      Press enter to boot the selected OS, `e' to edit the commands before booting or `c' for 
+      a command-line.                                                                          [0m[30m[47m[05;03H*Zaldros OS (legacy)                                                                            [0m[37m[40m[06;03H                                                                                                [07;03H                                                                                                [08;03H                                                                                                [09;03H                                                                                                [10;03H                                                                                                [11;03H                                                                                                [12;03H                                                                                                [13;03H                                                                                                [14;03H                                                                                                [15;03H                                                                                                [16;03H                                                                                                [17;03H                                                                                                [18;03H                                                                                                [19;03H                                                                                                [20;03H                                                                                                [21;03H                                                                                                [22;03H                                                                                                [23;03H                                                                                                 [29;01H   The highlighted entry will be executed automatically in 5s.                                     [22;1H   The highlighted entry will be executed automatically in 5s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 4s.                                     [22;1H   The highlighted entry will be executed automatically in 4s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 3s.                                     [22;1H   The highlighted entry will be executed automatically in 3s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 2s.                                     [22;1H   The highlighted entry will be executed automatically in 2s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 1s.                                     [22;1H   The highlighted entry will be executed automatically in 1s.                 [5;78H[29;01H   The highlighted entry will be executed automatically in 0s.                                     [22;1H   The highlighted entry will be executed automatically in 0s.                 [5;78H[0m[30m[40m[2J[01;01H[0m[37m[40m[?25h[H[J[1;1H[H[J[1;1H[0m[30m[40m[2J[01;01H[0m[37m[40mGRUB: loading kernelGRUB: loading kernel
+
+GRUB: loading initrdGRUB: loading initrd
+
+GRUB: bootingGRUB: booting
+
+[    0.000000] Linux version 7.0.0-30-generic (buildd@lcy02-amd64-048) (x86_64-linux-gnu-gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0, GNU ld (GNU Binutils for Ubuntu) 2.46) #30-Ubuntu SMP PREEMPT_DYNAMIC Fri Jul 31 18:22:54 UTC 2026 (Ubuntu 7.0.0-30.30-generic 7.0.12)
+[    0.000000] Command line: BOOT_IMAGE=/casper/vmlinuz boot=casper console=tty0 console=ttyS0,115200 zaldros.selftest noprompt
+[    0.000000] KERNEL supported cpus:
+[    0.000000]   Intel GenuineIntel
+[    0.000000]   AMD AuthenticAMD
+[    0.000000]   Hygon HygonGenuine
+[    0.000000]   Centaur CentaurHauls
+[    0.000000]   zhaoxin   Shanghai  
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff]  System RAM
+[    0.000000] BIOS-e820: [gap 0x00000000000a0000-0x00000000000fffff]
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000007fffff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x0000000000800000-0x0000000000807fff]  ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x0000000000808000-0x000000000080afff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x000000000080b000-0x000000000080bfff]  ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x000000000080c000-0x000000000080ffff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x0000000000810000-0x00000000008fffff]  ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x0000000000900000-0x000000007ed3efff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x000000007ed3f000-0x000000007edfffff]  device reserved
+[    0.000000] BIOS-e820: [mem 0x000000007ee00000-0x000000007f8ecfff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x000000007f8ed000-0x000000007fb6cfff]  device reserved
+[    0.000000] BIOS-e820: [mem 0x000000007fb6d000-0x000000007fb7efff]  ACPI data
+[    0.000000] BIOS-e820: [mem 0x000000007fb7f000-0x000000007fbfefff]  ACPI NVS
+[    0.000000] BIOS-e820: [mem 0x000000007fbff000-0x000000007feebfff]  System RAM
+[    0.000000] BIOS-e820: [mem 0x000000007feec000-0x000000007ff6ffff]  device reserved
+[    0.000000] BIOS-e820: [mem 0x000000007ff70000-0x000000007fffffff]  ACPI NVS
+[    0.000000] BIOS-e820: [gap 0x0000000080000000-0x00000000dfffffff]
+[    0.000000] BIOS-e820: [mem 0x00000000e0000000-0x00000000efffffff]  device reserved
+[    0.000000] BIOS-e820: [gap 0x00000000f0000000-0x00000000feffbfff]
+[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff]  device reserved
+[    0.000000] BIOS-e820: [gap 0x00000000ff000000-0x00000000ffffffff]
+[    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000017fffffff]  System RAM
+[    0.000000] BIOS-e820: [gap 0x0000000180000000-0x000000fcffffffff]
+[    0.000000] BIOS-e820: [mem 0x000000fd00000000-0x000000ffffffffff]  device reserved
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] APIC: Static calls initialized
+[    0.000000] efi: EFI v2.7 by Ubuntu distribution of EDK II
+[    0.000000] efi: SMBIOS=0x7f988000 SMBIOS 3.0=0x7f986000 ACPI=0x7fb7e000 ACPI 2.0=0x7fb7e014 MEMATTR=0x7e56f118 INITRD=0x7e55fe98 
+[    0.000000] SMBIOS 3.0.0 present.
+[    0.000000] DMI: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.02-2ubuntu0.9 06/02/2026
+[    0.000000] DMI: Memory slots populated: 1/1
+[    0.000000] secureboot: Secure boot disabled
+[    0.000000] Hypervisor detected: KVM
+[    0.000000] last_pfn = 0x7feec max_arch_pfn = 0x400000000
+[    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[    0.000000] kvm-clock: using sched offset of 7209078287 cycles
+[    0.000003] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+[    0.000005] tsc: Detected 2596.122 MHz processor
+[    0.000358] last_pfn = 0x180000 max_arch_pfn = 0x400000000
+[    0.000499] MTRR map: 4 entries (2 fixed + 2 variable; max 18), built from 8 variable MTRRs
+[    0.000505] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.000686] last_pfn = 0x7feec max_arch_pfn = 0x400000000
+[    0.004108] Using GB pages for direct mapping
+[    0.004314] secureboot: Secure boot disabled
+[    0.004314] RAMDISK: [mem 0x753dc000-0x79eeefff]
+[    0.004678] ACPI: Early table checksum verification disabled
+[    0.004682] ACPI: RSDP 0x000000007FB7E014 000024 (v02 BOCHS )
+[    0.004685] ACPI: XSDT 0x000000007FB7D0E8 000054 (v01 BOCHS  BXPC     00000001      01000013)
+[    0.004691] ACPI: FACP 0x000000007FB79000 0000F4 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.004696] ACPI: DSDT 0x000000007FB7A000 002119 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.004698] ACPI: FACS 0x000000007FBDD000 000040
+[    0.004699] ACPI: APIC 0x000000007FB78000 000080 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.004700] ACPI: HPET 0x000000007FB77000 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.004702] ACPI: MCFG 0x000000007FB76000 00003C (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.004703] ACPI: WAET 0x000000007FB75000 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.004705] ACPI: BGRT 0x000000007FB74000 000038 (v01 INTEL  EDK2     00000002      01000013)
+[    0.004706] ACPI: Reserving FACP table memory at [mem 0x7fb79000-0x7fb790f3]
+[    0.004707] ACPI: Reserving DSDT table memory at [mem 0x7fb7a000-0x7fb7c118]
+[    0.004707] ACPI: Reserving FACS table memory at [mem 0x7fbdd000-0x7fbdd03f]
+[    0.004707] ACPI: Reserving APIC table memory at [mem 0x7fb78000-0x7fb7807f]
+[    0.004708] ACPI: Reserving HPET table memory at [mem 0x7fb77000-0x7fb77037]
+[    0.004708] ACPI: Reserving MCFG table memory at [mem 0x7fb76000-0x7fb7603b]
+[    0.004708] ACPI: Reserving WAET table memory at [mem 0x7fb75000-0x7fb75027]
+[    0.004709] ACPI: Reserving BGRT table memory at [mem 0x7fb74000-0x7fb74037]
+[    0.005182] No NUMA configuration found
+[    0.005182] Faking a node at [mem 0x0000000000000000-0x000000017fffffff]
+[    0.005189] NODE_DATA(0) allocated [mem 0x17ffd5280-0x17fffffff]
+[    0.005911] ACPI: PM-Timer IO Port: 0x608
+[    0.005933] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.005994] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.005996] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.005998] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.005998] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.005999] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.006000] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.006002] ACPI: Using ACPI (MADT) for SMP configuration information
+[    0.006003] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+[    0.006016] TSC deadline timer available
+[    0.006018] CPU topo: Max. logical packages:   1
+[    0.006019] CPU topo: Max. logical nodes:      1
+[    0.006019] CPU topo: Num. nodes per package:  1
+[    0.006020] CPU topo: Max. logical dies:       1
+[    0.006021] CPU topo: Max. dies per package:   1
+[    0.006023] CPU topo: Max. threads per core:   1
+[    0.006023] CPU topo: Num. cores per package:     2
+[    0.006023] CPU topo: Num. threads per package:   2
+[    0.006024] CPU topo: Allowing 2 present CPUs plus 0 hotplug CPUs
+[    0.006045] kvm-guest: APIC: eoi() replaced with kvm_guest_apic_eoi_write()
+[    0.006071] kvm-guest: KVM setup pv remote TLB flush
+[    0.006090] kvm-guest: setup PV sched yield
+[    0.006099] PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+[    0.006100] PM: hibernation: Registered nosave memory: [mem 0x000a0000-0x000fffff]
+[    0.006101] PM: hibernation: Registered nosave memory: [mem 0x00800000-0x00807fff]
+[    0.006101] PM: hibernation: Registered nosave memory: [mem 0x0080b000-0x0080bfff]
+[    0.006102] PM: hibernation: Registered nosave memory: [mem 0x00810000-0x008fffff]
+[    0.006103] PM: hibernation: Registered nosave memory: [mem 0x7e566000-0x7e56efff]
+[    0.006103] PM: hibernation: Registered nosave memory: [mem 0x7ed3f000-0x7edfffff]
+[    0.006104] PM: hibernation: Registered nosave memory: [mem 0x7f8ed000-0x7fbfefff]
+[    0.006105] PM: hibernation: Registered nosave memory: [mem 0x7feec000-0xffffffff]
+[    0.006106] [gap 0x80000000-0xdfffffff] available for PCI devices
+[    0.006107] Booting paravirtualized kernel on KVM
+[    0.006108] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    0.006124] Zone ranges:
+[    0.006125]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.006126]   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+[    0.006127]   Normal   [mem 0x0000000100000000-0x000000017fffffff]
+[    0.006127]   Device   empty
+[    0.006128] Movable zone start for each node
+[    0.006129] Early memory node ranges
+[    0.006129]   node   0: [mem 0x0000000000001000-0x000000000009ffff]
+[    0.006130]   node   0: [mem 0x0000000000100000-0x00000000007fffff]
+[    0.006130]   node   0: [mem 0x0000000000808000-0x000000000080afff]
+[    0.006131]   node   0: [mem 0x000000000080c000-0x000000000080ffff]
+[    0.006131]   node   0: [mem 0x0000000000900000-0x000000007ed3efff]
+[    0.006131]   node   0: [mem 0x000000007ee00000-0x000000007f8ecfff]
+[    0.006132]   node   0: [mem 0x000000007fbff000-0x000000007feebfff]
+[    0.006132]   node   0: [mem 0x0000000100000000-0x000000017fffffff]
+[    0.006133] Initmem setup node 0 [mem 0x0000000000001000-0x000000017fffffff]
+[    0.006227] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.006231] On node 0, zone DMA: 96 pages in unavailable ranges
+[    0.006232] On node 0, zone DMA: 8 pages in unavailable ranges
+[    0.006232] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.006235] On node 0, zone DMA: 240 pages in unavailable ranges
+[    0.008202] On node 0, zone DMA32: 193 pages in unavailable ranges
+[    0.008207] On node 0, zone DMA32: 786 pages in unavailable ranges
+[    0.010397] On node 0, zone Normal: 276 pages in unavailable ranges
+[    0.010420] setup_percpu: NR_CPUS:8192 nr_cpumask_bits:2 nr_cpu_ids:2 nr_node_ids:1
+[    0.010566] percpu: Embedded 85 pages/cpu s225280 r8192 d114688 u1048576
+[    0.010643] kvm-guest: PV spinlocks enabled
+[    0.010645] PV qspinlock hash table entries: 256 (order: 0, 4096 bytes, linear)
+[    0.010647] Kernel command line: BOOT_IMAGE=/casper/vmlinuz boot=casper console=tty0 console=ttyS0,115200 zaldros.selftest noprompt
+[    0.010705] Unknown kernel command line parameters "noprompt boot=casper", will be passed to user space.
+[    0.010724] random: crng init done
+[    0.010725] printk: log buffer data + meta data: 262144 + 1114112 = 1376256 bytes
+[    0.010983] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+[    0.011122] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.011193] software IO TLB: area num 2.
+[    0.017045] Fallback order for Node 0: 0 
+[    0.017052] Built 1 zonelists, mobility grouping on.  Total pages: 1046975
+[    0.017053] Policy zone: Normal
+[    0.017065] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+[    0.021187] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+[    0.033770] ftrace: allocating 63941 entries in 252 pages
+[    0.033772] ftrace: allocated 252 pages with 6 groups
+[    0.034455] Dynamic Preempt: lazy
+[    0.034579] rcu: Preemptible hierarchical RCU implementation.
+[    0.034580] rcu: 	RCU restricting CPUs from NR_CPUS=8192 to nr_cpu_ids=2.
+[    0.034582] 	Trampoline variant of Tasks RCU enabled.
+[    0.034583] 	Rude variant of Tasks RCU enabled.
+[    0.034583] 	Tracing variant of Tasks RCU enabled.
+[    0.034584] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+[    0.034584] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+[    0.034591] RCU Tasks: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.034593] RCU Tasks Rude: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.037426] NR_IRQS: 524544, nr_irqs: 440, preallocated irqs: 16
+[    0.037678] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.037764] Console: colour dummy device 80x25
+[    0.037767] printk: legacy console [tty0] enabled
+[    0.037973] printk: legacy console [ttyS0] enabled
+[    0.244157] ACPI: Core revision 20251212
+[    0.245239] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+[    0.247269] APIC: Switch to symmetric I/O mode setup
+[    0.248847] x2apic enabled
+[    0.250065] APIC: Switched APIC routing to: physical x2apic
+[    0.251255] kvm-guest: APIC: send_IPI_mask() replaced with kvm_send_ipi_mask()
+[    0.252753] kvm-guest: APIC: send_IPI_mask_allbutself() replaced with kvm_send_ipi_mask_allbutself()
+[    0.254655] kvm-guest: setup PV IPIs
+[    0.257856] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.259148] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x256becde448, max_idle_ns: 440795276694 ns
+[    0.261303] Calibrating delay loop (skipped) preset value.. 5192.24 BogoMIPS (lpj=2596122)
+[    0.263539] x86/cpu: User Mode Instruction Prevention (UMIP) activated
+[    0.264564] Last level iTLB entries: 4KB 512, 2MB 255, 4MB 127
+[    0.265300] Last level dTLB entries: 4KB 512, 2MB 255, 4MB 127, 1GB 0
+[    0.266320] mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+[    0.267301] Speculative Store Bypass: Vulnerable
+[    0.268301] Speculative Return Stack Overflow: IBPB-extending microcode not applied!
+[    0.269300] Speculative Return Stack Overflow: WARNING: See https://kernel.org/doc/html/latest/admin-guide/hw-vuln/srso.html for mitigation options.
+[    0.269301] Spectre V2 : Mitigation: Retpolines
+[    0.271300] Speculative Return Stack Overflow: Vulnerable: Safe RET, no microcode
+[    0.272300] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.273300] Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+[    0.274301] active return thunk: srso_return_thunk
+[    0.275402] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+[    0.276300] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+[    0.277300] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+[    0.278300] x86/fpu: Supporting XSAVE feature 0x020: 'AVX-512 opmask'
+[    0.279300] x86/fpu: Supporting XSAVE feature 0x040: 'AVX-512 Hi256'
+[    0.280300] x86/fpu: Supporting XSAVE feature 0x080: 'AVX-512 ZMM_Hi256'
+[    0.281300] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+[    0.282300] x86/fpu: xstate_offset[5]:  832, xstate_sizes[5]:   64
+[    0.283300] x86/fpu: xstate_offset[6]:  896, xstate_sizes[6]:  512
+[    0.284300] x86/fpu: xstate_offset[7]: 1408, xstate_sizes[7]: 1024
+[    0.285300] x86/fpu: Enabled xstate features 0xe7, context size is 2432 bytes, using 'compacted' format.
+[    0.318084] Freeing SMP alternatives memory: 56K
+[    0.318306] pid_max: default: 32768 minimum: 301
+[    0.319469] landlock: Up and running.
+[    0.320302] Yama: becoming mindful.
+[    0.322409] AppArmor: AppArmor initialized
+[    0.323303] AppArmor: AppArmor secmark mediation reserved: ready to be enabled
+[    0.324430] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.325305] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.326411] VFS: Finished mounting rootfs on nullfs
+[    0.328459] smpboot: CPU0: AMD EPYC 9V45 96-Core Processor (family: 0x1a, model: 0x2, stepping: 0x1)
+[    0.329536] Performance Events: PMU not available due to virtualization, using software events only.
+[    0.331397] signal: max sigframe size: 3376
+[    0.332351] rcu: Hierarchical SRCU implementation.
+[    0.333312] rcu: 	Max phase no-delay instances is 400.
+[    0.334360] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[    0.344080] NMI watchdog: Perf NMI watchdog permanently disabled
+[    0.344368] smp: Bringing up secondary CPUs ...
+[    0.345514] smpboot: x86: Booting SMP configuration:
+[    0.346315] .... node  #0, CPUs:      #1
+[    0.348350] smp: Brought up 1 node, 2 CPUs
+[    0.350297] smpboot: Total of 2 processors activated (10384.48 BogoMIPS)
+[    0.351767] Memory: 2910576K/4187900K available (23799K kernel code, 4952K rwdata, 16764K rodata, 5292K init, 5856K bss, 1269540K reserved, 0K cma-reserved)
+[    0.352577] devtmpfs: initialized
+[    0.353383] x86/mm: Memory block size: 128MB
+[    0.355182] ACPI: PM: Registering ACPI NVS region [mem 0x00800000-0x00807fff] (32768 bytes)
+[    0.357315] ACPI: PM: Registering ACPI NVS region [mem 0x0080b000-0x0080bfff] (4096 bytes)
+[    0.359312] ACPI: PM: Registering ACPI NVS region [mem 0x00810000-0x008fffff] (983040 bytes)
+[    0.361320] ACPI: PM: Registering ACPI NVS region [mem 0x7fb7f000-0x7fbfefff] (524288 bytes)
+[    0.363316] ACPI: PM: Registering ACPI NVS region [mem 0x7ff70000-0x7fffffff] (589824 bytes)
+[    0.365421] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+[    0.366320] posixtimers hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.367313] futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+[    0.368686] PM: RTC time: 17:32:39, date: 2026-08-31
+[    0.369864] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.370502] DMA: preallocated 512 KiB GFP_KERNEL pool for atomic allocations
+[    0.372307] DMA: preallocated 512 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.373341] DMA: preallocated 512 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.374319] audit: initializing netlink subsys (disabled)
+[    0.375324] audit: type=2000 audit(1788197559.927:1): state=initialized audit_enabled=0 res=1
+[    0.375361] thermal_sys: Registered thermal governor 'fair_share'
+[    0.376313] thermal_sys: Registered thermal governor 'bang_bang'
+[    0.377311] thermal_sys: Registered thermal governor 'step_wise'
+[    0.378310] thermal_sys: Registered thermal governor 'user_space'
+[    0.380310] thermal_sys: Registered thermal governor 'power_allocator'
+[    0.381324] cpuidle: using governor ladder
+[    0.384318] cpuidle: using governor menu
+[    0.388671] efi: Freeing EFI boot services memory: 32920K
+[    0.390313] acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+[    0.391582] PCI: ECAM [mem 0xe0000000-0xefffffff] (base 0xe0000000) for domain 0000 [bus 00-ff]
+[    0.394324] PCI: Using configuration type 1 for base access
+[    0.395442] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+[    0.400349] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+[    0.402311] HugeTLB: 16380 KiB vmemmap can be freed for a 1.00 GiB page
+[    0.409308] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    0.410310] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+[    0.427947] fbcon: Taking over console
+[    0.428337] ACPI: Added _OSI(Module Device)
+[    0.428339] ACPI: Added _OSI(Processor Device)
+[    0.428340] ACPI: Added _OSI(Processor Aggregator Device)
+[    0.432964] ACPI: 1 ACPI AML tables successfully acquired and loaded
+[    0.435312] ACPI: \_SB_: platform _OSC: OS support mask [006e7eff]
+[    0.436608] ACPI: Interpreter enabled
+[    0.437325] ACPI: PM: (supports S0 S3 S4 S5)
+[    0.438309] ACPI: Using IOAPIC for interrupt routing
+[    0.440510] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+[    0.442311] PCI: Ignoring E820 reservations for host bridge windows
+[    0.444469] ACPI: Enabled 2 GPEs in block 00 to 3F
+[    0.449134] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    0.450315] acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
+[    0.452399] acpi PNP0A08:00: _OSC: platform does not support [PCIeHotplug LTR DPC]
+[    0.454450] acpi PNP0A08:00: _OSC: OS now controls [SHPCHotplug PME AER PCIeCapability]
+[    0.456570] PCI host bridge to bus 0000:00
+[    0.458312] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+[    0.459310] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+[    0.461310] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+[    0.463310] pci_bus 0000:00: root bus resource [mem 0x80000000-0xdfffffff window]
+[    0.465311] pci_bus 0000:00: root bus resource [mem 0xf0000000-0xfebfffff window]
+[    0.466310] pci_bus 0000:00: root bus resource [mem 0x180000000-0x97fffffff window]
+[    0.468311] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    0.470406] pci 0000:00:00.0: [8086:29c0] type 00 class 0x060000 conventional PCI endpoint
+[    0.473410] pci 0000:00:01.0: [1234:1111] type 00 class 0x030000 conventional PCI endpoint
+[    0.477101] pci 0000:00:01.0: BAR 0 [mem 0x80000000-0x80ffffff pref]
+[    0.478346] pci 0000:00:01.0: BAR 2 [mem 0x810c5000-0x810c5fff]
+[    0.479379] pci 0000:00:01.0: ROM [mem 0xffff0000-0xffffffff pref]
+[    0.481419] pci 0000:00:01.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+[    0.483848] pci 0000:00:02.0: [8086:10d3] type 00 class 0x020000 PCIe Root Complex Integrated Endpoint
+[    0.488030] pci 0000:00:02.0: BAR 0 [mem 0x810a0000-0x810bffff]
+[    0.489329] pci 0000:00:02.0: BAR 1 [mem 0x81080000-0x8109ffff]
+[    0.491327] pci 0000:00:02.0: BAR 2 [io  0x6060-0x607f]
+[    0.492327] pci 0000:00:02.0: BAR 3 [mem 0x810c0000-0x810c3fff]
+[    0.493372] pci 0000:00:02.0: ROM [mem 0xfff80000-0xffffffff pref]
+[    0.534242] pci 0000:00:1f.0: [8086:2918] type 00 class 0x060100 conventional PCI endpoint
+[    0.537148] pci 0000:00:1f.0: quirk: [io  0x0600-0x067f] claimed by ICH6 ACPI/GPIO/TCO
+[    0.539852] pci 0000:00:1f.2: [8086:2922] type 00 class 0x010601 conventional PCI endpoint
+[    0.542393] pci 0000:00:1f.2: BAR 4 [io  0x6040-0x605f]
+[    0.543327] pci 0000:00:1f.2: BAR 5 [mem 0x810c4000-0x810c4fff]
+[    0.546090] pci 0000:00:1f.3: [8086:2930] type 00 class 0x0c0500 conventional PCI endpoint
+[    0.549238] pci 0000:00:1f.3: BAR 4 [io  0x6000-0x603f]
+[    0.553065] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+[    0.554464] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+[    0.556461] ACPI: PCI: Interrupt link LNKC configured for IRQ 11
+[    0.557461] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+[    0.559461] ACPI: PCI: Interrupt link LNKE configured for IRQ 10
+[    0.561459] ACPI: PCI: Interrupt link LNKF configured for IRQ 10
+[    0.562459] ACPI: PCI: Interrupt link LNKG configured for IRQ 11
+[    0.564460] ACPI: PCI: Interrupt link LNKH configured for IRQ 11
+[    0.565367] ACPI: PCI: Interrupt link GSIA configured for IRQ 16
+[    0.567322] ACPI: PCI: Interrupt link GSIB configured for IRQ 17
+[    0.569322] ACPI: PCI: Interrupt link GSIC configured for IRQ 18
+[    0.570322] ACPI: PCI: Interrupt link GSID configured for IRQ 19
+[    0.572322] ACPI: PCI: Interrupt link GSIE configured for IRQ 20
+[    0.573322] ACPI: PCI: Interrupt link GSIF configured for IRQ 21
+[    0.574322] ACPI: PCI: Interrupt link GSIG configured for IRQ 22
+[    0.576322] ACPI: PCI: Interrupt link GSIH configured for IRQ 23
+[    0.578337] iommu: Default domain type: Translated
+[    0.579311] iommu: DMA domain TLB invalidation policy: lazy mode
+[    0.580551] SCSI subsystem initialized
+[    0.581345] ACPI: bus type USB registered
+[    0.582334] usbcore: registered new interface driver usbfs
+[    0.583318] usbcore: registered new interface driver hub
+[    0.584316] usbcore: registered new device driver usb
+[    0.586337] pps_core: LinuxPPS API ver. 1 registered
+[    0.587309] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    0.589313] PTP clock support registered
+[    0.590339] EDAC MC: Ver: 3.0.0
+[    0.591527] efivars: Registered efivars operations
+[    0.592617] NetLabel: Initializing
+[    0.593317] NetLabel:  domain hash size = 128
+[    0.594207] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+[    0.594337] NetLabel:  unlabeled traffic allowed by default
+[    0.595338] mctp: management component transport protocol core
+[    0.596310] NET: Registered PF_MCTP protocol family
+[    0.597316] PCI: Using ACPI for IRQ routing
+[    1.054098] e820: register RAM buffer resource [mem 0x0080b000-0x008fffff]
+[    1.054316] e820: register RAM buffer resource [mem 0x00810000-0x008fffff]
+[    1.055311] e820: register RAM buffer resource [mem 0x7e566000-0x7fffffff]
+[    1.056311] e820: register RAM buffer resource [mem 0x7ed3f000-0x7fffffff]
+[    1.057311] e820: register RAM buffer resource [mem 0x7f8ed000-0x7fffffff]
+[    1.058311] e820: register RAM buffer resource [mem 0x7feec000-0x7fffffff]
+[    1.059419] pci 0000:00:01.0: vgaarb: setting as boot VGA device
+[    1.060298] pci 0000:00:01.0: vgaarb: bridge control possible
+[    1.060298] pci 0000:00:01.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+[    1.060309] vgaarb: loaded
+[    1.060928] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+[    1.061298] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+[    1.068447] clocksource: Switched to clocksource kvm-clock
+[    1.070004] VFS: Disk quotas dquot_6.6.0
+[    1.071102] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    1.074119] AppArmor: AppArmor Filesystem Enabled
+[    1.075285] acpi PNP0C01:00: Reserved [mem 0xe0000000-0xefffffff]
+[    1.076665] pnp: PnP ACPI init
+[    1.078060] pnp: PnP ACPI: found 5 devices
+[    1.087560] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+[    1.089577] NET: Registered PF_INET protocol family
+[    1.090745] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
+[    1.107937] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    1.109887] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    1.111565] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    1.113304] TCP bind hash table entries: 32768 (order: 8, 1048576 bytes, linear)
+[    1.114942] TCP: Hash tables configured (established 32768 bind 32768)
+[    1.116400] MPTCP token hash table entries: 4096 (order: 5, 98304 bytes, linear)
+[    1.118007] UDP hash table entries: 2048 (order: 5, 131072 bytes, linear)
+[    1.119567] UDP-Lite hash table entries: 2048 (order: 5, 131072 bytes, linear)
+[    1.121183] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    1.122416] NET: Registered PF_XDP protocol family
+[    1.123467] pci 0000:00:02.0: ROM [mem 0xfff80000-0xffffffff pref]: can't claim; no compatible bridge window
+[    1.125558] pci 0000:00:02.0: ROM [mem 0x81000000-0x8107ffff pref]: assigned
+[    1.127070] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+[    1.128388] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+[    1.129707] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+[    1.131184] pci_bus 0000:00: resource 7 [mem 0x80000000-0xdfffffff window]
+[    1.132646] pci_bus 0000:00: resource 8 [mem 0xf0000000-0xfebfffff window]
+[    1.134121] pci_bus 0000:00: resource 9 [mem 0x180000000-0x97fffffff window]
+[    1.135766] PCI: CLS 0 bytes, default 64
+[    1.136718] PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+[    1.136890] Trying to unpack rootfs image as initramfs...
+[    1.138102] software IO TLB: mapped [mem 0x00000000713dc000-0x00000000753dc000] (64MB)
+[    1.138174] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x256becde448, max_idle_ns: 440795276694 ns
+[    1.144024] Initialise system trusted keyrings
+[    1.145062] Key type blacklist registered
+[    1.146668] workingset: timestamp_bits=36 max_order=20 bucket_order=0
+[    1.148476] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    1.150690] fuse: init (API version 7.45)
+[    1.154651] integrity: Platform Keyring initialized
+[    1.155728] integrity: Machine keyring initialized
+[    1.166861] Key type asymmetric registered
+[    1.167760] Asymmetric key parser 'x509' registered
+[    1.168843] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 242)
+[    1.170536] io scheduler mq-deadline registered
+[    1.172656] ledtrig-cpu: registered to indicate activity on CPUs
+[    1.174225] input: Power Button as /devices/platform/LNXPWRBN:00/input/input0
+[    1.175856] ACPI: button: Power Button [PWRF]
+[    1.177956] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+[    1.205072] 00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    1.210149] Linux agpgart interface v0.103
+[    1.213468] loop: module loaded
+[    1.214645] ACPI: bus type drm_connector registered
+[    1.216202] tun: Universal TUN/TAP device driver, 1.6
+[    1.217574] PPP generic driver version 2.4.2
+[    1.218914] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    1.226969] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    1.228297] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    1.229773] mousedev: PS/2 mouse device common for all mice
+[    1.231823] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+[    1.234167] rtc_cmos 00:04: RTC can wake from S4
+[    1.238656] rtc_cmos 00:04: registered as rtc0
+[    1.240016] rtc_cmos 00:04: setting system clock to 2026-08-31T17:32:40 UTC (1788197560)
+[    1.242210] rtc_cmos 00:04: alarms up to one day, y3k, 242 bytes nvram
+[    1.243914] i2c_dev: i2c /dev entries driver
+[    1.245073] device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+[    1.248198] device-mapper: uevent: version 1.0.3
+[    1.249462] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+[    1.251747] amd_pstate: The CPPC feature is supported but currently disabled by the BIOS.
+[    1.251747] Please enable it if your BIOS has the CPPC option.
+[    1.255304] amd_pstate: the _CPC object is not present in SBIOS or ACPI disabled
+[    1.257492] simple-framebuffer simple-framebuffer.0: [drm] Registered 1 planes with drm panic
+[    1.259900] [drm] Initialized simpledrm 1.0.0 for simple-framebuffer.0 on minor 0
+[    1.272032] Console: switching to colour frame buffer device 160x50
+[    1.274258] simple-framebuffer simple-framebuffer.0: [drm] fb0: simpledrmdrmfb frame buffer device
+[    1.276722] drop_monitor: Initializing network drop monitor service
+[    1.278556] NET: Registered PF_INET6 protocol family
+[    1.280172] Segment Routing with IPv6
+[    1.281200] In-situ OAM (IOAM) with IPv6
+[    1.282274] NET: Registered PF_PACKET protocol family
+[    1.283678] Key type dns_resolver registered
+[    1.286156] IPI shorthand broadcast: enabled
+[    1.290515] sched_clock: Marking stable (1074007232, 215609104)->(1344844891, -55228555)
+[    1.293890] registered taskstats version 1
+[    1.297971] Loading compiled-in X.509 certificates
+[    1.299974] Loaded X.509 cert 'Build time autogenerated kernel key: 95e77db4b9be914d2003459bdb9ea78076958bbb'
+[    1.302472] Loaded X.509 cert 'Canonical Ltd. Live Patch Signing 2025 Kmod: d541cef61dc7e793b7eb7e899970a2eef0b5dc8c'
+[    1.305135] Loaded X.509 cert 'Canonical Ltd. Live Patch Signing: 14df34d1a87cf37625abec039ef2bf521249b969'
+[    1.307576] Loaded X.509 cert 'Canonical Ltd. Kernel Module Signing 2025 Kmod: 4627603d2357a2a3f81006370894c221175893e9'
+[    1.308965] Freeing initrd memory: 76876K
+[    1.310259] Loaded X.509 cert 'Canonical Ltd. Kernel Module Signing: 88f752e560a1e0737e31163a466ad7b70a850c19'
+[    1.313238] blacklist: Loading compiled-in revocation X.509 certificates
+[    1.314758] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing: 61482aa2830d0ab2ad5af10b7250da9033ddcef0'
+[    1.316907] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2017): 242ade75ac4a15e50d50c84b0d45ff3eae707a03'
+[    1.319211] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (ESM 2018): 365188c1d374d6b07c3c8f240f8ef722433d6a8b'
+[    1.321596] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2019): c0746fd6c5da3ae827864651ad66ae47fe24b3e8'
+[    1.324013] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v1): a8d54bbb3825cfb94fa13c9f8a594a195c107b8d'
+[    1.326834] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v2): 4cf046892d6fd3c9a5b03f98d845f90851dc6a8c'
+[    1.329676] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v3): 100437bb6de6e469b581e61cd66bce3ef4ed53af'
+[    1.332946] Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (Ubuntu Core 2019): c1d57b8f6b743f23ee41f4f7ee292f06eecadfb9'
+[    1.344738] Demotion targets for Node 0: null
+[    1.346335] Key type .fscrypt registered
+[    1.347544] Key type fscrypt-provisioning registered
+[    1.349253] Key type big_key registered
+[    1.363665] Key type encrypted registered
+[    1.364762] AppArmor: AppArmor sha256 policy hashing enabled
+[    1.366162] ima: No TPM chip found, activating TPM-bypass!
+[    1.367692] Loading compiled-in module X.509 certificates
+[    1.369324] Loaded X.509 cert 'Build time autogenerated kernel key: 95e77db4b9be914d2003459bdb9ea78076958bbb'
+[    1.371751] ima: Allocated hash algorithm: sha256
+[    1.372946] ima: No architecture policies found
+[    1.374251] evm: Initialising EVM extended attributes:
+[    1.375528] evm: security.selinux
+[    1.376562] evm: security.SMACK64
+[    1.377455] evm: security.SMACK64EXEC
+[    1.378553] evm: security.SMACK64TRANSMUTE
+[    1.379771] evm: security.SMACK64MMAP
+[    1.380890] evm: security.apparmor
+[    1.381772] evm: security.ima
+[    1.382565] evm: security.capability
+[    1.383660] evm: HMAC attrs: 0x1
+[    1.384945] PM:   Magic number: 6:624:543
+[    1.386577] RAS: Correctable Errors collector initialized.
+[    1.388452] clk: Disabling unused clocks
+[    1.389774] PM: genpd: Disabling unused power domains
+[    1.393251] Freeing unused decrypted memory: 2028K
+[    1.394957] Freeing unused kernel image (initmem) memory: 5292K
+[    1.396058] Write protecting the kernel read-only data: 43008k
+[    1.397783] Freeing unused kernel image (text/rodata gap) memory: 776K
+[    1.399257] Freeing unused kernel image (rodata/data gap) memory: 1668K
+[    1.469917] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.471093] Run /init as init process
+Loading, please wait...
+Starting systemd-udevd version 259.5-0ubuntu3.4
+[    1.620263] ACPI: \_SB_.GSIA: Enabled at IRQ 16
+[    1.622772] ahci 0000:00:1f.2: AHCI vers 0001.0000, 32 command slots, 1.5 Gbps, SATA mode
+[    1.624226] ahci 0000:00:1f.2: 6/6 ports implemented (port mask 0x3f)
+[    1.625457] ahci 0000:00:1f.2: flags: 64bit ncq only 
+[    1.629819] scsi host0: ahci
+[    1.634695] scsi host1: ahci
+[    1.635522] scsi host2: ahci
+[    1.638729] scsi host3: ahci
+[    1.642861] e1000e: Intel(R) PRO/1000 Network Driver
+[    1.643781] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    1.645272] ACPI: \_SB_.GSIG: Enabled at IRQ 22
+[    1.645281] scsi host4: ahci
+[    1.646573] e1000e 0000:00:02.0: Interrupt Throttling Rate (ints/sec) set to dynamic conservative mode
+[    1.649466] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input4
+[    1.651184] scsi host5: ahci
+[    1.652093] ata1: SATA max UDMA/133 abar m4096@0x810c4000 port 0x810c4100 irq 24 lpm-pol 1
+[    1.653702] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input3
+[    1.654171] ata2: SATA max UDMA/133 abar m4096@0x810c4000 port 0x810c4180 irq 24 lpm-pol 1
+[    1.656356] ata3: SATA max UDMA/133 abar m4096@0x810c4000 port 0x810c4200 irq 24 lpm-pol 1
+[    1.657764] ata4: SATA max UDMA/133 abar m4096@0x810c4000 port 0x810c4280 irq 24 lpm-pol 1
+[    1.661053] ata5: SATA max UDMA/133 abar m4096@0x810c4000 port 0x810c4300 irq 24 lpm-pol 1
+[    1.662862] ata6: SATA max UDMA/133 abar m4096@0x810c4000 port 0x810c4380 irq 24 lpm-pol 1
+[    1.688386] e1000e 0000:00:02.0 0000:00:02.0 (uninitialized): registered PHC clock
+[    1.739314] e1000e 0000:00:02.0 eth0: (PCI Express:2.5GT/s:Width x1) 52:54:00:12:34:56
+[    1.740489] e1000e 0000:00:02.0 eth0: Intel(R) PRO/1000 Network Connection
+[    1.741742] e1000e 0000:00:02.0 eth0: MAC: 3, PHY: 8, PBA No: 000000-000
+[    1.972090] ata2: SATA link down (SStatus 0 SControl 300)
+[    1.973254] ata6: SATA link down (SStatus 0 SControl 300)
+[    1.974503] ata5: SATA link down (SStatus 0 SControl 300)
+[    1.975628] ata1: SATA link down (SStatus 0 SControl 300)
+[    1.976828] ata3: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+[    1.978112] ata3.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[    1.979042] ata3.00: applying bridge limits
+[    1.980150] ata4: SATA link down (SStatus 0 SControl 300)
+[    1.981286] ata3.00: configured for UDMA/100
+[    1.982352] scsi 2:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+[    1.995156] sr 2:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[    2.016788] cdrom: Uniform CD-ROM driver Revision: 3.20
+[    2.032897] sr 2:0:0:0: Attached scsi generic sg0 type 5
+[    2.035979] e1000e 0000:00:02.0 enp0s2: renamed from eth0
+Begin: Loading essential drivers ... done.
+Begin: Running /scripts/init-premount ... done.
+Begin: Mounting root file system ... Begin: Running /scripts/nfs-top ... done.
+Begin: Running /scripts/nfs-premount ... done.
+[    2.178066] loop0: detected capacity change from 0 to 4969808
+[    2.185434] overlayfs: null uuid in non-single lower fs '/', falling back to xino=off,index=off,nfs_export=off.
+[    2.240672] evm: overlay not supported
+Begin: Running /scripts/casper-premount ... done.
+done.
+touch: /root/var/crash/crash.init: No such file or directory
+rm: can't remove '/root/var/crash/crash.init': No such file or directory
+done.
+Begin: Creating debconf-communicate fifo mechanism ... done.
+Begin: Running /scripts/casper-bottom ... Begin: Moving mount points... ... done.
+Begin: Configuring fstab... ... done.
+Begin: Setting up swap... ... done.
+Begin: Setting up locales... ... done.
+Begin: Setting up automatic login... ... done.
+Begin: Setting hostname... ... done.
+Begin: Setting up console keyboard... ... done.
+Begin: Applying desktop settings... ... done.
+Begin: Regenerating SSL certificate... ... done.
+Begin: Loading preseed file... ... done.
+Begin: Adding live session user... ... warn: The home directory `/home/ubuntu' already exists.  Not touching this directory.
+warn: Warning: The home directory `/home/ubuntu' does not belong to the user you are currently creating.
+passwd: password changed.
+done.
+Begin: Setting up init... ... done.
+Begin: Configuring accessibility options... ... done.
+Begin: Disabling update-notifier... ... ln: /root/usr/lib/update-notifier/apt-check: No such file or directory
+ln: /root/usr/lib/ubuntu-release-upgrader/check-new-release: No such file or directory
+ln: /root/usr/lib/ubuntu-release-upgrader/check-new-release-gtk: No such file or directory
+done.
+Begin: Enabling detection of crashes... ... grep: /root/etc/default/apport: No such file or directory
+done.
+Begin: Disabling unnecessary KDE services... ... done.
+Begin: Disabling the lock screen for LXQt (LP: #2000787)... ... done.
+Begin: Generating APT cache for cdrom ... Reading package lists...
+done.
+Begin: Possibly disabling update-initramfs (useless on a live CD)... ... done.
+Begin: Grant administrative PolicyKit privileges to default user... ... done.
+Begin: Configuring jackd2... ... done.
+Begin: Disabling gnome-initial-setup... ... chown: warning: '.' should be ':': 'ubuntu.ubuntu'
+done.
+Begin: Disabling security unattended-upgrades... ... grep: /root/etc/apt/apt.cdone.
+Begin: Running /scripts/nfs-bottom ... done.
+Begin: Running /scripts/init-bottom ... done.
+P+q6E616D65\[    3.577765] systemd[1]: Inserted module 'autofs4'
+[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[    3.929378] systemd[1]: systemd 259.5-0ubuntu3.4 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +IPE +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF -XKBCOMMON -UTMP +SYSVINIT +LIBARCHIVE)
+[    3.934929] systemd[1]: Detected virtualization kvm.
+[    3.936093] systemd[1]: Detected architecture x86-64.
+
+[0;1;39mWelcome to [0m[1mUbuntu 26.04 LTS[0m[0;1;39m![0m
+
+[    3.940535] systemd[1]: Hostname set to <ubuntu>.
+]3008;start=21d3903332aa43ca8633b2581aadba4c;user=root;hostname=ubuntu;machineid=8f18b34666fe4f44af552d3068613615;bootid=db2dc552ef2f41ddb96ab6d6f8d7fb3b;pid=1;pidfdid=1;comm=systemd;type=boot\[    4.010512] systemd[1]: bpf-restrict-fs: BPF LSM hook not enabled in the kernel, BPF LSM not supported.
+[    4.093219] systemd[1]: Queued start job for default target graphical.target.
+[    4.103807] systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+[[0;32m  OK  [0m] Created slice [0;1;39msystem-modprobe.slice[0m - Slice /system/modprobe.
+[    4.107236] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+[[0;32m  OK  [0m] Created slice [0;1;39msystem-serial\x2dget…slice[0m - Slice /system/serial-getty.
+[    4.110860] systemd[1]: Created slice user.slice - User and Session Slice.
+[[0;32m  OK  [0m] Created slice [0;1;39muser.slice[0m - User and Session Slice.
+[    4.113632] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-ask-password-conso…[0mequests to Console Directory Watch.
+[    4.117350] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-ask-password-wall.…[0md Requests to Wall Directory Watch.
+[    4.121099] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+[[0;32m  OK  [0m] Set up automount [0;1;39mproc-sys-fs-binfm…[0mormats File System Automount Point.
+[    4.124955] systemd[1]: Expecting device dev-ttyS0.device - /dev/ttyS0...
+         Expecting device [0;1;39mdev-ttyS0.device[0m - /dev/ttyS0...
+[    4.127482] systemd[1]: Reached target imports.target - Image Downloads.
+[[0;32m  OK  [0m] Reached target [0;1;39mimports.target[0m - Image Downloads.
+[    4.130208] systemd[1]: Reached target paths.target - Path Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mpaths.target[0m - Path Units.
+[    4.132687] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+[[0;32m  OK  [0m] Reached target [0;1;39mremote-fs.target[0m - Remote File Systems.
+[    4.135501] systemd[1]: Reached target slices.target - Slice Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mslices.target[0m - Slice Units.
+[    4.138022] systemd[1]: Reached target swap.target - Swaps.
+[[0;32m  OK  [0m] Reached target [0;1;39mswap.target[0m - Swaps.
+[    4.140821] systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-ask-password.…[0m User Interactively for a Password.
+[    4.144763] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-creds.socket[0m - Credential Encryption/Decryption.
+[    4.148475] systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-factory-reset.socket[0m - Factory Reset Management.
+[    4.151768] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-journald-dev-…socket[0m - Journal Socket (/dev/log).
+[    4.155118] systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-journald.socket[0m - Journal Sockets.
+[    4.158464] systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-mute-console.…[0mnsole Output Muting Service Socket.
+[    4.161871] systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.164001] systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.166121] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-udevd-control.socket[0m - udev Control Socket.
+[    4.169259] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-udevd-kernel.socket[0m - udev Kernel Socket.
+[    4.172354] systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-udevd-varlink.socket[0m - udev Varlink Socket.
+[    4.176602] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+         Mounting [0;1;39mdev-hugepages.mount[0m - Huge Pages File System...
+[    4.180082] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+         Mounting [0;1;39mdev-mqueue.mount[0m - POSIX Message Queue File System...
+[    4.192257] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+         Mounting [0;1;39msys-kernel-debug.mount[0m - Kernel Debug File System...
+[    4.197941] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+         Mounting [0;1;39msys-kernel-tracing.mount[0m - Kernel Trace File System...
+[    4.208183] systemd[1]: Starting systemd-journald.service - Journal Service...
+         Starting [0;1;39msystemd-journald.service[0m - Journal Service...
+[    4.213286] systemd[1]: Starting keyboard-setup.service - Set the console keyboard layout...
+         Starting [0;1;39mkeyboard-setup.service[0m - Set the console keyboard layout...
+[    4.218506] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+         Starting [0;1;39mkmod-static-nodes.service[0m…eate List of Static Device Nodes...
+[    4.223375] systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+[    4.228264] systemd[1]: Mounting sys-kernel-config.mount - Kernel Configuration File System...
+         Mounting [0;1;39msys-kernel-config.mount[0m - Kernel Configuration File System...
+[    4.233440] systemd[1]: modprobe@drm.service - Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+[    4.241002] systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+[    4.243066] systemd-journald[532]: Collecting audit messages is disabled.
+         Starting [0;1;39mmodprobe@efi_pstore.servi…[0m - Load Kernel Module efi_pstore...
+[    4.248299] systemd[1]: modprobe@fuse.service - Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+[    4.253164] systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+         Mounting [0;1;39msys-fs-fuse-connections.mount[0m - FUSE Control File System...
+[    4.256775] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+[    4.267742] pstore: Using crash dump compression: deflate
+[    4.270374] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+         Starting [0;1;39msystemd-modules-load.service[0m - Load Kernel Module[    4.274776] pstore: Registered efi_pstore as persistent store backend
+s...
+[    4.276002] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.279673] systemd[1]: systemd-pcrproduct.service - TPM NvPCR Product ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.286514] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+         Starting [0;1;39msystemd-remount-fs.servic…[0munt Root and Kernel File Systems...
+[    4.291176] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.294170] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+         Starting [0;1;39msystemd-udev-load-credent…[0mLoad udev Rules from Credentials...
+[    4.299432] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+         Starting [0;1;39msystemd-udev-trigger.service[0m - Coldplug All udev Devices...
+[    4.312524] systemd[1]: Started systemd-journald.service - Journal Service.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-journald.service[0m - Journal Service.
+[[0;32m  OK  [0m] Mounted [0;1;39mdev-hugepages.mount[0m - Huge Pages File System.
+[[0;32m  OK  [0m] Mounted [0;1;39mdev-mqueue.mount[0m - POSIX Message Queue File System.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-kernel-debug.mount[0m - Kernel Debug File System.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-kernel-tracing.mount[0m - Kernel Trace File System.
+[[0;32m  OK  [0m] Finished [0;1;39mkeyboard-setup.service[0m - Set the console keyboard layout.
+[[0;32m  OK  [0m] Finished [0;1;39mkmod-static-nodes.service[0m…Create List of Static Device Nodes.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-kernel-config.mount[0m - Kernel Configuration File System.
+[[0;32m  OK  [0m] Finished [0;1;39mmodprobe@efi_pstore.service[0m - Load Kernel Module efi_pstore.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-fs-fuse-connections.mount[0m - FUSE Control File System.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-modules-load.service[0m - Load Kernel Modules.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-remount-fs.servic…[0mmount Root and Kernel File Systems.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-udev-load-credent…[0m- Load udev Rules from Credentials.
+         Starting [0;1;39msystemd-journal-flush.ser…[0msh Journal to Persistent Storage...
+         Starting [0;1;39msystemd-random-seed.service[0m - Load/Save OS Random Seed...
+[    4.361172] systemd-journald[532]: Received client request to flush runtime journal.
+         Starting [0;1;39msystemd-sysctl.service[0m - Apply Kernel Variables...
+         Starting [0;1;39msystemd-tmpfiles-setup-de…[0m Device Nodes in /dev gracefully...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-journal-flush.ser…[0mlush Journal to Persistent Storage.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-random-seed.service[0m - Load/Save OS Random Seed.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-sysctl.service[0m - Apply Kernel Variables.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-setup-de…[0mic Device Nodes in /dev gracefully.
+         Starting [0;1;39msystemd-sysusers.service[0m - Create System Users...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-sysusers.service[0m - Create System Users.
+         Starting [0;1;39msystemd-tmpfiles-setup-de…[0meate Static Device Nodes in /dev...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-setup-de…[0mCreate Static Device Nodes in /dev.
+[[0;32m  OK  [0m] Reached target [0;1;39mlocal-fs-pre.target[0m…Preparation for Local File Systems.
+         Starting [0;1;39msystemd-udevd.service[0m - R…ager for Device Events and Files...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-udev-trigger.service[0m - Coldplug All udev Devices.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-udevd.service[0m - Ru…anager for Device Events and Files.
+[[0;32m  OK  [0m] Found device [0;1;39mdev-ttyS0.device[0m - /dev/ttyS0.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-rfkill.socket[0m…ll Switch Status /dev/rfkill Watch.
+         Mounting [0;1;39mtmp.mount[0m - /tmp...
+[[0;32m  OK  [0m] Mounted [0;1;39mtmp.mount[0m - /tmp.
+[[0;32m  OK  [0m] Reached target [0;1;39mlocal-fs.target[0m - Local File Systems.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-sysext.socket[0m… System Extension Image Management.
+         Starting [0;1;39mconsole-setup.service[0m - Set console font and keymap...
+         Starting [0;1;39mfinalrd.service[0m - Create …time dir for shutdown pivot root...
+         Starting [0;1;39mnetplan-configure.service[0m - Netplan Backend Configuration...
+         Starting [0;1;39msystemd-binfmt.service[0m - Set Up Additional Binary Formats...
+         Starting [0;1;39msystemd-tmpfiles-setup.se…[0mate System Files and Directories...
+[[0;32m  OK  [0m] Finished [0;1;39mfinalrd.service[0m - Create …untime dir for shutdown pivot root.
+         Mounting [0;1;39mproc-sys-fs-binfmt_misc.m…[0mcutable File Formats File System...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-setup.se…[0mreate System Files and Directories.
+         Starting [0;1;39mldconfig.service[0m - Rebuild Dynamic Linker Cache...
+         Starting [0;1;39msystemd-journal-catalog-u…ervice[0m - Rebuild Journal Catalog...
+[[0;32m  OK  [0m] Mounted [0;1;39mproc-sys-fs-binfmt_misc.mo…[0mxecutable File Formats File System.
+[[0;32m  OK  [0m] Finished [0;1;39mnetplan-configure.service[0m - Netplan Backend Configuration.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-binfmt.service[0m - Set Up Additional Binary Formats.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-journal-catalog-u….service[0m - Rebuild Journal Catalog.
+[[0;32m  OK  [0m] Finished [0;1;39mconsole-setup.service[0m - Set console font and keymap.
+[[0;32m  OK  [0m] Finished [0;1;39mldconfig.service[0m - Rebuild Dynamic Linker Cache.
+         Starting [0;1;39msystemd-update-done.service[0m - Update is Completed...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-update-done.service[0m - Update is Completed.
+[[0;32m  OK  [0m] Reached target [0;1;39msysinit.target[0m - System Initialization.
+[[0;32m  OK  [0m] Started [0;1;39mapt-daily.timer[0m - Daily apt download activities.
+[[0;32m  OK  [0m] Started [0;1;39mapt-daily-upgrade.timer[0m - …y apt upgrade and clean activities.
+[[0;32m  OK  [0m] Started [0;1;39mdpkg-db-backup.timer[0m - Daily dpkg database backup timer.
+[[0;32m  OK  [0m] Started [0;1;39me2scrub_all.timer[0m - Period…Metadata Check for All Filesystems.
+[[0;32m  OK  [0m] Started [0;1;39mfstrim.timer[0m - Discard unused filesystem blocks once a week.
+[[0;32m  OK  [0m] Started [0;1;39mmotd-news.timer[0m - Message of the Day.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-tmpfiles-clean.tim…[0my Cleanup of Temporary Directories.
+[[0;32m  OK  [0m] Reached target [0;1;39mtimers.target[0m - Timer Units.
+[[0;32m  OK  [0m] Listening on [0;1;39mdbus.socket[0m - D-Bus System Message Bus Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-hostnamed.socket[0m - Hostname Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-logind-varlin…[0mer Login Management Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39muuidd.socket[0m - UUID daemon activation socket.
+[[0;32m  OK  [0m] Reached target [0;1;39msockets.target[0m - Socket Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mbasic.target[0m - Basic System.
+         Starting [0;1;39mchrony.service[0m - chrony, an NTP client/server...
+         Starting [0;1;39mdbus.service[0m - D-Bus System Message Bus...
+         Starting [0;1;39me2scrub_reap.service[0m - Re…ne ext4 Metadata Check Snapshots...
+         Starting [0;1;39msystemd-logind.service[0m - User Login Management...
+[[0;32m  OK  [0m] Started [0;1;39mdbus.service[0m - D-Bus System Message Bus.
+         Starting [0;1;39mNetworkManager.service[0m - Network Manager...
+[[0;32m  OK  [0m] Started [0;1;39msystemd-logind.service[0m - User Login Management.
+[[0;32m  OK  [0m] Finished [0;1;39me2scrub_reap.service[0m - Re…line ext4 Metadata Check Snapshots.
+[[0;32m  OK  [0m] Started [0;1;39mchrony.service[0m - chrony, an NTP client/server.
+         Starting [0;1;39msystemd-hostnamed.service[0m - Hostname Service...
+[[0;32m  OK  [0m] Started [0;1;39msystemd-hostnamed.service[0m - Hostname Service.
+         Starting [0;1;39mNetworkManager-dispatcher…[0manager Script Dispatcher Service...
+[[0;32m  OK  [0m] Started [0;1;39mNetworkManager.service[0m - Network Manager.
+[[0;32m  OK  [0m] Reached target [0;1;39mnetwork.target[0m - Network.
+         Starting [0;1;39msystemd-user-sessions.service[0m - Permit User Sessions...
+[[0;32m  OK  [0m] Started [0;1;39mNetworkManager-dispatcher.…[0m Manager Script Dispatcher Service.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-user-sessions.service[0m - Permit User Sessions.
+[[0;32m  OK  [0m] Started [0;1;39mserial-getty@ttyS0.service[0m - Serial Getty on ttyS0.
+[[0;32m  OK  [0m] Reached target [0;1;39mgetty.target[0m - Login Prompts.
+[[0;32m  OK  [0m] Reached target [0;1;39mmulti-user.target[0m - Multi-User System.
+         Starting [0;1;39msetvtrgb.service[0m - Set console scheme...
+[[0;32m  OK  [0m] Started [0;1;39mzaldros-session.service[0m - Zaldros desktop session (autologin).
+[[0;32m  OK  [0m] Reached target [0;1;39mgraphical.target[0m - Graphical Interface.
+         Starting [0;1;39mzaldros-selftest.service[0m - Zaldros boot self-test...
+[[0;32m  OK  [0m] Finished [0;1;39msetvtrgb.service[0m - Set console scheme.
+[[0;32m  OK  [0m] Created slice [0;1;39msystem-getty.slice[0m - Slice /system/getty.
+[[0;32m  OK  [0m] Created slice [0;1;39muser-1000.slice[0m - User Slice of UID 1000.
+         Starting [0;1;39muser-runtime-dir@1000.ser…[0mRuntime Directory /run/user/1000...
+[[0;32m  OK  [0m] Finished [0;1;39muser-runtime-dir@1000.ser…[0mr Runtime Directory /run/user/1000.
+         Starting [0;1;39muser@1000.service[0m - User Manager for UID 1000...
+[[0;32m  OK  [0m] Started [0;1;39muser@1000.service[0m - User Manager for UID 1000.
+[[0;32m  OK  [0m] Started [0;1;39msession-1.scope[0m - Session 1 of User ubuntu.
+         Starting [0;1;39msystemd-timedated.service[0m - Time & Date Service...
+[[0;32m  OK  [0m] Started [0;1;39msystemd-timedated.service[0m - Time & Date Service.
+         Starting [0;1;39msystemd-localed.service[0m - Locale Service...
+[[0;32m  OK  [0m] Started [0;1;39msystemd-localed.service[0m - Locale Service.
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n]3008;start=42c3de68e06744049e232885f172f0bc;user=root;hostname=ubuntu;machineid=8f18b34666fe4f44af552d3068613615;bootid=db2dc552ef2f41ddb96ab6d6f8d7fb3b;pid=964;pidfdid=439;comm=(agetty);servicename=serial-getty@ttyS0.service;invocationid=856b95288a0845ab8a8d53240791f400;type=service\P+q6E616D65\
+Ubuntu 26.04 LTS ubuntu ttyS0
+
+ubuntu login: ZALDROS-GEOMETRY {"screen": {"width": 1280, "height": 800}, "items": {"taskbar": {"x": 640, "y": 776, "left": 0, "top": 752, "width": 1280, "height": 48}, "taskbarGroup": {"x": 640, "y": 776, "left": 306, "top": 752, "width": 668, "height": 48}, "startButton": {"x": 328, "y": 776, "left": 306, "top": 752, "width": 44, "height": 48}, "taskbarSearch": {"x": 464, "y": 776, "left": 350, "top": 752, "width": 228, "height": 48}, "taskViewButton": {"x": 600, "y": 776, "left": 578, "top": 752, "width": 44, "height": 48}, "widgetsButton": {"x": 68, "y": 776, "left": 12, "top": 756, "width": 113, "height": 40}, "weatherIcon": {"x": 32, "y": 776, "left": 20, "top": 764, "width": 24, "height": 24}, "weatherTemperature": {"x": 57, "y": 768, "left": 52, "top": 760, "width": 10, "height": 16}, "weatherCondition": {"x": 79, "y": 784, "left": 52, "top": 776, "width": 55, "height": 15}, "trayGroup": {"x": 1139, "y": 776, "left": 1011, "top": 752, "width": 257, "height": 48}, "trayQuickButton": {"x": 1124, "y": 776, "left": 1085, "top": 752, "width": 78, "height": 48}, "clock": {"x": 1201, "y": 776, "left": 1163, "top": 752, "width": 77, "height": 48}, "notificationButton": {"x": 1254, "y": 776, "left": 1240, "top": 752, "width": 28, "height": 48}, "startPanel": {"x": 640, "y": 377, "left": 320, "top": 14, "width": 640, "height": 726}, "startSearch": {"x": 640, "y": 65, "left": 352, "top": 46, "width": 576, "height": 38}, "startPinnedGrid": {"x": 640, "y": 270, "left": 352, "top": 144, "width": 576, "height": 252}, "startFooter": {"x": 640, "y": 708, "left": 320, "top": 676, "width": 640, "height": 64}, "searchFlyout": {"x": 640, "y": 457, "left": 320, "top": 174, "width": 640, "height": 566}, "notificationCentre": {"x": 1088, "y": 542, "left": 908, "top": 344, "width": 360, "height": 396}, "quickPanel": {"x": 1088, "y": 586, "left": 908, "top": 432, "width": 360, "height": 308}, "clipboardFlyout": {"x": 192, "y": 674, "left": 12, "top": 607, "width": 360, "height": 133}, "gameBarFlyout": {"x": 165, "y": 148, "left": 12, "top": 12, "width": 306, "height": 272}, "gameBarToolbar": {"x": 640, "y": 39, "left": 378, "top": 12, "width": 523, "height": 54}, "contextMenu": {"x": 166, "y": 135, "left": 0, "top": 0, "width": 342, "height": 278}, "explorerWindow": {"x": 640, "y": 376, "left": 140, "top": 56, "width": 1000, "height": 640}, "explorerNavBar": {"x": 640, "y": 120, "left": 140, "top": 96, "width": 1000, "height": 48}, "explorerCommandBar": {"x": 640, "y": 168, "left": 140, "top": 144, "width": 1000, "height": 48}, "explorerSidebar": {"x": 235, "y": 431, "left": 140, "top": 192, "width": 190, "height": 478}, "explorerFileList": {"x": 736, "y": 446, "left": 331, "top": 222, "width": 809, "height": 448}, "settingsWindow": {"x": 690, "y": 400, "left": 220, "top": 90, "width": 940, "height": 620}, "settingsRail": {"x": 380, "y": 416, "left": 220, "top": 122, "width": 320, "height": 588}, "settingsBody": {"x": 850, "y": 416, "left": 540, "top": 122, "width": 620, "height": 588}, "titleBar": {"x": 690, "y": 106, "left": 220, "top": 90, "width": 940, "height": 32}, "captionButtons": {"x": 1091, "y": 106, "left": 1022, "top": 90, "width": 138, "height": 32}, "snapFlyout": {"x": 348, "y": 52, "left": 12, "top": 8, "width": 672, "height": 88}, "snapBar": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarLayouts": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarHint": {"x": 514, "y": 42, "left": 343, "top": 32, "width": 343, "height": 19}, "snapAssist": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "snapAssistGrid": {"x": 960, "y": 376, "left": 960, "top": 376, "width": 0, "height": 0}, "snapAssistScrim": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "edgePreview": {"x": 0, "y": 0, "left": 0, "top": 0, "width": 0, "height": 0}, "snapThumb0": {"x": 73, "y": 52, "left": 25, "top": 21, "width": 96, "height": 62}, "snapThumb1": {"x": 183, "y": 52, "left": 135, "top": 21, "width": 96, "height": 62}, "snapThumb2": {"x": 293, "y": 52, "left": 245, "top": 21, "width": 96, "height": 62}, "snapThumb3": {"x": 403, "y": 52, "left": 355, "top": 21, "width": 96, "height": 62}, "snapThumb4": {"x": 513, "y": 52, "left": 465, "top": 21, "width": 96, "height": 62}, "snapThumb5": {"x": 623, "y": 52, "left": 575, "top": 21, "width": 96, "height": 62}, "snapBarThumb0": {"x": 365, "y": 90, "left": 317, "top": 59, "width": 96, "height": 62}, "snapBarThumb1": {"x": 475, "y": 90, "left": 427, "top": 59, "width": 96, "height": 62}, "snapBarThumb2": {"x": 585, "y": 90, "left": 537, "top": 59, "width": 96, "height": 62}, "snapBarThumb3": {"x": 695, "y": 90, "left": 647, "top": 59, "width": 96, "height": 62}, "snapBarThumb4": {"x": 805, "y": 90, "left": 757, "top": 59, "width": 96, "height": 62}, "snapBarThumb5": {"x": 915, "y": 90, "left": 867, "top": 59, "width": 96, "height": 62}, "snapZone0_0": {"x": 48, "y": 52, "left": 25, "top": 21, "width": 45, "height": 62}, "snapZone0_1": {"x": 98, "y": 52, "left": 76, "top": 21, "width": 45, "height": 62}, "snapZone1_0": {"x": 165, "y": 52, "left": 135, "top": 21, "width": 60, "height": 62}, "snapZone1_1": {"x": 216, "y": 52, "left": 201, "top": 21, "width": 30, "height": 62}, "snapZone2_0": {"x": 268, "y": 52, "left": 245, "top": 21, "width": 45, "height": 62}, "snapZone2_1": {"x": 318, "y": 35, "left": 296, "top": 21, "width": 45, "height": 28}, "snapZone2_2": {"x": 318, "y": 69, "left": 296, "top": 55, "width": 45, "height": 28}, "snapZone3_0": {"x": 378, "y": 35, "left": 355, "top": 21, "width": 45, "height": 28}, "snapZone3_1": {"x": 428, "y": 35, "left": 406, "top": 21, "width": 45, "height": 28}, "snapZone3_2": {"x": 378, "y": 69, "left": 355, "top": 55, "width": 45, "height": 28}, "snapZone3_3": {"x": 428, "y": 69, "left": 406, "top": 55, "width": 45, "height": 28}, "snapZone4_0": {"x": 479, "y": 52, "left": 465, "top": 21, "width": 28, "height": 62}, "snapZone4_1": {"x": 513, "y": 52, "left": 499, "top": 21, "width": 28, "height": 62}, "snapZone4_2": {"x": 547, "y": 52, "left": 533, "top": 21, "width": 28, "height": 62}, "snapZone5_0": {"x": 586, "y": 52, "left": 575, "top": 21, "width": 21, "height": 62}, "snapZone5_1": {"x": 623, "y": 52, "left": 602, "top": 21, "width": 42, "height": 62}, "snapZone5_2": {"x": 660, "y": 52, "left": 650, "top": 21, "width": 21, "height": 62}}}
+ZALDROS-SELFTEST {"variant": "legacy", "kernel": "7.0.0-30-generic", "boot_time": {"uptime_at_selftest_s": 21.32, "systemd_analyze": null, "userspace_s": null, "kernel_s": null}, "systemd_state": "starting", "pending_jobs": "124 zaldros-selftest.service start running", "failed_units": "", "wayland_socket": ["/run/user/1000/wayland-0", "/run/user/1000/wayland-0.lock"], "kwin": true, "plasmashell": false, "shell": true, "shell_journal": "Aug 31 17:32:45 ubuntu systemd[1]: Started zaldros-session.service - Zaldros desktop session (autologin).\nAug 31 17:32:45 ubuntu (zaldros-session)[967]: pam_unix(login:session): session opened for user ubuntu(uid=1000) by ubuntu(uid=0)", "process_count": 26, "mem_used_mib": 644, "rss_mib": {"python3": 340.5, "kwin_wayland": 211.0, "systemd": 27.9, "NetworkManager": 19.6, "wireplumber": 16.4, "pipewire": 15.5, "systemd-udevd": 11.6, "pipewire-pulse": 10.6, "systemd-journal": 10.2, "dbus-daemon": 9.8, "systemd-logind": 9.5, "chronyd": 8.5}, "loadavg": ["0.03", "0.04", "0.01"], "session_log": "on/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\n", "app_launch": {"app": "konsole", "started": true, "seconds": 2.0}, "visual_layer": {"cursor_theme": "Fluent-dark-cursors", "cursor_theme_installed": true, "cursor_shapes": 111, "cursor_default_alias": true, "xcursor_theme_env": "", "icon_theme_installed": true, "icon_theme_apps": 17}, "switcher": {"package_installed": true, "accel_path": "/usr/lib/x86_64-linux-gnu/libexec/kglobalacceld", "accel_running": "", "session_bus_socket": true, "runtime_dir": "/run/user/1000", "dbus_kde_names": ["org.kde.KWin", "org.kde.KWin.Effect.WindowView1", "org.kde.KWin.HighlightWindow", "org.kde.keyboard", "org.kde.kglobalaccel", "org.kde.screensaver"], "all_components": "([objectpath '/component/kwin', '/component/org_kde_dolphin_desktop', '/component/org_kde_konsole_desktop', '/component/ksmserver', '/component/KDE_Keyboard_Layout_Switcher'],)", "invoke_shortcut_reply": "()", "package_files": ["contents/ui/IconBadge.qml", "contents/ui/main.qml", "metadata.json"], "installed_layouts": ["zaldros", "zaldros-grid"], "configured_layout": "zaldros", "tabbox_config": {"LayoutName": "zaldros", "ShowTabBox": "true", "HighlightWindows": "true", "SwitchingMode": "0", "MultiScreenMode": "0", "ApplicationsMode": "0", "MinimizedMode": "0"}, "tabbox_alternative_config": {"LayoutName": "zaldros-grid", "ShowTabBox": "true", "HighlightWindows": "true", "SwitchingMode": "0", "MultiScreenMode": "0", "ApplicationsMode": "0", "MinimizedMode": "0"}, "kglobalaccel_component_present": true, "all_shortcut_infos_error": "", "walk_through_windows": "Walk Through Windows of Current Application Alternative', 'Walk Through Windows of Current Application Alternative', 'kwin', 'KWin', 'default', 'Default Context', @ai [], @ai []), ", "walk_through_windows_exact": "Walk Through Windows', 'Walk Through Windows', 'kwin', 'KWin', 'default', 'Default Context', [150994945], [285212673, 150994945]), ", "zaldros_action": "Zaldros Walk Through Windows', 'Zaldros: следующее окно', 'kwin', 'KWin', 'default', 'Default Context', [285212729], [285212729]), ", "kwin_journal": ""}, "sessions_available": ["zaldros.desktop"], "users": "ubuntu:x:1000:1000:Live session user,,,:/home/ubuntu:/bin/bash", "runtime_dirs": ["1000"], "session_unit": "ActiveState=active\nSubState=running\nResult=success\nExecMainStatus=0", "session_journal": "Aug 31 17:32:45 ubuntu systemd[1]: Started zaldros-session.service - Zaldros desktop session (autologin).\nAug 31 17:32:45 ubuntu (zaldros-session)[967]: pam_unix(login:session): session opened for user ubuntu(uid=1000) by ubuntu(uid=0)", "ui_geometry": {"screen": {"width": 1280, "height": 800}, "items": {"taskbar": {"x": 640, "y": 776, "left": 0, "top": 752, "width": 1280, "height": 48}, "taskbarGroup": {"x": 640, "y": 776, "left": 306, "top": 752, "width": 668, "height": 48}, "startButton": {"x": 328, "y": 776, "left": 306, "top": 752, "width": 44, "height": 48}, "taskbarSearch": {"x": 464, "y": 776, "left": 350, "top": 752, "width": 228, "height": 48}, "taskViewButton": {"x": 600, "y": 776, "left": 578, "top": 752, "width": 44, "height": 48}, "widgetsButton": {"x": 68, "y": 776, "left": 12, "top": 756, "width": 113, "height": 40}, "weatherIcon": {"x": 32, "y": 776, "left": 20, "top": 764, "width": 24, "height": 24}, "weatherTemperature": {"x": 57, "y": 768, "left": 52, "top": 760, "width": 10, "height": 16}, "weatherCondition": {"x": 79, "y": 784, "left": 52, "top": 776, "width": 55, "height": 15}, "trayGroup": {"x": 1139, "y": 776, "left": 1011, "top": 752, "width": 257, "height": 48}, "trayQuickButton": {"x": 1124, "y": 776, "left": 1085, "top": 752, "width": 78, "height": 48}, "clock": {"x": 1201, "y": 776, "left": 1163, "top": 752, "width": 77, "height": 48}, "notificationButton": {"x": 1254, "y": 776, "left": 1240, "top": 752, "width": 28, "height": 48}, "startPanel": {"x": 640, "y": 377, "left": 320, "top": 14, "width": 640, "height": 726}, "startSearch": {"x": 640, "y": 65, "left": 352, "top": 46, "width": 576, "height": 38}, "startPinnedGrid": {"x": 640, "y": 270, "left": 352, "top": 144, "width": 576, "height": 252}, "startFooter": {"x": 640, "y": 708, "left": 320, "top": 676, "width": 640, "height": 64}, "searchFlyout": {"x": 640, "y": 457, "left": 320, "top": 174, "width": 640, "height": 566}, "notificationCentre": {"x": 1088, "y": 542, "left": 908, "top": 344, "width": 360, "height": 396}, "quickPanel": {"x": 1088, "y": 586, "left": 908, "top": 432, "width": 360, "height": 308}, "clipboardFlyout": {"x": 192, "y": 674, "left": 12, "top": 607, "width": 360, "height": 133}, "gameBarFlyout": {"x": 165, "y": 148, "left": 12, "top": 12, "width": 306, "height": 272}, "gameBarToolbar": {"x": 640, "y": 39, "left": 378, "top": 12, "width": 523, "height": 54}, "contextMenu": {"x": 166, "y": 135, "left": 0, "top": 0, "width": 342, "height": 278}, "explorerWindow": {"x": 640, "y": 376, "left": 140, "top": 56, "width": 1000, "height": 640}, "explorerNavBar": {"x": 640, "y": 120, "left": 140, "top": 96, "width": 1000, "height": 48}, "explorerCommandBar": {"x": 640, "y": 168, "left": 140, "top": 144, "width": 1000, "height": 48}, "explorerSidebar": {"x": 235, "y": 431, "left": 140, "top": 192, "width": 190, "height": 478}, "explorerFileList": {"x": 736, "y": 446, "left": 331, "top": 222, "width": 809, "height": 448}, "settingsWindow": {"x": 690, "y": 400, "left": 220, "top": 90, "width": 940, "height": 620}, "settingsRail": {"x": 380, "y": 416, "left": 220, "top": 122, "width": 320, "height": 588}, "settingsBody": {"x": 850, "y": 416, "left": 540, "top": 122, "width": 620, "height": 588}, "titleBar": {"x": 690, "y": 106, "left": 220, "top": 90, "width": 940, "height": 32}, "captionButtons": {"x": 1091, "y": 106, "left": 1022, "top": 90, "width": 138, "height": 32}, "snapFlyout": {"x": 348, "y": 52, "left": 12, "top": 8, "width": 672, "height": 88}, "snapBar": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarLayouts": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarHint": {"x": 514, "y": 42, "left": 343, "top": 32, "width": 343, "height": 19}, "snapAssist": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "snapAssistGrid": {"x": 960, "y": 376, "left": 960, "top": 376, "width": 0, "height": 0}, "snapAssistScrim": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "edgePreview": {"x": 0, "y": 0, "left": 0, "top": 0, "width": 0, "height": 0}, "snapThumb0": {"x": 73, "y": 52, "left": 25, "top": 21, "width": 96, "height": 62}, "snapThumb1": {"x": 183, "y": 52, "left": 135, "top": 21, "width": 96, "height": 62}, "snapThumb2": {"x": 293, "y": 52, "left": 245, "top": 21, "width": 96, "height": 62}, "snapThumb3": {"x": 403, "y": 52, "left": 355, "top": 21, "width": 96, "height": 62}, "snapThumb4": {"x": 513, "y": 52, "left": 465, "top": 21, "width": 96, "height": 62}, "snapThumb5": {"x": 623, "y": 52, "left": 575, "top": 21, "width": 96, "height": 62}, "snapBarThumb0": {"x": 365, "y": 90, "left": 317, "top": 59, "width": 96, "height": 62}, "snapBarThumb1": {"x": 475, "y": 90, "left": 427, "top": 59, "width": 96, "height": 62}, "snapBarThumb2": {"x": 585, "y": 90, "left": 537, "top": 59, "width": 96, "height": 62}, "snapBarThumb3": {"x": 695, "y": 90, "left": 647, "top": 59, "width": 96, "height": 62}, "snapBarThumb4": {"x": 805, "y": 90, "left": 757, "top": 59, "width": 96, "height": 62}, "snapBarThumb5": {"x": 915, "y": 90, "left": 867, "top": 59, "width": 96, "height": 62}, "snapZone0_0": {"x": 48, "y": 52, "left": 25, "top": 21, "width": 45, "height": 62}, "snapZone0_1": {"x": 98, "y": 52, "left": 76, "top": 21, "width": 45, "height": 62}, "snapZone1_0": {"x": 165, "y": 52, "left": 135, "top": 21, "width": 60, "height": 62}, "snapZone1_1": {"x": 216, "y": 52, "left": 201, "top": 21, "width": 30, "height": 62}, "snapZone2_0": {"x": 268, "y": 52, "left": 245, "top": 21, "width": 45, "height": 62}, "snapZone2_1": {"x": 318, "y": 35, "left": 296, "top": 21, "width": 45, "height": 28}, "snapZone2_2": {"x": 318, "y": 69, "left": 296, "top": 55, "width": 45, "height": 28}, "snapZone3_0": {"x": 378, "y": 35, "left": 355, "top": 21, "width": 45, "height": 28}, "snapZone3_1": {"x": 428, "y": 35, "left": 406, "top": 21, "width": 45, "height": 28}, "snapZone3_2": {"x": 378, "y": 69, "left": 355, "top": 55, "width": 45, "height": 28}, "snapZone3_3": {"x": 428, "y": 69, "left": 406, "top": 55, "width": 45, "height": 28}, "snapZone4_0": {"x": 479, "y": 52, "left": 465, "top": 21, "width": 28, "height": 62}, "snapZone4_1": {"x": 513, "y": 52, "left": 499, "top": 21, "width": 28, "height": 62}, "snapZone4_2": {"x": 547, "y": 52, "left": 533, "top": 21, "width": 28, "height": 62}, "snapZone5_0": {"x": 586, "y": 52, "left": 575, "top": 21, "width": 21, "height": 62}, "snapZone5_1": {"x": 623, "y": 52, "left": 602, "top": 21, "width": 42, "height": 62}, "snapZone5_2": {"x": 660, "y": 52, "left": 650, "top": 21, "width": 21, "height": 62}}}}
+ZALDROS-WINDOWS-READY {"ready": true, "caption": "Home — Dolphin", "windows": ["__main__.py", "Home — Dolphin"]}
+ZALDROS-GEOMETRY {"screen": {"width": 1280, "height": 800}, "items": {"taskbar": {"x": 640, "y": 776, "left": 0, "top": 752, "width": 1280, "height": 48}, "taskbarGroup": {"x": 640, "y": 776, "left": 306, "top": 752, "width": 668, "height": 48}, "startButton": {"x": 328, "y": 776, "left": 306, "top": 752, "width": 44, "height": 48}, "taskbarSearch": {"x": 464, "y": 776, "left": 350, "top": 752, "width": 228, "height": 48}, "taskViewButton": {"x": 600, "y": 776, "left": 578, "top": 752, "width": 44, "height": 48}, "widgetsButton": {"x": 68, "y": 776, "left": 12, "top": 756, "width": 113, "height": 40}, "weatherIcon": {"x": 32, "y": 776, "left": 20, "top": 764, "width": 24, "height": 24}, "weatherTemperature": {"x": 57, "y": 768, "left": 52, "top": 760, "width": 10, "height": 16}, "weatherCondition": {"x": 79, "y": 784, "left": 52, "top": 776, "width": 55, "height": 15}, "trayGroup": {"x": 1139, "y": 776, "left": 1011, "top": 752, "width": 257, "height": 48}, "trayQuickButton": {"x": 1124, "y": 776, "left": 1085, "top": 752, "width": 78, "height": 48}, "clock": {"x": 1201, "y": 776, "left": 1163, "top": 752, "width": 77, "height": 48}, "notificationButton": {"x": 1254, "y": 776, "left": 1240, "top": 752, "width": 28, "height": 48}, "startPanel": {"x": 640, "y": 377, "left": 320, "top": 14, "width": 640, "height": 726}, "startSearch": {"x": 640, "y": 65, "left": 352, "top": 46, "width": 576, "height": 38}, "startPinnedGrid": {"x": 640, "y": 270, "left": 352, "top": 144, "width": 576, "height": 252}, "startFooter": {"x": 640, "y": 708, "left": 320, "top": 676, "width": 640, "height": 64}, "searchFlyout": {"x": 640, "y": 457, "left": 320, "top": 174, "width": 640, "height": 566}, "notificationCentre": {"x": 1088, "y": 542, "left": 908, "top": 344, "width": 360, "height": 396}, "quickPanel": {"x": 1088, "y": 586, "left": 908, "top": 432, "width": 360, "height": 308}, "clipboardFlyout": {"x": 192, "y": 674, "left": 12, "top": 607, "width": 360, "height": 133}, "gameBarFlyout": {"x": 165, "y": 148, "left": 12, "top": 12, "width": 306, "height": 272}, "gameBarToolbar": {"x": 640, "y": 39, "left": 378, "top": 12, "width": 523, "height": 54}, "contextMenu": {"x": 166, "y": 135, "left": 0, "top": 0, "width": 342, "height": 278}, "explorerWindow": {"x": 640, "y": 376, "left": 140, "top": 56, "width": 1000, "height": 640}, "explorerNavBar": {"x": 640, "y": 120, "left": 140, "top": 96, "width": 1000, "height": 48}, "explorerCommandBar": {"x": 640, "y": 168, "left": 140, "top": 144, "width": 1000, "height": 48}, "explorerSidebar": {"x": 235, "y": 431, "left": 140, "top": 192, "width": 190, "height": 478}, "explorerFileList": {"x": 736, "y": 446, "left": 331, "top": 222, "width": 809, "height": 448}, "settingsWindow": {"x": 690, "y": 400, "left": 220, "top": 90, "width": 940, "height": 620}, "settingsRail": {"x": 380, "y": 416, "left": 220, "top": 122, "width": 320, "height": 588}, "settingsBody": {"x": 850, "y": 416, "left": 540, "top": 122, "width": 620, "height": 588}, "titleBar": {"x": 690, "y": 106, "left": 220, "top": 90, "width": 940, "height": 32}, "captionButtons": {"x": 1091, "y": 106, "left": 1022, "top": 90, "width": 138, "height": 32}, "snapFlyout": {"x": 348, "y": 52, "left": 12, "top": 8, "width": 672, "height": 88}, "snapBar": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarLayouts": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarHint": {"x": 514, "y": 42, "left": 343, "top": 32, "width": 343, "height": 19}, "snapAssist": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "snapAssistGrid": {"x": 960, "y": 376, "left": 960, "top": 376, "width": 0, "height": 0}, "snapAssistScrim": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "edgePreview": {"x": 0, "y": 0, "left": 0, "top": 0, "width": 0, "height": 0}, "snapThumb0": {"x": 73, "y": 52, "left": 25, "top": 21, "width": 96, "height": 62}, "snapThumb1": {"x": 183, "y": 52, "left": 135, "top": 21, "width": 96, "height": 62}, "snapThumb2": {"x": 293, "y": 52, "left": 245, "top": 21, "width": 96, "height": 62}, "snapThumb3": {"x": 403, "y": 52, "left": 355, "top": 21, "width": 96, "height": 62}, "snapThumb4": {"x": 513, "y": 52, "left": 465, "top": 21, "width": 96, "height": 62}, "snapThumb5": {"x": 623, "y": 52, "left": 575, "top": 21, "width": 96, "height": 62}, "snapBarThumb0": {"x": 365, "y": 90, "left": 317, "top": 59, "width": 96, "height": 62}, "snapBarThumb1": {"x": 475, "y": 90, "left": 427, "top": 59, "width": 96, "height": 62}, "snapBarThumb2": {"x": 585, "y": 90, "left": 537, "top": 59, "width": 96, "height": 62}, "snapBarThumb3": {"x": 695, "y": 90, "left": 647, "top": 59, "width": 96, "height": 62}, "snapBarThumb4": {"x": 805, "y": 90, "left": 757, "top": 59, "width": 96, "height": 62}, "snapBarThumb5": {"x": 915, "y": 90, "left": 867, "top": 59, "width": 96, "height": 62}, "snapZone0_0": {"x": 48, "y": 52, "left": 25, "top": 21, "width": 45, "height": 62}, "snapZone0_1": {"x": 98, "y": 52, "left": 76, "top": 21, "width": 45, "height": 62}, "snapZone1_0": {"x": 165, "y": 52, "left": 135, "top": 21, "width": 60, "height": 62}, "snapZone1_1": {"x": 216, "y": 52, "left": 201, "top": 21, "width": 30, "height": 62}, "snapZone2_0": {"x": 268, "y": 52, "left": 245, "top": 21, "width": 45, "height": 62}, "snapZone2_1": {"x": 318, "y": 35, "left": 296, "top": 21, "width": 45, "height": 28}, "snapZone2_2": {"x": 318, "y": 69, "left": 296, "top": 55, "width": 45, "height": 28}, "snapZone3_0": {"x": 378, "y": 35, "left": 355, "top": 21, "width": 45, "height": 28}, "snapZone3_1": {"x": 428, "y": 35, "left": 406, "top": 21, "width": 45, "height": 28}, "snapZone3_2": {"x": 378, "y": 69, "left": 355, "top": 55, "width": 45, "height": 28}, "snapZone3_3": {"x": 428, "y": 69, "left": 406, "top": 55, "width": 45, "height": 28}, "snapZone4_0": {"x": 479, "y": 52, "left": 465, "top": 21, "width": 28, "height": 62}, "snapZone4_1": {"x": 513, "y": 52, "left": 499, "top": 21, "width": 28, "height": 62}, "snapZone4_2": {"x": 547, "y": 52, "left": 533, "top": 21, "width": 28, "height": 62}, "snapZone5_0": {"x": 586, "y": 52, "left": 575, "top": 21, "width": 21, "height": 62}, "snapZone5_1": {"x": 623, "y": 52, "left": 602, "top": 21, "width": 42, "height": 62}, "snapZone5_2": {"x": 660, "y": 52, "left": 650, "top": 21, "width": 21, "height": 62}}}
+ZALDROS-UITEST {"variant": "legacy", "steps": {"desktop_ready": {"status": "PASS", "seconds": 0.507, "cpu_percent": {"kwin_wayland": 0.0, "python3": 0.0}, "rss_mib": {"kwin_wayland": 218.7, "python3": 323.7}}, "app_launch_explorer": {"status": "PASS", "seconds": 1.516, "cpu_percent": {"kwin_wayland": 21.1, "python3": 0.7}, "rss_mib": {"kwin_wayland": 238.4, "python3": 323.7}, "caption": "Home — Dolphin"}, "screenshot": {"status": "FAIL", "seconds": 0.001, "cpu_percent": {"kwin_wayland": 0.0, "python3": 0.0}, "rss_mib": {"kwin_wayland": 238.6, "python3": 323.7}}, "window_move": {"status": "PASS", "seconds": 1.014, "cpu_percent": {"kwin_wayland": 3.9, "python3": 0.0}, "rss_mib": {"kwin_wayland": 239.1, "python3": 323.7}}, "minimize": {"status": "PASS", "seconds": 1.016, "cpu_percent": {"kwin_wayland": 3.9, "python3": 2.0}, "rss_mib": {"kwin_wayland": 243.1, "python3": 323.7}}, "restore": {"status": "PASS", "seconds": 1.013, "cpu_percent": {"kwin_wayland": 0.0, "python3": 0.0}, "rss_mib": {"kwin_wayland": 243.6, "python3": 323.7}}, "start_open": {"status": "BLOCKED", "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"}, "start_close": {"status": "BLOCKED", "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"}, "alt_tab": {"status": "BLOCKED", "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"}, "taskbar_response": {"status": "BLOCKED", "why": "synthetic input is injected by the host via QMP input-send-event; see results/*.ui-host.json for the timings and screenshots"}, "frame_stability": {"status": "BLOCKED", "why": "QEMU renders through llvmpipe/virtio-gpu: frame timings would measure the emulator, not the compositor"}}, "processes": {"kwin_wayland": {"running": true, "rss_mib": 243.6}, "plasmashell": {"running": false, "rss_mib": 0}, "python3": {"running": true, "rss_mib": 323.7}}, "geometry": {"screen": {"width": 1280, "height": 800}, "items": {"taskbar": {"x": 640, "y": 776, "left": 0, "top": 752, "width": 1280, "height": 48}, "taskbarGroup": {"x": 640, "y": 776, "left": 306, "top": 752, "width": 668, "height": 48}, "startButton": {"x": 328, "y": 776, "left": 306, "top": 752, "width": 44, "height": 48}, "taskbarSearch": {"x": 464, "y": 776, "left": 350, "top": 752, "width": 228, "height": 48}, "taskViewButton": {"x": 600, "y": 776, "left": 578, "top": 752, "width": 44, "height": 48}, "widgetsButton": {"x": 68, "y": 776, "left": 12, "top": 756, "width": 113, "height": 40}, "weatherIcon": {"x": 32, "y": 776, "left": 20, "top": 764, "width": 24, "height": 24}, "weatherTemperature": {"x": 57, "y": 768, "left": 52, "top": 760, "width": 10, "height": 16}, "weatherCondition": {"x": 79, "y": 784, "left": 52, "top": 776, "width": 55, "height": 15}, "trayGroup": {"x": 1139, "y": 776, "left": 1011, "top": 752, "width": 257, "height": 48}, "trayQuickButton": {"x": 1124, "y": 776, "left": 1085, "top": 752, "width": 78, "height": 48}, "clock": {"x": 1201, "y": 776, "left": 1163, "top": 752, "width": 77, "height": 48}, "notificationButton": {"x": 1254, "y": 776, "left": 1240, "top": 752, "width": 28, "height": 48}, "startPanel": {"x": 640, "y": 377, "left": 320, "top": 14, "width": 640, "height": 726}, "startSearch": {"x": 640, "y": 65, "left": 352, "top": 46, "width": 576, "height": 38}, "startPinnedGrid": {"x": 640, "y": 270, "left": 352, "top": 144, "width": 576, "height": 252}, "startFooter": {"x": 640, "y": 708, "left": 320, "top": 676, "width": 640, "height": 64}, "searchFlyout": {"x": 640, "y": 457, "left": 320, "top": 174, "width": 640, "height": 566}, "notificationCentre": {"x": 1088, "y": 542, "left": 908, "top": 344, "width": 360, "height": 396}, "quickPanel": {"x": 1088, "y": 586, "left": 908, "top": 432, "width": 360, "height": 308}, "clipboardFlyout": {"x": 192, "y": 674, "left": 12, "top": 607, "width": 360, "height": 133}, "gameBarFlyout": {"x": 165, "y": 148, "left": 12, "top": 12, "width": 306, "height": 272}, "gameBarToolbar": {"x": 640, "y": 39, "left": 378, "top": 12, "width": 523, "height": 54}, "contextMenu": {"x": 166, "y": 135, "left": 0, "top": 0, "width": 342, "height": 278}, "explorerWindow": {"x": 640, "y": 376, "left": 140, "top": 56, "width": 1000, "height": 640}, "explorerNavBar": {"x": 640, "y": 120, "left": 140, "top": 96, "width": 1000, "height": 48}, "explorerCommandBar": {"x": 640, "y": 168, "left": 140, "top": 144, "width": 1000, "height": 48}, "explorerSidebar": {"x": 235, "y": 431, "left": 140, "top": 192, "width": 190, "height": 478}, "explorerFileList": {"x": 736, "y": 446, "left": 331, "top": 222, "width": 809, "height": 448}, "settingsWindow": {"x": 690, "y": 400, "left": 220, "top": 90, "width": 940, "height": 620}, "settingsRail": {"x": 380, "y": 416, "left": 220, "top": 122, "width": 320, "height": 588}, "settingsBody": {"x": 850, "y": 416, "left": 540, "top": 122, "width": 620, "height": 588}, "titleBar": {"x": 690, "y": 106, "left": 220, "top": 90, "width": 940, "height": 32}, "captionButtons": {"x": 1091, "y": 106, "left": 1022, "top": 90, "width": 138, "height": 32}, "snapFlyout": {"x": 348, "y": 52, "left": 12, "top": 8, "width": 672, "height": 88}, "snapBar": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarLayouts": {"x": 640, "y": 73, "left": 304, "top": 12, "width": 672, "height": 122}, "snapBarHint": {"x": 514, "y": 42, "left": 343, "top": 32, "width": 343, "height": 19}, "snapAssist": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "snapAssistGrid": {"x": 960, "y": 376, "left": 960, "top": 376, "width": 0, "height": 0}, "snapAssistScrim": {"x": 960, "y": 376, "left": 640, "top": 0, "width": 640, "height": 752}, "edgePreview": {"x": 0, "y": 0, "left": 0, "top": 0, "width": 0, "height": 0}, "snapThumb0": {"x": 73, "y": 52, "left": 25, "top": 21, "width": 96, "height": 62}, "snapThumb1": {"x": 183, "y": 52, "left": 135, "top": 21, "width": 96, "height": 62}, "snapThumb2": {"x": 293, "y": 52, "left": 245, "top": 21, "width": 96, "height": 62}, "snapThumb3": {"x": 403, "y": 52, "left": 355, "top": 21, "width": 96, "height": 62}, "snapThumb4": {"x": 513, "y": 52, "left": 465, "top": 21, "width": 96, "height": 62}, "snapThumb5": {"x": 623, "y": 52, "left": 575, "top": 21, "width": 96, "height": 62}, "snapBarThumb0": {"x": 365, "y": 90, "left": 317, "top": 59, "width": 96, "height": 62}, "snapBarThumb1": {"x": 475, "y": 90, "left": 427, "top": 59, "width": 96, "height": 62}, "snapBarThumb2": {"x": 585, "y": 90, "left": 537, "top": 59, "width": 96, "height": 62}, "snapBarThumb3": {"x": 695, "y": 90, "left": 647, "top": 59, "width": 96, "height": 62}, "snapBarThumb4": {"x": 805, "y": 90, "left": 757, "top": 59, "width": 96, "height": 62}, "snapBarThumb5": {"x": 915, "y": 90, "left": 867, "top": 59, "width": 96, "height": 62}, "snapZone0_0": {"x": 48, "y": 52, "left": 25, "top": 21, "width": 45, "height": 62}, "snapZone0_1": {"x": 98, "y": 52, "left": 76, "top": 21, "width": 45, "height": 62}, "snapZone1_0": {"x": 165, "y": 52, "left": 135, "top": 21, "width": 60, "height": 62}, "snapZone1_1": {"x": 216, "y": 52, "left": 201, "top": 21, "width": 30, "height": 62}, "snapZone2_0": {"x": 268, "y": 52, "left": 245, "top": 21, "width": 45, "height": 62}, "snapZone2_1": {"x": 318, "y": 35, "left": 296, "top": 21, "width": 45, "height": 28}, "snapZone2_2": {"x": 318, "y": 69, "left": 296, "top": 55, "width": 45, "height": 28}, "snapZone3_0": {"x": 378, "y": 35, "left": 355, "top": 21, "width": 45, "height": 28}, "snapZone3_1": {"x": 428, "y": 35, "left": 406, "top": 21, "width": 45, "height": 28}, "snapZone3_2": {"x": 378, "y": 69, "left": 355, "top": 55, "width": 45, "height": 28}, "snapZone3_3": {"x": 428, "y": 69, "left": 406, "top": 55, "width": 45, "height": 28}, "snapZone4_0": {"x": 479, "y": 52, "left": 465, "top": 21, "width": 28, "height": 62}, "snapZone4_1": {"x": 513, "y": 52, "left": 499, "top": 21, "width": 28, "height": 62}, "snapZone4_2": {"x": 547, "y": 52, "left": 533, "top": 21, "width": 28, "height": 62}, "snapZone5_0": {"x": 586, "y": 52, "left": 575, "top": 21, "width": 21, "height": 62}, "snapZone5_1": {"x": 623, "y": 52, "left": 602, "top": 21, "width": 42, "height": 62}, "snapZone5_2": {"x": 660, "y": 52, "left": 650, "top": 21, "width": 21, "height": 62}}}, "dbus_diag": {"loadScript": "method return time=1788197753.667019 sender=:1.9 -> destination=:1.43 serial=176 reply_serial=2\n   int32 10", "start": "method return time=1788197753.670177 sender=:1.9 -> destination=:1.44 serial=177 reply_serial=2"}}
+ZALDROS-LATE {"session_log_tail": "om provider: image://zaldrosicon/app/org.kde.dolphin\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\nQPainter::begin: Paint device returned engine == 0, type: 3\nQPainter::setRenderHint: Painter must be active to set rendering hints\nQPainter::setCompositionMode: Painter not active\njs: ZALDROS-WINDOWS [{\"caption\":\"__main__.py\",\"minimized\":false,\"x\":0,\"y\":0}]\njs: ZALDROS-WINDOWS [{\"caption\":\"__main__.py\",\"minimized\":false,\"x\":0,\"y\":0}]\njs: ZALDROS-WINDOWS [{\"caption\":\"__main__.py\",\"minimized\":false,\"x\":0,\"y\":0},{\"caption\":\"Home — Dolphin\",\"minimized\":false,\"x\":256,\"y\":115}]\njs: ZALDROS-WINDOWS [{\"caption\":\"__main__.py\",\"minimized\":false,\"x\":0,\"y\":0},{\"caption\":\"Home — Dolphin\",\"minimized\":false,\"x\":256,\"y\":115}]\njs: ZALDROS-WINDOWS [{\"caption\":\"__main__.py\",\"minimized\":false,\"x\":0,\"y\":0},{\"caption\":\"Home — Dolphin\",\"minimized\":false,\"x\":256,\"y\":115}]\njs: ZALDROS-WINDOWS [{\"caption\":\"__main__.py\",\"minimized\":false,\"x\":0,\"y\":0},{\"caption\":\"Home — Dolphin\",\"minimized\":true,\"x\":256,\"y\":115}]\njs: ZALDROS-WINDOWS [{\"caption\":\"__main__.py\",\"minimized\":false,\"x\":0,\"y\":0},{\"caption\":\"Home — Dolphin\",\"minimized\":true,\"x\":256,\"y\":115}]\nkf.package: Invalid metadata for package structure \"KWin/WindowSwitcher\"\nkf.package: Cannot set a path in a package without structure \"/usr/share/kwin/tabbox/zaldros\"\nkwin_tabbox: Could not find QML file for window switcher\nkf.package: Invalid metadata for package structure \"KWin/WindowSwitcher\"\nkf.package: Cannot set a path in a package without structure \"/usr/share/kwin/tabbox/zaldros-grid\"\nkwin_tabbox: Could not find QML file for window switcher\nqml: ZALDROS-PROBE meta_f9\nqml: ZALDROS-PROBE alt_f9\nqml: ZALDROS-PROBE ctrl_shift_f9\nqml: ZALDROS-SWITCHER cycle reverse=false candidates=2\nqml: ZALDROS-SWITCHER activating Home — Dolphin (was __main__.py)\n", "tabbox_lines": ["+ export QT_LOGGING_RULES=kwin_tabbox.debug=true;kwin_tabbox.info=true", "qml: ZALDROS-SWITCHER loaded (qml), windows=0", "Failed to load overview: \"qrc:/qt/qml/org/kde/kwin/overview/qml/Main.qml:18 module \\\"org.kde.kcmutils\\\" is not installed\\nqrc:/qt/qml/org/kde/kwin/overview/qml/Main.qml:17 module \\\"org.kde.plasma.extras\\\" is not installed\\nqrc:/qt/qml/org/kde/kwin/overview/qml/Main.qml:16 module \\\"org.kde.plasma.components\\\" is not installed\\nqrc:/qt/qml/org/kde/kwin/overview/qml/Main.qml:15 module \\\"org.kde.milou\\\" is not installed\\nqrc:/qt/qml/org/kde/kwin/overview/qml/Main.qml:14 module \\\"org.kde.kwin.private.effects\\\" is not installed\\nqrc:/qt/qml/org/kde/kwin/overview/qml/Main.qml:10 module \\\"Qt5Compat.GraphicalEffects\\\" is not installed\\n\"", "kf.package: Invalid metadata for package structure \"KWin/WindowSwitcher\"", "kf.package: Cannot set a path in a package without structure \"/usr/share/kwin/tabbox/zaldros\"", "kwin_tabbox: Could not find QML file for window switcher", "kf.package: Invalid metadata for package structure \"KWin/WindowSwitcher\"", "kf.package: Cannot set a path in a package without structure \"/usr/share/kwin/tabbox/zaldros-grid\"", "kwin_tabbox: Could not find QML file for window switcher", "qml: ZALDROS-SWITCHER cycle reverse=false candidates=2", "qml: ZALDROS-SWITCHER activating Home — Dolphin (was __main__.py)"], "switcher_script_lines": ["qml: ZALDROS-SWITCHER loaded (qml), windows=0", "qml: ZALDROS-SWITCHER cycle reverse=false candidates=2", "qml: ZALDROS-SWITCHER activating Home — Dolphin (was __main__.py)"], "probe_lines": ["-PROBE meta_f9", "-PROBE alt_f9", "-PROBE ctrl_shift_f9"], "switcher_cycles": ["cycle reverse=false candidates=2", "activating Home — Dolphin (was __main__.py)"], "alt_tab_switched": true, "shortcut_fired_by_key": true, "kwin_logging_rules": "kwin_tabbox.debug=true;kwin_tabbox.info=true", "invoke_delta": {"component": "kwin", "action": "Zaldros Walk Through Windows", "reply": "()", "log_gained": "qml: ZALDROS-SWITCHER cycle reverse=false candidates=2\nqml: ZALDROS-SWITCHER activating __main__.py (was Home — Dolphin)\n"}, "qml_import_paths": "/usr/lib/x86_64-linux-gnu/qt6/qml/QtQuick", "kwin_scripts_installed": "zaldros-switcher", "user_shortcuts_file": "p 9=,,Window to Desktop 9\nWindow to Next Desktop=,,Window to Next Desktop\nWindow to Next Screen=Meta+Shift+Right,Meta+Shift+Right,Move Window to Next Screen\nWindow to Previous Desktop=,,Window to Previous Desktop\nWindow to Previous Screen=Meta+Shift+Left,Meta+Shift+Left,Move Window to Previous Screen\nWindow to Screen 0=,,Move Window to Screen 0\nWindow to Screen 1=,,Move Window to Screen 1\nWindow to Screen 2=,,Move Window to Screen 2\nWindow to Screen 3=,,Move Window to Screen 3\nWindow to Screen 4=,,Move Window to Screen 4\nWindow to Screen 5=,,Move Window to Screen 5\nWindow to Screen 6=,,Move Window to Screen 6\nWindow to Screen 7=,,Move Window to Screen 7\nZaldros Probe Alt F9=Alt+F9,Alt+F9,Zaldros: проверка Alt+F9\nZaldros Probe Ctrl Shift F9=Ctrl+Shift+F9,Ctrl+Shift+F9,Zaldros: проверка Ctrl+Shift+F9\nZaldros Probe Meta F9=Meta+F9,Meta+F9,Zaldros: проверка Meta+F9\nZaldros Walk Through Windows=Meta+F10,Meta+F10,Zaldros: следующее окно\nZaldros Walk Through Windows (Reverse)=Meta+Shift+F10,Meta+Shift+F10,Zaldros: предыдущее окно\n_k_friendly_name=KWin\nview_actual_size=Meta+0,Meta+0,Zoom to Actual Size\nview_zoom_in=Meta++\\tMeta+=,Meta++\\tMeta+=,Zoom In\nview_zoom_out=Meta+-,Meta+-,Zoom Out\n", "shortcut_lines": {"/home/ubuntu/.config/kglobalshortcutsrc": ["[KDE Keyboard Layout Switcher]", "[ksmserver]", "[kwin]", "Walk Through Windows=Alt+Tab,Meta+Tab\\tAlt+Tab,Walk Through Windows", "Walk Through Windows (Reverse)=Alt+Shift+Tab,Meta+Shift+Tab\\tAlt+Shift+Tab,Walk Through Windows (Reverse)", "Walk Through Windows Alternative=Meta+Tab,none,Walk Through Windows Alternative", "Walk Through Windows Alternative (Reverse)=Meta+Shift+Tab,none,Walk Through Windows Alternative (Reverse)", "Walk Through Windows of Current Application=Alt+`,Meta+`\\tAlt+`,Walk Through Windows of Current Application", "Walk Through Windows of Current Application (Reverse)=Meta+~\\tAlt+~,Meta+~\\tAlt+~,Walk Through Windows of Current Application (Reverse)", "Walk Through Windows of Current Application Alternative=none,none,Walk Through Windows of Current Application Alternative", "Walk Through Windows of Current Application Alternative (Reverse)=none,none,Walk Through Windows of Current Application Alternative (Reverse)", "Zaldros Walk Through Windows=Meta+F10,Meta+F10,Zaldros: следующее окно", "Zaldros Walk Through Windows (Reverse)=Meta+Shift+F10,Meta+Shift+F10,Zaldros: предыдущее окно"], "/etc/xdg/kglobalshortcutsrc": ["[kwin]", "Walk Through Windows=Alt+Tab,Alt+Tab,Walk Through Windows", "Walk Through Windows (Reverse)=Alt+Shift+Tab,Alt+Shift+Tab,Walk Through Windows (Reverse)", "# (run #42 wrote `Walk Through Windows Alternative=none,none,...` into the guest's own", "Walk Through Windows Alternative=Meta+Tab,Meta+Tab,Walk Through Windows Alternative", "Walk Through Windows Alternative (Reverse)=Meta+Shift+Tab,Meta+Shift+Tab,Walk Through Windows Alternative (Reverse)", "Zaldros Walk Through Windows=Meta+F10,Meta+F10,Zaldros: следующее окно", "Zaldros Walk Through Windows (Reverse)=Meta+Shift+F10,Meta+Shift+F10,Zaldros: предыдущее окно", "Walk Through Windows of Current Application=Alt+`,Alt+`,Walk Through Windows of Current Application"]}, "switcher": {"package_installed": true, "accel_path": "/usr/lib/x86_64-linux-gnu/libexec/kglobalacceld", "accel_running": "", "session_bus_socket": true, "runtime_dir": "/run/user/1000", "dbus_kde_names": ["org.kde.KWin", "org.kde.KWin.Effect.WindowView1", "org.kde.KWin.HighlightWindow", "org.kde.dolphin-1192", "org.kde.keyboard", "org.kde.kglobalaccel", "org.kde.screensaver"], "all_components": "([objectpath '/component/kwin', '/component/org_kde_dolphin_desktop', '/component/org_kde_konsole_desktop', '/component/ksmserver', '/component/KDE_Keyboard_Layout_Switcher'],)", "invoke_shortcut_reply": "()", "package_files": ["contents/ui/IconBadge.qml", "contents/ui/main.qml", "metadata.json"], "installed_layouts": ["zaldros", "zaldros-grid"], "configured_layout": "zaldros", "tabbox_config": {"LayoutName": "zaldros", "ShowTabBox": "true", "HighlightWindows": "true", "SwitchingMode": "0", "MultiScreenMode": "0", "ApplicationsMode": "0", "MinimizedMode": "0"}, "tabbox_alternative_config": {"LayoutName": "zaldros-grid", "ShowTabBox": "true", "HighlightWindows": "true", "SwitchingMode": "0", "MultiScreenMode": "0", "ApplicationsMode": "0", "MinimizedMode": "0"}, "kglobalaccel_component_present": true, "all_shortcut_infos_error": "", "walk_through_windows": "Walk Through Windows of Current Application Alternative', 'Walk Through Windows of Current Application Alternative', 'kwin', 'KWin', 'default', 'Default Context', @ai [], @ai []), ", "walk_through_windows_exact": "Walk Through Windows', 'Walk Through Windows', 'kwin', 'KWin', 'default', 'Default Context', [150994945], [285212673, 150994945]), ", "zaldros_action": "Zaldros Walk Through Windows', 'Zaldros: следующее окно', 'kwin', 'KWin', 'default', 'Default Context', [285212729], [285212729]), ", "kwin_journal": "Aug 31 17:35:03 ubuntu zaldros-selftest[969]: ZALDROS_SELFTEST {\"variant\": \"legacy\", \"kernel\": \"7.0.0-30-generic\", \"boot_time\": {\"uptime_at_selftest_s\": 21.32, \"systemd_analyze\": null, \"userspace_s\": null, \"kernel_s\": null}, \"systemd_state\": \"starting\", \"pending_jobs\": \"124 zaldros-selftest.service start running\", \"failed_units\": \"\", \"wayland_socket\": [\"/run/user/1000/wayland-0\", \"/run/user/1000/wayland-0.lock\"], \"kwin\": true, \"plasmashell\": false, \"shell\": true, \"shell_journal\": \"Aug 31 17:32:45 ubuntu systemd[1]: Started zaldros-session.service - Zaldros desktop session (autologin).\\nAug 31 17:32:45 ubuntu (zaldros-session)[967]: pam_unix(login:session): session opened for user ubuntu(uid=1000) by ubuntu(uid=0)\", \"process_count\": 26, \"mem_used_mib\": 644, \"rss_mib\": {\"python3\": 340.5, \"kwin_wayland\": 211.0, \"systemd\": 27.9, \"NetworkManager\": 19.6, \"wireplumber\": 16.4, \"pipewire\": 15.5, \"systemd-udevd\": 11.6, \"pipewire-pulse\": 10.6, \"systemd-journal\": 10.2, \"dbus-daemon\": 9.8, \"systemd-logind\": 9.5, \"chronyd\": 8.5}, \"loadavg\": [\"0.03\", \"0.04\", \"0.01\"], \"session_log\": \"on/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/org.kde.dolphin\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/utilities-terminal\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/kvantum\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/soffice\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/gvim\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\\nfile:///opt/zaldros/qml/AppTile.qml:16:5: QML QQuickImage: Failed to get image from provider: image://zaldrosicon/app/zutty\\n\", \"app_launch\": {\"app\": \"konsole\", \"started\": true, \"seconds\": 2.0}, \"visual_layer\": {\"cursor_theme\": \"Fluent-dark-cursors\", \"cursor_theme_installed\": true, \"cursor_shapes\": 111, \"cursor_default_alias\": true, \"xcursor_theme_env\": \"\", \"icon_theme_installed\": true, \"icon_theme_apps\": 17}, \"switcher\": {\"package_installed\": true, \"accel_path\": \"/usr/lib/x86_64-linux-gnu/libexec/kglobalacceld\", \"accel_running\": \"\", \"session_bus_socket\": true, \"runtime_dir\": \"/run/user/1000\", \"dbus_kde_names\": [\"org.kde.KWin\", \"org.kde.KWin.Effect.WindowView1\", \"org.kde.KWin.HighlightWindow\", \"org.kde.keyboard\", \"org.kde.kglobalaccel\", \"org.kde.screensaver\"], \"all_components\": \"([objectpath '/component/kwin', '/component/org_kde_dolphin_desktop', '/component/org_kde_konsole_desktop', '/component/ksmserver', '/component/KDE_Keyboard_Layout_Switcher'],)\", \"invoke_shortcut_reply\": \"()\", \"package_files\": [\"contents/ui/IconBadge.qml\", \"contents/ui/main.qml\", \"metadata.json\"], \"installed_layouts\": [\"zaldros\", \"zaldros-grid\"], \"configured_layout\": \"zaldros\", \"tabbox_config\": {\"LayoutName\": \"zaldros\", \"ShowTabBox\": \"true\", \"HighlightWindows\": \"true\", \"SwitchingMode\": \"0\", \"MultiScreenMode\": \"0\", \"ApplicationsMode\": \"0\", \"MinimizedMode\": \"0\"}, \"tabbox_alternative_config\": {\"LayoutName\": \"zaldros-grid\", \"ShowTabBox\": \"true\", \"HighlightWindows\": \"true\", \"SwitchingMode\": \"0\", \"MultiScreenMode\": \"0\", \"ApplicationsMode\": \"0\", \"MinimizedMode\": \"0\"}, \"kglobalaccel_component_present\": true, \"all_shortcut_infos_error\": \"\", \"walk_through_windows\": \"Walk Through Windows of Current Application Alternative', 'Walk Through Windows of Current Application Alternative', 'kwin', 'KWin', 'default', 'Default Context', @ai [], @ai []), \", \"walk_through_windows_exact\": \"Walk Through Windows', 'Walk Through Windows', 'kwin', 'KWin', 'default', 'Default Context', [150994945], [285212673, 150994945]), \", \"zaldros_action\": \"Zaldros Walk Through Windows', 'Zaldros: следующее окно', 'kwin', 'KWin', 'default', 'Default Context', [285212729], [285212729]), \", \"kwin_journal\": \"\"}, \"sessions_available\": [\"zaldros.desktop\"], \"users\": \"ubuntu:x:1000:1000:Live session user,,,:/home/ubuntu:/bin/bash\", \"runtime_dirs\": [\"1000\"], \"session_unit\": \"ActiveState=active\\nSubState=running\\nResult=success\\nExecMainStatus=0\", \"session_journal\": \"Aug 31 17:32:45 ubuntu systemd[1]: Started zaldros-session.service - Zaldros desktop session (autologin).\\nAug 31 17:32:45 ubuntu (zaldros-session)[967]: pam_unix(login:session): session opened for user ubuntu(uid=1000) by ubuntu(uid=0)\", \"ui_geometry\": {\"screen\": {\"width\": 1280, \"height\": 800}, \"items\": {\"taskbar\": {\"x\": 640, \"y\": 776, \"left\": 0, \"top\": 752, \"width\": 1280, \"height\": 48}, \"taskbarGroup\": {\"x\": 640, \"y\": 776, \"left\": 306, \"top\": 752, \"width\": 668, \"height\": 48}, \"startButton\": {\"x\": 328, \"y\": 776, \"left\": 306, \"top\": 752, \"width\": 44, \"height\": 48}, \"taskbarSearch\": {\"x\": 464, \"y\": 776, \"left\": 350, \"top\": 752, \"width\": 228, \"height\": 48}, \"taskViewButton\": {\"x\": 600, \"y\": 776, \"left\": 578, \"top\": 752, \"width\": 44, \"height\": 48}, \"widgetsButton\": {\"x\": 68, \"y\": 776, \"left\": 12, \"top\": 756, \"width\": 113, \"height\": 40}, \"weatherIcon\": {\"x\": 32, \"y\": 776, \"left\": 20, \"top\": 764, \"width\": 24, \"height\": 24}, \"weatherTemperature\": {\"x\": 57, \"y\": 768, \"left\": 52, \"top\": 760, \"width\": 10, \"height\": 16}, \"weatherCondition\": {\"x\": 79, \"y\": 784, \"left\": 52, \"top\": 776, \"width\": 55, \"height\": 15}, \"trayGroup\": {\"x\": 1139, \"y\": 776, \"left\": 1011, \"top\": 752, \"width\": 257, \"height\": 48}, \"trayQuickButton\": {\"x\": 1124, \"y\": 776, \"left\": 1085, \"top\": 752, \"width\": 78, \"height\": 48}, \"clock\": {\"x\": 1201, \"y\": 776, \"left\": 1163, \"top\": 752, \"width\": 77, \"height\": 48}, \"notificationButton\": {\"x\": 1254, \"y\": 776, \"left\": 1240, \"top\": 752, \"width\": 28, \"height\": 48}, \"startPanel\": {\"x\": 640, \"y\": 377, \"left\": 320, \"top\": 14, \"width\": 640, \"height\": 726}, \"startSearch\": {\"x\": 640, \"y\": 65, \"left\": 352, \"top\": 46, \"width\": 576, \"height\": 38}, \"startPinnedGrid\": {\"x\": 640, \"y\": 270, \"left\": 352, \"top\": 144, \"width\": 576, \"height\": 252}, \"startFooter\": {\"x\": 640, \"y\": 708, \"left\": 320, \"top\": 676, \"width\": 640, \"height\": 64}, \"searchFlyout\": {\"x\": 640, \"y\": 457, \"left\": 320, \"top\": 174, \"width\": 640, \"height\": 566}, \"notificationCentre\": {\"x\": 1088, \"y\": 542, \"left\": 908, \"top\": 344, \"width\": 360, \"height\": 396}, \"quickPanel\": {\"x\": 1088, \"y\": 586, \"left\": 908, \"top\": 432, \"width\": 360, \"height\": 308}, \"clipboardFlyout\": {\"x\": 192, \"y\": 674, \"left\": 12, \"top\": 607, \"width\": 360, \"height\": 133}, \"gameBarFlyout\": {\"x\": 165, \"y\": 148, \"left\": 12, \"top\": 12, \"width\": 306, \"height\": 272}, \"gameBarToolbar\": {\"x\": 640, \"y\": 39, \"left\": 378, \"top\": 12, \"width\": 523, \"height\": 54}, \"contextMenu\": {\"x\": 166, \"y\": 135, \"left\": 0, \"top\": 0, \"width\": 342, \"height\": 278}, \"explorerWindow\": {\"x\": 640, \"y\": 376, \"left\": 140, \"top\": 56, \"width\": 1000, \"height\": 640}, \"explorerNavBar\": {\"x\": 640, \"y\": 120, \"left\": 140, \"top\": 96, \"width\": 1000, \"height\": 48}, \"explorerCommandBar\": {\"x\": 640, \"y\": 168, \"left\": 140, \"top\": 144, \"width\": 1000, \"height\": 48}, \"explorerSidebar\": {\"x\": 235, \"y\": 431, \"left\": 140, \"top\": 192, \"width\": 190, \"height\": 478}, \"explorerFileList\": {\"x\": 736, \"y\": 446, \"left\": 331, \"top\": 222, \"width\": 809, \"height\": 448}, \"settingsWindow\": {\"x\": 690, \"y\": 400, \"left\": 220, \"top\": 90, \"width\": 940, \"height\": 620}, \"settingsRail\": {\"x\": 380, \"y\": 416, \"left\": 220, \"top\": 122, \"width\": 320, \"height\": 588}, \"settingsBody\": {\"x\": 850, \"y\": 416, \"left\": 540, \"top\": 122, \"width\": 620, \"height\": 588}, \"titleBar\": {\"x\": 690, \"y\": 106, \"left\": 220, \"top\": 90, \"width\": 940, \"height\": 32}, \"captionButtons\": {\"x\": 1091, \"y\": 106, \"left\": 1022, \"top\": 90, \"width\": 138, \"height\": 32}, \"snapFlyout\": {\"x\": 348, \"y\": 52, \"left\": 12, \"top\": 8, \"width\": 672, \"height\": 88}, \"snapBar\": {\"x\": 640, \"y\": 73, \"left\": 304, \"top\": 12, \"width\": 672, \"height\": 122}, \"snapBarLayouts\": {\"x\": 640, \"y\": 73, \"left\": 304, \"top\": 12, \"width\": 672, \"height\": 122}, \"snapBarHint\": {\"x\": 514, \"y\": 42, \"left\": 343, \"top\": 32, \"width\": 343, \"height\": 19}, \"snapAssist\": {\"x\": 960, \"y\": 376, \"left\": 640, \"top\": 0, \"width\": 640, \"height\": 752}, \"snapAssistGrid\": {\"x\": 960, \"y\": 376, \"left\": 960, \"top\": 376, \"width\": 0, \"height\": 0}, \"snapAssistScrim\": {\"x\": 960, \"y\": 376, \"left\": 640, \"top\": 0, \"width\": 640, \"height\": 752}, \"edgePreview\": {\"x\": 0, \"y\": 0, \"left\": 0, \"top\": 0, \"width\": 0, \"height\": 0}, \"snapThumb0\": {\"x\": 73, \"y\": 52, \"left\": 25, \"top\": 21, \"width\": 96, \"height\": 62}, \"snapThumb1\": {\"x\": 183, \"y\": 52, \"left\": 135, \"top\": 21, \"width\": 96, \"height\": 62}, \"snapThumb2\": {\"x\": 293, \"y\": 52, \"left\": 245, \"top\": 21, \"width\": 96, \"height\": 62}, \"snapThumb3\": {\"x\": 403, \"y\": 52, \"left\": 355, \"top\": 21, \"width\": 96, \"height\": 62}, \"snapThumb4\": {\"x\": 513, \"y\": 52, \"left\": 465, \"top\": 21, \"width\": 96, \"height\": 62}, \"snapThumb5\": {\"x\": 623, \"y\": 52, \"left\": 575, \"top\": 21, \"width\": 96, \"height\": 62}, \"snapBarThumb0\": {\"x\": 365, \"y\": 90, \"left\": 317, \"top\": 59, \"width\": 96, \"height\": 62}, \"snapBarThumb1\": {\"x\": 475, \"y\": 90, \"left\": 427, \"top\": 59, \"width\": 96, \"height\": 62}, \"snapBarThumb2\": {\"x\": 585, \"y\": 90, \"left\": 537, \"top\": 59, \"width\": 96, \"height\": 62}, \"snapBarThumb3\": {\"x\": 695, \"y\": 90, \"left\": 647, \"top\": 59, \"width\": 96, \"height\": 62}, \"snapBarThumb4\": {\"x\": 805, \"y\": 90, \"left\": 757, \"top\": 59, \"width\": 96, \"height\": 62}, \"snapBarThumb5\": {\"x\": 915, \"y\": 90, \"left\": 867, \"top\": 59, \"width\": 96, \"height\": 62}, \"snapZone0_0\": {\"x\": 48, \"y\": 52, \"left\": 25, \"top\": 21, \"width\": 45, \"height\": 62}, \"snapZone0_1\": {\"x\": 98, \"y\": 52, \"left\": 76, \"top\": 21, \"width\": 45, \"height\": 62}, \"snapZone1_0\": {\"x\": 165, \"y\": 52, \"left\": 135, \"top\": 21, \"width\": 60, \"height\": 62}, \"snapZone1_1\": {\"x\": 216, \"y\": 52, \"left\": 201, \"top\": 21, \"width\": 30, \"height\": 62}, \"snapZone2_0\": {\"x\": 268, \"y\": 52, \"left\": 245, \"top\": 21, \"width\": 45, \"height\": 62}, \"snapZone2_1\": {\"x\": 318, \"y\": 35, \"left\": 296, \"top\": 21, \"width\": 45, \"height\": 28}, \"snapZone2_2\": {\"x\": 318, \"y\": 69, \"left\": 296, \"top\": 55, \"width\": 45, \"height\": 28}, \"snapZone3_0\": {\"x\": 378, \"y\": 35, \"left\": 355, \"top\": 21, \"width\": 45, \"height\": 28}, \"snapZone3_1\": {\"x\": 428, \"y\": 35, \"left\": 406, \"top\": 21, \"width\": 45, \"height\": 28}, \"snapZone3_2\": {\"x\": 378, \"y\": 69, \"left\": 355, \"top\": 55, \"width\": 45, \"height\": 28}, \"snapZone3_3\": {\"x\": 428, \"y\": 69, \"left\": 406, \"top\": 55, \"width\": 45, \"height\": 28}, \"snapZone4_0\": {\"x\": 479, \"y\": 52, \"left\": 465, \"top\": 21, \"width\": 28, \"height\": 62}, \"snapZone4_1\": {\"x\": 513, \"y\": 52, \"left\": 499, \"top\": 21, \"width\": 28, \"height\": 62}, \"snapZone4_2\": {\"x\": 547, \"y\": 52, \"left\": 533, \"top\": 21, \"width\": 28, \"height\": 62}, \"snapZone5_0\": {\"x\": 586, \"y\": 52, \"left\": 575, \"top\": 21, \"width\": 21, \"height\": 62}, \"snapZone5_1\": {\"x\": 623, \"y\": 52, \"left\": 602, \"top\": 21, \"width\": 42, \"height\": 62}, \"snapZone5_2\": {\"x\": 660, \"y\": 52, \"left\": 650, \"top\": 21, \"width\": 21, \"height\": 62}}}}"}}
+[[0;32m  OK  [0m] Stopped [0;1;39mzaldros-selftest.service[0m - Zaldros boot self-test.
+         Stopping [0;1;39msession-1.scope[0m - Session 1 of User ubuntu...
+[[0;32m  OK  [0m] Removed slice [0;1;39msystem-getty.slice[0m - Slice /system/getty.
+[[0;32m  OK  [0m] Removed slice [0;1;39msystem-modprobe.slice[0m - Slice /system/modprobe.
+[[0;32m  OK  [0m] Stopped target [0;1;39mgraphical.target[0m - Graphical Interface.
+[[0;32m  OK  [0m] Stopped target [0;1;39mmulti-user.target[0m - Multi-User System.
+[[0;32m  OK  [0m] Stopped target [0;1;39mgetty.target[0m - Login Prompts.
+[[0;32m  OK  [0m] Stopped target [0;1;39mtimers.target[0m - Timer Units.
+[[0;32m  OK  [0m] Stopped [0;1;39mapt-daily-upgrade.timer[0m - …y apt upgrade and clean activities.
+[[0;32m  OK  [0m] Stopped [0;1;39mapt-daily.timer[0m - Daily apt download activities.
+[[0;32m  OK  [0m] Stopped [0;1;39mdpkg-db-backup.timer[0m - Daily dpkg database backup timer.
+[[0;32m  OK  [0m] Stopped [0;1;39me2scrub_all.timer[0m - Period…Metadata Check for All Filesystems.
+[[0;32m  OK  [0m] Stopped [0;1;39mfstrim.timer[0m - Discard unused filesystem blocks once a week.
+[[0;32m  OK  [0m] Stopped [0;1;39mmotd-news.timer[0m - Message of the Day.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-tmpfiles-clean.tim…[0my Cleanup of Temporary Directories.
+[[0;32m  OK  [0m] Closed [0;1;39msystemd-rfkill.socket[0m - Loa…ll Switch Status /dev/rfkill Watch.
+         Stopping [0;1;39mchrony.service[0m - chrony, an NTP client/server...
+         Stopping [0;1;39mfinalrd.service[0m - Create …time dir for shutdown pivot root...
+         Stopping [0;1;39mserial-getty@ttyS0.service[0m - Serial Getty on ttyS0...
+         Stopping [0;1;39msystemd-random-seed.service[0m - Load/Save OS Random Seed...
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-udev-load-credenti…[0m- Load udev Rules from Credentials.
+         Stopping [0;1;39mzaldros-session.service[0m -…dros desktop session (autologin)...
+[[0;32m  OK  [0m] Stopped [0;1;39mchrony.service[0m - chrony, an NTP client/server.
+[[0;32m  OK  [0m] Stopped [0;1;39mserial-getty@ttyS0.service[0m - Serial Getty on ttyS0.
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[[0;32m  OK  [0m] Stopped [0;1;39mzaldros-session.service[0m - Zaldros desktop session (autologin).
+[[0;32m  OK  [0m] Stopped [0;1;39mfinalrd.service[0m - Create f…untime dir for shutdown pivot root.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-random-seed.service[0m - Load/Save OS Random Seed.
+[[0;32m  OK  [0m] Stopped [0;1;39msession-1.scope[0m - Session 1 of User ubuntu.
+[[0;32m  OK  [0m] Removed slice [0;1;39msystem-serial\x2dget…slice[0m - Slice /system/serial-getty.
+         Stopping [0;1;39muser@1000.service[0m - User Manager for UID 1000...
+[[0;32m  OK  [0m] Stopped [0;1;39muser@1000.service[0m - User Manager for UID 1000.
+         Stopping [0;1;39msystemd-user-sessions.service[0m - Permit User Sessions...
+         Stopping [0;1;39muser-runtime-dir@1000.ser…[0mRuntime Directory /run/user/1000...
+[[0;32m  OK  [0m] Unmounted [0;1;39mrun-user-1000.mount[0m - /run/user/1000.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-user-sessions.service[0m - Permit User Sessions.
+[[0;32m  OK  [0m] Stopped [0;1;39muser-runtime-dir@1000.serv…[0mr Runtime Directory /run/user/1000.
+[[0;32m  OK  [0m] Removed slice [0;1;39muser-1000.slice[0m - User Slice of UID 1000.
+[[0;32m  OK  [0m] Stopped target [0;1;39mnetwork.target[0m - Network.
+[[0;32m  OK  [0m] Stopped target [0;1;39mremote-fs.target[0m - Remote File Systems.
+         Stopping [0;1;39mNetworkManager.service[0m - Network Manager...
+         Stopping [0;1;39msystemd-logind.service[0m - User Login Management...
+[[0;32m  OK  [0m] Stopped [0;1;39mNetworkManager.service[0m - Network Manager.
+[[0;32m  OK  [0m] Stopped [0;1;39mnetplan-configure.service[0m - Netplan Backend Configuration.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-logind.service[0m - User Login Management.
+[[0;32m  OK  [0m] Stopped target [0;1;39mbasic.target[0m - Basic System.
+[[0;32m  OK  [0m] Stopped target [0;1;39mpaths.target[0m - Path Units.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-ask-password-conso…[0mequests to Console Directory Watch.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-ask-password-wall.…[0md Requests to Wall Directory Watch.
+[[0;32m  OK  [0m] Stopped target [0;1;39mslices.target[0m - Slice Units.
+[[0;32m  OK  [0m] Removed slice [0;1;39muser.slice[0m - User and Session Slice.
+[[0;32m  OK  [0m] Stopped target [0;1;39msockets.target[0m - Socket Units.
+[[0;32m  OK  [0m] Closed [0;1;39msystemd-hostnamed.socket[0m - Hostname Service Socket.
+[[0;32m  OK  [0m] Closed [0;1;39msystemd-logind-varlink.sock…[0mer Login Management Varlink Socket.
+[[0;32m  OK  [0m] Closed [0;1;39msystemd-mute-console.socket[0m…nsole Output Muting Service Socket.
+[[0;32m  OK  [0m] Closed [0;1;39muuidd.socket[0m - UUID daemon activation socket.
+[[0;32m  OK  [0m] Stopped target [0;1;39msysinit.target[0m - System Initialization.
+[[0;32m  OK  [0m] Stopped target [0;1;39mimports.target[0m - Image Downloads.
+         Stopping [0;1;39msystemd-binfmt.service[0m - Set Up Additional Binary Formats...
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-sysctl.service[0m - Apply Kernel Variables.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-modules-load.service[0m - Load Kernel Modules.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-update-done.service[0m - Update is Completed.
+[[0;32m  OK  [0m] Stopped [0;1;39mldconfig.service[0m - Rebuild Dynamic Linker Cache.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-journal-catalog-up….service[0m - Rebuild Journal Catalog.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-tmpfiles-setup.ser…[0mreate System Files and Directories.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-binfmt.service[0m - Set Up Additional Binary Formats.
+[[0;32m  OK  [0m] Unset automount [0;1;39mproc-sys-fs-binfmt…[0mormats File System Automount Point.
+[[0;32m  OK  [0m] Stopped target [0;1;39mlocal-fs.target[0m - Local File Systems.
+         Unmounting [0;1;39mcdrom.mount[0m - /cdrom...
+         Unmounting [0;1;39mrofs.mount[0m - /rofs...
+         Unmounting [0;1;39mtmp.mount[0m - /tmp...
+[[0;1;31mFAILED[0m] Failed unmounting [0;1;39mcdrom.mount[0m - /cdrom.
+[[0;32m  OK  [0m] Unmounted [0;1;39mrofs.mount[0m - /rofs.
+[[0;32m  OK  [0m] Unmounted [0;1;39mtmp.mount[0m - /tmp.
+[[0;32m  OK  [0m] Stopped target [0;1;39mlocal-fs-pre.target[0m…Preparation for Local File Systems.
+[[0;32m  OK  [0m] Stopped target [0;1;39mswap.target[0m - Swaps.
+[[0;32m  OK  [0m] Reached target [0;1;39mumount.target[0m - Unmount All Filesystems.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-tmpfiles-setup-dev…[0mCreate Static Device Nodes in /dev.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-sysusers.service[0m - Create System Users.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-remount-fs.service[0m…mount Root and Kernel File Systems.
+[[0;32m  OK  [0m] Stopped [0;1;39msystemd-tmpfiles-setup-dev…[0mic Device Nodes in /dev gracefully.
+[[0;32m  OK  [0m] Reached target [0;1;39mshutdown.target[0m - System Shutdown.
+         Starting [0;1;39mcasper.service[0m - Shuts do…ive" preinstalled system cleanly...
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n]3008;start=54e910c4fed44dbabe2f64efae22f799;user=root;hostname=ubuntu;machineid=8f18b34666fe4f44af552d3068613615;bootid=db2dc552ef2f41ddb96ab6d6f8d7fb3b;pid=1387;pidfdid=636;comm=(casper-stop);servicename=casper.service;invocationid=e57562b87b724d939ad079bc75f9a1e3;type=service\[[0;32m  OK  [0m] Finished [0;1;39mcasper.service[0m - Shuts do…"live" preinstalled system cleanly.
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n]3008;end=54e910c4fed44dbabe2f64efae22f799\[[0;32m  OK  [0m] Reached target [0;1;39mfinal.target[0m - Late Shutdown Services.
+         Unmounting [0;1;39mcdrom.mount[0m - /cdrom...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-poweroff.service[0m - System Power Off.
+[[0;32m  OK  [0m] Reached target [0;1;39mpoweroff.target[0m - System Power Off.
+]3008;end=21d3903332aa43ca8633b2581aadba4c\[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[  245.551696] shutdown[1]: Failed to parse /proc/self/mountinfo: Operation not supported
+[  245.552948] shutdown[1]: Unable to unmount file systems: Operation not supported
+[  245.554134] shutdown[1]: Cannot enumerate swap partitions, no libmount support.
+[  245.555283] shutdown[1]: Unable to deactivate swaps: Operation not supported
+[  245.558082] shutdown[1]: Failed to parse /proc/self/mountinfo: Operation not supported
+[  245.559377] shutdown[1]: Unable to unmount file systems: Operation not supported
+[  245.560558] shutdown[1]: Cannot enumerate swap partitions, no libmount support.
+[  245.561704] shutdown[1]: Unable to deactivate swaps: Operation not supported
+[  245.564202] shutdown[1]: Could not detach loopback /dev/loop0: Device or resource busy
+[  245.565532] shutdown[1]: Unable to finalize remaining file systems, swap devices, loop devices, ignoring.
+[  245.572072] reboot: Power down
