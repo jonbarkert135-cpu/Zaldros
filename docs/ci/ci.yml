@@ -49,10 +49,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # quay.io CDN periodically drops the fedora-bootc pull with
+      # "unexpected EOF" (exit 125). Network-only flake -> retry 3x.
       - name: Build zaldros-base
-        run: podman build -t zaldros-base -f build/Containerfile.base .
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::podman build zaldros-base (attempt $attempt/3)"
+            if podman build -t zaldros-base -f build/Containerfile.base .; then
+              echo "::endgroup::"; exit 0
+            fi
+            echo "::endgroup::"
+            echo "attempt $attempt failed"; sleep $((attempt * 30))
+          done
+          echo "zaldros-base failed 3 times - not a transient pull error"; exit 1
       - name: Build zaldros-desktop
-        run: podman build -t zaldros-desktop -f build/Containerfile.desktop .
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::podman build zaldros-desktop (attempt $attempt/3)"
+            if podman build -t zaldros-desktop -f build/Containerfile.desktop .; then
+              echo "::endgroup::"; exit 0
+            fi
+            echo "::endgroup::"
+            echo "attempt $attempt failed"; sleep $((attempt * 30))
+          done
+          echo "zaldros-desktop failed 3 times - not a transient pull error"; exit 1
 
   bench:
     name: benchmark harness (baseline on the runner)
