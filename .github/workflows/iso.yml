@@ -115,7 +115,7 @@ jobs:
         run: |
           # pipefail, or `tee` reports success for a report that crashed and a boot that failed.
           set -o pipefail
-          python3 ./build/iso/report.py results | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ./build/iso/report.py results --variant "${{ matrix.variant }}" --profile "${{ matrix.profile }}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Publish boot results to the ci-logs branch
         if: always()
         run: |

@@ -198,10 +198,23 @@ def test_the_panel_keeps_the_measured_windows_geometry():
     assert 2 * bar["padding"] + 4 * bar["tile"] + 3 * bar["tile_gap"] == bar["width"]
 
 
-def test_the_boot_test_really_takes_a_screenshot_in_the_guest():
+def test_the_boot_test_rejects_a_grabber_that_writes_no_file(tmp_path, monkeypatch):
+    import importlib.util
+    import subprocess
+
     uitest = (REPO / "build" / "iso" / "uitest.py").read_text()
     assert 'step("screenshot"' in uitest
-    assert "the tool ran but wrote no file" in uitest
+    spec = importlib.util.spec_from_file_location("capture_guest_probe", REPO / "build/iso/uitest.py")
+    guest = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(guest)
+    monkeypatch.setattr(guest.shutil, "which", lambda tool: tool if tool == "spectacle" else None)
+    monkeypatch.setattr(guest.subprocess, "run", lambda command, **_: subprocess.CompletedProcess(
+        command, 0, "", "backend wrote no file"))
+    results = {}
+    target = tmp_path / "missing.png"
+    guest.step("screenshot", lambda: guest._screenshot(target), results)
+    assert results["screenshot"]["status"] == "FAIL"
+    assert results["screenshot"]["error"] and not target.exists()
     report = (REPO / "build" / "iso" / "report.py").read_text()
     assert '"screenshot"' in report
 

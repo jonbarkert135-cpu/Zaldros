@@ -70,25 +70,15 @@ EXTRACT="$(dirname "$0")/extract_marked.py"
 if python3 "$EXTRACT" "$SERIAL" 'ZALDROS-SELFTEST ' --out "$JSON"; then
   python3 "$EXTRACT" "$SERIAL" 'ZALDROS-UITEST ' --out "$OUT/$NAME.ui-guest.json" --optional || true
   python3 "$EXTRACT" "$SERIAL" 'ZALDROS-LATE ' --out "$OUT/$NAME.late.json" --optional || true
-  python3 - "$JSON" "$ELAPSED" "$PROFILE" <<'PY'
+  python3 - "$JSON" "$ELAPSED" "$PROFILE" "$(dirname "$0")" <<'PY'
 import json, sys
+sys.path.insert(0, sys.argv[4])
+from report import boot_checks
 data = json.load(open(sys.argv[1]))
 data["wall_seconds"] = int(sys.argv[2]); data["profile"] = sys.argv[3]
 # ponytail: the self-test marker only proves the guest talked to us. PASS needs the real chain:
 # kernel + systemd + Wayland + KWin + shell + a launched application (spec PART "NO FALSE SUCCESS").
-checks = {
-    "kernel": bool(data.get("kernel")),
-    # "starting" is only accepted when the sole outstanding jobs are this test's own units;
-    # any other pending job, and any failed unit, still fails the check.
-    "systemd": data.get("systemd_state") in ("running", "degraded") or (
-        data.get("systemd_state") == "starting" and not data.get("failed_units")
-        and all(any(u in line for u in ("zaldros-selftest.service", "graphical.target"))
-                for line in data.get("pending_jobs", "x").splitlines() if line.strip())),
-    "wayland": bool(data.get("wayland_socket")),
-    "kwin": bool(data.get("kwin")),
-    "shell": bool(data.get("shell")),
-    "app_launch": bool((data.get("app_launch") or {}).get("started")),
-}
+checks = boot_checks(data)
 data["checks"] = checks
 data["boot"] = "PASS" if all(checks.values()) else "FAIL"
 data["failed_checks"] = [k for k, v in checks.items() if not v]
@@ -100,10 +90,12 @@ for extra, key in ((sys.argv[1].replace(".json", ".ui-guest.json"), "ui_guest"),
     except Exception as exc:
         data[key] = {"status": "MISSING", "why": str(exc)}
 json.dump(data, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
+sys.exit(0 if data["boot"] == "PASS" else 1)
 PY
-  echo "PASS: $JSON"
+  echo "Boot checks passed: $JSON (required UI acceptance is checked by report.py)"
 else
   python3 -c 'import json,sys; json.dump({"profile":sys.argv[1],"boot":"FAIL","wall_seconds":int(sys.argv[2]),"qemu_rc":int(sys.argv[3]),"serial_tail":open(sys.argv[4],errors="replace").read()[-4000:]},open(sys.argv[5],"w"),ensure_ascii=False,indent=2)' \
     "$PROFILE" "$ELAPSED" "$RC" "$SERIAL" "$JSON"
   echo "FAIL: no parsable self-test report on the serial log — see $SERIAL"
+  exit 1
 fi

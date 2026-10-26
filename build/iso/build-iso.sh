@@ -74,14 +74,12 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami"
+BASE="kwin-common ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami kde-spectacle xdg-desktop-portal xdg-desktop-portal-kde"
 case "$VARIANT" in
-  # kde-spectacle and the portal are what makes Win+G's screenshot and recording real rather than
-  # decorative: the shell resolves a grabber at runtime (zaldros_shell/capture.py) and disables the
-  # tile with a reason when none is installed. ffmpeg is only in `full` — it is ~90 MiB, and the
-  # point of `services` is to measure a smaller image.
-  full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland kde-spectacle ffmpeg xdg-desktop-portal xdg-desktop-portal-kde" ;;
-  services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen kde-spectacle xdg-desktop-portal xdg-desktop-portal-kde" ;;
+  # Screenshot support is a required desktop test, so Spectacle and its portal backend
+  # belong to BASE for every variant. ffmpeg recording remains a full-only extension.
+  full)     EXTRA="plasma-desktop plasma-workspace kwin-wayland ffmpeg" ;;
+  services) EXTRA="kwin-wayland plasma-nm plasma-pa powerdevil kscreen" ;;
   legacy)   EXTRA="kwin-wayland layer-shell-qt" ;;
   *) echo "unknown variant $VARIANT" >&2; exit 2 ;;
 esac

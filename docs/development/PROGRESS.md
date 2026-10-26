@@ -231,6 +231,132 @@ capability contract в P03/P17; не отключать проверки рад�
 CI shell install теперь фиксирует проверенные PySide6/pytest/Pillow/numpy versions,
 чтобы context-menu suite выполнялся и в GitHub, а не только в текущем venv.
 
+## P03/P17 — достоверность функционального CI (по следующему запросу владельца)
+
+База: `7660f2c3ec63dd592f88e6be8fb04d0fa58e5598`, PR #2 MERGED.
+Владелец поручил продолжить с ранее обозначенного D03. Это независимое исправление
+корректности CI; P02 licensing и остальные требования P03 не объявляются закрытыми.
+На базе 7660f2c normal CI run 40338140411 и ISO run 40338140298 были зелёными,
+что само по себе не устраняло подтверждённый дефект D03.
+
+Изменения:
+
+- report.py требует PASS всех 11 обязательных UI steps от их владельца. Ошибка
+  второго наблюдателя не маскируется; missing/blocked/skipped/unknown не заменяют
+  результат. QMP и явно измеренные diagnostic/report FAIL тоже дают exit 1.
+- Гость отвечает за окно/запуск/снимок; host — за input-driven шаги. BLOCKED guest
+  entries для host steps не трактуются как второй провал, когда host PASS.
+  Frame pacing не измеряется VM и не объявляется проверенным.
+- Boot producer и consumer используют один boot_checks; пустой список pending jobs
+  при starting больше не является доказательством успеха. Имена unit проверяются
+  точно, failed units всегда дают fail. boot-test.sh сохраняет неуспешный exit code.
+- Оба ISO workflow передают ожидаемый variant/profile; stale, missing, extra и
+  duplicate targets отклоняются. Source-SHA correlation внутри guest — ещё P17 work.
+- Spectacle и KDE portal включены в BASE всех вариантов. Существующий screenshot
+  тест не отключён; legacy получает недостающий runtime. ffmpeg остаётся full-only.
+  Старые размер/RAM цифры не характеризуют изменённый minimal image.
+- Решение и ограниченный контракт: ADR-0026. Исторические отчёты не изменялись.
+
+Проверки до отправки:
+
+| Проверка | Итог |
+| --- | --- |
+| Новые regression tests на старом коде | 38 failed / 2 passed; дефект воспроизведён |
+| Финальные gate/boot-report/serial/package suites | 72 passed, exit 0 |
+| Полный shell/backend pytest | 587 passed, 0 skipped, 62 forkpty warnings, exit 0, 154.20s |
+| Tools | 44 passed, exit 0 |
+| Replay девяти сохранённых VM reports новым report.py | exit 1: ровно legacy/low, legacy/mid, legacy/modern screenshot FAIL |
+| bash -n, синхронность двух ISO workflow, diff whitespace | PASS |
+
+Actual composition heredoc boot-test.sh исполняется в regression test из внешнего
+cwd и сохраняет failure как для boot, так и для screenshot. Форматировочные старые
+fixtures дополнены полноценными UI результатами; assertions не ослаблялись.
+Финальные логи: `/tmp/zaldros-functional-final-tests.log`,
+`/tmp/zaldros-functional-replay.log`. Новая VM-матрица должна подтвердить реальный
+скриншот в legacy; старые FAIL не пересчитаны в PASS и не являются новым прогоном.
+Перед доставкой в main — PR, normal CI и новый ISO/VM прогон. Точное подтверждение
+remote результатов добавляется отдельно после их получения.
+
+### Дополнительная диагностика производителя результатов
+
+Первый кандидат `dfe9237` прошёл CI, но просмотр сырого legacy/modern отчёта выявил
+`status=PASS` одновременно с `error=the tool ran but wrote no file`. Этот результат
+не принят как функциональное подтверждение. В старых services отчётах найдена
+та же ошибка. step() принимал любой словарь за успех; итоговый gate теперь отклоняет
+непустой error независимо от PASS, а producer не превращает error/None/пустые
+результаты в успех. Таким образом исходный false-green дефект имел два уровня.
+
+Полный набор пакетов сравнен по реальным CI manifests: kwin-common установлен
+только в full, тогда как Spectacle присутствовал в services. Подписанный
+resolute-updates InRelease проверен keyring из аутентифицированного Ubuntu base,
+индекс Packages и deb сверены по SHA256. В kwin-common найдены screenshot.so и
+screencast.so. kwin-common теперь также в BASE; приватные данные/секреты не нужны.
+Receipt: `docs/state/evidence/functional-gate/screenshot-dependency.json`.
+
+Снимок считается выполненным только при exit 0 и свежем изображении, которое
+декодируется QImage с width/height > 0. stderr/return code не теряются. Реальные
+window probes теперь сохраняют UUID запущенного Dolphin, проверяют его геометрию
+и переход minimized на том же окне, а не наличие произвольного окна. internalId
+проверен по официальному KWin v6.6.6 window.h.
+
+Новые проверки: **126 passed** в focused suites, **612 passed / 0 skipped** в
+полном наборе, 62 существующих forkpty warnings, 152.85s. В первом полном прогоне
+после правки producer было 611 passed / 1 failed: старый capture test проверял
+буквальную строку ошибки. Он заменён более строгой поведенческой проверкой:
+команда exit 0 без файла должна дать FAIL через настоящий step()+_screenshot().
+Assertions не отключались. Финальный лог: `/tmp/zaldros-functional-final-evidence-tests.log`.
+
+Replay исходных девяти VM reports финальным gate теперь даёт exit 1 с шестью
+ошибками screenshot (legacy + services), включая ранее замаскированные error fields.
+PR #3 обновляется; до нового VM прогона эти screenshot функции не объявляются PASS.
+Предложенные владельцем варианты нового имени обсуждаются отдельно; переименование
+без выбранного окончательного имени в этот PR не добавлялось.
+
+### Исправление перемещения Wayland
+
+Run [40353950450](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40353950450)
+на `e5c98f0` завершился failure: девять window_move FAIL, остальные обязательные
+шаги PASS. Все девять screenshot теперь содержат свежие PNG 1280×800; это
+подтверждает исправление пакетов, но не является приёмкой всей матрицы.
+Точные commits диагностических отчётов сохранены в
+`docs/state/evidence/functional-gate/geometry-failure.json` с ограничением provenance.
+
+Причина воспроизведена реальным QJSEngine и QObject с QRectF: запись g.x/g.y
+отправляет промежуточные setters, последняя запись возвращает исходные координаты
+до Wayland ack. Новый regression на старом коде: 1 failed. Отправляем одно
+отдельное значение x/y/width/height; этот формат подтверждён исходником
+[KWin v6.6.6 scripting.cpp](https://github.com/KDE/kwin/blob/v6.6.6/src/scripting/scripting.cpp).
+Focused producer/gate: 73 passed. Подтверждение в VM требуется заново.
+Полный набор после исправления: **613 passed / 0 skipped**, 62 прежних forkpty
+warnings, 152.23s; tools: **44 passed**. Лог:
+`/tmp/zaldros-functional-geometry-tests.log`. Assertions/gate не ослаблялись.
+
+### D03 — удалённая приёмка выполнена
+
+Проверенный runtime source: `4c35535a33466c0b4c6bd28139e12b75c56f4a44`.
+Normal CI [40375589292](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40375589292):
+5/5 jobs PASS. ISO [40375579596](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40375579596):
+3/3 builds, 9/9 boot jobs PASS. Все девять новых сырых JSON перепроверены
+`python build/iso/report.py /tmp/zaldros-4c-vm-reports`: exit 0, **99/99** обязательных
+UI steps PASS. На каждом target проверены одинаковый UUID при move/minimize/restore,
+геометрия (256,115) → (376,195), minimized true → false и screenshot PNG 1280×800
+без error; размер 307398–309895 bytes. Пакеты screenshot runtime подтверждены
+актуальными installed-packages manifests всех трёх сборок.
+
+Точные workflow metadata, commits диагностических веток, версии пакетов и результаты:
+`docs/state/evidence/functional-gate/vm-acceptance.json`. Guest JSON ещё не содержит
+source SHA/run ID: ограничение явно сохранено, не заменено догадкой. Этот rerun
+подтверждает D03/одиннадцать шагов boot/UI; P02 licensing, остальные P03/P17,
+installed-system, hardware и frame pacing остаются открытыми. Старые FAIL сохранены.
+
+Временный независимый fault-injection baseline для будущего P04: приватный
+dbus-daemon, синхронный Bus.call timeout 0.2s из Qt event loop; фактически call
+0.2006s, max gap heartbeat 204.8ms при интервале 5ms. Это измерение транспорта,
+не полный Settings/VM/recovery тест. Script/receipt в текущей среде:
+`/tmp/zaldros-gui-timeout-baseline.py` и `/tmp/zaldros-gui-timeout-baseline.json`.
+Следующий этап: оставшиеся P02/P03 gates, затем async lifecycle с heartbeat/recovery
+регрессиями. Эти измерения не объявляют P04 выполненным.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

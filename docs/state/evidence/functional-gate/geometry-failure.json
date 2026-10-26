@@ -1,0 +1,306 @@
+{
+  "workflow_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40353950450",
+  "source_commit": "e5c98f0b5aa1f70f566a2af48f5dd797c893b4f2",
+  "conclusion": "failure",
+  "observation": "All nine guest screenshots are decoded images; all nine window_move probes fail. This run is not accepted.",
+  "provenance_limit": "Reports were retrieved from mutable diagnostic branches after this workflow; report commits are pinned here but guest JSON does not itself embed source SHA or run ID.",
+  "reports": [
+    {
+      "variant": "full",
+      "profile": "low",
+      "report_commit": "322768dc35d4dd73d05311754ac1cfe945c04e23",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307441,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.788,
+        "cpu_percent": {
+          "kwin_wayland": 67.3,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 272.5,
+          "python3": 360.6
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.553,
+        "cpu_percent": {
+          "kwin_wayland": 61.2,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 273.3,
+          "python3": 360.6
+        }
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "mid",
+      "report_commit": "6f546b1873161bc539cf3ce5dad58fbbd501b571",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307430,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.924,
+        "cpu_percent": {
+          "kwin_wayland": 69.3,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 273.9,
+          "python3": 366.3
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.616,
+        "cpu_percent": {
+          "kwin_wayland": 60.6,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 274.7,
+          "python3": 366.3
+        }
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "modern",
+      "report_commit": "a979a4b451d3b76111496ac450e570c563db4681",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307531,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.912,
+        "cpu_percent": {
+          "kwin_wayland": 72.4,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 272.0,
+          "python3": 366.0
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.612,
+        "cpu_percent": {
+          "kwin_wayland": 63.3,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 272.7,
+          "python3": 366.0
+        }
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "low",
+      "report_commit": "bf46bf5392e64af1a0ad0f0652c82804dcea32e6",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309999,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.685,
+        "cpu_percent": {
+          "kwin_wayland": 45.3,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 248.2,
+          "python3": 318.9
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.529,
+        "cpu_percent": {
+          "kwin_wayland": 2.6,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 248.9,
+          "python3": 318.9
+        }
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "mid",
+      "report_commit": "b842b52e6138052eed5c523b8a5778f2b85c2594",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309562,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.727,
+        "cpu_percent": {
+          "kwin_wayland": 45.4,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 246.8,
+          "python3": 326.5
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.531,
+        "cpu_percent": {
+          "kwin_wayland": 4.6,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 247.5,
+          "python3": 326.5
+        }
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "modern",
+      "report_commit": "59e85a3b496539ac423e51a321377edefaa6d7fc",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309526,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.765,
+        "cpu_percent": {
+          "kwin_wayland": 44.4,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 248.3,
+          "python3": 326.9
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.528,
+        "cpu_percent": {
+          "kwin_wayland": 5.2,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 250.5,
+          "python3": 326.9
+        }
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "low",
+      "report_commit": "e4a50ad1a1d8824f2c77496ed525197ca4181463",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309702,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.673,
+        "cpu_percent": {
+          "kwin_wayland": 46.1,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 246.6,
+          "python3": 320.9
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.528,
+        "cpu_percent": {
+          "kwin_wayland": 3.3,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 248.9,
+          "python3": 320.9
+        }
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "mid",
+      "report_commit": "2b123708c241c10c5306ef4fba937ae917d90f0b",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309452,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.7,
+        "cpu_percent": {
+          "kwin_wayland": 45.7,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 247.0,
+          "python3": 327.2
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.527,
+        "cpu_percent": {
+          "kwin_wayland": 3.9,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 249.3,
+          "python3": 327.2
+        }
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "modern",
+      "report_commit": "eee7d44760e5762f5f2a5ffd73a337c7038a4464",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309728,
+        "width": 1280,
+        "height": 800,
+        "status": "PASS",
+        "seconds": 0.773,
+        "cpu_percent": {
+          "kwin_wayland": 45.3,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 245.3,
+          "python3": 330.2
+        }
+      },
+      "window_move": {
+        "status": "FAIL",
+        "seconds": 1.529,
+        "cpu_percent": {
+          "kwin_wayland": 5.2,
+          "python3": 0.0
+        },
+        "rss_mib": {
+          "kwin_wayland": 246.0,
+          "python3": 330.2
+        }
+      }
+    }
+  ]
+}

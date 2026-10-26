@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Stage 2 — in-guest UI validation. Times the interaction chain the spec asks for and samples
 CPU/RSS around every step, so "it booted" and "it feels responsive" stay separate verdicts.
 
@@ -22,10 +23,12 @@ WINDOWS_MARK = "ZALDROS-WINDOWS-READY "
 KWIN_SCRIPT = """
 var out = [];
 workspace.windowList().forEach(function (w) {
-    out.push({caption: w.caption, minimized: w.minimized, x: w.frameGeometry.x, y: w.frameGeometry.y});
+    out.push({id: String(w.internalId), caption: w.caption, minimized: w.minimized,
+              x: w.frameGeometry.x, y: w.frameGeometry.y});
 });
 console.info("ZALDROS-WINDOWS " + JSON.stringify(out));
 """
+TEST_WINDOW_ID = None
 
 
 def sh(*cmd, timeout=15):
@@ -148,21 +151,26 @@ def step(name, fn, results):
     try:
         with Sampler() as s:
             detail = fn()
-        results[name] = {"status": "PASS" if detail is not False else "FAIL",
-                         "seconds": s.seconds, "cpu_percent": s.cpu, "rss_mib": s.rss}
-        if isinstance(detail, dict):
-            results[name].update(detail)
+        entry = dict(detail) if isinstance(detail, dict) else {}
+        status = entry.get("status", "PASS" if detail else "FAIL")
+        if entry.get("error") or not isinstance(detail, (bool, dict)):
+            status = "FAIL"
+        entry.update(status=status, seconds=s.seconds, cpu_percent=s.cpu, rss_mib=s.rss)
+        results[name] = entry
     except Exception as exc:
         results[name] = {"status": "FAIL", "error": str(exc)}
 
 
 def wait_for_window(match, timeout=30):
     """A window is 'open' only when KWin reports it, not when the process started."""
+    global TEST_WINDOW_ID
+    TEST_WINDOW_ID = None
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         found = [w for w in windows() if match.lower() in (w.get("caption") or "").lower()]
-        if found:
-            return {"caption": found[0]["caption"]}
+        if found and found[0].get("id") not in (None, "", "undefined", "null"):
+            TEST_WINDOW_ID = found[0]["id"]
+            return {"caption": found[0]["caption"], "window_id": TEST_WINDOW_ID}
         time.sleep(0.5)
     return False
 
@@ -172,7 +180,7 @@ def main():
     variant = Path("/etc/zaldros-variant").read_text().strip() \
         if Path("/etc/zaldros-variant").is_file() else "unknown"
 
-    step("desktop_ready", lambda: bool(windows()) or {"note": "no windows yet"}, results)
+    step("desktop_ready", lambda: bool(windows()), results)
     step("app_launch_explorer",
          lambda: (subprocess.Popen(["dolphin"], stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL), wait_for_window("dolphin"))[1],
@@ -222,33 +230,64 @@ def _kwin_eval(js):
     return kwin_call("start")
 
 
-def _screenshot():
-    """Grab the screen with whatever this image really ships. BLOCKED beats a guess."""
-    target = Path("/tmp/zaldros-shot.png")
+def _screenshot(target=None):
+    """Require a successful command and a fresh, decodable image; retain failure diagnostics."""
+    from PySide6.QtGui import QImage
+
+    target = Path(target) if target is not None else Path("/tmp/zaldros-shot.png")
     if target.exists():
         target.unlink()
     for command in (["spectacle", "-b", "-n", "-f", "-o", str(target)], ["grim", str(target)]):
         if not shutil.which(command[0]):
             continue
-        sh(*command, timeout=30)
-        if target.is_file() and target.stat().st_size > 0:
-            return {"tool": command[0], "bytes": target.stat().st_size}
-        return {"tool": command[0], "error": "the tool ran but wrote no file"}
-    return False
+        done = subprocess.run(command, capture_output=True, text=True, timeout=30)
+        if done.returncode != 0:
+            raise RuntimeError(f"{command[0]} exited {done.returncode}: {(done.stderr or done.stdout).strip()[-1500:]}")
+        image = QImage(str(target)) if target.is_file() else QImage()
+        if image.isNull() or image.width() <= 0 or image.height() <= 0:
+            raise RuntimeError(f"{command[0]} did not create a decodable screenshot: {(done.stderr or done.stdout).strip()[-1500:]}")
+        return {"tool": command[0], "bytes": target.stat().st_size,
+                "width": image.width(), "height": image.height()}
+    raise RuntimeError("no screenshot backend installed (spectacle or grim)")
+
+
+def _target_window():
+    return next((w for w in windows() if TEST_WINDOW_ID and w.get("id") == TEST_WINDOW_ID), None)
+
+
+def _for_test_window(action):
+    """Keep manipulating the same external window after minimizing it changes focus."""
+    identity = json.dumps(TEST_WINDOW_ID)
+    _kwin_eval("var w = workspace.windowList().filter(function(w) { return String(w.internalId) === "
+               + identity + "; })[0]; if (w) { " + action + " }")
 
 
 def _move():
-    _kwin_eval("var w = workspace.activeWindow; if (w) { var g = w.frameGeometry; "
-               "g.x += 120; g.y += 80; w.frameGeometry = g; }")
+    before = _target_window()
+    if before is None:
+        return False
+    # Qt's QRectF gadget is a live property reference: changing g.x/g.y issues
+    # intermediate requests, then the final assignment can restore the unacked
+    # geometry. KWin registers plain JS rectangle conversion; submit one value.
+    _for_test_window("var g = w.frameGeometry; w.frameGeometry = "
+                     "{x: g.x + 120, y: g.y + 80, width: g.width, height: g.height};")
     time.sleep(0.5)
-    return bool(windows())
+    after = _target_window()
+    if after is None or (before.get("x"), before.get("y")) == (after.get("x"), after.get("y")):
+        return False
+    return {"window_id": TEST_WINDOW_ID, "before": [before["x"], before["y"]],
+            "after": [after["x"], after["y"]]}
 
 
 def _set_minimized(state):
-    _kwin_eval(f"var w = workspace.activeWindow; if (w) w.minimized = {str(state).lower()};")
+    before = _target_window()
+    if before is None or before.get("minimized") is state:
+        return False
+    _for_test_window(f"w.minimized = {str(state).lower()};")
     time.sleep(0.5)
-    wins = windows()
-    return any(w.get("minimized") == state for w in wins) if wins else False
+    after = _target_window()
+    return {"window_id": TEST_WINDOW_ID, "minimized": state} if (
+        after is not None and after.get("minimized") is state) else False
 
 
 if __name__ == "__main__":

@@ -8,8 +8,7 @@ the raw `systemd-analyze` text and became the two-way measurement dict from
 into `$GITHUB_STEP_SUMMARY` with `tee`, and without `pipefail` the pipeline exits 0 no matter what
 Python did. Both halves are covered here, so the numbers cannot disappear silently again.
 
-`pipefail` is checked in `docs/ci/iso.yml`; the live workflow under `.github/` has to be edited by
-the owner, because Viktor's GitHub App is not allowed to push workflow files.
+Both live and documented workflows preserve the report's exit code and select the expected target.
 """
 
 import importlib.util
@@ -41,6 +40,10 @@ def _result(**overrides):
         "mem_used_mib": 1462, "process_count": 214,
         "boot_time": {"uptime_at_selftest_s": 41.7, "systemd_analyze": None,
                       "kernel_s": None, "userspace_s": None},
+        "ui_guest": {"steps": {step: {"status": "PASS"} for step in (
+            "desktop_ready", "app_launch_explorer", "window_move", "minimize", "restore", "screenshot")}},
+        "ui_host": {step: {"status": "PASS"} for step in (
+            "start_open", "start_close", "alt_tab", "task_view", "taskbar_response")},
     }
     data.update(overrides)
     return data
@@ -90,17 +93,12 @@ def test_a_failed_boot_still_returns_a_failing_exit_code(tmp_path, capsys):
     assert code == 1
 
 
-def test_the_reviewed_workflow_does_not_swallow_the_report_exit_code():
-    """`docs/ci/iso.yml` is the copy this repository reviews, so the gate is checked there.
-
-    The live `.github/workflows/iso.yml` needs the same two lines. Viktor's GitHub App cannot
-    push changes under `.github/workflows/` (`without workflows permission`), so applying them is
-    an owner action — it is written down in TODO.md rather than quietly skipped here.
-    """
-    workflow = REPO / "docs" / "ci" / "iso.yml"
+@pytest.mark.parametrize("relative", ["docs/ci/iso.yml", ".github/workflows/iso.yml"])
+def test_the_workflow_preserves_exit_status_and_checks_the_selected_target(relative):
+    workflow = REPO / relative
     text = workflow.read_text()
-    assert "report.py results | tee" in text, workflow
-    step = text.split("report.py results | tee")[0]
+    assert 'report.py results --variant "${{ matrix.variant }}" --profile "${{ matrix.profile }}" | tee' in text
+    step = text.split("report.py results")[0]
     assert "set -o pipefail" in step.rsplit("- name:", 1)[1], "tee hides a crash and an exit code"
 
 
@@ -136,9 +134,7 @@ def test_the_matrix_ignores_the_diagnostic_halves_next_to_a_boot_result(tmp_path
     an extra image and printed a `| ? | ? | FAIL |` row, which took the exit code to 1."""
     import json as _json
 
-    (tmp_path / "zaldros-full-modern.json").write_text(_json.dumps(
-        {"variant": "full", "profile": "modern", "boot": "PASS", "kernel": "7.0.0-30-generic",
-         "systemd_state": "running", "wayland_socket": True, "kwin": True, "shell": True}))
+    (tmp_path / "zaldros-full-modern.json").write_text(_json.dumps(_result()))
     (tmp_path / "zaldros-full-modern.late.json").write_text(_json.dumps(
         {"switcher_script_lines": ["qml: ZALDROS-SWITCHER tabbox layout loaded"]}))
     (tmp_path / "zaldros-full-modern-host.json").write_text(_json.dumps({"alt_tab": {}}))

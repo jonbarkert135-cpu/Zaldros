@@ -1,8 +1,9 @@
 # Project state — 2026-10-26
 
-Current source baseline: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-P01 documentation changes are uncommitted. This page supersedes the old current-status
-summary; it does not retrospectively reclassify historical test runs.
+This delivery cycle starts from main `7660f2c3ec63dd592f88e6be8fb04d0fa58e5598`.
+Runtime-verified source: `4c35535a33466c0b4c6bd28139e12b75c56f4a44`.
+P01 and P02 deliveries are already committed and merged. This page supersedes the
+old current-status summary; it does not retrospectively reclassify historical runs.
 
 ## Current milestone
 
@@ -23,11 +24,32 @@ OS, installed system, or fully working backend is **not established**.
 | Base | Ubuntu 26.04 live ISO is the active implementation candidate; ADR-0009 remains PROPOSED until accepted by its gate |
 | Desktop | KWin 6/Wayland + own Qt/QML shell; internal QML windows and real compositor windows must be verified separately |
 | Variant | full/services/legacy comparison still open; full is the first smoke-test control, not an accepted winner |
-| Current implementation evidence | Local unit, mock-service bus, filesystem/PTY and offscreen checks; actual target-service/VM/hardware evidence is not refreshed here |
+| Current implementation evidence | Local tests plus source 4c35535 boot/UI validation: all three variants × three VM profiles; installed-system and hardware evidence remain open |
 | Updates/recovery | Query/refresh implemented; complete update/install/recovery lifecycle not delivered; apt has no inherited bootc atomicity |
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+Current functional-gate change: **613 passed, no skips**, 62 existing forkpty
+warnings, exit 0, 152.23s. Focused gate/producer/report checks before the geometry
+regression: **126 passed**; producer/gate including that regression: **73 passed**;
+tools: **44 passed**. Replaying the nine archived reports now returns exit 1 for
+six legacy/services screenshot failures, including errors mislabeled PASS.
+The guest producer, window readbacks and missing kwin-common runtime plugin are
+also corrected. Run `40353950450` confirms decoded screenshots in all nine VMs,
+but correctly fails all nine window_move checks. A Qt gadget/Wayland geometry
+request bug was then reproduced and fixed; the rerun below confirms that fix.
+
+**Accepted remote rerun:** [ISO run 40375579596](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40375579596)
+on `4c35535` passed all three builds and nine boot jobs. Rechecking all nine raw
+reports with the strict CLI returns exit 0: 99 required UI steps PASS, decoded
+1280×800 screenshots without errors, and the same Dolphin UUID moves from
+(256,115) to (376,195), minimizes and restores. Normal CI run `40375589292`
+also passed all five jobs. Exact workflow metadata, diagnostic commits and
+observations: [vm-acceptance.json](evidence/functional-gate/vm-acceptance.json).
+Guest/source SHA binding remains a stated evidence limitation. These results
+certify the eleven-step boot/UI scope, not a complete backend, installed OS,
+physical hardware or frame pacing.
 
 After canonical-branding cleanup and installation of the missing visual-test
 dependencies: **538 passed, no skips**, 62 forkpty warnings, exit 0, 146.71s.
@@ -71,9 +93,11 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
    Sixteen toggle rows have no backend control; static status must not imply measurement.
 5. **P1 / P03:** ISO path filters omit backend/apps/assets; Office jobs described in
    docs are absent from the active CI workflow.
-6. **P1 / P03/P17:** report.py currently gates only on `boot`, so a guest UI step
-   can report FAIL while the workflow is green. Reproduced by legacy screenshot
-   results in all three profiles; define/enforce functional acceptance explicitly.
+6. **P1 / P03/P17:** report.py previously gated only on `boot`, so a guest UI step
+   could report FAIL while the workflow was green. **D03 fixed and VM-verified**
+   on 4c35535: boot facts and eleven UI steps gate all nine targets. The missing
+   screenshot runtime and geometry producer are corrected. Other P03/P17 work
+   remains open. See ADR-0026 and iteration 0013.
 
 See F01–F12 and D01/D02 in the capability register for scope and confidence.
 No functional application code was changed by P01. P02 changes build authentication,
