@@ -331,6 +331,32 @@ Focused producer/gate: 73 passed. Подтверждение в VM требуе�
 warnings, 152.23s; tools: **44 passed**. Лог:
 `/tmp/zaldros-functional-geometry-tests.log`. Assertions/gate не ослаблялись.
 
+### D03 — удалённая приёмка выполнена
+
+Проверенный runtime source: `4c35535a33466c0b4c6bd28139e12b75c56f4a44`.
+Normal CI [40375589292](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40375589292):
+5/5 jobs PASS. ISO [40375579596](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40375579596):
+3/3 builds, 9/9 boot jobs PASS. Все девять новых сырых JSON перепроверены
+`python build/iso/report.py /tmp/zaldros-4c-vm-reports`: exit 0, **99/99** обязательных
+UI steps PASS. На каждом target проверены одинаковый UUID при move/minimize/restore,
+геометрия (256,115) → (376,195), minimized true → false и screenshot PNG 1280×800
+без error; размер 307398–309895 bytes. Пакеты screenshot runtime подтверждены
+актуальными installed-packages manifests всех трёх сборок.
+
+Точные workflow metadata, commits диагностических веток, версии пакетов и результаты:
+`docs/state/evidence/functional-gate/vm-acceptance.json`. Guest JSON ещё не содержит
+source SHA/run ID: ограничение явно сохранено, не заменено догадкой. Этот rerun
+подтверждает D03/одиннадцать шагов boot/UI; P02 licensing, остальные P03/P17,
+installed-system, hardware и frame pacing остаются открытыми. Старые FAIL сохранены.
+
+Временный независимый fault-injection baseline для будущего P04: приватный
+dbus-daemon, синхронный Bus.call timeout 0.2s из Qt event loop; фактически call
+0.2006s, max gap heartbeat 204.8ms при интервале 5ms. Это измерение транспорта,
+не полный Settings/VM/recovery тест. Script/receipt в текущей среде:
+`/tmp/zaldros-gui-timeout-baseline.py` и `/tmp/zaldros-gui-timeout-baseline.json`.
+Следующий этап: оставшиеся P02/P03 gates, затем async lifecycle с heartbeat/recovery
+регрессиями. Эти измерения не объявляют P04 выполненным.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

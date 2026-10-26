@@ -12,8 +12,9 @@ driver exit status. Expected variant/profile is supplied by both workflow copies
 stale/duplicate/extra targets fail. Screenshot runtime is common to all variants.
 Decision and scope: ADR-0026. Remaining P02/P03/P17 requirements stay open.
 
-**RESULT** — Local gate behavior verified. New VM validation is required to accept
-the legacy screenshot runtime fix; no historical report was relabeled as passing.
+**RESULT** — D03 fixed and VM-verified on source `4c35535`. ISO run `40375579596`
+passed three builds and nine boot jobs; strict replay of their raw reports exits 0
+with 99 required UI steps PASS. No historical failure was relabeled as passing.
 
 **PROBLEMS** — report.py only checked BOOT; legacy lacked Spectacle/portal packages.
 The systemd table and producer used different acceptance rules; an empty pending
@@ -35,8 +36,8 @@ whitespace checks pass. Full commands/logs: PROGRESS.md.
 is now an acceptance prerequisite; unmeasured frame pacing remains explicitly
 outside VM certification. New ISO sizes/resource data need a new run.
 
-**NEXT** — Publish PR, run ordinary CI and all three variants by three profiles,
-inspect per-step results, diagnose any real failure and merge after verification.
+**NEXT** — Merge PR after evidence documentation passes CI. Continue remaining
+P02 licensing and P03 coverage before the P04 operation lifecycle work.
 Source-SHA/run-ID binding within guest reports, licensing review, Office CI and
 async backend remain subsequent work.
 
@@ -67,3 +68,13 @@ of plain objects with x/y/width/height. The acceptance assertion remains strict;
 a new nine-VM run must confirm the geometry fix.
 Local verification after this fix: 613 passed, zero skips, 62 existing forkpty
 warnings, 152.23s; producer/gate 73 passed, tools 44 passed.
+
+**REMOTE ACCEPTANCE** — Source `4c35535a33466c0b4c6bd28139e12b75c56f4a44`;
+normal CI `40375589292`: five jobs PASS; ISO `40375579596`: three builds plus
+nine boot jobs PASS. All raw reports were fetched and checked with report.py:
+exit 0. Every target has 11 required UI PASS, a decoded 1280×800 screenshot,
+and same-UUID move from (256,115) to (376,195), minimize and restore. Screenshot
+sizes range from 307398 to 309895 bytes. Metadata, pinned report commits, package
+versions and observations: `../evidence/functional-gate/vm-acceptance.json`.
+Documentation-only follow-ups do not change this verified runtime source.
+Guest/source binding, installed-system and hardware checks remain open.

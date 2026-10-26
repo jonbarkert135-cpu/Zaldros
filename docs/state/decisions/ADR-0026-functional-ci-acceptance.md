@@ -83,5 +83,11 @@ boot-script composition heredoc is exercised from outside the checkout, includin
 a failed boot and a failed screenshot. Runtime package checks protect every variant.
 Actual ISO/VM runs remain necessary for the package fix and are tracked separately.
 
+Runtime confirmation: ISO run `40375579596` on source `4c35535` passes all nine
+targets with the strict gate. Raw reports confirm real screenshot dimensions and
+same-UUID geometry/state changes. Metadata and exact diagnostic commits are in
+`docs/state/evidence/functional-gate/vm-acceptance.json`. Subsequent documentation
+updates do not change that runtime source or extend the certified scope.
+
 This fixes one P03/P17 acceptance defect. It does not close the remaining P02
 licensing review, Office CI, async backend, installer, recovery or hardware work.
