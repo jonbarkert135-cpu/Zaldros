@@ -25,9 +25,14 @@ OS, installed system, or fully working backend is **not established**.
 | Variant | full/services/legacy comparison still open; full is the first smoke-test control, not an accepted winner |
 | Current implementation evidence | Local unit, mock-service bus, filesystem/PTY and offscreen checks; actual target-service/VM/hardware evidence is not refreshed here |
 | Updates/recovery | Query/refresh implemented; complete update/install/recovery lifecycle not delivered; apt has no inherited bootc atomicity |
-| Current work | P01 DONE; next P02: asset provenance and rootfs verification before extraction |
+| Current work | P01 DONE; P02 PARTIAL: signature/hash gate and asset staging implemented; live Ubuntu verification and licensing reviews remain open |
 
 ## Verification
+
+P02 final local suite: **536 passed, 1 skipped**, 61 existing forkpty warnings,
+exit 0, 148.57s. Authentication/provenance/diagnostics/packaging subset: **34 passed**.
+Tools remain **44 passed**. OpenPGP tests use real disposable signatures, not mock
+verification. Asset staging and exact cursor-commit retrieval were exercised.
 
 P01 repeated tools: **44 passed**. Focused Settings/backend/files/KWin-wiring checks:
 **112 passed, zero skips**, 72.69s. The preceding audit of the same source HEAD ran
@@ -44,8 +49,9 @@ for those checks, not evidence that every service adapter is broken.
 
 ## Confirmed issues and priorities
 
-1. **P0 / P02:** rootfs fetch goes directly from curl to tar without checking an
-   authenticated checksum manifest. Fix verification before a privileged build.
+1. **P0 / P02:** rootfs fetch now authenticates the checksum manifest and archive
+   before extraction, with tamper tests. The live Ubuntu endpoint/signing-key check
+   remains blocked by environment egress policy. Fallback icon provenance is unresolved.
 2. **P1 / P04:** synchronous GUI-to-service path and reconnect/subscription recovery
    need fault-injection evidence and an operation lifecycle.
 3. **P1 / P05:** taskbar and internal window model do not prove external-window behavior.
@@ -55,7 +61,8 @@ for those checks, not evidence that every service adapter is broken.
    docs are absent from the active CI workflow.
 
 See F01–F12 and D01/D02 in the capability register for scope and confidence.
-No functional application code was changed by P01.
+No functional application code was changed by P01. P02 changes build authentication,
+asset staging and source pinning; see the next iteration report and progress log.
 
 ## Historical evidence — preserved, not revalidated
 

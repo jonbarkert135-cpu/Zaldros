@@ -11,6 +11,8 @@ MIRROR="${MIRROR:-http://archive.ubuntu.com/ubuntu}"
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 WORK="${WORK:-$(mktemp -d)}"
 ROOT="$WORK/rootfs"
+ROOTFS_VERIFIED=0
+MOUNTS_STARTED=0
 
 # --- diagnostics -------------------------------------------------------------------------------
 # Every run leaves a debug directory behind, whether it succeeds or fails, so a failure is read from
@@ -47,20 +49,26 @@ collect_debug() {                     # runs on every exit, including failures
     echo "=== rootfs: $ROOT"; ls -la "$ROOT" 2>/dev/null | head -40
     echo "=== rootfs size"; du -sh "$ROOT" 2>/dev/null
     echo "=== rootfs /etc/os-release"; cat "$ROOT/etc/os-release" 2>/dev/null
-    echo "=== rootfs dpkg --print-architecture"; chroot "$ROOT" dpkg --print-architecture 2>&1
+    echo "=== rootfs dpkg --print-architecture"
+    if [ "$ROOTFS_VERIFIED" -eq 1 ]; then chroot "$ROOT" dpkg --print-architecture 2>&1; else echo "[rootfs not authenticated; chroot skipped]"; fi
     echo "=== rootfs /etc/resolv.conf"; cat "$ROOT/etc/resolv.conf" 2>/dev/null
-    echo "=== rootfs DNS check"; chroot "$ROOT" getent hosts archive.ubuntu.com 2>&1
+    echo "=== rootfs DNS check"
+    if [ "$ROOTFS_VERIFIED" -eq 1 ]; then chroot "$ROOT" getent hosts archive.ubuntu.com 2>&1; else echo "[rootfs not authenticated; chroot skipped]"; fi
     echo "=== step exit codes (name / rc / command)"; cat "$DEBUG_DIR/steps.tsv"
   } > "$DEBUG_DIR/environment.txt" 2>&1
   cat "$ROOT"/etc/apt/sources.list "$ROOT"/etc/apt/sources.list.d/* > "$DEBUG_DIR/sources.txt" 2>&1 || true
   cp -a "$ROOT"/var/log/apt "$DEBUG_DIR/apt-log" 2>/dev/null || true
   cp "$ROOT"/var/log/dpkg.log "$DEBUG_DIR/dpkg.log" 2>/dev/null || true
-  chroot "$ROOT" dpkg-query -W -f='${binary:Package}\t${Version}\n' > "$DEBUG_DIR/installed-packages.txt" 2>&1 || true
+  if [ "$ROOTFS_VERIFIED" -eq 1 ]; then
+    chroot "$ROOT" dpkg-query -W -f='${binary:Package}\t${Version}\n' > "$DEBUG_DIR/installed-packages.txt" 2>&1 || true
+  fi
   for f in "$DEBUG_DIR"/*.log; do
     [ -e "$f" ] || continue
     { echo "===== tail -200 $(basename "$f")"; tail -200 "$f"; } >> "$DEBUG_DIR/tails.txt"
   done
-  umount -l "$ROOT/dev" "$ROOT/proc" "$ROOT/sys" 2>/dev/null || true
+  if [ "$MOUNTS_STARTED" -eq 1 ]; then
+    umount -l "$ROOT/dev" "$ROOT/proc" "$ROOT/sys" 2>/dev/null || true
+  fi
   echo "== diagnostics written to $DEBUG_DIR"
 }
 trap collect_debug EXIT
@@ -79,20 +87,12 @@ case "$VARIANT" in
 esac
 
 # Ubuntu publishes an official minimal rootfs tarball for the release, so we unpack that instead of
-# re-deriving it with debootstrap: no dependency on the runner's debootstrap version knowing the
-# suite, and it is faster. debootstrap stays as the fallback if the tarball is unavailable.
+# re-deriving it with debootstrap. The independent signing policy is checked before extraction.
+# Fail closed: a failed signature/download must never select a less verified fallback.
 BASE_TARBALL="${BASE_TARBALL:-https://cdimage.ubuntu.com/ubuntu-base/releases/$SUITE/release/ubuntu-base-26.04-base-amd64.tar.gz}"
-mkdir -p "$ROOT"
-echo "== fetch base rootfs: $BASE_TARBALL"
-if curl -fsSL "$BASE_TARBALL" | tar -xz -C "$ROOT"; then
-  echo "== unpacked the official Ubuntu base rootfs"
-else
-  echo "== tarball unavailable, falling back to debootstrap $SUITE"
-  # Older debootstrap has no script for a newer suite; Ubuntu suites share the gutsy-derived script.
-  [ -e "/usr/share/debootstrap/scripts/$SUITE" ] || ln -s gutsy "/usr/share/debootstrap/scripts/$SUITE"
-  debootstrap --arch=amd64 --variant=minbase --components=main,universe "$SUITE" "$ROOT" "$MIRROR" \
-    || { echo "== debootstrap failed, tail of its log:"; tail -50 "$ROOT/debootstrap/debootstrap.log" 2>/dev/null; exit 1; }
-fi
+step rootfs-auth python3 "$REPO/build/iso/fetch-rootfs.py" \
+  --url "$BASE_TARBALL" --root "$ROOT" --evidence "$DEBUG_DIR"
+ROOTFS_VERIFIED=1
 cp /etc/resolv.conf "$ROOT/etc/resolv.conf"
 rm -f "$ROOT/etc/apt/sources.list"   # the base image ships deb822 sources; ours replaces them
 
@@ -104,7 +104,10 @@ Components: main universe restricted multiverse
 Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
 
-mount --bind /dev "$ROOT/dev"; mount -t proc proc "$ROOT/proc"; mount -t sysfs sys "$ROOT/sys"
+mount --bind /dev "$ROOT/dev"
+MOUNTS_STARTED=1
+mount -t proc proc "$ROOT/proc"
+mount -t sysfs sys "$ROOT/sys"
 
 # apt is split into update and install so a failure names which half broke, and both keep full output.
 step apt-update chroot "$ROOT" env DEBIAN_FRONTEND=noninteractive apt-get update
@@ -140,7 +143,7 @@ mkdir -p "$ROOT/opt/zaldros"
 # all import it, and PYTHONPATH is already /opt/zaldros, so it goes next to zaldros_shell.
 cp -a "$REPO/shell/zaldros-shell/zaldros_shell" "$REPO/shell/zaldros-shell/qml" \
       "$REPO/shell/zaldros-shell/data" "$REPO/backend/zaldros_backend" "$ROOT/opt/zaldros/"
-cp -a "$REPO/assets" "$ROOT/opt/zaldros/assets"
+step asset-inventory python3 "$REPO/build/iso/stage-assets.py" --dest "$ROOT/opt/zaldros/assets"
 cp -a "$REPO/system/theme" "$ROOT/opt/zaldros/theme"
 cp "$(dirname "$0")/selftest.py" "$ROOT/usr/local/bin/zaldros-selftest"
 cp "$(dirname "$0")/uitest.py"   "$ROOT/usr/local/bin/zaldros-uitest"

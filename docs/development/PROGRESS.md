@@ -7,17 +7,22 @@
 Владелец запросил анализ и точный план последовательного совершенствования Zaldros,
 с clean-room подходом и рабочим backend, а не только внешним видом.
 Подготовлены README/AUDIT/PLAN/PROMPTS/PROGRESS в `docs/development/`.
-Приложение, тесты, workflow и зависимости репозитория в этом цикле не менялись.
-Ничего не закоммичено, не отправлено и не опубликовано.
+В исходном аудите/P01 функциональный код не менялся. P02 меняет сборку и тесты.
+P01 закоммичен как `ec1ca56` и отправлен в `codex/p01-capability-baseline`.
+Пользователь затем явно разрешил GitHub push/PR/merge и потребовал доставлять
+проверенные изменения в main. Текущий P02 готовится в `codex/p02-trusted-rootfs`;
+способ доставки при заблокированном API — обычный Git merge/push без force и
+без обхода ограничений ветки. Публикация релиза/готовность ОС этим не подтверждается.
 
-**P01 DONE. Следующий этап: P02.** P02–P20 ещё не выполнены.
+**P01 DONE. P02 PARTIAL.** P03–P20 ещё не выполнены.
 Реестр [CAPABILITIES.md](CAPABILITIES.md) связывает 35 групп сценариев и все 69
 страниц Settings с кодом, проверками и разрывами. README, PROJECT_STATE и ROADMAP
 актуализированы; исходные state/roadmap сохранены в `docs/state/history/pre-P01/`.
-Следующий кодовый шаг: заменить непосредственный curl → tar в build-iso.sh на
-проверяемую цепочку download → signed manifest → digest → extract с отрицательными
-тестами до привилегированной сборки. Одновременно в рамках P02 нужен provenance
-поставляемых компонентов. Не объявлять весь P02 завершённым только по rootfs fix.
+В P02 уже реализованы download → signed manifest → digest → staged extract и
+provenance/shipping inventory. Остаются live Ubuntu verification и лицензирование
+части исторических assets; весь P02 ещё не закрыт. Следующий необходимый шаг:
+применить подготовленные egress-настройки, проверить настоящий Ubuntu manifest/key
+и получить проверяемые license/source сведения либо согласовать замену fallback icons.
 
 ## Проверки предшествующего аудита (тот же исходный HEAD)
 
@@ -91,6 +96,65 @@ current-SHA ISO/VM/hardware результатов.
 указано, устаревшие текущие статусы отделены, scope/приоритеты и следующий дефект
 зафиксированы. Проверки документов: локальные ссылки, 69 page IDs, C01–C35,
 порядок 20 промптов, сохранность архивов и `git diff --check`.
+
+## P02 — локальная реализация, внешние gates открыты
+
+Дата: 2026-10-26. Parent commit `ec1ca56`; результат — коммит, содержащий эту запись.
+Работа ведётся в `codex/p02-trusted-rootfs`, доставка в main разрешена пользователем.
+
+Изменения:
+
+- `fetch-rootfs.py` и отдельная Ubuntu signing policy: строгий HTTPS, изолированный
+  GnuPG, полный fingerprint, проверенная подпись SHA256SUMS, единственная запись
+  имени архива, SHA256 и распаковка в staged directory. Fail-closed, без fallback.
+- Обработчик ошибок не исполняет chroot до успешной аутентификации rootfs и не
+  размонтирует дерево, если этот запуск ещё не делал mount.
+- `build/provenance/assets.json`: 158 файлов, хеши, компоненты/источники/лицензии,
+  явные provenance gaps. `stage-assets.py` пакует 154 файла; refs и generator не
+  попадают в ISO. Проверяются новые/изменённые/отсутствующие файлы и symlinks.
+- Cursor source закреплён на полном SHA; настоящий fetch/checkout выполнен успешно.
+  GNUPG/curl/Python явно добавлены в активный и документированный ISO workflow.
+- Flat-layout regression теперь вызывает настоящий staging step, а не только cp.
+- README дополнен английским contributor/funding разделом без эмодзи. Возобновлённая
+  разработка и ограничения описаны честно. $5,300 — предварительная цель, не смета.
+  Bitcoin mainnet address предоставлен владельцем; checksum проверен, ключей не запрашивали.
+
+Проверки:
+
+| Команда / проверка | Итог |
+| --- | --- |
+| `QT_QPA_PLATFORM=offscreen python -m pytest tests -q -rs`, shell directory, финальная версия | 536 passed, 1 skipped (нет PIL), 61 forkpty warning; 148.57s; exit 0 |
+| Пять targeted suites: rootfs_authentication, asset_provenance, build_iso_diagnostics, visual_layer, flat_layout | 34 passed, exit 0, 2.78s |
+| `python -m pytest tools -q` | 44 passed, exit 0 |
+| `python -m zaldros_compat --check`, tools/zaldros-compat | PASS 8 apps / 13 hardware entries, exit 0 |
+| `python3 build/iso/stage-assets.py` + staging в новый /tmp каталог | 158 записей проверены, 154 staged + manifest, exit 0 |
+| `bash system/theme/fetch-sources.sh /tmp/zaldros-p02-upstreams` | Полный pinned commit загружен/выбран, exit 0 |
+| `bash -n` для shell scripts, `py_compile` helpers, идентичность двух ISO workflow | PASS |
+
+Первый targeted run: 31 passed / 1 failed — старый flat-layout harness понимал только
+cp, поэтому не готовил новые staged assets. Harness обновлён; повтор прошёл.
+Промежуточный full run: 535 passed / 1 skipped до дополнительного теста chroot guard;
+после него выполнен финальный full run выше. Проверки OpenPGP используют реальные
+одноразовые ключи/подписи, проверяют tamper/wrong signer/missing manifest entry/
+duplicate/invalid tar, не подменяют GnuPG mock-ответом.
+Логи текущей машины: `/tmp/zaldros-p02-tests.log`, `/tmp/zaldros-p02-final-tests.log`.
+
+Открыто:
+
+- Git read/write доступен, но `gh api` и HTTPS к Ubuntu endpoints возвращают
+  tunnel `403 Forbidden` из-за egress policy. Это не доказательство отсутствия
+  GitHub-токена: GH_TOKEN уже присутствует. Новый секрет не запрашивался.
+- В draft сохранены добавления `api.github.com`, `cdimage.ubuntu.com`, `ubuntu.com`,
+  `keyserver.ubuntu.com`. Сохранение draft не применяет runtime policy и не публикует
+  среду. Для live gate нужны сохранение настроек/публикация через UI среды.
+- Настоящий текущий Ubuntu manifest/signing key, ISO build/boot и remote CI status
+  не проверены. Не считать fixture PASS доказательством работающей загрузки Ubuntu.
+- В fallback icon archive не найдено точных LICENSE/LICENSE.txt/COPYING/AUTHORS/
+  COPYRIGHT files. Историческая store GPL claim не закрывает per-file права.
+  Остальные unknown upstream revisions/ancestry перечислены в provenance README.
+  Нужны verifiable notice/source или отдельно проверенная замена до public release.
+
+P02 остаётся PARTIAL; не переходить к объявлению alpha/release ready.
 
 ## Шаблон следующей записи
 

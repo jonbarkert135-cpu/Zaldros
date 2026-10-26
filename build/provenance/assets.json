@@ -1,0 +1,1052 @@
+{
+  "schema": 1,
+  "source_baseline": "12afe1f572193fa105e0b2cd27a77b0715b4d605",
+  "scope": "Tracked asset inventory, not legal clearance. Pending component reviews block public release, not local development.",
+  "components": {
+    "fluent-system-icons": {
+      "source": "https://github.com/microsoft/fluentui-system-icons",
+      "revision": null,
+      "license": "MIT",
+      "evidence": [
+        "assets/icons/fluent/LICENSE"
+      ],
+      "provenance_status": "notice-present-upstream-revision-unrecorded",
+      "modifications": "Runtime recoloring; exact per-file upstream match not established"
+    },
+    "fluent-app-icons": {
+      "source": "https://github.com/vinceliuice/Fluent-icon-theme",
+      "revision": null,
+      "license": "GPL-3.0 (recorded upstream claim)",
+      "evidence": [
+        "assets/icons/apps/COPYING",
+        "assets/icons/apps/AUTHORS"
+      ],
+      "provenance_status": "notice-present-derived-ancestry-needs-review",
+      "modifications": "Selected SVGs; original fetched revision unrecorded"
+    },
+    "win11-place-icons": {
+      "source": "https://github.com/yeyushengfan258/Win11-icon-theme",
+      "revision": null,
+      "license": "GPL-3.0 (recorded upstream claim)",
+      "evidence": [
+        "assets/icons/places/COPYING",
+        "assets/icons/places/AUTHORS"
+      ],
+      "provenance_status": "notice-present-yaru-ancestry-needs-review",
+      "modifications": "Selected SVGs; original fetched revision unrecorded"
+    },
+    "pt-sans": {
+      "source": "https://github.com/google/fonts/tree/main/ofl/ptsans",
+      "revision": null,
+      "license": "OFL-1.1",
+      "evidence": [
+        "assets/fonts/pt-sans/LICENSE.txt"
+      ],
+      "provenance_status": "notice-present-upstream-revision-unrecorded",
+      "modifications": "None recorded; reserved font names retained"
+    },
+    "eleven-fallback": {
+      "source": "https://store.kde.org/p/1977340",
+      "revision": "4.8.8",
+      "license": "GPL-3.0 (recorded distributor claim)",
+      "evidence": [
+        "assets/themes/NOTICE.md",
+        "THIRD_PARTY_LICENSES.md"
+      ],
+      "provenance_status": "per-file-archive-licensing-unresolved-release-blocker",
+      "modifications": "Vendored archive; installed fallback, not merely research"
+    },
+    "windows-modern-kvantum": {
+      "source": "https://github.com/Jeysef/KDE-Windows-Modern",
+      "revision": null,
+      "license": "GPL-3.0 (recorded upstream claim)",
+      "evidence": [
+        "assets/themes/kvantum/LICENSE",
+        "assets/themes/kvantum/ATTRIBUTION.md"
+      ],
+      "provenance_status": "snapshot-and-selected-file-ancestry-needs-review",
+      "modifications": "Selected Kvantum files; full attribution describes more than this subset"
+    },
+    "zaldros-generated": {
+      "source": "this repository: tools/theme/make_aurorae.py and assets/wallpaper/generate.py",
+      "revision": "12afe1f572193fa105e0b2cd27a77b0715b4d605",
+      "license": "GPL-3.0-or-later",
+      "evidence": [
+        "LICENSE",
+        "CONTRIBUTING.md"
+      ],
+      "provenance_status": "project-generated",
+      "modifications": "Original project artwork/generator output"
+    },
+    "research-only": {
+      "source": "assets/refs/*/library.json and reference files",
+      "revision": null,
+      "license": "not cleared for redistribution",
+      "evidence": [
+        "docs/WIN11_REFERENCE_LIBRARY.md"
+      ],
+      "provenance_status": "research-only-excluded-from-image",
+      "modifications": "References are not shipped"
+    },
+    "theme-notice": {
+      "source": "this repository",
+      "revision": "12afe1f572193fa105e0b2cd27a77b0715b4d605",
+      "license": "GPL-3.0-or-later",
+      "evidence": [
+        "assets/themes/NOTICE.md"
+      ],
+      "provenance_status": "project-notice",
+      "modifications": "Historical redistribution notices"
+    }
+  },
+  "files": [
+    {
+      "path": "assets/fonts/pt-sans/LICENSE.txt",
+      "sha256": "2758cf7a872827f39661cf8cc24188113c030447aefb5ca7145993650076ca8c",
+      "component": "pt-sans",
+      "shipped": true
+    },
+    {
+      "path": "assets/fonts/pt-sans/PTSans-Bold.ttf",
+      "sha256": "3128bd5ecf01816e59a23d54c57a7a6b14615b07db53ff277c77376010265b05",
+      "component": "pt-sans",
+      "shipped": true
+    },
+    {
+      "path": "assets/fonts/pt-sans/PTSans-Regular.ttf",
+      "sha256": "9cc831490532009bae2b3ce0d39c62adfc889060beb421593bfd9d2396d0f10a",
+      "component": "pt-sans",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/AUTHORS",
+      "sha256": "e89011649462f0ec8e63ff9e04263bdc415ab6df5756cd6a9c1af2b1ecded81f",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/ark.svg",
+      "sha256": "7760d7b409a31788ab6e96a62dcc9e46c4e69291fb98a94e1183dea846cd6b03",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/dolphin.svg",
+      "sha256": "ce8befe998655ab2711aa23aeb412a5c959f8e900c4a7ab49ef1260e8023525e",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/firefox.svg",
+      "sha256": "bfcb3b9271387d3ea1d5b008a305eb1556f1ef1e417a84dc8c396850e39f997a",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/gwenview.svg",
+      "sha256": "d10dc5945c9a7bcca8856b2cb9f025c8be00e054f3a8f44bd6bf8ae06c962702",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/kcalc.svg",
+      "sha256": "0bce6ed2a31d39ee088e5592555a6d584031edc5e4e315423b4ffa4c58a7e1af",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/konsole.svg",
+      "sha256": "8403d0ad16961354ea2372f22b33ea373af946e93369dae22be3c538bae36cfe",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/libreoffice.svg",
+      "sha256": "e08087bd8ea48d58f3f3856610d6377db616365e3f90700331dd86128ff05fb9",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/mpv.svg",
+      "sha256": "7737f7bf25c3bb35a898ceab5ea70857e862c957c8d9f2b5c60fb51221882c43",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/okular.svg",
+      "sha256": "e52a4cf3b616deff75b7dc4f7d3155bff26d9a6592c7d699da16b2bb8c246589",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/python3.svg",
+      "sha256": "ac0cc1a473dfb71ba2d9b82b4c46a3f9e7f42f55e78f9ed96301362c9fafc1e3",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/spectacle.svg",
+      "sha256": "1ef1d7739af79c407bfcdcfbf51d783e0ed9d6e92a677881fc778e997e19354b",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/thunderbird.svg",
+      "sha256": "62804a175566c9609370b23b347ed9066cb29b7fd141538e8893e4cbd10e965b",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/vim.svg",
+      "sha256": "90289902fa2c2b3d2a6c256cb137ca02d18ef92b2cb1f19aa319a94f1994f178",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/zaldros-notepad.svg",
+      "sha256": "a46e6e6579bb24e13379b5c4726961b0e5d5c4ea1fa0e7f5bed2eacf6f9355fc",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/zaldros-settings.svg",
+      "sha256": "a73c1e3eb7bac08c9ec793b702f79d1eb551a6329651dfcdfcacc77898787ce8",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/zaldros-store.svg",
+      "sha256": "ee09d5127277db3a5d60db36c0af16c1509aba1e5f4593b5e8f5b5666e485da6",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/apps/zaldros-taskmgr.svg",
+      "sha256": "7872821d7a1f545b4593d872b51aef15a49e4e8d571f3a2dc435e70e992ee5df",
+      "component": "fluent-app-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/LICENSE",
+      "sha256": "69bc45dc42b9acb96a69823adbc6ae538374e3c0bde169b855b32c48eaaef52f",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/accessibility.svg",
+      "sha256": "298b25235dd76378cdd2dcc6d43f44debd8906fa896968523e2187d05106cfa2",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/add-circle.svg",
+      "sha256": "96dabe4bf87b2b6fc9397ea5cf0f92d9f6b7bdd6808aff4d0ad477fbec33d7dd",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/add.svg",
+      "sha256": "167c7f2703870a06ff80dbbcc5d60fa37bfae9d225f37ed3d585949239bc3431",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/airplane.svg",
+      "sha256": "af771099f5a162965ed0650fd5032dd9917aaa95b84f41dbc1626f818404cb5c",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/app-generic.svg",
+      "sha256": "69554ad42b056af10fe104a7e4ece5fd71a15ba7c92a09eac0b5139383c3a62a",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/apps.svg",
+      "sha256": "49acd3ca4b7fffce746312a729ebc007ec82d3d7372be9830577f50b541fa6df",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/arrow-left.svg",
+      "sha256": "746b500d735b5f6ab075151ba0588600c7bb88d43102c03b2284fd064f5080ab",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/arrow-right.svg",
+      "sha256": "4f415858d01fce575cf40c9a17f336ea848017b5697ccb464f6e0789116d60e3",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/arrow-up.svg",
+      "sha256": "588b480f9fff053221c9288bfbe8a9a4f063ba2c27e06366e8ad804e4b11d309",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/battery.svg",
+      "sha256": "9844491cb138baac14fa1156913d0d2f74f3b7486f2a0f66e597472fab678ac8",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/bell.svg",
+      "sha256": "71baa585b5effa33b12695c294e9b5301c141307caf125b865984f7217a6b7d3",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/bluetooth.svg",
+      "sha256": "f9c1cbb048ba4362395aa7773b85e15938dbb26d0e5c1df3fe7e4825ed3d79ab",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/brightness.svg",
+      "sha256": "c6a4eb912c9e9c245ab5dfa77c7a8dea691a1acf8869190449bb908830ff9b93",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/calendar.svg",
+      "sha256": "7bb2e8004c34326c241d2d796c355d257e99fa1a5209178fb3d032cc429a8221",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/camera.svg",
+      "sha256": "b98fc06c9abe687437c55ee7e4d90a883f8deac1b706b96c0da4d77d51b4a315",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/cast.svg",
+      "sha256": "fbabae2763d0838d40dc82148ecd57bba7ad1d97961761bafb4f3f60dd69187f",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/check.svg",
+      "sha256": "643b76be6638a22b348c14990f0957335fbe98b39e9adb7ba7b4dc86b6745177",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/chevron-down.svg",
+      "sha256": "52b3569967dcd33b226bd19a7cb3bf1bf491dd22822c4c3a8d36f80cb6612ffa",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/chevron-left.svg",
+      "sha256": "3735add64f88d63dbc609c10c93ac3c5fc09c9e93a1ad8707be5e4a95f5dc2ce",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/chevron-right.svg",
+      "sha256": "212c611689abb60d2cd56d868e070e44a4c4fbe1d4392622040d1d10a46463e2",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/chevron-up.svg",
+      "sha256": "5d2c30dd49be34bcba7daaf1a46ff9c18db1c301d4433a0ec85e9255c50dec60",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/clock.svg",
+      "sha256": "5b2faea30a81e8db8c2ec212be3c0f1aa7f756e62b2ef3c7f0fc081afdf08726",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/close.svg",
+      "sha256": "e84ad771fa8afba8e3ef52c98d9ab2d8ef4fc8e23c5954766a1c4e88fc13b355",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/computer.svg",
+      "sha256": "e23ff4e0521dd46d491710e4955cb2e4484c71c94fcf31e88de778443146a1e5",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/copy.svg",
+      "sha256": "ae4268eef9bc6cae4c77a8a2b3b8607861594e0e834e4ed0730667f92e73609e",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/cut.svg",
+      "sha256": "af3d18f0d18afc680385675fdc91d6cb486611753cd7dc2341bc8907b6ae6f24",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/dark-theme.svg",
+      "sha256": "8b8f044215cebad29a387053a7d95f9f867f797b219d2301c38feea5bef1cecd",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/delete.svg",
+      "sha256": "0f0769b54d5862f2390ea7e51aab825e5dc10d4fa36da34d1559acc55799be92",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/desktop.svg",
+      "sha256": "320f7422cc8da3425d060c8c16e073c698209f2b970ade3c07b6553e1a52988d",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/dismiss.svg",
+      "sha256": "f23a501be08e93ad334f1705be0c9e8224a8e7457bd884fe59263db1c6a4f3dc",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/document.svg",
+      "sha256": "c70164c6ee7f495a3bb4978de76628e166d6ba5b52210a016ddcfe35138528b1",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/download.svg",
+      "sha256": "2749dfd0860188f7de7a573a634f3e37fe8ea4e99aa36fd1559e62d1a8243910",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/edit.svg",
+      "sha256": "2dae3a8425dbeb5ff15a0e1af84f5d15719fe62b012937a6a5457a1481804c73",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/ethernet.svg",
+      "sha256": "eeb89ccb87a48e8d442aaaaff7abd324782a3875f497926c643f37e81b414963",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/filter.svg",
+      "sha256": "06d1ca481689c345922149cae48b1471135d251a9a3e7caf389ab40caaddf8f7",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/folder-open.svg",
+      "sha256": "d1a653db2d775144808d375b0f5c2a0b64db646e54e54283ecce1610882352c9",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/folder.svg",
+      "sha256": "7fb7fb2567a518b9e09997c9ddd4588a78c9e02fd1c3e2bb714efa7798a2e560",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/games.svg",
+      "sha256": "d200b4e0ee14963d6ee9223960796b7c53ac926415d5a8c6724242916e0a0a86",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/globe.svg",
+      "sha256": "bb024c6df766abce2e500a714d6818f2654bfcb507594d68cff28ec48d7296fd",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/grid.svg",
+      "sha256": "206c7049fc72a2072f0c429a958f4bb7021a96418879565ea7bcc8b528ad0dc3",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/hard-drive.svg",
+      "sha256": "449f9e9317d7f8ab52ee11e7f5b641a635ceef3ebfebafd2770ae053bb982f54",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/history.svg",
+      "sha256": "07d75bb67b1b81cf504b86952cf90fc7af2de44ee6b335595ee3806047fc45b4",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/home.svg",
+      "sha256": "f78ef623c07e6f40474ebd55b88ad29739d77bf9629e20ef462f4db86452acf0",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/image.svg",
+      "sha256": "205577a958d9ba03377d211b00dc625abaa56a878719dd5ea880f8e2ea8cfac8",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/info.svg",
+      "sha256": "ec9891767b25630079faca1b06026cab94eee56129dc1264a40d256aa65911bb",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/keyboard.svg",
+      "sha256": "28ab75dbebc0371f8f4f28ca1011ed289439a895bbb0fac2679690987902b7cc",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/link.svg",
+      "sha256": "6792b4658fb8334e1214ec8c558e1295676d084ae7d3b7e60fe1339bfed28548",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/list.svg",
+      "sha256": "579ae8ffa11cb8d15c8b0ba97aaf6bc76230ea3db12407acad018d1702d226c4",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/maximize.svg",
+      "sha256": "360e939d996fe21035862d2716603477b7c323de226c88135bdf4d4cd8817dba",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/microphone-off.svg",
+      "sha256": "3b35adc139947de500b10765ce54320bef86010c189076eddbd6bd0883c9111c",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/microphone.svg",
+      "sha256": "fd21c3468e1b22a4969982a36041189d96eb74fe6000d33dea3deef1f2eb30ca",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/minimize.svg",
+      "sha256": "cdba492b0fe35494b23b8b0934a9b38af3b52058852777d4820ee8ced991c24f",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/more.svg",
+      "sha256": "aacb8ee10e503858f5465d18beb79f16d1ad790eb2b802127ee572062129fc3a",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/music.svg",
+      "sha256": "6dacdfca1f1d955e41ef48412b3fb9e8567120ee17cee6f3ed1c4563170e34aa",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/night.svg",
+      "sha256": "9ffadd57a15c85524fdb979f42773e2a58199b07ccc39b188d7a6a1392a41cbe",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/open-folder.svg",
+      "sha256": "b223f863f213dcc1bf75a65d31a287830380c08503c79565b317c77b10e7a2e1",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/paint-brush.svg",
+      "sha256": "afbac2dbe8474f7893aebfebb5e2dae4c944ee4aef065b8518f58103bb2c0fe6",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/paste.svg",
+      "sha256": "2f9053de6de55352a4b244c1ddc15af9b9648ca9f77f6402d33616290aca292b",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/person.svg",
+      "sha256": "4f9862044a1afff206c2154d37d32ca652c4b9ba8beb615510316f473e4d862f",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/phone.svg",
+      "sha256": "6719d206f68101ee2b495b3b0ba8867a9994b276080d391b2f10c5b155533cd9",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/pin.svg",
+      "sha256": "b9c336db06284379d60461fff1b2f7367236b3e7f7c4d96fbc23ebd87642375a",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/power.svg",
+      "sha256": "e29f64cc7f913418505e3cfce061076440dbce1db20ed8424e197388e28adc98",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/record.svg",
+      "sha256": "8ac5e79af932a41554f8236f6e180fea3ffb646544490ae039d241677347ebe3",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/recycle-bin.svg",
+      "sha256": "c3ce6fcb04fa1564fc50e00677d763ddf5cafa0ade58604df4c478268ef54452",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/refresh.svg",
+      "sha256": "488566eef8203823292a19660c47d4b9c86ca64e6910848342e6b5fa3c5a7558",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/rename.svg",
+      "sha256": "2b1680d20bcd5e195b88ad63fa125dd4c731723285357ef087e991934fa197c8",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/screen.svg",
+      "sha256": "40fbbcb48b1bdc18b91f0991acc64016503b9b1d4b112ec010433ecfff42b7cb",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/search.svg",
+      "sha256": "5ac1eac82df532662cd1bad2c8e55763846e1b258740bcbb0612a48d22630d40",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/settings.svg",
+      "sha256": "ac5bdb808bed91dc8c0b6f346e7a0a1ee1901fc4b50f5641987498a65e200685",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/share.svg",
+      "sha256": "1938a31fa87cd929b8a6f6bb321f877c4f46843443a2fc6efef291154adc78f1",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/shield.svg",
+      "sha256": "b760261754d66e65fc21ceba3eb988b32aa25efe8f2086eca9865e4ef22f5bbd",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/sort.svg",
+      "sha256": "f95fb569a4ce30336a11bab1c5a90a465f7f1b1987b191977f1cd2e1f824e48f",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/speaker.svg",
+      "sha256": "7e8c26c6b8283df8b41e786b0684fb37355bbafd626ea6567ae103f286b6c0e3",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/star.svg",
+      "sha256": "539d0a2ae49d00b12a9709dd02ff096bfefe22a8b199c5b0d0e7768afcee83bb",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/subtract.svg",
+      "sha256": "8c2e073d38e1442d7726f60dd7886dff5b498550cdf030fae6102adac5859f0c",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/sync.svg",
+      "sha256": "9537e4dc984b915d1d67bf2ed61c1fdf713c69d0b293a4dc12b2520d57ab55b7",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/taskview.svg",
+      "sha256": "f761eecc7e527ddd571a86918ac10f303ce91e7daea1406ca4fd70c6752be99d",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/terminal.svg",
+      "sha256": "02857a38851826d92a019e543fc5a23643939e6b557efcf960e337a818ae2645",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/user.svg",
+      "sha256": "c75bdf7e4c02437f3ad35c305253f4eaf4e2dfb2cc11e30d5a31af02a391e7ad",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/video.svg",
+      "sha256": "3c28800019195c93ae380bdadac00f59686eb3656a6317337266417cbdce4518",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/view.svg",
+      "sha256": "9fc94ddf01b7ab8c4ba4ea0f0ca1f32fcb75492817df6fa49113d587b779336c",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/volume.svg",
+      "sha256": "42e7c3f32201be44f3252e263fedc2abf8c43da81c8b95ab7878795e3f3d53da",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/vpn.svg",
+      "sha256": "92223217713b042339cfa811014ea0488cead1f08398d4626786b1375dec0ea5",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/warning.svg",
+      "sha256": "9ea77c6c004bf7ce7232d348bda79baf63e4ef3bccca09638066dee955811976",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/weather-cloud.svg",
+      "sha256": "cd9974292feed1ce773814b611ba58cca8240bade9566b864c4d7098ddbdf68c",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/weather-rain.svg",
+      "sha256": "b8823fac7c71fed6b485c056b38144478d83b99635cde12f70abfb7687110136",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/weather-snow.svg",
+      "sha256": "0ba24abfd02f905c2815690a6c4e3d13ee3b3e79da5dd73cc2fc672e4d3f1271",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/weather-sun.svg",
+      "sha256": "0ab79963a8c16c623980da51a0b2623be939b9ee167958123c11240adfcdbbaa",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/weather.svg",
+      "sha256": "39512ea88513a158fcbf2ae3f74b2042c339dec498b874894150ba0065f11531",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/wifi.svg",
+      "sha256": "65daed2b3756f762cee52026170f2bfcc50817dfd5a4489e6a789ad87f248355",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/fluent/window.svg",
+      "sha256": "6e2ec499c1bff13971b59a44b2fd3212d5aeb26bf78c31e1695a40dfac05cb4d",
+      "component": "fluent-system-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/AUTHORS",
+      "sha256": "c0d08aaf18a5351ec8d6ab5bfd8a1524e3b3dfdc81c4917bd02abfd1406bbe90",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/computer.svg",
+      "sha256": "613797057e695beae422d1758e61d353868c0e96cf4c65677a33a0803e81c769",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/folder-documents.svg",
+      "sha256": "4dbdc6c4341be9780b0c9a66a2571335285bf9c0627a6c0d4af5efea8d72e706",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/folder-download.svg",
+      "sha256": "ec39bf3a338e85cad2d5d21a01dd98f8c7b24f8a190688ef30346efe9fdcdfed",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/folder-pictures.svg",
+      "sha256": "bf29211248703b46bebbf4171a9e32300895b0ed24cf3b7a3dfcffdfa84f709a",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/folder.svg",
+      "sha256": "46002c2333bfd07d7f3156cebc9aa6fe1de08f20c1c1c152b1ba7e6204a3289b",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/system-file-manager.svg",
+      "sha256": "ddfc2e2c5224791bec825533a4181a4e10827bbf30600bf6281084f20c7190e2",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/user-desktop.svg",
+      "sha256": "efadbab613d8bf27153bd96d9e3b3c77961d1ffc90a646899abc3c9e6589ad12",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/user-home.svg",
+      "sha256": "aa7d8c74122a75fe1fb5b3df1194e6a8faae0e99f54ed61b81718fb183e41791",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/icons/places/user-trash.svg",
+      "sha256": "9b4a4c365fe2b77ed10c63aa785984e6c8fe23c33fa10ceda8574adb2e2c8364",
+      "component": "win11-place-icons",
+      "shipped": true
+    },
+    {
+      "path": "assets/refs/excel/library.json",
+      "sha256": "da962cc755421980e509e8f29f9f2e61bb31c2cc769dad9a9d3f3f19578cf202",
+      "component": "research-only",
+      "shipped": false
+    },
+    {
+      "path": "assets/refs/win11/library.json",
+      "sha256": "8a1a77ef26d26e78c2b14d732e4aad6f004c611a4e7f7bc93848fe7170f00af1",
+      "component": "research-only",
+      "shipped": false
+    },
+    {
+      "path": "assets/refs/win11_start_reference.png",
+      "sha256": "d566c864324d1859a7229b3f3af197876fc511eaba090260d15ddfcf762f4f35",
+      "component": "research-only",
+      "shipped": false
+    },
+    {
+      "path": "assets/themes/NOTICE.md",
+      "sha256": "a7715448a6d4a2c6e878ceffaeacc5ba0200a483dfa54b7382b40d363c618907",
+      "component": "theme-notice",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/Zaldros-Darkrc",
+      "sha256": "9983d986d1de9dbf3a04991b33d785f9549bec3b61122e6acd0af3c685eab3b4",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/alldesktops.svg",
+      "sha256": "46555d07664f8be43aad3f440a4703b5765f7f02e2ec9afe755c62e131a92ca9",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/close.svg",
+      "sha256": "3924933d6a076d8c27230b6ea1740163606be3c7ee925d8731fb14d4d2e6c2f6",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/decoration.svg",
+      "sha256": "c7d13be36cd4d69a3269beeea84ce067b3d618c4a476d0386b9fed9127cfaf8b",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/keepabove.svg",
+      "sha256": "93d69fa63c8135a68ff7af7b2c4eb3e7c7aee34f79cd64e5bf98d235796c54f6",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/keepbelow.svg",
+      "sha256": "cda5ece4715249cb631436568e603d272cfc5431d9379bfd11941c7cc4e27702",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/maximize.svg",
+      "sha256": "0459f2c11c748fade66fb93e301c4df489dd5fac25de41d0567f49d7fe0e4a5d",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/metadata.desktop",
+      "sha256": "01a4993ead847fce23fb3b91f43ad402a87ca092fd62f519e894315801244846",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/minimize.svg",
+      "sha256": "ff7e1ebf2210ea4c8ac57b9d9aaaa0cce65c8493147a2c7ccafa7f00b07e05b4",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros-Dark/restore.svg",
+      "sha256": "31decea2417e5c590fcfd5d13a85ba957b2dc5ab82966e1f01b48abdff8f2a2f",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/Zaldrosrc",
+      "sha256": "f701f38edf5617e09937b5727b86f090483660845f207e4eca2c64162b518b64",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/alldesktops.svg",
+      "sha256": "5d27e94dd96c58896bf1899a5e3780e222bb96920f962d3e699f35a51966ab4b",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/close.svg",
+      "sha256": "6f1943f4fae695000dc69bd8607032bf89b9401f1ac1a2e2641eb5794a41071f",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/decoration.svg",
+      "sha256": "400983e904a4974f233a8cd0982fca5957dac124a687ee6ce088f9655925bb66",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/keepabove.svg",
+      "sha256": "ac89feac768712bf25869802a78d45f571aaa642f1fc7a77e175fd0e175e760d",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/keepbelow.svg",
+      "sha256": "415d7c41fd4134d612eb2fa203c7bce5189b1e63c74322fba7cfed643077a5e3",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/maximize.svg",
+      "sha256": "7554bb4120bab83b1a118d2c7ee53de624d765fbaaf65bddefbd1d8d6432d971",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/metadata.desktop",
+      "sha256": "347694949afb6dfbf5cf4ecc8f0acdc9567b6f24334fa574d5b8c1b560b9db53",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/minimize.svg",
+      "sha256": "4cd143f8575cc1716ef15f07e635eba16745f409ac2e60d4b3257d72c2cebc3b",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/aurorae/Zaldros/restore.svg",
+      "sha256": "0d31c545ce3a13d44a317c57fd892e06c87293128cd70ed5f5e1b9656cd3c393",
+      "component": "zaldros-generated",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/icons/Windows-Eleven-icons-4.8.8.tar.xz",
+      "sha256": "acf89c4039be070fd062d72c48c5a78873597e20775bebcd8c71d79760fbe804",
+      "component": "eleven-fallback",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/kvantum/ATTRIBUTION.md",
+      "sha256": "13415b36e88a00ab09cfcdb4d50e5fffe1c3ff9073c0c1a9c71150ec0ad008fb",
+      "component": "windows-modern-kvantum",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/kvantum/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "component": "windows-modern-kvantum",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/kvantum/Windows-modern/Windows-modern.kvconfig",
+      "sha256": "de957239fb26527092f5c89c78f173f0c48a74728963ad9854e6643d11e07532",
+      "component": "windows-modern-kvantum",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/kvantum/Windows-modern/Windows-modern.svg",
+      "sha256": "8de1865d05ab7f2ad6e8acc895ebed1dfea434626d18cd31a66b4ac8960db8ce",
+      "component": "windows-modern-kvantum",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/kvantum/Windows-modern/Windows-modernDark.kvconfig",
+      "sha256": "27c71f8616733b0368f4e692a8ba38130c86f8306b8d226114099f1aecb6c322",
+      "component": "windows-modern-kvantum",
+      "shipped": true
+    },
+    {
+      "path": "assets/themes/kvantum/Windows-modern/Windows-modernDark.svg",
+      "sha256": "d2701ec544d94a5bce6413182b0e69a8e862c256e715a978d38f64eddf9f7618",
+      "component": "windows-modern-kvantum",
+      "shipped": true
+    },
+    {
+      "path": "assets/wallpaper/generate.py",
+      "sha256": "cbcff21e03915e166d3b9dac27e57a7970eb390671d8d52f0d12b3db1fca5f86",
+      "component": "zaldros-generated",
+      "shipped": false
+    },
+    {
+      "path": "assets/wallpaper/zaldros-default.png",
+      "sha256": "9bab35721d146606b278514badb4e9b611f71b20a9ecad18e745697f575d29bd",
+      "component": "zaldros-generated",
+      "shipped": true
+    }
+  ]
+}

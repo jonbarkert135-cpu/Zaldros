@@ -1,6 +1,10 @@
 # Реестр возможностей Zaldros OS
 
 Срез P01: 2026-10-26, HEAD `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
+P02 update: [trusted build/provenance](../../build/provenance/README.md) now implements
+the rootfs authenticity gate and explicit asset staging described as missing below.
+The P01 matrix remains the baseline; subsequent results are in PROGRESS.md. Real
+Ubuntu verification and asset licensing gaps remain open, not promoted to PASS.
 Статус относится к этому исходному коду и указанной среде, а не к последнему
 непроверенному сообщению CI. Рабочая цель — developer alpha из [PLAN.md](PLAN.md).
 Это реестр сценариев, не процент готовности и не замена спецификации.

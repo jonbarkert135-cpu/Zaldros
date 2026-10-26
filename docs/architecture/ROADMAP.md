@@ -9,7 +9,9 @@ The executable sequence is [P01–P20](../development/PLAN.md), with
 ## Active sequence
 
 1. **P01 DONE:** inventory real capabilities, reconcile current status and define alpha scope.
-2. **P02 NEXT:** clean-room provenance and authenticated rootfs verification before extraction.
+2. **P02 PARTIAL:** rootfs signature/digest gate, asset inventory/shipping filter and
+   immutable cursor source pin implemented and tested locally. Real Ubuntu endpoint
+   validation and unresolved vendored-asset license reviews remain open.
 3. **P03–P04:** reproducible development/CI, nonblocking operations and service recovery.
 4. **P05–P16:** real KWin windows and complete Linux user workflows, including error paths,
    application/update lifecycle, authorization, RU/EN and accessibility.

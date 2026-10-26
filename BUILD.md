@@ -44,11 +44,19 @@ in QEMU on a GitHub runner" until a machine says otherwise.
 
 ## Requirements for the ISO build
 
+P02 authenticates the Ubuntu rootfs checksum manifest and archive before extraction;
+download or verification failure stops the build without fallback. See
+[build provenance](build/provenance/README.md) for signing policy, evidence and
+remaining live-validation/provenance gaps. Research references are excluded from
+the staged ISO assets by an explicit hash inventory.
+
 - A Linux host where you are **really root** (or a user namespace with a full `/etc/subuid`
   range). `debootstrap`/apt configure system users and `chown` them; a namespace that maps a
   single UID fails with `dpkg-statoverride: error setting ownership … Invalid argument`, which
   kills the `apt-install` step after the packages are already unpacked.
 - `squashfs-tools`, `xorriso`, `grub-pc-bin`, `grub-efi-amd64-bin`, `mtools`, ~25 GB free disk.
+- Python 3.11+, `curl`, `gnupg`, `tar`; HTTPS access to `cdimage.ubuntu.com`
+  and `keyserver.ubuntu.com` for authenticated rootfs retrieval.
 - For the boot test: `qemu-system-x86_64`, `ovmf`, `socat`, `imagemagick`, and `/dev/kvm`.
   Without KVM the boot test still runs, but slowly — TCG times must not be quoted as boot times.
 
