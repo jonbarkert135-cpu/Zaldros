@@ -389,6 +389,32 @@ HTTP 403; это ограничение доступа к диагностике
 увеличения token permissions. Tools после диагностики: **55 passed**. Следующий
 run должен показать точную причину Writer; assertions не ослабляются.
 
+### Office CI и исправления Writer — подтверждено удалённо
+
+Source `50555cedb2cba41d70d0f1533e0ade1525eed92c`,
+[CI 40383962576](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40383962576):
+**8/8 jobs PASS**. Writer **17** (12 engine / 5 UI), Sheets **15** (9 / 6), Slides
+**15** (11 / 4): **47 passed, 0 skipped**. Python 3.12.3, LibreOffice 24.2.7.2,
+системный UNO. Взяты настоящие summaries через Checks API, не предположение по
+цвету job. Протестированный PR merge checkout `4691fd5` имеет идентичное дерево
+файлов с source 50555ce; оба tree IDs сохранены в receipt.
+
+Четыре исходных Writer FAIL на source 376840d подтверждают две причины:
+CharPosture — UNO Enum, а не int; XText.getString() пропускает таблицы. Исправлены
+типизированное чтение/запись FontSlant, чтение текста body/table cells из движка
+и индексы абзацев после таблиц. Сохранён исходный table regression, усилена
+проверка порядка body/table text; добавлены реальные italic-toggle и post-table
+formatting проверки. UI Writer больше не падает на чтении формата.
+
+Полные source/workflow/job/runtime/count receipts:
+`docs/state/evidence/office-ci/acceptance.json`; исходные ошибки:
+`writer-initial-failures.json`. Артефакты JUnit/versions существуют, но downloads
+здесь дают 403; это ограничение доступа явно записано. Tools: **55 passed**.
+Передача: PR #4, финальный evidence commit меняет только документацию. После его
+CI — merge в main. Затем оставшиеся P02 licensing/P03 coverage и bootstrap,
+P04 operation lifecycle/recovery. Office/ISO/hardware readiness сверх проверенного
+engine/offscreen scope не объявляется.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

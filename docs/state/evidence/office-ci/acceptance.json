@@ -1,0 +1,133 @@
+{
+  "source_commit": "50555cedb2cba41d70d0f1533e0ade1525eed92c",
+  "tested_checkout_commit": "4691fd58899bbbf33bbe8e0d9103958425f7f59d",
+  "source_tree": "f5fb8a6ba6673778b6fa2f23733e2700a4567887",
+  "tested_tree": "f5fb8a6ba6673778b6fa2f23733e2700a4567887",
+  "tree_equivalence": "git diff --quiet source_commit tested_checkout_commit exits 0; the PR merge checkout has the identical file tree.",
+  "workflow": {
+    "conclusion": "success",
+    "headSha": "50555cedb2cba41d70d0f1533e0ade1525eed92c",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "databaseId": 121787184050,
+        "name": "zaldros-sysprobe (unit tests + live run)"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 121787184462,
+        "name": "compatibility registries (evidence gate)"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 121787184494,
+        "name": "build OS images (requires podman)"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 121787184613,
+        "name": "office (writer, real UNO + Qt)"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 121787184644,
+        "name": "shell prototype (backend + visual render tests)"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 121787184670,
+        "name": "office (slides, real UNO + Qt)"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 121787184677,
+        "name": "benchmark harness (baseline on the runner)"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 121787184688,
+        "name": "office (sheets, real UNO + Qt)"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40383962576"
+  },
+  "office": [
+    {
+      "job": {
+        "conclusion": "success",
+        "databaseId": 121787184613,
+        "name": "office (writer, real UNO + Qt)"
+      },
+      "summary": {
+        "collected": 17,
+        "passed": {
+          "test_engine.py": 12,
+          "test_ui.py": 5
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "4691fd58899bbbf33bbe8e0d9103958425f7f59d",
+        "run_id": "40383962576"
+      }
+    },
+    {
+      "job": {
+        "conclusion": "success",
+        "databaseId": 121787184670,
+        "name": "office (slides, real UNO + Qt)"
+      },
+      "summary": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 11,
+          "test_ui.py": 4
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "4691fd58899bbbf33bbe8e0d9103958425f7f59d",
+        "run_id": "40383962576"
+      }
+    },
+    {
+      "job": {
+        "conclusion": "success",
+        "databaseId": 121787184688,
+        "name": "office (sheets, real UNO + Qt)"
+      },
+      "summary": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 9,
+          "test_ui.py": 6
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "4691fd58899bbbf33bbe8e0d9103958425f7f59d",
+        "run_id": "40383962576"
+      }
+    }
+  ],
+  "accepted_tests": 47,
+  "skipped": 0,
+  "scope": "Real UNO engine and offscreen Qt suites on Ubuntu 24.04; not complete Office compatibility or ISO-installed/hardware integration.",
+  "evidence_access": "Structured runtime/test summaries fetched through Checks API annotations; JUnit/version artifacts exist but artifact download in this execution environment returned HTTP 403."
+}

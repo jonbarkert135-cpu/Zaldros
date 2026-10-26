@@ -1,4 +1,4 @@
-# Iteration 0014 — required real-engine Office CI
+# Iteration 0014 — real-engine Office CI and Writer readback fixes
 
 Date: 2026-10-26. Base: `870c3610661507899cd0c5425629761062c54f3e`.
 
@@ -45,10 +45,20 @@ Strengthen the existing ODT table round trip, and add real-engine italic-toggle
 and post-table paragraph-selection regressions. Local Writer: 9 passed, 8 skipped
 (no UNO); those skips are not acceptance. Remote Writer must now pass all 17.
 
+**REMOTE ACCEPTANCE** — Source `50555cedb2cba41d70d0f1533e0ade1525eed92c`;
+CI `40383962576` passes all eight jobs. Writer 17 (12 engine / 5 UI), Sheets 15
+(9 engine / 6 UI), Slides 15 (11 engine / 4 UI): **47 passed / 0 skipped**.
+Checks API runtime summaries confirm Python 3.12.3, LibreOffice 24.2.7.2 and the
+system UNO module. Git tree equality confirms the PR merge checkout is identical
+to the named source commit. All original real-engine assertions remain; the table
+assertion is strengthened. Receipts: `../evidence/office-ci/acceptance.json`.
+JUnit/version artifacts were uploaded, but downloads here return HTTP 403; test
+counts and runtime were inspected via structured Checks annotations instead.
+Subsequent documentation-only changes do not alter this tested implementation.
+
 **METRICS / BOUNDARIES** — No performance, Office compatibility or installed-system
 claim. Apt versions are recorded, not an immutable snapshot. P02 licensing and
 remaining P03/P17 work remain open.
 
-**NEXT** — Run the new matrix, inspect actual results/JUnit counts and repair any
-real regression before merging. Then continue P03 coverage/bootstrap and P04's
-measured synchronous-operation/recovery defects.
+**NEXT** — Merge after the documentation/evidence follow-up passes CI. Then continue
+P03 coverage/bootstrap and P04's measured synchronous-operation/recovery defects.
