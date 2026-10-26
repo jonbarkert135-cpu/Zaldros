@@ -24,7 +24,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends debootstrap squashfs-tools xorriso \
-            grub-efi-amd64-bin grub-pc-bin mtools dosfstools zstd
+            grub-efi-amd64-bin grub-pc-bin mtools dosfstools zstd curl gnupg python3
       - name: Build ISO (${{ matrix.variant }})
         run: |
           set -o pipefail

@@ -59,12 +59,24 @@ def test_build_script_copies_are_readable() -> None:
     assert not missing, f"build-iso.sh copies paths that do not exist: {missing}"
 
 
-def test_shell_renders_from_the_flat_iso_layout(tmp_path: Path) -> None:
-    """Stage /opt/zaldros as the ISO builds it, then render a frame with only that tree present."""
-    root = tmp_path / "opt-zaldros"
+def stage_iso_tree(root: Path) -> None:
+    """Exercise both ordinary copies and the actual inventory-based asset staging step."""
     root.mkdir()
     for source, name in iso_copies():
         subprocess.run(["cp", "-a", str(source), str(root / name)], check=True)
+    for line in BUILD.read_text().replace("\\\n", " ").splitlines():
+        if line.startswith("step asset-inventory "):
+            command = shlex.split(line)[2:]
+            command = [word.replace("$REPO", str(REPO)).replace(TARGET, str(root))
+                       for word in command]
+            command[0] = sys.executable
+            subprocess.run(command, check=True)
+
+
+def test_shell_renders_from_the_flat_iso_layout(tmp_path: Path) -> None:
+    """Stage /opt/zaldros as the ISO builds it, then render a frame with only that tree present."""
+    root = tmp_path / "opt-zaldros"
+    stage_iso_tree(root)
 
     output = tmp_path / "flat.png"
     env = {
@@ -91,8 +103,7 @@ def test_shell_renders_from_the_flat_iso_layout(tmp_path: Path) -> None:
 def test_flat_layout_uses_the_installed_assets_and_data(tmp_path: Path) -> None:
     """The staged tree must carry the wallpaper and the pinned list, not fall back to the repo."""
     root = tmp_path / "opt-zaldros"
-    root.mkdir()
-    for source, name in iso_copies():
-        subprocess.run(["cp", "-a", str(source), str(root / name)], check=True)
+    stage_iso_tree(root)
     assert (root / "assets" / "wallpaper").is_dir(), "the ISO ships no wallpaper directory"
     assert (root / "data" / "pinned.json").is_file(), "the ISO ships no data/pinned.json"
+    assert not (root / "assets" / "refs").exists(), "research references must not enter the ISO"

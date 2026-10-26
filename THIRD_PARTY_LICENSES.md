@@ -3,6 +3,11 @@
 Required by spec PART 1 §11. Every third-party component that ships in a Zaldros OS image must be
 listed here with project, version, source, license, our modifications and redistribution requirements.
 
+Current P02 inventory: [build/provenance/README.md](build/provenance/README.md) and
+the per-file [asset manifest](build/provenance/assets.json). These record unresolved
+licensing/source-revision gaps explicitly. Historical tables below are not a
+complete release SBOM or clearance of the installed fallback icon archive.
+
 **No proprietary Microsoft binaries, fonts, icons, cursors or wallpapers may ever be added to this
 repository or to a Zaldros image.** Segoe UI, the Windows icon set and Windows wallpapers are
 proprietary; Zaldros ships open substitutes (see below) and may optionally import assets from a
@@ -10,7 +15,7 @@ Windows installation the user themselves licenses, at their explicit request, at
 
 | Project | Version | Source | License | Modifications | Redistribution requirements |
 | --- | --- | --- | --- | --- | --- |
-| _(none yet — Phase 0)_ | | | | | |
+| Fluent cursor theme | c8a244f571ef8fb47812bdc9dbce76546cedce69 | github.com/vinceliuice/Fluent-icon-theme, cursors/ | GPL-3.0 | copied unmodified | install cursors/LICENSE; retain corresponding source |
 
 ## Planned components (to be recorded here when first included in an image)
 

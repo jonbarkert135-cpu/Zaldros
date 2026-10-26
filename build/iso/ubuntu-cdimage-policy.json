@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "primary_fingerprints": ["843938DF228D22F7B3742BC0D94AA3F0EFE21092"],
+  "authority": "Ubuntu CD Image Automatic Signing Key (2012)",
+  "reference": "https://ubuntu.com/tutorials/how-to-verify-ubuntu#4-retrieve-the-correct-signature-key",
+  "key_url": "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x843938DF228D22F7B3742BC0D94AA3F0EFE21092",
+  "rotation": "Change the full fingerprint only after independent verification against Ubuntu's published signing-key documentation. A fetched public key alone is not authority."
+}

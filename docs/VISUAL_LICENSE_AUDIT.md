@@ -1,5 +1,11 @@
 # Visual license audit
 
+> Historical audit. P02 found that this document's Selawik and theme-exclusion
+> statements no longer match the shipping recipe. Use
+> [the current provenance inventory](../build/provenance/README.md) for PT Sans,
+> actual fallback themes, per-file hashes and unresolved release-blocking reviews.
+> This earlier analysis is retained as history, not legal clearance.
+
 Every third-party visual asset that is **shipped** with Zaldros, with the licence terms that govern
 it. Zaldros itself is GPL-3.0-or-later, which is compatible with everything listed here.
 Anything not on this list is not shipped. Reference-only projects are in
