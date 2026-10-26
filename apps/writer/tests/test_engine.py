@@ -45,22 +45,15 @@ def test_converting_a_file_that_does_not_exist_says_which_file():
     assert "zaldros-nonexistent" in str(error.value)
 
 
-def test_without_writer_the_error_names_the_missing_package_not_the_engines_riddle():
+def test_without_writer_the_error_names_the_missing_package_not_the_engines_riddle(monkeypatch):
     """LibreOffice answers «type detection failed», which tells a user nothing."""
-    if writer_available():
-        pytest.skip("Writer is installed here")
+    # Exercise the absent-component path even on the fully provisioned CI runner.
+    # new_document checks this before requesting a desktop; no engine is needed.
+    monkeypatch.setattr("zaldros_writer.engine.writer_available", lambda: False)
     engine = WriterEngine()
-    try:
-        engine.start()
-    except EngineError as error:
-        assert "soffice" in str(error) or "UNO" in str(error)
-        return
-    try:
-        with pytest.raises(EngineError) as error:
-            engine.new_document()
-        assert "libreoffice-writer-nogui" in str(error.value)
-    finally:
-        engine.stop()
+    with pytest.raises(EngineError) as error:
+        engine.new_document()
+    assert "libreoffice-writer-nogui" in str(error.value)
 
 
 # --- with a real Writer ------------------------------------------------------------------------------

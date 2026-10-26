@@ -4,7 +4,53 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
+  office:
+    name: office (${{ matrix.app }}, real UNO + Qt)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {app: writer, component: writer}
+          - {app: sheets, component: calc}
+          - {app: slides, component: impress}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the matching system Python and Office engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            python3-uno python3-venv libreoffice-${{ matrix.component }}-nogui \
+            libgl1 libegl1 libxkbcommon0 libdbus-1-3 fonts-liberation fonts-dejavu-core
+          /usr/bin/python3 -m venv --system-site-packages .venv-office
+          .venv-office/bin/python -m pip install -r tools/ci/office-requirements.txt
+      - name: Record interpreter and engine versions
+        run: |
+          mkdir -p office-results
+          {
+            .venv-office/bin/python --version
+            soffice --version
+            dpkg-query -W python3-uno libreoffice-core-nogui libreoffice-${{ matrix.component }}-nogui
+            .venv-office/bin/python -m pip freeze
+          } > office-results/versions.txt
+          cat office-results/versions.txt
+      - name: Test real engine round trips and Qt UI without skips
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: .venv-office/bin/python tools/ci/office.py ${{ matrix.app }} --junitxml office-results/tests.xml
+      - name: Preserve Office test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: office-${{ matrix.app }}
+          path: office-results/
+          if-no-files-found: error
+
   sysprobe:
     name: zaldros-sysprobe (unit tests + live run)
     runs-on: ubuntu-latest
@@ -49,30 +95,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # quay.io CDN periodically drops the fedora-bootc pull with
-      # "unexpected EOF" (exit 125). Network-only flake -> retry 3x.
       - name: Build zaldros-base
-        run: |
-          for attempt in 1 2 3; do
-            echo "::group::podman build zaldros-base (attempt $attempt/3)"
-            if podman build -t zaldros-base -f build/Containerfile.base .; then
-              echo "::endgroup::"; exit 0
-            fi
-            echo "::endgroup::"
-            echo "attempt $attempt failed"; sleep $((attempt * 30))
-          done
-          echo "zaldros-base failed 3 times - not a transient pull error"; exit 1
+        run: podman build -t zaldros-base -f build/Containerfile.base .
       - name: Build zaldros-desktop
-        run: |
-          for attempt in 1 2 3; do
-            echo "::group::podman build zaldros-desktop (attempt $attempt/3)"
-            if podman build -t zaldros-desktop -f build/Containerfile.desktop .; then
-              echo "::endgroup::"; exit 0
-            fi
-            echo "::endgroup::"
-            echo "attempt $attempt failed"; sleep $((attempt * 30))
-          done
-          echo "zaldros-desktop failed 3 times - not a transient pull error"; exit 1
+        run: podman build -t zaldros-desktop -f build/Containerfile.desktop .
 
   bench:
     name: benchmark harness (baseline on the runner)
@@ -105,7 +131,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgl1 libegl1 libxkbcommon0 libdbus-1-3 fonts-noto-color-emoji
-          python -m pip install PySide6-Essentials pytest
+          python -m pip install PySide6-Essentials==6.12.0 pytest==9.1.1 Pillow==13.0.0 numpy==2.5.4
       - name: Run shell tests and render evidence screenshots
         working-directory: shell/zaldros-shell
         env:

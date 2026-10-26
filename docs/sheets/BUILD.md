@@ -34,4 +34,7 @@ cd apps/sheets && python3 -m pytest tests -q
 * `tests/test_ui.py` renders the window offscreen and measures it against
   `system/theme/excel-reference.json`.
 
-CI runs both in the `sheets` job, on the runner's own Python with `python3-uno` from apt.
+The required `office (sheets, real UNO + Qt)` job runs both suites with the matching
+system Python and `python3-uno`. Its strict runner rejects all skips and incomplete
+suites. See [Office development and CI](../office/BUILD.md) for the shared setup,
+commands and evidence contract.
