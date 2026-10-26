@@ -382,6 +382,13 @@ Office CI. Полноценный движок локально не прове�
 Далее: новый PR → реальный remote UNO/Qt → исправление выявленных ошибок → merge.
 P02 licensing, ISO path filters и прочие P03/P17 gates не объявляются закрытыми.
 
+Первый remote source `03033fd`, CI `40382270592`: Office Sheets/Slides PASS,
+Writer FAIL на настоящем test step. Artifact и job-log downloads здесь дают
+HTTP 403; это ограничение доступа к диагностике, не основание принять сбой.
+Добавлены bounded/escaped Checks annotations с traceback и suite counts без
+увеличения token permissions. Tools после диагностики: **55 passed**. Следующий
+run должен показать точную причину Writer; assertions не ослабляются.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

@@ -54,3 +54,16 @@ def test_no_executable_is_an_explicit_preflight_failure(monkeypatch):
     monkeypatch.setattr(office.shutil, "which", lambda _: None)
     with pytest.raises(RuntimeError, match="not installed"):
         office.preflight()
+
+
+def test_check_annotations_escape_workflow_commands(monkeypatch, capsys):
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    office.annotate("error", "Office test failure", "100%\r\n::warning::embedded")
+    assert capsys.readouterr().out == (
+        "::error title=Office test failure::100%25%0D%0A::warning::embedded\n")
+
+
+def test_annotations_are_quiet_outside_actions(monkeypatch, capsys):
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    office.annotate("notice", "Office test summary", "{}")
+    assert not capsys.readouterr().out

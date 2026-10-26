@@ -5,12 +5,22 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import json
+import os
 import shutil
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APPS = ("writer", "sheets", "slides")
+
+
+def annotate(level, title, message):
+    """Expose bounded diagnostics through the Checks API as well as artifact logs."""
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        escaped = str(message).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+        print(f"::{level} title={title}::{escaped}", flush=True)
 
 
 class RequiredOfficeTests:
@@ -18,20 +28,24 @@ class RequiredOfficeTests:
 
     def __init__(self):
         self.skipped = []
-        self.passed = set()
+        self.passed = Counter()
 
     def pytest_collectreport(self, report):
         if report.skipped:
             self.skipped.append(report.nodeid)
+        if report.failed:
+            annotate("error", "Office collection failure", str(report.longrepr)[-5000:])
 
     def pytest_runtest_logreport(self, report):
         if report.skipped:
             self.skipped.append(report.nodeid)
+        if report.failed:
+            annotate("error", "Office test failure", str(report.longrepr)[-5000:])
         if report.when == "call" and report.passed:
-            self.passed.add(Path(report.nodeid.split("::", 1)[0]).name)
+            self.passed[Path(report.nodeid.split("::", 1)[0]).name] += 1
 
     def pytest_sessionfinish(self, session, exitstatus):
-        missing = {"test_engine.py", "test_ui.py"} - self.passed
+        missing = {"test_engine.py", "test_ui.py"} - self.passed.keys()
         if exitstatus == 0 and (self.skipped or missing):
             session.exitstatus = 1
             terminal = session.config.pluginmanager.get_plugin("terminalreporter")
@@ -39,6 +53,10 @@ class RequiredOfficeTests:
                 terminal.write_line(
                     f"Office acceptance FAIL: {len(self.skipped)} skipped; "
                     f"missing executed suites: {sorted(missing)}", red=True)
+        annotate("notice", "Office test summary", json.dumps({
+            "collected": session.testscollected, "passed": dict(self.passed),
+            "failed": session.testsfailed, "skipped": len(self.skipped),
+            "exitstatus": int(session.exitstatus)}))
 
 
 def preflight():

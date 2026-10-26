@@ -25,6 +25,13 @@ failed suites. Missing UNO/binary preflight paths fail. The actual new runner on
 the local no-UNO interpreter exits 1 instead of accepting 9 skips. Remote Office
 engine/UI validation is required before acceptance.
 
+**REMOTE FINDING** — First source `03033fd`, run `40382270592`: Sheets and Slides
+real-engine jobs pass; Writer's real test step fails. Artifact/log download from
+this execution environment is rejected with HTTP 403. Added bounded Checks API
+annotations for failures and executed-suite counts without increasing workflow
+permissions or ignoring the failed result. Tools after this diagnostic addition:
+55 passed; annotation escaping is covered. Fresh remote diagnosis is required.
+
 **METRICS / BOUNDARIES** — No performance, Office compatibility or installed-system
 claim. Apt versions are recorded, not an immutable snapshot. P02 licensing and
 remaining P03/P17 work remain open.

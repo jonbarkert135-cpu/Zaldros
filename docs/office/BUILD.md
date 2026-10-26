@@ -47,6 +47,8 @@ For optional development without an engine, ordinary pytest remains available:
 
 CI uploads JUnit XML and interpreter/LibreOffice/package versions as
 `office-writer`, `office-sheets` and `office-slides` artifacts, including on failure.
+Bounded failure details and executed test counts are also emitted as GitHub Checks
+annotations, so diagnosis does not depend solely on artifact download access.
 LibreOffice/UNO come from the runner's signed apt repositories. Qt and pytest are
 pinned in `tools/ci/office-requirements.txt`; apt package versions are recorded,
 not claimed to be an immutable distribution snapshot.
