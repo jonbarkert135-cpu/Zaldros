@@ -35,6 +35,16 @@ The first annotation attempt was prefixed by pytest's unterminated progress line
 and ignored by GitHub. A subprocess reproduced `F::error` / `100%]::notice`;
 annotations now begin a new line and the regression includes preceding progress.
 
+**WRITER ROOT CAUSES** — Run `40383136896`, source `376840d`, confirms 4 failures
+out of 15 Writer tests with zero skips. Three fail because CharPosture is a UNO
+FontSlant Enum, not an integer; the UI also reaches this broken readback. The
+fourth confirms XText.getString() omits table cells. Read actual enum values and
+write a typed UNO Enum; enumerate engine paragraphs/table cells for text. Keep
+paragraph indexes consistent with style/format setters when a table intervenes.
+Strengthen the existing ODT table round trip, and add real-engine italic-toggle
+and post-table paragraph-selection regressions. Local Writer: 9 passed, 8 skipped
+(no UNO); those skips are not acceptance. Remote Writer must now pass all 17.
+
 **METRICS / BOUNDARIES** — No performance, Office compatibility or installed-system
 claim. Apt versions are recorded, not an immutable snapshot. P02 licensing and
 remaining P03/P17 work remain open.

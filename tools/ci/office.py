@@ -8,6 +8,7 @@ import importlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -68,6 +69,13 @@ def preflight():
     if not binary:
         raise RuntimeError("LibreOffice is not installed (no soffice/libreoffice on PATH)")
     print(f"Office interpreter: {sys.executable}\nLibreOffice executable: {binary}", flush=True)
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        version = subprocess.check_output([binary, "--version"], text=True, timeout=10).strip()
+        annotate("notice", "Office runtime", json.dumps({
+            "python": sys.version.split()[0], "libreoffice": version,
+            "uno_module": importlib.import_module("uno").__file__,
+            "workflow_sha": os.environ.get("GITHUB_SHA"),
+            "run_id": os.environ.get("GITHUB_RUN_ID")}))
 
 
 def main(argv=None):
@@ -77,7 +85,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         preflight()
-    except (ImportError, RuntimeError, OSError) as exc:
+    except (ImportError, RuntimeError, OSError, subprocess.SubprocessError) as exc:
         print(f"Office preflight FAIL: {exc}. Use the system Python matching python3-uno "
               "and a venv with --system-site-packages.", file=sys.stderr)
         return 1
