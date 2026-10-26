@@ -3,7 +3,7 @@
 The structure follows the Windows 11 Settings information architecture, which is what a user
 coming from Windows navigates by. Everything Windows-only was dropped rather than faked:
 activation, OneDrive, Microsoft accounts, subscriptions, payments and order history have no
-counterpart on Raven, so they are absent instead of present and dead. "Получить помощь" points at
+counterpart on Zaldros OS, so they are absent instead of present and dead. "Получить помощь" points at
 the project's own issue tracker, because that is where help for this system actually comes from.
 
 Every value shown is either a real reading (hostinfo.py, system.py, files.py) or the honest word
@@ -13,6 +13,7 @@ for its absence. Titles and subtitles are UI copy; numbers never are.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from gettext import gettext as _
 
 from . import hostinfo, prefs, system
 
@@ -148,7 +149,7 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Специальные возможности", "Текст, указатель, контраст", "accessibility", "", "accessibility"),
         Entry("Игры", "Игровая панель, записи, игровой режим", "games", "", "games"),
         Entry("Конфиденциальность и защита", "Права доступа и диагностика", "shield", "", "privacy"),
-        Entry("Обновление Raven", "Пакеты системы и приложений", "sync", "", "update"),
+        Entry(_("Обновление Zaldros OS"), "Пакеты системы и приложений", "sync", "", "update"),
     ])
 
     page("system", "Система", "desktop", "home", [
@@ -479,12 +480,12 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
     ])
 
     page("privacy", "Конфиденциальность и защита", "shield", "home", [
-        Entry("Безопасность Raven", "Брандмауэр, обновления, права root", "shield", "",
+        Entry(_("Безопасность Zaldros OS"), "Брандмауэр, обновления, права root", "shield", "",
               "security", group="Безопасность"),
         Entry("Шифрование диска", "Защита файлов при потере устройства", "hard-drive", "",
               "encryption"),
         Entry("Диагностика", "Что система записывает о себе", "info", "локально",
-              "diagnostics", group="Данные Raven"),
+              "diagnostics", group=_("Данные Zaldros OS")),
         Entry("Журнал действий", "История запусков и открытых файлов", "list", "", "activity"),
         Entry("Расположение", "Доступ приложений к местоположению", "globe", "",
               "permissions", group="Разрешения приложений"),
@@ -500,7 +501,7 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
           "document"),
         C("pref:clipboard.history", "Журнал буфера обмена", "Что помнит Win+V", "copy"),
     ])
-    page("security", "Безопасность Raven", "shield", "privacy", [
+    page("security", _("Безопасность Zaldros OS"), "shield", "privacy", [
         C("updates.available", "Обновления безопасности", "Пакеты из репозиториев", "sync"),
         C("privacy.firewall", "Брандмауэр", "Фильтрация сетевых подключений", "shield"),
     ])
@@ -529,7 +530,7 @@ def build(readings: dict[str, str] | None = None, state: dict | None = None,
         Entry("Папка записей", "Куда складывать ролики и снимки", "folder", "~/Видео/Записи"),
     ])
 
-    page("update", "Обновление Raven", "sync", "home", [
+    page("update", _("Обновление Zaldros OS"), "sync", "home", [
         C("updates.available", "Доступные обновления", "Пакеты системы и приложений", "sync"),
         C("updates.check", "Проверить обновления", "Обновить список пакетов", "refresh"),
         Entry("Восстановление", "Загрузка в UEFI и перезапуск", "refresh", "", "recovery"),

@@ -6,9 +6,8 @@ lightweight and aggressively optimised Linux system underneath.
 The goal is a complete Linux desktop environment designed around Windows-familiar workflows.
 The current implementation is a prototype; a complete everyday OS is not yet verified.
 
-**Name:** the official project name is **Zaldros OS**. The master-specification text uses
-"Raven OS" in historical requirements maps to Zaldros OS — see
-[`docs/NAMING.md`](docs/NAMING.md).
+**Name:** the official project name is **Zaldros OS**. See
+[`docs/NAMING.md`](docs/NAMING.md) for canonical forms.
 
 ## Status
 
@@ -17,8 +16,8 @@ The current implementation is a prototype; a complete everyday OS is not yet ver
 | Current target | **Developer alpha**: real Linux workflows, not only offscreen UI |
 | Spec parts received | All 5 parts, preserved in `spec/` |
 | Implemented foundation | Qt/QML shell, Python backend, system tools, Office bridges, ISO/VM scripts |
-| Verified locally | Tools: 44 passed; current shell/backend suite: 536 passed, 1 skipped; real system/VM/hardware checks remain separate |
-| Current cycle | P01 complete; P02 adds rootfs authentication and asset provenance, with live validation and licensing gaps still open |
+| Verified locally | Tools: 44 passed; current shell/backend suite: 538 passed, no skips; real system/VM/hardware checks remain separate |
+| Current cycle | P01 complete; P02 rootfs authentication verified against Ubuntu; vendored-asset licensing reviews remain open |
 
 See the [capability register](docs/development/CAPABILITIES.md) for implementation gaps,
 test environments and unverified behavior. A successful mock-service test does not prove
@@ -89,9 +88,11 @@ The project has not been abandoned. There is no promised release date.
 
 ### Experimental builds
 
-Historical CI reports describe successful VM builds and boots. Current-source
-boot compatibility, physical-hardware support, installation, updates and recovery
-are not yet comprehensively verified. Some controls and features are incomplete.
+CI has produced three ISO variants and verified nine VM boots for the source
+revision recorded in the [build evidence](docs/state/evidence/p02-rootfs/README.md).
+Those checks have limits, including failed screenshot checks in the minimal
+variant. Physical-hardware support, installation, updates and recovery are not yet
+comprehensively verified. Some controls and features are incomplete.
 
 Start with a virtual machine. If testing on physical hardware, use a dedicated test
 computer and back up its data. A live ISO is not evidence of a finished installer,

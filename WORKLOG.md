@@ -642,7 +642,7 @@ Windows 11 information architecture — 65 pages, every row either navigating so
 showing a reading — and `SettingsTree` hands it to QML, which now has a back arrow, nested pages,
 section headings ("Зрение", "Слух", "Взаимодействие") and Windows-style switches.
 
-Deliberately dropped, because Raven has no counterpart and a dead row is worse than no row:
+Deliberately dropped, because Zaldros OS has no counterpart and a dead row is worse than no row:
 activation, OneDrive, Microsoft accounts, subscriptions, payments, order history.
 `tests/test_settings_tree.py` fails if any of them comes back, if a row leads to a page that does
 not exist, or if a page becomes unreachable from the rail. "Получить помощь" opens this

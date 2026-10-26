@@ -22,12 +22,9 @@ name-availability audit in `docs/NAME_RESEARCH.md` (129 names checked). See ADR-
 
 - **Bedrock OS / Bedrock Linux** — collides with Bedrock Linux (active meta-distribution since 2009,
   bedrocklinux.org), Minecraft Bedrock Edition and BedRock Systems. 🔴 RED.
-- **Raven OS / Raven Linux** — collides with Raven-OS (raven-os.org), RavenOS (Arch-based) and
-  Raven Resonance. 🔴 RED. The name "RAVEN OS" in the master-spec prompt parts was invented by the
-  AI that wrote the prompt and never was an owner decision.
 - Prime / Nova / Aurora / Basalt / Polaris / Phoenix — all 🔴 RED, see `docs/NAME_RESEARCH.md`.
 
-When reading spec parts 1–5, map every occurrence of "RAVEN OS" / "Raven …" to the Zaldros forms above.
+Use the canonical Zaldros forms above throughout the specification, interface and documentation.
 
 ## Open item
 

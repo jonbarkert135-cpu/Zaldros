@@ -4,8 +4,7 @@ Date: 2026-08-23 · Status: **Accepted** (owner decision) · Supersedes: ADR-000
 
 ## Context
 
-The working names used so far ("RAVEN OS" from the spec prompt, then "Bedrock OS" from ADR-0005) were
-never verified. A full name-availability audit of **129 candidates** was run: RDAP queries to the
+The earlier working names were never verified. A full name-availability audit of **129 candidates** was run: RDAP queries to the
 `.com`/`.org`/`.io`/`.dev` registries, namespace probes on GitHub / GitLab / Codeberg, GitHub Search,
 and web verification against DistroWatch, Wikipedia, company registries and product sites.
 Full record: `docs/NAME_RESEARCH.md`.
@@ -14,7 +13,6 @@ Result: every previously considered name is 🔴 RED.
 
 - Bedrock — Bedrock Linux (active meta-distribution since 2009, v0.7.31, Wikipedia), Minecraft
   Bedrock Edition, BedRock Systems.
-- Raven — Raven-OS (raven-os.org), RavenOS (Arch-based), Raven Resonance.
 - Prime — PrimeOS (Android-x86), Prime GNU/Linux. Nova — Nova GNU/Linux (Cuba), OpenStack Nova.
 - Aurora — Aurora OS (Russian mobile OS) and Aurora by Universal Blue. Basalt — BasaltOS.
   Polaris — Linux Polaris. Phoenix — PhoenixOS, Phoenix BIOS.
@@ -36,8 +34,8 @@ Reserve names if trademark clearance fails: **Quinvara**, then **Oskuria**.
 - Repository-wide rename: `ID=zaldros`, package prefix `zaldros-*`, modules `zaldros_*`,
   CLI `zaldros-sysprobe|hwinfo|compat|bench`, shell at `shell/zaldros-shell`, QML `ZaldrosTheme`.
 - `docs/NAMING.md` rewritten as the authoritative naming reference.
-- `docs/NAME_RESEARCH.md` deliberately keeps the Bedrock/Raven names — it is the audit record and
-  must name the conflicting projects explicitly.
+- `docs/NAME_RESEARCH.md` retains the naming audit. Obsolete references were removed on
+  2026-10-26 at the owner’s request; the accepted product name is unchanged.
 - The Git repository itself is still `bedrock_os` on GitHub; renaming it is an owner action
   (GitHub redirects the old URL, so it is safe to do at any time).
 - `.github/workflows/ci.yml` cannot be pushed by the automation (missing `workflows` permission);

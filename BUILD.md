@@ -1,5 +1,11 @@
 # Building Zaldros OS
 
+Latest recorded build-input validation: [P02 evidence](docs/state/evidence/p02-rootfs/README.md),
+source `6168e9b`, workflow `40333303076`: three ISO builds and nine boot jobs succeeded.
+The guest screenshot step reports FAIL for legacy variants, despite green jobs;
+see the retained per-step summary. This is not a completed desktop acceptance gate.
+The dated CI account below remains historical context.
+
 The live ISO is built by `build/iso/build-iso.sh` (Ubuntu 26.04 base rootfs → apt → squashfs →
 `grub-mkrescue`) and boot-tested by `build/iso/boot-test.sh` under QEMU/KVM. The container/bootc
 recipe further down belongs to the superseded Fedora base (**ADR-0009**) and is kept only because
