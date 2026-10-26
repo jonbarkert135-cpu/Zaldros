@@ -1,7 +1,8 @@
 # Project state — 2026-10-26
 
-This delivery cycle starts from main `7660f2c3ec63dd592f88e6be8fb04d0fa58e5598`.
+The current Office-CI cycle starts from main `870c3610661507899cd0c5425629761062c54f3e`.
 Runtime-verified source: `4c35535a33466c0b4c6bd28139e12b75c56f4a44`.
+Office engine/UI verified source: `50555cedb2cba41d70d0f1533e0ade1525eed92c`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
 old current-status summary; it does not retrospectively reclassify historical runs.
 
@@ -29,6 +30,17 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+Office cycle: tools **55 passed** locally. Real LibreOffice/UNO + Qt CI run
+[40383962576](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40383962576)
+passes all eight jobs: Writer **17**, Sheets **15**, Slides **15** tests, zero
+failures/skips. Python 3.12.3 and LibreOffice 24.2.7.2; UNO comes from the system
+Python packages. The tested PR merge checkout has the identical Git tree to source
+`50555ce`. Initial Writer crashes on FontSlant Enum and omitted table text are
+fixed; real italic-toggle/table/post-table-formatting regressions pass. Exact
+metadata and structured Checks receipts: [Office acceptance](evidence/office-ci/acceptance.json).
+This is engine/offscreen-UI evidence, not full Office compatibility or installed
+ISO integration. The following counts describe the earlier boot/UI change.
 
 Current functional-gate change: **613 passed, no skips**, 62 existing forkpty
 warnings, exit 0, 152.23s. Focused gate/producer/report checks before the geometry
@@ -91,8 +103,9 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
 3. **P1 / P05:** taskbar and internal window model do not prove external-window behavior.
 4. **P1 / P16:** Settings fonts says Selawik while the shell preference is PT Sans.
    Sixteen toggle rows have no backend control; static status must not imply measurement.
-5. **P1 / P03:** ISO path filters omit backend/apps/assets; Office jobs described in
-   docs are absent from the active CI workflow.
+5. **P1 / P03:** ISO path filters still omit backend/apps/assets. Required Office
+   CI is now real-UNO/Qt verified: 47 tests, no skips, source 50555ce. Other P03
+   bootstrap/coverage/reproducibility work remains open.
 6. **P1 / P03/P17:** report.py previously gated only on `boot`, so a guest UI step
    could report FAIL while the workflow was green. **D03 fixed and VM-verified**
    on 4c35535: boot facts and eleven UI steps gate all nine targets. The missing

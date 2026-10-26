@@ -16,8 +16,9 @@ The current implementation is a prototype; a complete everyday OS is not yet ver
 | Current target | **Developer alpha**: real Linux workflows, not only offscreen UI |
 | Spec parts received | All 5 parts, preserved in `spec/` |
 | Implemented foundation | Qt/QML shell, Python backend, system tools, Office bridges, ISO/VM scripts |
-| Verified locally | Tools: 44 passed; current shell/backend suite: 613 passed, no skips; real system/VM/hardware checks remain separate |
+| Verified locally | Tools: 55 passed; current shell/backend suite: 613 passed, no skips; real system/VM/hardware checks remain separate |
 | Verified in VM | Source `4c35535`: full/services/legacy × low/mid/modern; nine boot targets and 99 required UI steps passed. Installed-system and hardware acceptance remain open |
+| Office CI | Source `50555ce`: Writer 17, Sheets 15 and Slides 15 real-engine/Qt tests passed without skips; see [evidence](docs/state/evidence/office-ci/acceptance.json) |
 | Current cycle | P01 complete; P02 rootfs authentication verified against Ubuntu; vendored-asset licensing reviews remain open |
 
 See the [capability register](docs/development/CAPABILITIES.md) for implementation gaps,

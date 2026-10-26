@@ -1,6 +1,7 @@
 # Передача контекста
 
-Обновлено: 2026-10-26. Базовый HEAD: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
+Обновлено: 2026-10-26. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
+Текущий цикл Office CI начинается с main `870c361` (PR #3 MERGED).
 
 ## Текущая задача и результат
 
@@ -16,7 +17,8 @@ API заработал после первоначальных 403; обычно
 без force/обхода правил. GitHub подтвердил состояние PR MERGED. Публикация
 релиза/готовность ОС этим не подтверждается.
 
-**P01 DONE. P02 PARTIAL.** P03–P20 ещё не выполнены.
+**P01 DONE. P02/P03/P17 PARTIAL.** В P03/P17 проверен D03; остальные требования
+этих этапов остаются открытыми. P04–P16 и P18–P20 ещё не выполнены.
 Реестр [CAPABILITIES.md](CAPABILITIES.md) связывает 35 групп сценариев и все 69
 страниц Settings с кодом, проверками и разрывами. README, PROJECT_STATE и ROADMAP
 актуализированы; исходные state/roadmap сохранены в `docs/state/history/pre-P01/`.
@@ -356,6 +358,62 @@ dbus-daemon, синхронный Bus.call timeout 0.2s из Qt event loop; фа
 `/tmp/zaldros-gui-timeout-baseline.py` и `/tmp/zaldros-gui-timeout-baseline.json`.
 Следующий этап: оставшиеся P02/P03 gates, затем async lifecycle с heartbeat/recovery
 регрессиями. Эти измерения не объявляют P04 выполненным.
+
+### P03 — обязательный CI Writer / Sheets / Slides
+
+База: main `870c361`, ветка `codex/office-ci-gates`. Активный workflow не запускал
+Office, хотя docs/sheets/BUILD.md утверждал обратное. Воспроизведение на текущем
+интерпретаторе без UNO: Calc engine pytest → 9 skipped, exit 0. Новый
+`tools/ci/office.py sheets --junitxml ...` → preflight FAIL, exit 1.
+
+Добавлена матрица трёх Ubuntu 24.04 jobs: системный Python + python3-uno + нужный
+LibreOffice component; изолированный system-site-packages venv с фиксированными
+pytest/Qt. Runner требует исполненных engine/UI suites и отклоняет любой skip,
+включая collection skip. Unit test отсутствующего Writer теперь инжектирует
+условие и не пропускается на машине с установленным Writer. Versions/JUnit
+сохраняются как Office artifacts. Normal CI contents permission: read-only.
+Reference workflow синхронизирован с активным без переноса старых retry предложений.
+
+Локально: **53 tools passed**, включая 9 новых subprocess/preflight regressions;
+проверка отсутствующего Writer — 1 passed. UI: Writer 5 passed, Sheets 6 passed;
+Slides 3 passed / 1 skipped (нет UNO). Это optional/local результат, не принятие
+Office CI. Полноценный движок локально не проверен. Команды установки и строгого
+запуска: `docs/office/BUILD.md`; iteration `0014-office-ci-gates.md`.
+Далее: новый PR → реальный remote UNO/Qt → исправление выявленных ошибок → merge.
+P02 licensing, ISO path filters и прочие P03/P17 gates не объявляются закрытыми.
+
+Первый remote source `03033fd`, CI `40382270592`: Office Sheets/Slides PASS,
+Writer FAIL на настоящем test step. Artifact и job-log downloads здесь дают
+HTTP 403; это ограничение доступа к диагностике, не основание принять сбой.
+Добавлены bounded/escaped Checks annotations с traceback и suite counts без
+увеличения token permissions. Tools после диагностики: **55 passed**. Следующий
+run должен показать точную причину Writer; assertions не ослабляются.
+
+### Office CI и исправления Writer — подтверждено удалённо
+
+Source `50555cedb2cba41d70d0f1533e0ade1525eed92c`,
+[CI 40383962576](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40383962576):
+**8/8 jobs PASS**. Writer **17** (12 engine / 5 UI), Sheets **15** (9 / 6), Slides
+**15** (11 / 4): **47 passed, 0 skipped**. Python 3.12.3, LibreOffice 24.2.7.2,
+системный UNO. Взяты настоящие summaries через Checks API, не предположение по
+цвету job. Протестированный PR merge checkout `4691fd5` имеет идентичное дерево
+файлов с source 50555ce; оба tree IDs сохранены в receipt.
+
+Четыре исходных Writer FAIL на source 376840d подтверждают две причины:
+CharPosture — UNO Enum, а не int; XText.getString() пропускает таблицы. Исправлены
+типизированное чтение/запись FontSlant, чтение текста body/table cells из движка
+и индексы абзацев после таблиц. Сохранён исходный table regression, усилена
+проверка порядка body/table text; добавлены реальные italic-toggle и post-table
+formatting проверки. UI Writer больше не падает на чтении формата.
+
+Полные source/workflow/job/runtime/count receipts:
+`docs/state/evidence/office-ci/acceptance.json`; исходные ошибки:
+`writer-initial-failures.json`. Артефакты JUnit/versions существуют, но downloads
+здесь дают 403; это ограничение доступа явно записано. Tools: **55 passed**.
+Передача: PR #4, финальный evidence commit меняет только документацию. После его
+CI — merge в main. Затем оставшиеся P02 licensing/P03 coverage и bootstrap,
+P04 operation lifecycle/recovery. Office/ISO/hardware readiness сверх проверенного
+engine/offscreen scope не объявляется.
 
 ## Шаблон следующей записи
 

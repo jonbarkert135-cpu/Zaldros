@@ -127,7 +127,18 @@ class Document:
     # --- reading -------------------------------------------------------------------------
     @property
     def text(self) -> str:
-        return self._doc.getText().getString()
+        # XText.getString() omits tables. Read their cell text from the engine too,
+        # in its enumeration order, without maintaining another document model.
+        chunks = []
+        elements = self._doc.getText().createEnumeration()
+        while elements.hasMoreElements():
+            element = elements.nextElement()
+            if element.supportsService("com.sun.star.text.Paragraph"):
+                chunks.append(element.getString())
+            elif element.supportsService("com.sun.star.text.TextTable"):
+                chunks.extend(element.getCellByName(name).getString()
+                              for name in element.getCellNames())
+        return "\n".join(chunks)
 
     def paragraphs(self) -> list[Paragraph]:
         out: list[Paragraph] = []
@@ -136,13 +147,13 @@ class Document:
         while enumeration.hasMoreElements():
             element = enumeration.nextElement()
             if not element.supportsService("com.sun.star.text.Paragraph"):
-                index += 1
                 continue
             out.append(Paragraph(
                 index=index, text=element.getString(),
                 style=str(getattr(element, "ParaStyleName", "")),
                 bold=float(getattr(element, "CharWeight", 100)) > 100,
-                italic=int(getattr(element, "CharPosture", 0)) != 0,
+                italic=getattr(getattr(element, "CharPosture", None), "value", "NONE") in
+                       ("ITALIC", "OBLIQUE", "REVERSE_ITALIC", "REVERSE_OBLIQUE"),
                 underline=int(getattr(element, "CharUnderline", 0)) != 0,
                 size=float(getattr(element, "CharHeight", 0)),
                 alignment=int(getattr(element, "ParaAdjust", 0))))
@@ -206,7 +217,9 @@ class Document:
                 if bold is not None:
                     element.CharWeight = 150.0 if bold else 100.0
                 if italic is not None:
-                    element.CharPosture = 2 if italic else 0
+                    import uno
+                    element.CharPosture = uno.Enum("com.sun.star.awt.FontSlant",
+                                                  "ITALIC" if italic else "NONE")
                 if underline is not None:
                     element.CharUnderline = 1 if underline else 0
                 if size is not None:

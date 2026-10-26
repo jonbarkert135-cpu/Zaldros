@@ -1,17 +1,21 @@
-# CI pipeline
+# CI workflows
 
-`ci.yml` is the GitHub Actions workflow for this repository. It runs the `zaldros-sysprobe` unit
-tests and then executes a live probe on the runner (a real systemd host), publishing the generated
-service map as a build artefact.
+The active workflows live in `.github/workflows/`. Files in this directory are
+reference copies and must match the active definitions; they are not pending
+installation instructions. Repository workflow changes can be pushed through
+the authorized PR process.
 
-It lives here rather than in `.github/workflows/` because the connected GitHub App is not granted the
-`workflows` permission and pushes containing workflow files are rejected. To activate it, copy the
-file to `.github/workflows/ci.yml` from a normal user account, or grant the app workflow permission.
+`ci.yml` runs tools and live inventory probes, compatibility evidence checks,
+the historical Fedora/bootc container builds, a runner benchmark baseline,
+shell/backend/render tests, and the three required real-UNO Office jobs.
+The container builds are not the selected Ubuntu ISO acceptance gate.
 
-## Pending change (not yet live)
+`iso.yml` builds the Ubuntu candidate and tests full/services/legacy against
+low/mid/modern VM profiles. Its separate boot/UI acceptance contract is documented
+in ADR-0026 and BUILD.md. A green Office job does not certify the installed OS.
 
-`docs/ci/ci.yml` currently contains one change that is **not** in `.github/workflows/ci.yml`:
-the two `podman build` steps of the `image` job retry up to 3 times (30s/60s backoff) because the
-quay.io CDN periodically aborts the `fedora-bootc:42` pull with `unexpected EOF` (exit 125), which
-reds out `main` for a purely network reason. Paste the file into `.github/workflows/ci.yml` from a
-normal user account to activate it; everything else in the file is unchanged.
+Office setup, strict skip handling and version/JUnit artifacts are documented in
+[Office development and CI](../office/BUILD.md). Ordinary CI uses read-only
+repository contents permission. ISO publishing has its own scoped write permission
+for diagnostic branches. P03 still includes development bootstrap, broader ISO
+path coverage and other reproducibility work; these jobs do not close that stage.
