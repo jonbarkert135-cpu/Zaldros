@@ -29,6 +29,12 @@ OS, installed system, or fully working backend is **not established**.
 
 ## Verification
 
+Current functional-gate change: **587 passed, no skips**, 62 existing forkpty
+warnings, exit 0, 154.20s. Focused gate/report/package checks: **72 passed**;
+tools: **44 passed**. Replaying the nine archived reports returns exit 1 with
+exactly the three previously hidden legacy screenshot failures. The new screenshot
+package fix still needs its own ISO/VM confirmation.
+
 After canonical-branding cleanup and installation of the missing visual-test
 dependencies: **538 passed, no skips**, 62 forkpty warnings, exit 0, 146.71s.
 Visual geometry: **110/110** checks; refreshed current renders. Text search and
@@ -71,9 +77,10 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
    Sixteen toggle rows have no backend control; static status must not imply measurement.
 5. **P1 / P03:** ISO path filters omit backend/apps/assets; Office jobs described in
    docs are absent from the active CI workflow.
-6. **P1 / P03/P17:** report.py currently gates only on `boot`, so a guest UI step
-   can report FAIL while the workflow is green. Reproduced by legacy screenshot
-   results in all three profiles; define/enforce functional acceptance explicitly.
+6. **P1 / P03/P17:** report.py previously gated only on `boot`, so a guest UI step
+   could report FAIL while the workflow was green. D03 now has a local fix requiring
+   boot facts and all eleven UI steps; new VM confirmation is pending. Spectacle/
+   portal is included in BASE for every variant. See ADR-0026 and iteration 0013.
 
 See F01–F12 and D01/D02 in the capability register for scope and confidence.
 No functional application code was changed by P01. P02 changes build authentication,

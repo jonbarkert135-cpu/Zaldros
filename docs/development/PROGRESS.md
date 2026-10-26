@@ -231,6 +231,52 @@ capability contract в P03/P17; не отключать проверки рад�
 CI shell install теперь фиксирует проверенные PySide6/pytest/Pillow/numpy versions,
 чтобы context-menu suite выполнялся и в GitHub, а не только в текущем venv.
 
+## P03/P17 — достоверность функционального CI (по следующему запросу владельца)
+
+База: `7660f2c3ec63dd592f88e6be8fb04d0fa58e5598`, PR #2 MERGED.
+Владелец поручил продолжить с ранее обозначенного D03. Это независимое исправление
+корректности CI; P02 licensing и остальные требования P03 не объявляются закрытыми.
+На базе 7660f2c normal CI run 40338140411 и ISO run 40338140298 были зелёными,
+что само по себе не устраняло подтверждённый дефект D03.
+
+Изменения:
+
+- report.py требует PASS всех 11 обязательных UI steps от их владельца. Ошибка
+  второго наблюдателя не маскируется; missing/blocked/skipped/unknown не заменяют
+  результат. QMP и явно измеренные diagnostic/report FAIL тоже дают exit 1.
+- Гость отвечает за окно/запуск/снимок; host — за input-driven шаги. BLOCKED guest
+  entries для host steps не трактуются как второй провал, когда host PASS.
+  Frame pacing не измеряется VM и не объявляется проверенным.
+- Boot producer и consumer используют один boot_checks; пустой список pending jobs
+  при starting больше не является доказательством успеха. Имена unit проверяются
+  точно, failed units всегда дают fail. boot-test.sh сохраняет неуспешный exit code.
+- Оба ISO workflow передают ожидаемый variant/profile; stale, missing, extra и
+  duplicate targets отклоняются. Source-SHA correlation внутри guest — ещё P17 work.
+- Spectacle и KDE portal включены в BASE всех вариантов. Существующий screenshot
+  тест не отключён; legacy получает недостающий runtime. ffmpeg остаётся full-only.
+  Старые размер/RAM цифры не характеризуют изменённый minimal image.
+- Решение и ограниченный контракт: ADR-0026. Исторические отчёты не изменялись.
+
+Проверки до отправки:
+
+| Проверка | Итог |
+| --- | --- |
+| Новые regression tests на старом коде | 38 failed / 2 passed; дефект воспроизведён |
+| Финальные gate/boot-report/serial/package suites | 72 passed, exit 0 |
+| Полный shell/backend pytest | 587 passed, 0 skipped, 62 forkpty warnings, exit 0, 154.20s |
+| Tools | 44 passed, exit 0 |
+| Replay девяти сохранённых VM reports новым report.py | exit 1: ровно legacy/low, legacy/mid, legacy/modern screenshot FAIL |
+| bash -n, синхронность двух ISO workflow, diff whitespace | PASS |
+
+Actual composition heredoc boot-test.sh исполняется в regression test из внешнего
+cwd и сохраняет failure как для boot, так и для screenshot. Форматировочные старые
+fixtures дополнены полноценными UI результатами; assertions не ослаблялись.
+Финальные логи: `/tmp/zaldros-functional-final-tests.log`,
+`/tmp/zaldros-functional-replay.log`. Новая VM-матрица должна подтвердить реальный
+скриншот в legacy; старые FAIL не пересчитаны в PASS и не являются новым прогоном.
+Перед доставкой в main — PR, normal CI и новый ISO/VM прогон. Точное подтверждение
+remote результатов добавляется отдельно после их получения.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

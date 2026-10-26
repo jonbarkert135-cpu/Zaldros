@@ -34,6 +34,14 @@ def test_pyside6_submodules_have_iso_packages() -> None:
     assert not missing, f"missing ISO packages for PySide6 modules: {missing}"
 
 
+def test_screenshot_acceptance_dependencies_are_common_to_all_variants() -> None:
+    base = re.search(r'^BASE="([^"]+)"', BUILD.read_text(), re.MULTILINE)
+    assert base is not None
+    packages = set(base[1].split())
+    assert {"kde-spectacle", "xdg-desktop-portal", "xdg-desktop-portal-kde"} <= packages, (
+        "legacy must be able to perform the same required screenshot check as full/services")
+
+
 THEME = REPO / "system" / "theme" / "install-visual-theme.sh"
 
 

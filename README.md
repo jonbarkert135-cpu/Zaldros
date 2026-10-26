@@ -16,7 +16,7 @@ The current implementation is a prototype; a complete everyday OS is not yet ver
 | Current target | **Developer alpha**: real Linux workflows, not only offscreen UI |
 | Spec parts received | All 5 parts, preserved in `spec/` |
 | Implemented foundation | Qt/QML shell, Python backend, system tools, Office bridges, ISO/VM scripts |
-| Verified locally | Tools: 44 passed; current shell/backend suite: 538 passed, no skips; real system/VM/hardware checks remain separate |
+| Verified locally | Tools: 44 passed; current shell/backend suite: 587 passed, no skips; real system/VM/hardware checks remain separate |
 | Current cycle | P01 complete; P02 rootfs authentication verified against Ubuntu; vendored-asset licensing reviews remain open |
 
 See the [capability register](docs/development/CAPABILITIES.md) for implementation gaps,
@@ -90,8 +90,9 @@ The project has not been abandoned. There is no promised release date.
 
 CI has produced three ISO variants and verified nine VM boots for the source
 revision recorded in the [build evidence](docs/state/evidence/p02-rootfs/README.md).
-Those checks have limits, including failed screenshot checks in the minimal
-variant. Physical-hardware support, installation, updates and recovery are not yet
+Earlier results exposed failed screenshot checks in the minimal variant. The
+current gate rejects failed or missing required UI results, and screenshot runtime
+is included in every variant. Physical-hardware support, installation, updates and recovery are not yet
 comprehensively verified. Some controls and features are incomplete.
 
 Start with a virtual machine. If testing on physical hardware, use a dedicated test

@@ -6,6 +6,11 @@ The guest screenshot step reports FAIL for legacy variants, despite green jobs;
 see the retained per-step summary. This is not a completed desktop acceptance gate.
 The dated CI account below remains historical context.
 
+The [current functional gate](docs/state/decisions/ADR-0026-functional-ci-acceptance.md)
+requires boot facts and all eleven host/guest UI checks to pass. Failed or missing
+UI results now fail the report command and CI. Spectacle/portal screenshot support
+is included in every variant; new build/boot evidence is recorded in PROGRESS.md.
+
 The live ISO is built by `build/iso/build-iso.sh` (Ubuntu 26.04 base rootfs → apt → squashfs →
 `grub-mkrescue`) and boot-tested by `build/iso/boot-test.sh` under QEMU/KVM. The container/bootc
 recipe further down belongs to the superseded Fedora base (**ADR-0009**) and is kept only because
@@ -73,6 +78,10 @@ the staged ISO assets by an explicit hash inventory.
 ./build/iso/boot-test.sh  zaldros-full.iso modern results
 python3 ./build/iso/report.py results               # PASS/FAIL matrix; exit 1 if anything failed
 ```
+
+For a single CI target, specify `--variant full --profile modern` (or the selected
+variant/profile) so a stale or different target cannot validate the job. Historical
+boot-only reports without complete UI measurements no longer satisfy this gate.
 
 `build-iso.sh` writes `steps.tsv` next to the ISO — one line per step with its exit code, which is
 the fastest way to see how far a failed build got.
