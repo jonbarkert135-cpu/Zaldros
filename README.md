@@ -16,7 +16,7 @@ The current implementation is a prototype; a complete everyday OS is not yet ver
 | Current target | **Developer alpha**: real Linux workflows, not only offscreen UI |
 | Spec parts received | All 5 parts, preserved in `spec/` |
 | Implemented foundation | Qt/QML shell, Python backend, system tools, Office bridges, ISO/VM scripts |
-| Verified locally | Tools: 44 passed; current shell/backend suite: 587 passed, no skips; real system/VM/hardware checks remain separate |
+| Verified locally | Tools: 44 passed; current shell/backend suite: 612 passed, no skips; real system/VM/hardware checks remain separate |
 | Current cycle | P01 complete; P02 rootfs authentication verified against Ubuntu; vendored-asset licensing reviews remain open |
 
 See the [capability register](docs/development/CAPABILITIES.md) for implementation gaps,

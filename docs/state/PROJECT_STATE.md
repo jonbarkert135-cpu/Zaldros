@@ -29,11 +29,12 @@ OS, installed system, or fully working backend is **not established**.
 
 ## Verification
 
-Current functional-gate change: **587 passed, no skips**, 62 existing forkpty
-warnings, exit 0, 154.20s. Focused gate/report/package checks: **72 passed**;
-tools: **44 passed**. Replaying the nine archived reports returns exit 1 with
-exactly the three previously hidden legacy screenshot failures. The new screenshot
-package fix still needs its own ISO/VM confirmation.
+Current functional-gate change: **612 passed, no skips**, 62 existing forkpty
+warnings, exit 0, 152.85s. Focused gate/producer/report checks: **126 passed**;
+tools: **44 passed**. Replaying the nine archived reports now returns exit 1 for
+six legacy/services screenshot failures, including errors mislabeled PASS.
+The guest producer, window readbacks and missing kwin-common runtime plugin are
+also corrected; a fresh ISO/VM run is required for confirmation.
 
 After canonical-branding cleanup and installation of the missing visual-test
 dependencies: **538 passed, no skips**, 62 forkpty warnings, exit 0, 146.71s.

@@ -80,6 +80,8 @@ def ui_result(data, step):
     guest, host = ui_sources(data)
     for source in (guest, host):
         entry = source.get(step)
+        if isinstance(entry, dict) and entry.get("error"):
+            return {**entry, "status": "FAIL"}
         if isinstance(entry, dict) and entry.get("status") in ("FAIL", "ERROR", "TIMEOUT"):
             return entry
     entry = (host if step in HOST_STEPS else guest).get(step)
@@ -105,18 +107,23 @@ def acceptance_failures(data):
         failures.extend(f"producer boot {name}: not PASS" for name in boot_checks(data)
                         if checks.get(name) is not True)
     for step in UI_STEPS:
-        status = ui_result(data, step).get("status", "MISSING")
+        entry = ui_result(data, step)
+        status = entry.get("status", "MISSING")
         if status != "PASS":
-            failures.append(f"UI {step}: {status}")
+            reason = str(entry.get("error") or entry.get("why") or "").replace("\n", " ")[:500]
+            failures.append(f"UI {step}: {status}" + (f" ({reason})" if reason else ""))
     for name in ("ui_guest", "ui_host"):
         source = data.get(name)
-        if isinstance(source, dict) and source.get("status") in ("FAIL", "ERROR", "TIMEOUT"):
-            failures.append(f"{name}: {source['status']}")
+        if isinstance(source, dict):
+            if source.get("status") in ("FAIL", "ERROR", "TIMEOUT") or source.get("error"):
+                failures.append(f"{name}: failure/error recorded")
     for source in ui_sources(data):
         for step, entry in source.items():
             if step not in UI_STEPS and isinstance(entry, dict) and entry.get("status") in (
                     "FAIL", "ERROR", "TIMEOUT"):
                 failures.append(f"UI diagnostic {step}: {entry['status']}")
+            elif step not in UI_STEPS and isinstance(entry, dict) and entry.get("error"):
+                failures.append(f"UI diagnostic {step}: error recorded")
     host = data.get("ui_host")
     if isinstance(host, dict) and host.get("qmp_errors"):
         failures.append("QMP command errors recorded")

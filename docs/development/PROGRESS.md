@@ -277,6 +277,41 @@ fixtures дополнены полноценными UI результатами
 Перед доставкой в main — PR, normal CI и новый ISO/VM прогон. Точное подтверждение
 remote результатов добавляется отдельно после их получения.
 
+### Дополнительная диагностика производителя результатов
+
+Первый кандидат `dfe9237` прошёл CI, но просмотр сырого legacy/modern отчёта выявил
+`status=PASS` одновременно с `error=the tool ran but wrote no file`. Этот результат
+не принят как функциональное подтверждение. В старых services отчётах найдена
+та же ошибка. step() принимал любой словарь за успех; итоговый gate теперь отклоняет
+непустой error независимо от PASS, а producer не превращает error/None/пустые
+результаты в успех. Таким образом исходный false-green дефект имел два уровня.
+
+Полный набор пакетов сравнен по реальным CI manifests: kwin-common установлен
+только в full, тогда как Spectacle присутствовал в services. Подписанный
+resolute-updates InRelease проверен keyring из аутентифицированного Ubuntu base,
+индекс Packages и deb сверены по SHA256. В kwin-common найдены screenshot.so и
+screencast.so. kwin-common теперь также в BASE; приватные данные/секреты не нужны.
+Receipt: `docs/state/evidence/functional-gate/screenshot-dependency.json`.
+
+Снимок считается выполненным только при exit 0 и свежем изображении, которое
+декодируется QImage с width/height > 0. stderr/return code не теряются. Реальные
+window probes теперь сохраняют UUID запущенного Dolphin, проверяют его геометрию
+и переход minimized на том же окне, а не наличие произвольного окна. internalId
+проверен по официальному KWin v6.6.6 window.h.
+
+Новые проверки: **126 passed** в focused suites, **612 passed / 0 skipped** в
+полном наборе, 62 существующих forkpty warnings, 152.85s. В первом полном прогоне
+после правки producer было 611 passed / 1 failed: старый capture test проверял
+буквальную строку ошибки. Он заменён более строгой поведенческой проверкой:
+команда exit 0 без файла должна дать FAIL через настоящий step()+_screenshot().
+Assertions не отключались. Финальный лог: `/tmp/zaldros-functional-final-evidence-tests.log`.
+
+Replay исходных девяти VM reports финальным gate теперь даёт exit 1 с шестью
+ошибками screenshot (legacy + services), включая ранее замаскированные error fields.
+PR #3 обновляется; до нового VM прогона эти screenshot функции не объявляются PASS.
+Предложенные владельцем варианты нового имени обсуждаются отдельно; переименование
+без выбранного окончательного имени в этот PR не добавлялось.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

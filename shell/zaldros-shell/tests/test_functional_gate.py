@@ -96,6 +96,14 @@ def test_ui_report_level_failure_is_not_masked_by_successful_steps(tmp_path):
     assert report.main(write(tmp_path, row)) == 1
 
 
+def test_pass_label_with_error_field_from_real_screenshot_bug_is_rejected(tmp_path):
+    row = result()
+    row["ui_guest"]["steps"]["screenshot"] = {
+        "status": "PASS", "tool": "spectacle", "error": "the tool ran but wrote no file"}
+    assert report.main(write(tmp_path, row)) == 1
+    assert report.ui_cell(row, "screenshot").startswith("FAIL")
+
+
 def test_failure_of_additional_measured_step_is_not_ignored(tmp_path):
     row = result()
     row["ui_guest"]["steps"]["frame_stability"] = {"status": "FAIL"}

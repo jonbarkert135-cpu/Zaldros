@@ -39,3 +39,18 @@ outside VM certification. New ISO sizes/resource data need a new run.
 inspect per-step results, diagnose any real failure and merge after verification.
 Source-SHA/run-ID binding within guest reports, licensing review, Office CI and
 async backend remain subsequent work.
+
+**FOLLOW-UP FINDING** — The first candidate dfe9237 still produced false PASS:
+the guest step wrapper accepted an error dictionary as success. Raw services/
+legacy reports contained PASS plus "no file" errors. That intermediate remote
+success is not functional evidence. The final wrapper and consumer reject errors,
+and the screenshot probe requires exit 0 plus a newly decoded image/dimensions.
+kwin-common was missing in both minimal variants; its screenshot.so module was
+confirmed through a signed Ubuntu metadata/hash chain and moved into BASE.
+Window probes now track one Dolphin UUID and verify its actual state/geometry.
+
+**FINAL LOCAL VALIDATION** — 612 passed, no skips, 62 existing forkpty warnings,
+152.85s. Focused suites: 126 passed. The original capture wiring test was strengthened
+to exercise failure through the real producer instead of matching an error string.
+Replay now rejects six original screenshot failures including the in-band error
+cases. A new remote run is required; earlier green jobs are not reused as proof.

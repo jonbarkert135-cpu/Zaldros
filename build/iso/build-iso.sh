@@ -74,7 +74,7 @@ collect_debug() {                     # runs on every exit, including failures
 trap collect_debug EXIT
 
 # Package set per variant — the three architectures we are comparing.
-BASE="ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami kde-spectacle xdg-desktop-portal xdg-desktop-portal-kde"
+BASE="kwin-common ubuntu-minimal ca-certificates linux-image-generic systemd-sysv casper network-manager pipewire pipewire-pulse wireplumber dolphin konsole dbus-user-session qt6-wayland kwin-style-aurorae qt6-style-kvantum fonts-dejavu-core python3 python3-pyside6.qtquick python3-pyside6.qtsvg python3-pyside6.qtdbus qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-org-kde-kirigami kde-spectacle xdg-desktop-portal xdg-desktop-portal-kde"
 case "$VARIANT" in
   # Screenshot support is a required desktop test, so Spectacle and its portal backend
   # belong to BASE for every variant. ffmpeg recording remains a full-only extension.

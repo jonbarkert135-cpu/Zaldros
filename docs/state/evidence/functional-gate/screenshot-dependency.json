@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-26",
+  "distribution_index": "https://archive.ubuntu.com/ubuntu/dists/resolute-updates/InRelease",
+  "verification": "GnuPG-verified InRelease using the archive keyring from the authenticated Ubuntu base rootfs; Packages.xz SHA256 verified against Release; deb SHA256 verified against Packages",
+  "packages_index_sha256": "bfdebaaf737db766ed1e645c193c35ab20bd77b5251239be1c7256a68be8a997",
+  "package": {
+    "name": "kwin-common",
+    "version": "4:6.6.6-0ubuntu0.1",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/universe/k/kwin/kwin-common_6.6.6-0ubuntu0.1_amd64.deb",
+    "sha256": "2a818759afaeaf424ea72bad3cb0fdcddde204471c517bfdc74dfe41a6ccdb54"
+  },
+  "verified_files": [
+    "usr/lib/x86_64-linux-gnu/qt6/plugins/kwin/plugins/screenshot.so",
+    "usr/lib/x86_64-linux-gnu/qt6/plugins/kwin/plugins/screencast.so"
+  ],
+  "scope": "Inspection only; no downloaded package installed on the cloud host. New VM verification is required."
+}

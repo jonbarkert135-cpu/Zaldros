@@ -38,7 +38,7 @@ def test_screenshot_acceptance_dependencies_are_common_to_all_variants() -> None
     base = re.search(r'^BASE="([^"]+)"', BUILD.read_text(), re.MULTILINE)
     assert base is not None
     packages = set(base[1].split())
-    assert {"kde-spectacle", "xdg-desktop-portal", "xdg-desktop-portal-kde"} <= packages, (
+    assert {"kwin-common", "kde-spectacle", "xdg-desktop-portal", "xdg-desktop-portal-kde"} <= packages, (
         "legacy must be able to perform the same required screenshot check as full/services")
 
 
