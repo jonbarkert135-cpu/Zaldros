@@ -25,9 +25,15 @@ OS, installed system, or fully working backend is **not established**.
 | Variant | full/services/legacy comparison still open; full is the first smoke-test control, not an accepted winner |
 | Current implementation evidence | Local unit, mock-service bus, filesystem/PTY and offscreen checks; actual target-service/VM/hardware evidence is not refreshed here |
 | Updates/recovery | Query/refresh implemented; complete update/install/recovery lifecycle not delivered; apt has no inherited bootc atomicity |
-| Current work | P01 DONE; P02 PARTIAL: signature/hash gate and asset staging implemented; live Ubuntu verification and licensing reviews remain open |
+| Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+After canonical-branding cleanup and installation of the missing visual-test
+dependencies: **538 passed, no skips**, 62 forkpty warnings, exit 0, 146.71s.
+Visual geometry: **110/110** checks; refreshed current renders. Text search and
+OCR of 38 tracked raster images found no superseded product label.
+The following P02 counts are the preceding runs, not additional tests to sum.
 
 P02 final local suite: **536 passed, 1 skipped**, 61 existing forkpty warnings,
 exit 0, 148.57s. Authentication/provenance/diagnostics/packaging subset: **34 passed**.
@@ -42,16 +48,22 @@ Slides **3 passed / 12 skipped**. Missing LibreOffice/UNO means no Office engine
 readiness claim. Compatibility registry check: 8 app / 13 hardware entries accepted
 by the evidence gate; this does not establish compatibility on real hardware.
 
-No current-SHA ISO build/boot, real KWin session, installed-system test, or physical
-hardware run was performed in this cycle. The current container lacks a confirmed
-running systemd desktop and QEMU/KVM prerequisites. This is an environment limitation
-for those checks, not evidence that every service adapter is broken.
+P01 did not run ISO/VM validation. Subsequently GitHub Actions run `40333303076`
+on `6168e9b` completed all three ISO builds and nine boot jobs successfully.
+The exact CI metadata and published-report commits are retained under
+`evidence/p02-rootfs/`. Host UI steps and guest window operations have separate
+statuses; the legacy guest screenshot step is FAIL in all three profiles, and
+frame stability remains BLOCKED. Green job status is not full alpha acceptance.
+The later branding patch is locally verified separately; the installed-system
+and physical-hardware gates remain unrun. The local container itself still has no
+confirmed running systemd/KWin desktop or QEMU/KVM workflow.
 
 ## Confirmed issues and priorities
 
 1. **P0 / P02:** rootfs fetch now authenticates the checksum manifest and archive
    before extraction, with tamper tests. The live Ubuntu endpoint/signing-key check
-   remains blocked by environment egress policy. Fallback icon provenance is unresolved.
+   subsequently passed; evidence is in evidence/p02-rootfs/. Fallback icon provenance
+   is unresolved.
 2. **P1 / P04:** synchronous GUI-to-service path and reconnect/subscription recovery
    need fault-injection evidence and an operation lifecycle.
 3. **P1 / P05:** taskbar and internal window model do not prove external-window behavior.
@@ -59,6 +71,9 @@ for those checks, not evidence that every service adapter is broken.
    Sixteen toggle rows have no backend control; static status must not imply measurement.
 5. **P1 / P03:** ISO path filters omit backend/apps/assets; Office jobs described in
    docs are absent from the active CI workflow.
+6. **P1 / P03/P17:** report.py currently gates only on `boot`, so a guest UI step
+   can report FAIL while the workflow is green. Reproduced by legacy screenshot
+   results in all three profiles; define/enforce functional acceptance explicitly.
 
 See F01–F12 and D01/D02 in the capability register for scope and confidence.
 No functional application code was changed by P01. P02 changes build authentication,

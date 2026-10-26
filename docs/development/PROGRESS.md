@@ -10,19 +10,21 @@
 В исходном аудите/P01 функциональный код не менялся. P02 меняет сборку и тесты.
 P01 закоммичен как `ec1ca56` и отправлен в `codex/p01-capability-baseline`.
 Пользователь затем явно разрешил GitHub push/PR/merge и потребовал доставлять
-проверенные изменения в main. Текущий P02 готовится в `codex/p02-trusted-rootfs`;
-способ доставки при заблокированном API — обычный Git merge/push без force и
-без обхода ограничений ветки. Публикация релиза/готовность ОС этим не подтверждается.
+проверенные изменения в main. P02 code commit `b133e96` отправлен, PR #1 создан
+и MERGED: merge commit `6168e9bd5f55d879630d34b4e1ae0509ec1b3eb4` в main.
+API заработал после первоначальных 403; обычное Git-слияние/push принято сервером
+без force/обхода правил. GitHub подтвердил состояние PR MERGED. Публикация
+релиза/готовность ОС этим не подтверждается.
 
 **P01 DONE. P02 PARTIAL.** P03–P20 ещё не выполнены.
 Реестр [CAPABILITIES.md](CAPABILITIES.md) связывает 35 групп сценариев и все 69
 страниц Settings с кодом, проверками и разрывами. README, PROJECT_STATE и ROADMAP
 актуализированы; исходные state/roadmap сохранены в `docs/state/history/pre-P01/`.
 В P02 уже реализованы download → signed manifest → digest → staged extract и
-provenance/shipping inventory. Остаются live Ubuntu verification и лицензирование
-части исторических assets; весь P02 ещё не закрыт. Следующий необходимый шаг:
-применить подготовленные egress-настройки, проверить настоящий Ubuntu manifest/key
-и получить проверяемые license/source сведения либо согласовать замену fallback icons.
+provenance/shipping inventory. Live Ubuntu verification после восстановления
+связности прошёл. Остаётся лицензирование части исторических assets; весь P02
+ещё не закрыт. Следующий необходимый шаг: получить проверяемые license/source
+сведения либо подготовить отдельно проверенную замену fallback icons.
 
 ## Проверки предшествующего аудита (тот же исходный HEAD)
 
@@ -155,6 +157,79 @@ duplicate/invalid tar, не подменяют GnuPG mock-ответом.
   Нужны verifiable notice/source или отдельно проверенная замена до public release.
 
 P02 остаётся PARTIAL; не переходить к объявлению alpha/release ready.
+
+### Последующее восстановление доступа и live validation
+
+После первоначального 403 следующие запросы GitHub API и официальных Ubuntu HTTPS
+endpoints прошли. Требование нового токена не возникло; публикация снимка среды
+по-прежнему не подтверждена. Чтение branch-protection metadata отдельно возвращает
+`Resource not accessible by integration`; это scope endpoint, не блокировка всех PR.
+
+- PR #1: https://github.com/jonbarkert135-cpu/Zaldros/pull/1 — MERGED.
+- Main после слияния: `6168e9bd5f55d879630d34b4e1ae0509ec1b3eb4`, совпадение
+  local HEAD и `git ls-remote origin refs/heads/main` проверено.
+- Официальный Ubuntu tutorial получен по HTTPS и содержит полный fingerprint
+  `843938DF228D22F7B3742BC0D94AA3F0EFE21092`, совпадающий с policy.
+- Настоящий `fetch-rootfs.py` с URL Ubuntu 26.04 amd64 завершился exit 0:
+  signature → SHA256 → staged extraction. Digest
+  `046fcabb7f16f45a80ae11824664f2a07e01386c6fb1ed9dc1e225a66a6553a2`.
+  `/etc/os-release` извлечённого дерева сообщает Ubuntu 26.04 Resolute.
+- Долговечные публичные артефакты: `docs/state/evidence/p02-rootfs/`.
+  Сам tar/rootfs не добавлен в Git; это не VM boot и не запуск кода из rootfs.
+- Remote main CI/ISO runs начались на 6168e9b; их окончательный результат
+  фиксируется отдельно, а не предполагается по факту запуска.
+
+Первоначальные ограничения выше сохранены как хронология. Live artifact gate
+теперь PASS; license reviews и функциональные system/E2E/hardware gates открыты.
+
+## Каноническое имя и обновлённые визуальные материалы
+
+По прямому запросу владельца удалено прежнее обозначение проекта из всех текущих
+файлов, включая naming research и ADR-0006. Неактуальные строки исследования
+удалены, а не переименованы в несуществующие сторонние проекты/URL. Указано, что
+число 129 относится к первоначальному исследованию. Обновлены WORKLOG, README,
+NAMING, Settings, тестовые комментарии и capability index. История Git не переписывалась.
+
+Изменённые видимые строки Settings используют gettext и каноническое Zaldros OS.
+44 отслеживаемых visual artifacts перегенерированы настоящим renderer/parity tool,
+измерительные reference targets не менялись. Поиск по всем текстовым файлам —
+ноль совпадений прежнего обозначения; OCR по 38 tracked PNG/JPG — ноль совпадений.
+OCR вспомогательный, основное доказательство изображений — их регенерация из
+исправленного кода. Старый медленный OCR-процесс остановлен и заменён ограниченным
+по потокам сканированием, которое завершилось успешно.
+
+Для ранее пропущенной группы установлены Pillow 13.0.0 / numpy 2.5.4 в venv;
+их точные версии добавлены в install_script draft среды. Изменение draft не
+является публикацией снимка. Финальный `pytest tests -q -rs`: **538 passed,
+0 skipped**, 62 forkpty warnings, 146.71s, exit 0. После gettext-изменения отдельно
+прошли settings_tree + context_menu_fit: **8 passed**, exit 0. Полный финальный
+набор уже включает эти проверки. `tools/visual/parity.py --quiet --output
+/tmp/zaldros-naming-visual`: **110/110**, exit 0; оттуда скопированы current artifacts.
+
+Remote CI для main `6168e9b`: все 5 jobs SUCCESS;
+`docs/state/evidence/p02-rootfs/main-ci.json` хранит результат с исходным SHA.
+Результаты ISO workflow и прямое чтение отчётов фиксируются отдельно. Загрузка
+zip artifacts через временный blob URL пока заблокирована egress; подписи URL
+не сохранялись в репозиторий. Диагностические ветки доступны через Git.
+
+Логи: `/tmp/zaldros-canonical-final-tests.log`, `/tmp/zaldros-naming-parity.log`.
+Следующая доставка — PR с canonical branding и live Ubuntu evidence в main.
+
+ISO run `40333303076` на `6168e9b` завершён: **3/3 builds и 9/9 boot jobs SUCCESS**.
+Через Git прочитаны все девять свежих BOOT PASS отчётов, сохранены точные commits
+публичных diagnostic refs и раздельные UI статусы в `vm-report-summary.json`.
+`report.py` на всех девяти отчётах вернул exit 0. Старый August legacy/mid отчёт
+не использовался: дождались новой публикации. ZIP route всё ещё 403; raw временные
+redirect credentials не попадали в Git.
+
+**D03:** во всех трёх legacy profiles screenshot = FAIL, но job зелёный, поскольку
+report.py определяет exit code только по BOOT. Это подтверждённый acceptance-gate
+дефект, а не доказательство полного UI PASS. Остальные измеренные host/window шаги
+имеют свои PASS, frame_stability — BLOCKED. Исправить функциональные gates и
+capability contract в P03/P17; не отключать проверки ради зелёного статуса.
+
+CI shell install теперь фиксирует проверенные PySide6/pytest/Pillow/numpy versions,
+чтобы context-menu suite выполнялся и в GitHub, а не только в текущем venv.
 
 ## Шаблон следующей записи
 

@@ -80,7 +80,14 @@ Real OpenPGP fixtures test valid extraction, tampering, an untrusted signer, mis
 duplicate entries, absent signatures and signed-but-malformed tar. These tests use
 locally generated keys and no network/root; they do not establish that the current
 Ubuntu release still uses the pinned key or that the live endpoint is reachable.
-That live check was blocked in this environment by egress policy at the time of P02.
+The live check was initially blocked by egress policy. After connectivity became
+available, the production helper authenticated and extracted the real Ubuntu
+26.04 amd64 rootfs on 2026-10-26. The full fingerprint was also checked against the
+official Ubuntu verification tutorial over HTTPS. Archive SHA256:
+`046fcabb7f16f45a80ae11824664f2a07e01386c6fb1ed9dc1e225a66a6553a2`.
+The [signed manifest and receipt](../../docs/state/evidence/p02-rootfs/README.md)
+are retained in the repository. This establishes artifact authentication and
+extraction, not successful boot or hardware support.
 
 ## System packages and code
 
@@ -99,5 +106,6 @@ LibreOffice/UNO Office prototypes are in the repository but are not copied by th
 current ISO recipe. Wine/Proton integration remains separate work. Legacy Fedora
 Containerfiles are not evidence for the active Ubuntu dependency graph.
 
-Release remains blocked on provenance gaps, a real Ubuntu signing/manifest check,
-current-source ISO build/boot and the functional gates in the development plan.
+Release remains blocked on provenance gaps, current-source ISO build/boot acceptance
+and the functional gates in the development plan. Successful artifact verification
+does not resolve those independent requirements.

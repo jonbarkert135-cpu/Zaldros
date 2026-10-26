@@ -1,0 +1,340 @@
+{
+  "workflow_run": 40333303076,
+  "workflow_head": "6168e9bd5f55d879630d34b4e1ae0509ec1b3eb4",
+  "note": "Read published diagnostic refs after current jobs; exact report commits retained. Reports themselves do not embed the source SHA.",
+  "rows": [
+    {
+      "variant": "full",
+      "profile": "low",
+      "report_ref": "origin/ci-logs-boot-full-low",
+      "report_commit": "68c3de5feec31137d97cc7126ee7a1b96165aa6e",
+      "report_date": "2026-10-26T13:57:46Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "mid",
+      "report_ref": "origin/ci-logs-boot-full-mid",
+      "report_commit": "bd50865d284d0ef4379000bcc7d05781a9251977",
+      "report_date": "2026-10-26T13:57:20Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "modern",
+      "report_ref": "origin/ci-logs-boot-full-modern",
+      "report_commit": "ca718f79b0005472220a97a5a255e938529d4f03",
+      "report_date": "2026-10-26T13:56:52Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "low",
+      "report_ref": "origin/ci-logs-boot-services-low",
+      "report_commit": "ecdb5653a9c1d704874a00b33b98027ebdb0e7b0",
+      "report_date": "2026-10-26T13:56:47Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "mid",
+      "report_ref": "origin/ci-logs-boot-services-mid",
+      "report_commit": "c3823565ffeef607163f538d3d29e08992e10fda",
+      "report_date": "2026-10-26T13:57:34Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "modern",
+      "report_ref": "origin/ci-logs-boot-services-modern",
+      "report_commit": "fe75a7b7e96df825035971c431097b19696e4039",
+      "report_date": "2026-10-26T13:56:52Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "low",
+      "report_ref": "origin/ci-logs-boot-legacy-low",
+      "report_commit": "ec20e4d80786847267536a6847220cc3f2b47144",
+      "report_date": "2026-10-26T13:58:50Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "FAIL",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "modern",
+      "report_ref": "origin/ci-logs-boot-legacy-modern",
+      "report_commit": "d07e32c2e9b6ed03960c2aa0093340a717ccd286",
+      "report_date": "2026-10-26T13:57:08Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "FAIL",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "mid",
+      "report_ref": "origin/ci-logs-boot-legacy-mid",
+      "report_commit": "3f71003921f6bd99218b0aa5329c57fff9d33215",
+      "report_date": "2026-10-26T14:05:22Z",
+      "boot": "PASS",
+      "checks": {
+        "kernel": true,
+        "systemd": true,
+        "wayland": true,
+        "kwin": true,
+        "shell": true,
+        "app_launch": true
+      },
+      "host": {
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "taskbar_response": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "shortcut_probes": "INFO"
+      },
+      "guest": {
+        "desktop_ready": "PASS",
+        "app_launch_explorer": "PASS",
+        "screenshot": "FAIL",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "start_open": "BLOCKED",
+        "start_close": "BLOCKED",
+        "alt_tab": "BLOCKED",
+        "taskbar_response": "BLOCKED",
+        "frame_stability": "BLOCKED"
+      }
+    }
+  ]
+}

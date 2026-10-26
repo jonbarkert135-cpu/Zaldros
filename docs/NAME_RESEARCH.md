@@ -1,6 +1,7 @@
 # NAME AVAILABILITY AUDIT — выбор имени дистрибутива
 
 Дата: 2026-08-23. Автор: Viktor (по заданию владельца проекта).
+Редакция 2026-10-26: по запросу владельца неактуальные записи прежнего имени удалены. Число 129 ниже относится к первоначальному объёму исследования, а не к числу оставшихся строк.
 Методика: (1) веб-поиск по актуальным источникам (DistroWatch, Wikipedia, GitHub, официальные сайты, реестры компаний UK/HK/EE, LinkedIn, Crunchbase);
 (2) машинная проверка **129 имён**: RDAP-запросы к реестрам доменов (.com/.org/.io — Verisign/PIR/Identity Digital, .dev — через rdap.org), GitHub (`github.com/<name>`, `github.com/<name>linux`, GitHub Search API), GitLab (`/api/v4/users`), Codeberg.
 Дисклеймер: это **не юридическое заключение**. Проведён публичный веб- и реестровый поиск, полноценный поиск по базам товарных знаков (USPTO/EUIPO/WIPO) не выполнялся. Для финального имени: **LEGAL REVIEW REQUIRED** перед регистрацией бренда.
@@ -13,7 +14,6 @@
 
 | Имя | Вердикт | Конфликт | Ссылка |
 |---|---|---|---|
-| **Raven OS / Raven Linux** | 🔴 RED | Raven-OS — реальная ОС/дистрибутив (org на GitHub, 20 репо, сайт raven-os.org); RavenOS (Arch-based, ocsmos); RavenOS (Adiras, own kernel); Raven Resonance — стартап смарт-очков на Linux (AWE 2026, PR Newswire). Домены raven.com/.org/.io заняты. | https://github.com/raven-os · https://raven-os.org · https://raven.computer |
 | **Bedrock Linux** | 🔴 RED | Bedrock Linux — действующая мета-дистрибуция с 2009, v0.7.31 (2026-01-12), Wikipedia-статья, сайт, GitHub-org. Прямое столкновение. | https://bedrocklinux.org · https://en.wikipedia.org/wiki/Bedrock_Linux |
 | **Bedrock OS** | 🔴 RED | То же ядро конфликта + Minecraft **Bedrock Edition** (массовый бренд), BedRock Systems (ныне BlueRock, кибербез). Постоянная путаница в поиске гарантирована. | https://minecraft.wiki/w/Bedrock_Edition · https://www.cbinsights.com/company/bedrock-systems |
 | **Prime OS / PrimeOS** | 🔴 RED | PrimeOS — известная Android-x86 десктоп-ОС (SourceForge, XDA, зеркала на GitHub). Все домены заняты. | https://sourceforge.net/projects/primeos/ · https://github.com/nyhtml/PrimeOS |
@@ -250,9 +250,6 @@ AVAILABLE/FREE = не занято на 2026-08-23; UNKNOWN = проверку �
 | quenrik | AVAILABLE | AVAILABLE | AVAILABLE | AVAILABLE | FREE | FREE | UNKNOWN | FREE |
 | quinvara | AVAILABLE | AVAILABLE | AVAILABLE | UNKNOWN(429) | UNKNOWN(429) | UNKNOWN(429) | FREE | FREE |
 | quorix | TAKEN | TAKEN | TAKEN | TAKEN | TAKEN | FREE | FREE | FREE |
-| raven | TAKEN | TAKEN | TAKEN | TAKEN | TAKEN | TAKEN | TAKEN | TAKEN |
-| ravenlinux | AVAILABLE | AVAILABLE | AVAILABLE | AVAILABLE | TAKEN | FREE | TAKEN | FREE |
-| ravenos | TAKEN | TAKEN | TAKEN | AVAILABLE | TAKEN | FREE | FREE | FREE |
 | sablon | TAKEN | TAKEN | TAKEN | AVAILABLE | TAKEN | FREE | FREE | FREE |
 | seldara | TAKEN | AVAILABLE | AVAILABLE | AVAILABLE | FREE | FREE | FREE | FREE |
 | selvara | TAKEN | TAKEN | AVAILABLE | UNKNOWN | TAKEN | FREE | FREE | FREE |

@@ -4,7 +4,8 @@
 P02 update: [trusted build/provenance](../../build/provenance/README.md) now implements
 the rootfs authenticity gate and explicit asset staging described as missing below.
 The P01 matrix remains the baseline; subsequent results are in PROGRESS.md. Real
-Ubuntu verification and asset licensing gaps remain open, not promoted to PASS.
+Ubuntu artifact authentication/extraction subsequently passed; asset licensing
+gaps remain open. This does not promote system/boot/E2E/hardware checks to PASS.
 Статус относится к этому исходному коду и указанной среде, а не к последнему
 непроверенному сообщению CI. Рабочая цель — developer alpha из [PLAN.md](PLAN.md).
 Это реестр сценариев, не процент готовности и не замена спецификации.
@@ -81,7 +82,7 @@ P2 — расширение или поздний release gate. Это прио�
 | C20 Обновления | Settings update → Registry → B/updates.py:updates,refresh → PackageKit | PARTIAL query/refresh; T/test_backend_settings.py, test_settings_controls.py — B V2/V3 | P1: install lifecycle/reboot/dpkg recovery нет; синхронный GUI путь; P04/P15 |
 | C21 Recovery/encryption | Settings recovery: reboot/UEFI controls; encryption — статическая строка; RECOVERY.md — контракт | PARTIAL только firmware/reboot; T/test_backend_settings.py — B V2/V3 | P0: нет проверенного rollback/restore/encryption readback; не обещать bootc на apt; P18 |
 | C22 Accessibility | Settings accessibility и дочерние страницы → преимущественно static Entry; pref:visual.animations реальный pref | PARTIAL UI; render/input tests V2 не проверяют screen reader | P1: отсутствует доказательство системных magnifier/sticky keys/contrast и AT-SPI, focus core workflow; P16 |
-| C23 Personalisation | Settings background/colours/themes/fonts/start/taskbar → Prefs/Registry → M/prefs.py и Q theme | PARTIAL prefs; T/test_prefs.py, test_ui_font.py в V2; V8 подтверждает неверный font label | P1: static vs applied settings; Selawik/Raven stale labels; P16, дефект D01 ниже |
+| C23 Personalisation | Settings background/colours/themes/fonts/start/taskbar → Prefs/Registry → M/prefs.py и Q theme | PARTIAL prefs; T/test_prefs.py, test_ui_font.py в V2; V8 подтверждает неверный font label | P1: static vs applied settings; Selawik/stale product labels; P16, дефект D01 ниже |
 | C24 Gaming/capture | Q/GameBar*, Settings games → M/model.py:GameBarModel → capture.py/portal.py → Spectacle/ffmpeg/portal/PipeWire | PARTIAL; T/test_capture.py — U с fake runner V2 | P2: consent/Unix FD, декодирование видео, global hotkeys, GameMode только строка; P12/P19 |
 | C25 Terminal | Q/apps/Terminal.qml → M/model.py:TerminalModel → B/terminal.py:PtySession/Screen → настоящий PTY/shell | PRESENT ограниченный terminal; T/test_terminal.py — U/PTY V2 | P1: полная эмуляция, lifecycle и forkpty warning требуют проверки; external process не desktop E2E; P04/P11/P17 |
 | C26 Task Manager | Q/apps/TaskManager.qml → ProcessModel/StartupModel → B/processes.py:sample,end → /proc/signals/autostart | PRESENT ограниченная утилита; T/test_processes.py, test_backend_overhead.py — U/fixtures V2 | P1: права, PID reuse, реальные процессы/нагрузки/GPU и sampling в сессии; P14/P17 |
@@ -207,13 +208,13 @@ F09 — edge-case риски, не доказанная потеря данны�
 | `privacy` | Конфиденциальность и защита | C19 | Нет literal controls; см. группу |
 | `encryption` | Шифрование диска | C21 | Нет literal controls; см. группу |
 | `activity` | Журнал действий | C19 | `pref:privacy.recent_files`, `pref:clipboard.history` |
-| `security` | Безопасность Raven | C19 | `updates.available`, `privacy.firewall` |
+| `security` | Безопасность Zaldros OS | C19 | `updates.available`, `privacy.firewall` |
 | `permissions` | Разрешения приложений | C19 | `privacy.microphone`, `privacy.camera`, `privacy.location` |
 | `diagnostics` | Диагностика | C28 | Нет literal controls; см. группу |
 | `games` | Игры | C24 | Нет literal controls; см. группу |
 | `game-bar` | Игровая панель | C24 | Нет literal controls; см. группу |
 | `captures` | Записи | C24 | Нет literal controls; см. группу |
-| `update` | Обновление Raven | C20 | `updates.available`, `updates.check` |
+| `update` | Обновление Zaldros OS | C20 | `updates.available`, `updates.check` |
 
 Динамические controls: `display.output.*` (C04), `network.vpn:*` и `sound.app:*`
 (C07/C05), `accounts.admin.*`/`accounts.locked.*` (C17), `storage.mounted.*` (C14).

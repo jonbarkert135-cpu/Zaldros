@@ -29,7 +29,7 @@ def test_every_nested_page_is_reachable_from_the_rail():
 
 
 def test_windows_only_rows_are_absent():
-    """Activation, OneDrive and Microsoft billing have no counterpart on Raven (2026-08-26)."""
+    """Activation, OneDrive and Microsoft billing have no counterpart on Zaldros OS (2026-08-26)."""
     text = " ".join(entry["title"] + entry["subtitle"]
                     for page in _tree().values() for entry in page["entries"])
     for phrase in ("Активация", "OneDrive", "Подписки", "Варианты оплаты", "Журнал заказов",
