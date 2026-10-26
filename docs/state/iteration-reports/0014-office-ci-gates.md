@@ -31,6 +31,9 @@ this execution environment is rejected with HTTP 403. Added bounded Checks API
 annotations for failures and executed-suite counts without increasing workflow
 permissions or ignoring the failed result. Tools after this diagnostic addition:
 55 passed; annotation escaping is covered. Fresh remote diagnosis is required.
+The first annotation attempt was prefixed by pytest's unterminated progress line
+and ignored by GitHub. A subprocess reproduced `F::error` / `100%]::notice`;
+annotations now begin a new line and the regression includes preceding progress.
 
 **METRICS / BOUNDARIES** — No performance, Office compatibility or installed-system
 claim. Apt versions are recorded, not an immutable snapshot. P02 licensing and

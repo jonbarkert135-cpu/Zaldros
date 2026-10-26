@@ -20,7 +20,8 @@ def annotate(level, title, message):
     """Expose bounded diagnostics through the Checks API as well as artifact logs."""
     if os.environ.get("GITHUB_ACTIONS") == "true":
         escaped = str(message).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-        print(f"::{level} title={title}::{escaped}", flush=True)
+        # pytest writes progress without a newline; runner commands must start one.
+        print(f"\n::{level} title={title}::{escaped}", flush=True)
 
 
 class RequiredOfficeTests:

@@ -33,6 +33,8 @@ jobs:
         run: |
           mkdir -p office-results
           {
+            printf 'workflow_sha=%s\nrun_id=%s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID"
+            git rev-parse HEAD
             .venv-office/bin/python --version
             soffice --version
             dpkg-query -W python3-uno libreoffice-core-nogui libreoffice-${{ matrix.component }}-nogui
