@@ -3,22 +3,29 @@
 A Linux desktop operating system built around **Windows-11-familiar workflows**, with a clean,
 lightweight and aggressively optimised Linux system underneath.
 
-> Not "Linux with a Windows theme" — a complete Linux desktop environment designed around
-> Windows-familiar workflows.
+The goal is a complete Linux desktop environment designed around Windows-familiar workflows.
+The current implementation is a prototype; a complete everyday OS is not yet verified.
 
 **Name:** the official project name is **Zaldros OS**. The master-specification text uses
-"Zaldros OS"; that name was invented by the AI that drafted the spec and is superseded — see
+"Raven OS" in historical requirements maps to Zaldros OS — see
 [`docs/NAMING.md`](docs/NAMING.md).
 
 ## Status
 
 | | |
 |---|---|
-| Phase | **Phase 0 — Research & Architecture** (in progress) |
-| Spec parts received | 1, 2 of 5 |
-| Current milestone | Foundation: architecture decisions + first tooling |
+| Current target | **Developer alpha**: real Linux workflows, not only offscreen UI |
+| Spec parts received | All 5 parts, preserved in `spec/` |
+| Implemented foundation | Qt/QML shell, Python backend, system tools, Office bridges, ISO/VM scripts |
+| Verified locally | Tools: 44 passed; shell/backend audit: 514 passed, 1 skipped; real system/VM/hardware checks remain separate |
+| Current cycle | P01 capability inventory complete; P02 clean-room and trusted rootfs preparation next |
+
+See the [capability register](docs/development/CAPABILITIES.md) for implementation gaps,
+test environments and unverified behavior. A successful mock-service test does not prove
+that the corresponding real Linux service works end to end.
 
 Live state lives in [`docs/state/PROJECT_STATE.md`](docs/state/PROJECT_STATE.md).
+The [development plan and 20 task prompts](docs/development/README.md) define the next work.
 
 ## Repository layout
 
@@ -27,7 +34,12 @@ spec/                  Master specification parts as received (source of truth f
 docs/research/         Evidence-based comparisons (base distro, compositor, toolkit, ...)
 docs/architecture/     Architecture, tech stack, dependency graph, roadmap, risks, strategies
 docs/state/            Living project state, decision log (ADRs), iteration reports
-tools/zaldros-sysprobe/ Service & resource probe — produces the service/dependency map (spec §7)
+docs/development/      Current audit, capability register, plan, prompts and handoff
+backend/               Linux service adapters and D-Bus transport
+shell/zaldros-shell/   Qt/QML shell and backend tests
+apps/                  Writer, Sheets and Slides backed by LibreOffice
+tools/                 sysprobe, hwinfo, compatibility registry, benchmarks and diagnostics
+build/iso/             Ubuntu live ISO build and QEMU verification scripts
 assets/refs/           UX reference material
 ```
 
@@ -41,5 +53,6 @@ assets/refs/           UX reference material
 
 ## License
 
-Project code: see `LICENSE` (to be finalised). Third-party components are tracked in
+Zaldros's own code: GPL-3.0-or-later, see `LICENSE` and `CONTRIBUTING.md`.
+Third-party components retain their licenses and are tracked in
 [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md).

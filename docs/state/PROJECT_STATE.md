@@ -1,85 +1,77 @@
-# Project state
+# Project state — 2026-10-26
 
-```
-Base:          Ubuntu 26.04 LTS
-Status:        PROPOSED
-ISO:           BUILT - run #25 (773c1f4), all 3 variants x 3 profiles
-Boot:          PASS - 9/9 combinations, failed_checks = [].
-               Verified per combination: kernel 7.0.0-30-generic, systemd with
-               0 failed units, /run/user/1000/wayland-0, kwin_wayland, autologin
-               session, the Zaldros shell drawing on screen (QMP screenshots),
-               konsole launch 2.0 s.
-               run 32991329542, 2026-08-26.
-Architecture:  NOT ACCEPTED YET - the three variants now boot identically, so the
-               comparison is finally possible, but it needs one run with the UI
-               interaction test believed (see below) before a variant is chosen.
-Idle RAM (QEMU, run #25): full 655 MiB / 26 proc, services 606 MiB / 23 proc,
-               legacy 606 MiB / 23 proc (low profile) - shell + KWin, no plasmashell.
-               Comparison data under emulation, not hardware evidence.
-Boot time:     MEASURED (QEMU) - uptime at self-test 21.3-24.3 s across all 9
-               combinations; systemd-analyze still empty while systemd is "starting".
-UI test:       NOT TRUSTWORTHY in run #25 - the window query read the wrong log and
-               the host driver clicked a guessed point, so it reported FAIL against a
-               working shell. Fixed in run #26; verdicts before it are void.
-```
+Current source baseline: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
+P01 documentation changes are uncommitted. This page supersedes the old current-status
+summary; it does not retrospectively reclassify historical test runs.
 
-_Last updated: 2026-08-26_
+## Current milestone
 
-| Field | Value |
+**Developer alpha: integrate and verify real Linux workflows.** The project contains
+more than UI: Python Linux-service adapters, Qt/QML shell, file operations, PTY terminal,
+process/device inventory, LibreOffice bridges, and ISO/VM tooling. Completion of an
+OS, installed system, or fully working backend is **not established**.
+
+- [Capability register](../development/CAPABILITIES.md): 35 scenario groups, all 69
+  Settings pages, code/test links, implementation gaps, evidence levels.
+- [Plan](../development/PLAN.md) and [task prompts](../development/PROMPTS.md): P01–P20.
+- [Session handoff](../development/PROGRESS.md): results and next concrete action.
+
+| Field | Current evidence and decision |
 | --- | --- |
-| Project | Zaldros OS |
-| Phase | 0 — Research & Architecture |
-| Spec parts received | **all 5 of 5** (complete specification) |
-| Base decision | Ubuntu 26.04 LTS `resolute`, live ISO (ADR-0009, **PROPOSED** — accepted only after a real build + boot). Supersedes ADR-0001 Fedora bootc. |
-| Desktop decision | KWin 6 (Wayland) + own Zaldros shell components in Qt6/QML (ADR-0002, ADR-0003) |
-| Reality audit | `docs/REALITY_AUDIT.md` — project was documentation+backend only until 2026-08-23 |
-| Shipping code | `zaldros-sysprobe`, `zaldros-hwinfo`, `zaldros-compat`, `zaldros-bench` (all v0.1.0) + `shell/zaldros-shell` prototype — 44 tool tests + 9 shell tests passing |
-| Blocked on | a Linux build host with podman + /dev/kvm (or enabled GitHub Actions) — needed to build and boot the images and to record any hardware evidence |
+| Product | Zaldros OS; naming authority: ../NAMING.md / ADR-0006 |
+| Specification | All five parts in spec/; phases 0–14 remain specification categories, not sequential completion claims |
+| Base | Ubuntu 26.04 live ISO is the active implementation candidate; ADR-0009 remains PROPOSED until accepted by its gate |
+| Desktop | KWin 6/Wayland + own Qt/QML shell; internal QML windows and real compositor windows must be verified separately |
+| Variant | full/services/legacy comparison still open; full is the first smoke-test control, not an accepted winner |
+| Current implementation evidence | Local unit, mock-service bus, filesystem/PTY and offscreen checks; actual target-service/VM/hardware evidence is not refreshed here |
+| Updates/recovery | Query/refresh implemented; complete update/install/recovery lifecycle not delivered; apt has no inherited bootc atomicity |
+| Current work | P01 DONE; next P02: asset provenance and rootfs verification before extraction |
 
-## Done
-- Specification parts 1–2 preserved verbatim in `spec/`
-- Naming authority recorded (`docs/NAMING.md`): official name **Zaldros OS**, not "Zaldros OS"
-- Base distribution research and decision
-- Desktop/compositor/toolkit research and decision
-- Architecture, roadmap, risks, performance, security and testing strategies
-- First component built and tested: `zaldros-sysprobe`
-- CI: unit tests + live service-map and hardware-inventory runs on a real systemd host, artefacts published
-- PART 3 integrated: `docs/architecture/SYSTEM_APPS.md` — build/reuse decision for every system app
-- Second component: `tools/zaldros-hwinfo` v0.1.0 (Device Manager / System Information backend)
-- PART 4 integrated: `docs/architecture/COMPATIBILITY_AND_HARDWARE.md`
-- Third component: `tools/zaldros-compat` v0.1.0 — compatibility registries with a CI evidence gate
-- `build/Containerfile.base` + `build/Containerfile.desktop` written (**never built — no build host**)
-- PART 5 integrated: combined-spec audit (`docs/SPEC_AUDIT.md`), feature matrix, roadmap renumbered to phases 0–14
-- Fourth component: `tools/zaldros-bench` v0.1.0 — baseline/compare harness (PART 5 §1)
-- Spec §14 document set complete: README, ARCHITECTURE, BUILD, INSTALL, RECOVERY, SECURITY, PERFORMANCE, COMPATIBILITY, CONTRIBUTING, THIRD_PARTY_LICENSES, CHANGELOG
+## Verification
 
-## Next
-1. Answers to the 7 open questions in `docs/SPEC_AUDIT.md` §E (name, license, locale, encryption default, Secure Boot, build host, reference hardware).
-2. `Containerfile` for `zaldros-base` (core, no shell) + `zaldros-desktop`, built in CI.
-3. QEMU boot smoke test; attach the `zaldros-sysprobe` map and baseline metrics to the build.
-4. Turn the map into the three performance profiles as systemd presets.
+P01 repeated tools: **44 passed**. Focused Settings/backend/files/KWin-wiring checks:
+**112 passed, zero skips**, 72.69s. The preceding audit of the same source HEAD ran
+shell/backend: **514 passed, 1 skipped** (Pillow missing), 61 forkpty warnings.
+Office: Writer audit **9 passed / 6 skipped**; P01 Sheets **6 passed / 9 skipped**,
+Slides **3 passed / 12 skipped**. Missing LibreOffice/UNO means no Office engine
+readiness claim. Compatibility registry check: 8 app / 13 hardware entries accepted
+by the evidence gate; this does not establish compatibility on real hardware.
 
-## Open questions for the owner
-- **Name collision:** an unrelated project zaldroslinux.org already uses "Zaldros OS". Keep it or
-  differentiate before release?
-- Target hardware for the first baseline (which machine defines "reference laptop")?
-- Is a Linux build host / self-hosted runner available for image builds and VM tests?
+No current-SHA ISO build/boot, real KWin session, installed-system test, or physical
+hardware run was performed in this cycle. The current container lacks a confirmed
+running systemd desktop and QEMU/KVM prerequisites. This is an environment limitation
+for those checks, not evidence that every service adapter is broken.
 
-- Run #18: all CI jobs green, boot=FAIL on all 9 (systemd/app_launch), root causes fixed in run #19 candidate. Architecture: NOT ACCEPTED. [ci run 32670157459, 2026-08-23]
-- Run #24: iso + CI green, boot=FAIL on all 9 (`shell`) — the ISO never shipped `data/pinned.json`.
-  Fixed in the run #25 candidate together with a flat-layout guard test. [ci run 32675722125, 2026-08-24]
-- Run #27 (visual parity cycle 1): Windows 11 geometry measured into `system/theme/win11-reference.json`; `tools/visual/parity.py` reports 29/29 component checks matching; Explorer and Settings became real applications. Boot verdict unchanged from run #25 (PASS 9/9). [local render + pytest, 2026-08-26]
-- Диспетчер задач (ADR-0016): процессы, ЦП/память/диск/сеть/GPU/автозагрузка из `/proc` и sysfs;
-  закрытое окно не делает ни одного чтения (проверено тестом). Семь кадров попиксельно идентичны
-  HEAD `89975d5`, паритет 41/41, shell 372 passed + 1 skipped, tools 44. На живом железе не
-  проверялось. [local pytest + parity, 2026-08-28]
+## Confirmed issues and priorities
 
+1. **P0 / P02:** rootfs fetch goes directly from curl to tar without checking an
+   authenticated checksum manifest. Fix verification before a privileged build.
+2. **P1 / P04:** synchronous GUI-to-service path and reconnect/subscription recovery
+   need fault-injection evidence and an operation lifecycle.
+3. **P1 / P05:** taskbar and internal window model do not prove external-window behavior.
+4. **P1 / P16:** Settings fonts says Selawik while the shell preference is PT Sans.
+   Sixteen toggle rows have no backend control; static status must not imply measurement.
+5. **P1 / P03:** ISO path filters omit backend/apps/assets; Office jobs described in
+   docs are absent from the active CI workflow.
 
-## Ночь 28 августа 2026
+See F01–F12 and D01/D02 in the capability register for scope and confidence.
+No functional application code was changed by P01.
 
-Диспетчер задач (ADR-0016), Диспетчер устройств (ADR-0017), пути записи для сети/звука/Bluetooth/
-питания (ADR-0018), терминал (ADR-0019), Writer частично (ADR-0020, движка в песочнице нет),
-ввод в ячейку в Sheets, Slides на живом движке Impress (ADR-0022). Гейты: shell 441 passed +
-1 skipped, tools 44, sheets 15, slides 15, writer 9 + 6 skipped, соответствие Windows 11 41/41,
-семь эталонных кадров отличаются только часами. Полный разбор — в `NIGHTLY_REPORT.md`.
-[замерено в песочнице, 2026-08-28]
+## Historical evidence — preserved, not revalidated
+
+The [previous state document](history/pre-P01/PROJECT_STATE.md) is preserved byte for
+byte, including earlier contradictory “not built” and “boot PASS” claims. It is an
+archive, not current status. The [previous roadmap](history/pre-P01/ROADMAP.md) is
+also retained. Historical iteration reports and ADRs remain unchanged.
+
+BUILD.md reports ISO workflow 33157358995 (2026-08-28, b85017e) with green build/boot
+jobs. Other reports describe earlier failures and fixes, including switcher issues.
+Those remote artifacts were not downloaded or independently checked in this cycle;
+no historical PASS is silently promoted to a current-SHA acceptance.
+
+## Remaining external decisions
+
+Reference hardware for Wi-Fi/Bluetooth/GPU/suspend evidence; appropriate VM host;
+Secure Boot/release signing policy; brand trademark clearance before release.
+Name, license, default languages and opt-in encryption already have owner decisions
+(ADR-0005/0006); do not ask those resolved questions again.
