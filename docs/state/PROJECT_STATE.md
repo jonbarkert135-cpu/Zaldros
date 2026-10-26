@@ -29,12 +29,15 @@ OS, installed system, or fully working backend is **not established**.
 
 ## Verification
 
-Current functional-gate change: **612 passed, no skips**, 62 existing forkpty
-warnings, exit 0, 152.85s. Focused gate/producer/report checks: **126 passed**;
+Current functional-gate change: **613 passed, no skips**, 62 existing forkpty
+warnings, exit 0, 152.23s. Focused gate/producer/report checks before the geometry
+regression: **126 passed**; producer/gate including that regression: **73 passed**;
 tools: **44 passed**. Replaying the nine archived reports now returns exit 1 for
 six legacy/services screenshot failures, including errors mislabeled PASS.
 The guest producer, window readbacks and missing kwin-common runtime plugin are
-also corrected; a fresh ISO/VM run is required for confirmation.
+also corrected. Run `40353950450` confirms decoded screenshots in all nine VMs,
+but correctly fails all nine window_move checks. A Qt gadget/Wayland geometry
+request bug is reproduced and fixed locally; fresh VM confirmation is required.
 
 After canonical-branding cleanup and installation of the missing visual-test
 dependencies: **538 passed, no skips**, 62 forkpty warnings, exit 0, 146.71s.

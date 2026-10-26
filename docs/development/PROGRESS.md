@@ -312,6 +312,25 @@ PR #3 обновляется; до нового VM прогона эти screens
 Предложенные владельцем варианты нового имени обсуждаются отдельно; переименование
 без выбранного окончательного имени в этот PR не добавлялось.
 
+### Исправление перемещения Wayland
+
+Run [40353950450](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40353950450)
+на `e5c98f0` завершился failure: девять window_move FAIL, остальные обязательные
+шаги PASS. Все девять screenshot теперь содержат свежие PNG 1280×800; это
+подтверждает исправление пакетов, но не является приёмкой всей матрицы.
+Точные commits диагностических отчётов сохранены в
+`docs/state/evidence/functional-gate/geometry-failure.json` с ограничением provenance.
+
+Причина воспроизведена реальным QJSEngine и QObject с QRectF: запись g.x/g.y
+отправляет промежуточные setters, последняя запись возвращает исходные координаты
+до Wayland ack. Новый regression на старом коде: 1 failed. Отправляем одно
+отдельное значение x/y/width/height; этот формат подтверждён исходником
+[KWin v6.6.6 scripting.cpp](https://github.com/KDE/kwin/blob/v6.6.6/src/scripting/scripting.cpp).
+Focused producer/gate: 73 passed. Подтверждение в VM требуется заново.
+Полный набор после исправления: **613 passed / 0 skipped**, 62 прежних forkpty
+warnings, 152.23s; tools: **44 passed**. Лог:
+`/tmp/zaldros-functional-geometry-tests.log`. Assertions/gate не ослаблялись.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

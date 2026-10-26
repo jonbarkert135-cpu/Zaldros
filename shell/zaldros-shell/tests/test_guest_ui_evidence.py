@@ -94,6 +94,37 @@ def test_move_requires_same_window_geometry_to_change(window_probe):
     assert 'String(w.internalId) === "target"' in commands[0]
 
 
+def test_move_submits_one_detached_rectangle_before_wayland_ack(window_probe, qt_app):
+    """Qt gadget writes call the setter immediately; Wayland reads stay old until ack."""
+    from PySide6.QtCore import QObject, Property, QRectF
+    from PySide6.QtQml import QJSEngine
+
+    class PendingWindow(QObject):
+        def __init__(self):
+            super().__init__()
+            self.requests = []
+
+        def geometry(self):
+            return QRectF(256, 115, 800, 500)
+
+        def request(self, value):
+            self.requests.append(value.toVariant() if hasattr(value, "toVariant") else value)
+
+        frameGeometry = Property("QVariant", geometry, request)
+        internalId = Property(str, lambda self: "target", constant=True)
+
+    readings, commands = window_probe
+    readings([window(x=256, y=115)], [window(x=376, y=195)])
+    guest._move()
+    target = PendingWindow()
+    engine = QJSEngine()
+    engine.globalObject().setProperty("target", engine.newQObject(target))
+    engine.evaluate("var workspace = {windowList: function() {return [target];}};")
+    result = engine.evaluate(commands[0])
+    assert not result.isError(), result.toString()
+    assert target.requests == [{"x": 376, "y": 195, "width": 800, "height": 500}]
+
+
 @pytest.mark.parametrize("after", [[window()], [window("other", x=130)], []])
 def test_existing_or_other_window_does_not_prove_a_move(window_probe, after):
     readings, _ = window_probe

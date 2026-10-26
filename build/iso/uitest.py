@@ -266,7 +266,11 @@ def _move():
     before = _target_window()
     if before is None:
         return False
-    _for_test_window("var g = w.frameGeometry; g.x += 120; g.y += 80; w.frameGeometry = g;")
+    # Qt's QRectF gadget is a live property reference: changing g.x/g.y issues
+    # intermediate requests, then the final assignment can restore the unacked
+    # geometry. KWin registers plain JS rectangle conversion; submit one value.
+    _for_test_window("var g = w.frameGeometry; w.frameGeometry = "
+                     "{x: g.x + 120, y: g.y + 80, width: g.width, height: g.height};")
     time.sleep(0.5)
     after = _target_window()
     if after is None or (before.get("x"), before.get("y")) == (after.get("x"), after.get("y")):

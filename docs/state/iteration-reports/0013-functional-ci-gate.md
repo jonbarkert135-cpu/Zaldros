@@ -54,3 +54,16 @@ Window probes now track one Dolphin UUID and verify its actual state/geometry.
 to exercise failure through the real producer instead of matching an error string.
 Replay now rejects six original screenshot failures including the in-band error
 cases. A new remote run is required; earlier green jobs are not reused as proof.
+
+**WAYLAND GEOMETRY FOLLOW-UP** — Run `40353950450` on `e5c98f0` correctly
+failed all nine boot jobs on window_move. All nine screenshot probes now produced
+decoded 1280×800 PNG files; minimize/restore and host steps passed. Exact report
+commits and observations: `../evidence/functional-gate/geometry-failure.json`.
+The Qt gadget reference generated three geometry setter calls, ending with the
+old geometry before the asynchronous Wayland acknowledgement. A real QJSEngine/
+QObject regression reproduces that behavior: old code fails, the detached single
+rectangle request passes. KWin v6.6.6 scripting.cpp explicitly registers conversion
+of plain objects with x/y/width/height. The acceptance assertion remains strict;
+a new nine-VM run must confirm the geometry fix.
+Local verification after this fix: 613 passed, zero skips, 62 existing forkpty
+warnings, 152.23s; producer/gate 73 passed, tools 44 passed.
