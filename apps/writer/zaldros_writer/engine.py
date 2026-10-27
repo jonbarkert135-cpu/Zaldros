@@ -144,6 +144,14 @@ class Document:
         return "\n".join(chunks)
 
     def paragraphs(self) -> list[Paragraph]:
+        try:
+            return self._read_paragraphs()
+        except EngineError:
+            raise
+        except Exception as exc:
+            raise EngineError(_("Writer не прочитал документ: {error}").format(error=exc)) from exc
+
+    def _read_paragraphs(self) -> list[Paragraph]:
         out: list[Paragraph] = []
         enumeration = self._doc.getText().createEnumeration()
         index = 0
@@ -195,6 +203,102 @@ class Document:
             cursor.ParaStyleName = style
         if text:
             body.insertString(cursor, text, False)
+
+    @staticmethod
+    def _text_offset(cursor, count: int, select: bool = False) -> None:
+        # UNO takes a signed short. Validate the selected text before any write.
+        while count:
+            step = min(count, 32767)
+            if not cursor.goRight(step, select):
+                raise EngineError(_("Позиция текста вне абзаца"))
+            count -= step
+
+    @staticmethod
+    def _units(text: str) -> int:
+        return len(text.encode("utf-16-le")) // 2
+
+    def _cursor_after(self, paragraph, prefix: str):
+        # Qt positions are UTF-16. UNO versions may count a surrogate pair as one
+        # character or two units. Match the actual range, never guess an offset.
+        for count in dict.fromkeys((len(prefix), self._units(prefix))):
+            cursor = paragraph.getText().createTextCursorByRange(paragraph.getStart())
+            try:
+                self._text_offset(cursor, count, True)
+            except EngineError:
+                continue
+            if cursor.getString() == prefix:
+                cursor.collapseToEnd()
+                return cursor
+        raise EngineError(_("Writer не подтвердил позицию текста"))
+
+    def replace_paragraph_text(self, index: int, before: str, after: str) -> None:
+        """Replace only the changed span, preserving untouched runs and paragraph structure."""
+        if any(char in after for char in ("\r", "\n", "\u2029", "\x00")):
+            raise EngineError(_("Новый абзац создаётся клавишей Enter"))
+        try:
+            after.encode("utf-16-le")  # refuse unmatched surrogates before touching the document
+            paragraph = self._paragraph(index)
+            if paragraph.getString() == after:
+                return  # safe retry after a successful write whose readback failed
+            if paragraph.getString() != before:
+                raise EngineError(_("Абзац изменён в движке. Обновите документ перед повторной правкой"))
+            prefix = 0
+            while prefix < min(len(before), len(after)) and before[prefix] == after[prefix]:
+                prefix += 1
+            suffix = 0
+            while (suffix < min(len(before), len(after)) - prefix
+                   and before[len(before) - 1 - suffix] == after[len(after) - 1 - suffix]):
+                suffix += 1
+            if before == after:
+                return
+            old_end = len(before) - suffix
+            new_end = len(after) - suffix
+            cursor = self._cursor_after(paragraph, before[:prefix])
+            end = self._cursor_after(paragraph, before[:old_end])
+            cursor.gotoRange(end, True)
+            cursor.setString(after[prefix:new_end])
+        except EngineError:
+            raise
+        except Exception as exc:
+            raise EngineError(_("Writer не изменил текст: {error}").format(error=exc)) from exc
+
+    def split_paragraph(self, index: int, position: int) -> None:
+        try:
+            paragraph = self._paragraph(index)
+            encoded = paragraph.getString().encode("utf-16-le")
+            if not 0 <= position <= len(encoded) // 2:
+                raise ValueError("offset")
+            prefix = encoded[:position * 2].decode("utf-16-le")  # no split inside a surrogate pair
+            cursor = self._cursor_after(paragraph, prefix)
+            paragraph.getText().insertControlCharacter(cursor, 0, False)
+        except EngineError:
+            raise
+        except Exception as exc:
+            raise EngineError(_("Writer не разделил абзац: {error}").format(error=exc)) from exc
+
+    def merge_paragraph(self, index: int) -> None:
+        """Join with the immediately preceding body paragraph, never across a table."""
+        try:
+            elements = self._doc.getText().createEnumeration()
+            previous = None
+            position = 0
+            while elements.hasMoreElements():
+                element = elements.nextElement()
+                if element.supportsService("com.sun.star.text.Paragraph"):
+                    if position == index:
+                        if previous is None or not previous.supportsService("com.sun.star.text.Paragraph"):
+                            raise EngineError(_("Нельзя объединить абзацы через таблицу или границу документа"))
+                        cursor = element.getText().createTextCursorByRange(previous.getEnd())
+                        cursor.gotoRange(element.getStart(), True)
+                        cursor.setString("")
+                        return
+                    position += 1
+                previous = element
+            raise EngineError(_("Нет абзаца с номером {index}").format(index=index))
+        except EngineError:
+            raise
+        except Exception as exc:
+            raise EngineError(_("Writer не объединил абзацы: {error}").format(error=exc)) from exc
 
     def _paragraph(self, index: int):
         """Use the same top-level paragraph indexing as paragraphs(), skipping tables."""
@@ -292,13 +396,15 @@ class Document:
             return []
 
     # --- files -------------------------------------------------------------------------
-    def save_as(self, path: str | os.PathLike[str], *, keep_open: bool = True) -> Path:
+    def save_as(self, path: str | os.PathLike[str], *, keep_open: bool = True,
+                overwrite: bool = False) -> Path:
         target = Path(path).expanduser().resolve()
         suffix = target.suffix.lower()
         if suffix not in FILTERS:
             raise EngineError(f"неизвестный формат {suffix!r}; известные: "
                               f"{', '.join(sorted(FILTERS))}")
-        args = (self._engine._property("FilterName", FILTERS[suffix]),)
+        args = (self._engine._property("FilterName", FILTERS[suffix]),
+                self._engine._property("Overwrite", overwrite))
         try:
             if keep_open:
                 self._doc.storeToURL(target.as_uri(), args)

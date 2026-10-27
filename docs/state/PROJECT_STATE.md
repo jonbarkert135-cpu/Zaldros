@@ -1,9 +1,9 @@
 # Project state — 2026-10-27
 
-The Writer Home cycle starts from main `c907842411cf80cae27f50ac99c9e8c5aea740b7`
-(development bootstrap PR #6 merged).
+The Writer editing cycle starts from main `4514ba65742a8072731e1d8a5d808f25eb43aa35`
+(Writer Home PR #7 merged).
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
-Office engine/UI verified source: `babdfe8c287872b219b930eef0b72d0c7277b65a`.
+Office engine/UI verified source: `747cb015a8d78bba1bb917b7c1db8d287ab99d59`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
 old current-status summary; it does not retrospectively reclassify historical runs.
 
@@ -31,6 +31,15 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+Writer editing follow-up: local optional suite **14 passed / 18 skipped** because
+this interpreter lacks UNO; tools **81 passed**. Stable inline editors, guarded
+draft flushing, paragraph split/join and local save/unsaved-close UI are implemented.
+Source `747cb01`, CI `40565144511`: **all eight job types PASS**, Writer **32**,
+Sheets **15**, Slides **15**, zero failures/skips on real LibreOffice/UNO. Tests
+include unchanged mixed-run preservation, Unicode/table boundaries, actual Qt text
+input/caret and two Ctrl+S saves/reopen for DOCX/ODT. Limits and exact scope:
+iteration 0018 and [acceptance](evidence/writer-editing/acceptance.json).
 
 Writer Home (P19 partial): grouped font/size, character toggles, alignment and
 style controls now target a selected whole paragraph through the existing UNO
