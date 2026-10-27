@@ -83,6 +83,13 @@ Python with `--require-virtualenv`; user site packages are disabled. A failed in
 can leave a partial venv and returns nonzero; choose a new target or repair the
 explicit development directory rather than replacing an unrelated user folder.
 
+Child processes ignore `PYTHONPATH`/`PYTHONHOME`, pip destination/extra-requirement
+overrides and user/system pip configuration files. Network/source/TLS/verification
+options listed in `PIP_SOURCE_OPTIONS` are retained, including configured indexes,
+wheelhouses and hash requirements. Configure private indexes via `PIP_INDEX_URL`
+or `PIP_EXTRA_INDEX_URL`; the bootstrap does not echo network-option values. These
+changes apply to child processes, not the caller's environment.
+
 Direct versions live once in `tools/dev/constraints.txt`. The tools, shell and
 Office requirement files reference those pins. This fixes direct dependencies;
 transitive packages, interpreter builds and apt repositories are not an immutable

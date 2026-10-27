@@ -488,6 +488,35 @@ P19 prompt: Calc/Writer/Impress остаются; UI-команды связыв
 P03 hardening и P02 licensing остаются отдельными задачами; P04 async/recovery
 переходит к измеряемому прототипу после подготовки этой воспроизводимой базы.
 
+### Bootstrap — первая удалённая приёмка и изоляция pip destination
+
+Source `85cec3877d44373b29f32efa13e6e18712ab50b8`:
+normal CI `40467806652` — **8/8 PASS**, реальные Checks annotations подтверждают
+вызов нового bootstrap для tools/shell/office. Tools/shell Python 3.12.15,
+Office Python 3.12.3 + системный UNO + LibreOffice 24.2.7.2. **47 Office tests PASS,
+0 skipped**. Receipt: `docs/state/evidence/development-bootstrap/ci-acceptance.json`.
+ISO `40467806594`: **3/3 builds, 9/9 boots, 99/99 required UI PASS**;
+строгий replay exit 0. Exact commits/ограничения: `iso-acceptance.json` там же.
+
+Локальные own-app chrome captures из новой shell venv сохранены для сравнения с
+присланными Windows Office примерами: три PNG + `office-chrome.json`. Это baseline
+без UNO/открытого документа, не функциональная или pixel-parity приёмка. В brief
+перечислены реальные пробелы Writer/Slides ribbon, own-brand captions и локализации.
+
+Во время review обнаружен конкретный выход за target через ambient pip config:
+проверка старого child_environment — **1 failed / 1 passed**. Child-процессы теперь
+игнорируют destination/extra-requirement overrides, user/system pip config и
+PYTHONPATH/PYTHONHOME, сохраняя network/TLS/hash-policy env options. На настоящем
+fresh tools setup с PIP_TARGET/PREFIX/USER/LOG/config + подложным pytest в PYTHONPATH
+сторонние destinations не созданы, импортирован правильный pytest. Доказательство:
+`destination-isolation.json`; финальные checks/hash/80 tools: `local-final-checks.json`.
+Исходный local-setup.json сохранён с прежним hash и 613 shell pass, без перелэйбливания.
+
+Эта правка bootstrap требует нового normal CI. ISO recipe/runtime/engine код не
+меняются; повторный тяжёлый ISO не нужен для финальных tools/docs-only изменений.
+Далее: CI hardened source → normal merge → измеряемый P04 slice. P02 licensing,
+полная lock/snapshot воспроизводимость и permission hardening остаются открытыми.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

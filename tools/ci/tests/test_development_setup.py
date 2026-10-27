@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Bootstrap failures must not overwrite user directories or install into global Python."""
 import importlib.util
+import os
 from pathlib import Path
 import sys
 import venv
@@ -145,3 +146,27 @@ def test_constraints_reject_duplicate_versions(tmp_path, monkeypatch):
     monkeypatch.setattr(setup, "CONSTRAINTS", constraints)
     with pytest.raises(RuntimeError, match="duplicate dependency pin"):
         setup.expected_versions("tools")
+
+
+def test_child_environment_ignores_destination_overrides_without_changing_parent(monkeypatch):
+    overrides = {"PIP_TARGET": "/outside/target", "PIP_PREFIX": "/outside/prefix",
+                 "PIP_USER": "1", "PIP_LOG": "/outside/log", "PIP_CONSTRAINT": "/outside/constraints",
+                 "PYTHONHOME": "/outside/python", "PYTHONPATH": "/outside/modules"}
+    for key, value in overrides.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setenv("PIP_CONFIG_FILE", "/outside/pip.conf")
+    env = setup.child_environment()
+    assert all(key not in env for key in overrides)
+    assert env["PIP_CONFIG_FILE"] == os.devnull
+    assert all(os.environ[key] == value for key, value in overrides.items())
+
+
+def test_child_environment_keeps_network_configuration(monkeypatch):
+    monkeypatch.setenv("PIP_INDEX_URL", "https://packages.example/simple")
+    monkeypatch.setenv("PIP_CERT", "/trusted/ca.pem")
+    monkeypatch.setenv("PIP_REQUIRE_HASHES", "1")
+    env = setup.child_environment()
+    assert env["PIP_INDEX_URL"] == "https://packages.example/simple"
+    assert env["PIP_CERT"] == "/trusted/ca.pem"
+    assert env["PIP_REQUIRE_HASHES"] == "1"
+    assert env["PIP_REQUIRE_VIRTUALENV"] == "1"

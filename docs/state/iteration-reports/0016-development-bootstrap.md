@@ -33,6 +33,24 @@ development dependencies, not system services or an installed OS. Local UNO is a
 real Office readiness must come from remote engine/UI tests. Owner screenshots remain
 conversation references; no fabricated pixel measurement or UI implementation is claimed.
 
+**INITIAL REMOTE ACCEPTANCE** — Source `85cec38`, CI `40467806652`: all eight
+jobs PASS. Live environment annotations confirm shared setup in all three profiles;
+Python 3.12.15 for tools/shell and 3.12.3/system UNO for Office. Writer/Sheets/Slides:
+47 passed / 0 skipped on LibreOffice 24.2.7.2. ISO `40467806594`: three builds,
+nine boots and strict replay of 99 required UI checks PASS. Receipts are preserved
+as `ci-acceptance.json` and `iso-acceptance.json` in this iteration's evidence directory.
+
+**DESTINATION FIX** — Review exposed ambient PIP_TARGET/config redirects despite
+the venv interpreter guard. Regression on the previous child environment: 1 failed,
+1 passed. Ignore destination/extra-requirement overrides and pip config files in
+children; preserve explicit source/TLS/hash-policy environment settings. Disable
+ambient PYTHONPATH/PYTHONHOME in children. Actual fresh tools setup under conflicting
+target/prefix/user/log/config/module overrides writes only the requested venv.
+Final local tools: 80 passed; current target imports/read-only checks pass. The
+earlier fresh-shell receipt is retained with its original code hash. A fresh remote
+run is required for this refinement. Actual receipts: destination-isolation.json
+and local-final-checks.json; UI/engine/recipe sources remain unchanged.
+
 **NEXT** — Publish PR, verify all three profiles in normal CI and required real-UNO
 suites, inspect any ISO triggered by the shell README update, and merge normally.
 Then proceed to the measured P04 operation/recovery slice; P02 licensing and remaining

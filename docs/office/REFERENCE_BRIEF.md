@@ -47,3 +47,26 @@ do not turn its displayed pixels into claimed original measurements.
 These screenshots are currently conversation references, not newly archived
 files in the repository's reference library. This iteration records the UI target;
 it does not claim that the supplied designs have already been implemented.
+
+## Current own-app baseline
+
+Captured from source `85cec38` using the fresh shell venv at 1280×800, offscreen,
+without UNO or an open document: [Writer](../state/evidence/development-bootstrap/writer-chrome.png),
+[Sheets](../state/evidence/development-bootstrap/sheets-chrome.png),
+[Slides](../state/evidence/development-bootstrap/slides-chrome.png).
+Hashes, commands and scope: [office-chrome.json](../state/evidence/development-bootstrap/office-chrome.json).
+
+Observed gaps to address in P19:
+
+- Sheets already has ribbon/formula/grid/sheet regions; compare grouping/density
+  and verify selection/formatting against real Calc state with an open workbook.
+- Writer's ribbon is mostly text commands. It needs engine-backed font/paragraph
+  controls, style-gallery presentation and a Word-specific layout baseline.
+- Slides has the thumbnail/canvas/notes regions but a minimal ribbon and limited
+  content presentation. Expand from real Impress capabilities and document fixtures.
+- Current reference-style window captions, mixed language and font labels need
+  review against the own-branding/localization/document-state contract above.
+
+These images verify that the chrome renders in the new environment. Their empty
+or unavailable-document state is explicit; they do not demonstrate working Office
+editing or parity with the owner's reference screenshots.

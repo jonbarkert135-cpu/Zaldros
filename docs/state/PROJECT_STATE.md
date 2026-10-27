@@ -36,7 +36,12 @@ preparation script used locally/CI. Actual fresh local venvs: **78 tools passed*
 **613 shell passed / zero skips**, 62 existing forkpty warnings, 148.98s. Read-only
 inspection preserves venv file sizes/mtimes; repeated setup succeeds. Actual default
 Office interpreter lacks UNO and fails before target creation. Remote bootstrap/UNO
-confirmation is pending. Receipt: [local setup](evidence/development-bootstrap/local-setup.json).
+confirmation is recorded for initial source 85cec38: eight CI jobs and all 47
+Office tests pass. A subsequent pip-destination isolation fix has 80 local tools
+tests and actual hostile-config verification; fresh CI for it is pending.
+Receipts: [local setup](evidence/development-bootstrap/local-setup.json),
+[initial CI](evidence/development-bootstrap/ci-acceptance.json),
+[destination isolation](evidence/development-bootstrap/destination-isolation.json).
 The new Office UI instruction preserves Calc/Writer/Impress engines; its screenshot
 reference brief is linked in P19. No UI refresh is claimed by the bootstrap.
 
@@ -130,7 +135,8 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
    tools 65 passed; source 38ba104 passes all nine VM targets. Office CI remains
    verified at 47 tests without skips on 50555ce. Other P03 bootstrap/reproducibility
    stays open. A shared rootless dev bootstrap is locally verified; its CI confirmation
-   is pending in iteration 0016.
+   is recorded for initial source 85cec38 in iteration 0016; final destination
+   hardening is locally verified and requires its fresh CI.
 6. **P1 / P03/P17:** report.py previously gated only on `boot`, so a guest UI step
    could report FAIL while the workflow was green. **D03 fixed and VM-verified**
    on 4c35535: boot facts and eleven UI steps gate all nine targets. The missing

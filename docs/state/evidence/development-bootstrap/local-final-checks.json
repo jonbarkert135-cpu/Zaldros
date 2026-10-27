@@ -1,0 +1,41 @@
+{
+  "bootstrap_sha256": "2446329558d8c4e4ec9f9e97ff1303bbbaca442e6aeb0f564889a18f832a4736",
+  "tools_passed": 80,
+  "tools": {
+    "base_prefix": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python",
+    "executable": "/workspace/Zaldros/.venv-tools/bin/python",
+    "packages": {
+      "pytest": "9.1.1"
+    },
+    "prefix": "/workspace/Zaldros/.venv-tools",
+    "profile": "tools",
+    "python": "3.12.14",
+    "readiness": "dependencies-imported",
+    "uno_module": null,
+    "version_info": [
+      3,
+      12
+    ]
+  },
+  "shell": {
+    "base_prefix": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python",
+    "executable": "/workspace/Zaldros/.venv/bin/python",
+    "packages": {
+      "Pillow": "13.0.0",
+      "PySide6-Essentials": "6.12.0",
+      "numpy": "2.5.4",
+      "pytest": "9.1.1"
+    },
+    "prefix": "/workspace/Zaldros/.venv",
+    "profile": "shell",
+    "python": "3.12.14",
+    "readiness": "dependencies-imported",
+    "uno_module": null,
+    "version_info": [
+      3,
+      12
+    ]
+  },
+  "readonly_venv_snapshot_unchanged": true,
+  "scope": "Final helper checks on the prepared environments plus 80 tool tests; original 613-test fresh shell run is retained separately."
+}

@@ -1,0 +1,400 @@
+{
+  "source_commit": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-27T07:33:11Z",
+    "event": "push",
+    "head_sha": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+    "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40467806594",
+    "id": 40467806594,
+    "status": "completed"
+  },
+  "jobs": [
+    {
+      "name": "build (services)",
+      "conclusion": "success"
+    },
+    {
+      "name": "build (legacy)",
+      "conclusion": "success"
+    },
+    {
+      "name": "build (full)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (services, low)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (services, modern)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (legacy, modern)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (full, mid)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (legacy, low)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (services, mid)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (full, modern)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (full, low)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (legacy, mid)",
+      "conclusion": "success"
+    }
+  ],
+  "builds": [
+    {
+      "variant": "full",
+      "report_commit": "e8d9245110c091aadc58d71085f8a72f205d10d0",
+      "subject": "diagnostics: run 40467806594 full success"
+    },
+    {
+      "variant": "services",
+      "report_commit": "1f1cff841376651a95056f0566cdc1b21b0cfe9a",
+      "subject": "diagnostics: run 40467806594 services success"
+    },
+    {
+      "variant": "legacy",
+      "report_commit": "186e25f346e9a3cdbdb51cf91c14fc7bc37e68e1",
+      "subject": "diagnostics: run 40467806594 legacy success"
+    }
+  ],
+  "results": [
+    {
+      "variant": "full",
+      "profile": "low",
+      "report_commit": "5ff4aa865a22775dfa02d46024d7ac8635d7f072",
+      "published_at": "2026-10-27T07:46:29Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{3a552576-460f-4c4a-b498-1eec4c9382ab}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307329,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "mid",
+      "report_commit": "167035a3609a1c70dc53575d24c3edf7ad17673b",
+      "published_at": "2026-10-27T07:47:17Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{f0acbbe2-ee73-4bfe-b135-e0b3ab9e087d}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307097,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "modern",
+      "report_commit": "5d1befc8087ae878e95c59fb47ced6049fa5da71",
+      "published_at": "2026-10-27T07:46:30Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{81a87ddc-ce2f-4657-ada2-6da3e0cb7bc7}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307623,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "low",
+      "report_commit": "5a633609d1609b7e376979e819b6ee2a0537eb4a",
+      "published_at": "2026-10-27T07:45:54Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{a6c91b44-f592-41c9-920d-a9688d2c8eef}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309642,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "mid",
+      "report_commit": "ca868baa2a2762ceed10ebee09c858295581b926",
+      "published_at": "2026-10-27T07:48:09Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{959077c3-5114-4b46-a6e4-e86a0b57e619}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309563,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "modern",
+      "report_commit": "d33eb79cac073cb074c8154089be5b389652d58e",
+      "published_at": "2026-10-27T07:45:56Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{4d4bf618-8e90-4a92-ae39-8cc9b7624bfb}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309336,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "low",
+      "report_commit": "14a2f0867c793b569295739498e58d8429532384",
+      "published_at": "2026-10-27T07:46:06Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{269b1d86-b074-4425-8d17-1c4d506e998e}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309567,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "mid",
+      "report_commit": "de68fa3406f15dbbd60bb9ddbd452772e54c386f",
+      "published_at": "2026-10-27T07:54:08Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{3a7a163e-c58f-4689-98a6-6a7e900df6a4}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309355,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "modern",
+      "report_commit": "78aa940398618771c01b207ae3de9a1d890f0b23",
+      "published_at": "2026-10-27T07:46:44Z",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "window_id": "{591068cb-0375-48d8-8acf-37d937116de4}",
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309497,
+        "width": 1280,
+        "height": 800
+      }
+    }
+  ],
+  "strict_cli_exit": 0,
+  "required_ui_passes": 99,
+  "scope": "ISO run triggered by the shell README change. Actual recipe/runtime files are unchanged; this is existing boot/UI scope, not Office packaging or hardware certification.",
+  "provenance_limit": "Guest reports do not embed source SHA/run ID. Workflow source and diagnostic commits are pinned, and publication dates were checked against this run; end-to-end binding remains P17 work."
+}

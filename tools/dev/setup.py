@@ -15,6 +15,12 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 CONSTRAINTS = ROOT / "tools/dev/constraints.txt"
+PIP_SOURCE_OPTIONS = {
+    "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_NO_INDEX", "PIP_FIND_LINKS",
+    "PIP_TRUSTED_HOST", "PIP_CERT", "PIP_CLIENT_CERT", "PIP_PROXY",
+    "PIP_TIMEOUT", "PIP_DEFAULT_TIMEOUT", "PIP_RETRIES", "PIP_REQUIRE_HASHES",
+    "PIP_ONLY_BINARY", "PIP_NO_BINARY",
+}
 PROFILES = {
     "tools": (".venv-tools", "tools/dev/tools-requirements.txt", ["pytest"], ["pytest"]),
     "shell": (".venv", "tools/dev/shell-requirements.txt",
@@ -37,8 +43,14 @@ print(json.dumps({
 
 
 def child_environment():
-    return {**os.environ, "PYTHONNOUSERSITE": "1", "PYTHONDONTWRITEBYTECODE": "1",
-            "PIP_DISABLE_PIP_VERSION_CHECK": "1", "PIP_REQUIRE_VIRTUALENV": "1"}
+    # Destination/extra-requirement overrides must not escape the chosen venv.
+    # Keep source/TLS/verification settings without echoing their secret values.
+    inherited = {key: value for key, value in os.environ.items()
+                 if key not in {"PYTHONPATH", "PYTHONHOME"}
+                 and (not key.startswith("PIP_") or key in PIP_SOURCE_OPTIONS)}
+    return {**inherited, "PYTHONNOUSERSITE": "1", "PYTHONDONTWRITEBYTECODE": "1",
+            "PIP_DISABLE_PIP_VERSION_CHECK": "1", "PIP_REQUIRE_VIRTUALENV": "1",
+            "PIP_CONFIG_FILE": os.devnull}
 
 
 def probe(python, packages=(), modules=()):
