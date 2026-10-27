@@ -42,7 +42,11 @@ class RequiredOfficeTests:
         if report.skipped:
             self.skipped.append(report.nodeid)
         if report.failed:
-            annotate("error", "Office test failure", str(report.longrepr)[-5000:])
+            # Put the actual exception first. Long Unicode source excerpts can use
+            # the annotation's byte budget before the assertion is ever visible.
+            crash = getattr(report.longrepr, "reprcrash", None)
+            detail = f"{crash.message}\n{report.nodeid}" if crash else str(report.longrepr)
+            annotate("error", "Office test failure", detail.encode("utf-8")[:4500].decode("utf-8", errors="ignore"))
         if report.when == "call" and report.passed:
             self.passed[Path(report.nodeid.split("::", 1)[0]).name] += 1
 
@@ -92,7 +96,7 @@ def main(argv=None):
     import pytest
 
     args.junitxml.parent.mkdir(parents=True, exist_ok=True)
-    return int(pytest.main([str(ROOT / "apps" / args.app / "tests"), "-q", "-ra",
+    return int(pytest.main([str(ROOT / "apps" / args.app / "tests"), "-q", "-ra", "--tb=short",
                             f"--junitxml={args.junitxml.resolve()}"],
                            plugins=[RequiredOfficeTests()]))
 

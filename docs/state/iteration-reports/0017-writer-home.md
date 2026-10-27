@@ -42,3 +42,14 @@ Other Office apps and the backend operation/recovery P04 slice remain open.
 
 **NEXT** — Run real UNO CI, diagnose any failures, inspect evidence, then normal
 PR/main merge under repository rules. Preserve all failed/cancelled results.
+
+**INITIAL REAL-UNO FAILURE** — Source `600043a`, PR run `40556254699`, Writer job
+`122372995181`: 21 passed, 1 failed, zero skips (engine 14 / UI 7 passed). All mouse,
+keyboard and readback assertions reached the screenshot step. The concluding
+DOCX save/reopen path failed, but the long Unicode test-source annotation consumed
+the available diagnostic budget before the actual exception. Full original Checks
+payload is preserved in `initial-ci-failure.json`; it is not accepted as PASS.
+Job-log download returned no log in this environment. Emit the actual pytest crash
+message first, bounded in UTF-8 bytes, and use short terminal tracebacks. A real
+pytest regression with a long Unicode source ensures the exception survives.
+No document assertion has been removed; rerun is required to diagnose the cause.

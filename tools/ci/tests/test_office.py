@@ -68,3 +68,21 @@ def test_annotations_are_quiet_outside_actions(monkeypatch, capsys):
     monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
     office.annotate("notice", "Office test summary", "{}")
     assert not capsys.readouterr().out
+
+
+def test_failure_annotation_keeps_actual_unicode_exception_before_long_source(tmp_path):
+    (tmp_path / "test_engine.py").write_text(
+        "def test_failure():\n" + "    # длинный исходный код\n" * 400
+        + "    raise RuntimeError('DOCX round-trip diagnostic')\n")
+    command = ("import runpy,sys,pytest; "
+               f"gate=runpy.run_path({str(SCRIPT)!r})['RequiredOfficeTests'](); "
+               "sys.exit(pytest.main(['-q','.'],plugins=[gate]))")
+    import os
+    result = subprocess.run([sys.executable, '-c', command], cwd=tmp_path,
+                            capture_output=True, text=True, timeout=30,
+                            env={**os.environ, 'GITHUB_ACTIONS': 'true'})
+    assert result.returncode == 1
+    annotation = next(line for line in result.stdout.splitlines()
+                      if line.startswith('::error title=Office test failure::'))
+    assert 'RuntimeError: DOCX round-trip diagnostic' in annotation[:250]
+    assert len(annotation.encode('utf-8')) < 5000

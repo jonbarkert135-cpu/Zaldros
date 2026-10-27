@@ -1,0 +1,37 @@
+{
+  "source_commit": "600043adb400bf04300bf434930c75492488049b",
+  "workflow_run": 40556254699,
+  "job_id": 122372995181,
+  "result": "Writer 21 passed, 1 failed, zero skips; not accepted",
+  "annotations": [
+    {
+      "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+      "title": ""
+    },
+    {
+      "message": "Process completed with exit code 1.",
+      "title": ""
+    },
+    {
+      "message": "{\"scope\": \"Real UNO paragraph-formatting interaction, owned two-paragraph fixture\", \"viewport\": [1280, 800], \"device_pixel_ratio\": 1.0, \"selected_paragraph\": 1, \"paragraphs\": [{\"index\": 0, \"text\": \"\\u041f\\u0435\\u0440\\u0432\\u044b\\u0439 \\u0430\\u0431\\u0437\\u0430\\u0446\", \"style\": \"Standard\", \"bold\": false, \"italic\": false, \"underline\": false, \"size\": 13.0, \"alignment\": 0, \"font\": \"Monospace\"}, {\"index\": 1, \"text\": \"\\u0412\\u0442\\u043e\\u0440\\u043e\\u0439 \\u0430\\u0431\\u0437\\u0430\\u0446\", \"style\": \"Heading 1\", \"bold\": true, \"italic\": false, \"underline\": false, \"size\": 18.0, \"alignment\": 0, \"font\": \"Liberation Sans\"}], \"sha256\": \"b941bd053d20ffa0827d2da27c001c59b5595d13fd4693a6a44ac5f5eb3fd7f2\", \"source\": \"b0efad0baf35e805176c58d722a92a1bc205f45b\"}",
+      "title": "Writer UI evidence"
+    },
+    {
+      "message": "{\"collected\": 22, \"passed\": {\"test_engine.py\": 14, \"test_ui.py\": 7}, \"failed\": 1, \"skipped\": 0, \"exitstatus\": 1}",
+      "title": "Office test summary"
+    },
+    {
+      "message": "h('/tmp/pytest-of-runner/pytest-0/test_home_controls_edit_real_p0')\n\n    @needs_writer\n    def test_home_controls_edit_real_paragraph_and_saved_docx(qt_app, live_writer, tmp_path):\n        \"\"\"Mouse/keyboard -> QML -> model -> UNO -> reopened DOCX, including toggle off.\"\"\"\n        from PySide6.QtCore import Qt\n        from PySide6.QtTest import QTest\n        document = live_writer.new_document()\n        view = None\n        try:\n            document.append('\u041f\u0435\u0440\u0432\u044b\u0439 \u0430\u0431\u0437\u0430\u0446')\n            document.append_paragraph('\u0412\u0442\u043e\u0440\u043e\u0439 \u0430\u0431\u0437\u0430\u0446')\n            document.set_character_format(0, font='Liberation Serif', size=12,\n                                          bold=False, italic=False, underline=False)\n            document.set_character_format(1, font='Liberation Sans', size=18, bold=True)\n            model = DocumentModel(document)\n            view = writer_view(model)\n            qt_app.processEvents()\n            assert control(view, 'fontFamily').property('displayText') == 'Liberation Serif'\n            assert control(view, 'fontSize').property('value') == 120\n            for name, attribute in [('boldButton', 'bold'), ('italicButton', 'italic'),\n                                    ('underlineButton', 'underline')]:\n                click(view, name, qt_app)\n                assert getattr(document.paragraphs()[0], attribute) is True\n                assert control(view, name).property('checked') is True\n                click(view, name, qt_app)\n                assert getattr(document.paragraphs()[0], attribute) is False\n                assert control(view, name).property('checked') is False\n            for alignment in (3, 1, 2, 0):\n                click(view, 'alignment' + str(alignment), qt_app)\n                assert document.paragraphs()[0].alignment == alignment\n                assert control(view, 'alignment' + str(alignment)).property('checked') is True\n    \n            # The font picker and spin box use their real keyboard interaction paths.\n            family = control(view, 'fontFamily')\n            family.forceActiveFocus()\n            QTest.keyClick(view, Qt.Key.Key_Down)\n            qt_app.processEvents()\n            assert document.paragraphs()[0].font == family.property('currentText')\n            assert document.paragraphs()[0].font != 'Liberation Serif'\n            size = control(view, 'fontSize')\n            size.forceActiveFocus()\n            QTest.keyClick(view, Qt.Key.Key_Up)\n            qt_app.processEvents()\n            assert document.paragraphs()[0].size == 13\n    \n            click(view, 'paragraph1', qt_app)\n            assert model.selectedParagraph == 1\n            assert control(view, 'fontSize').property('value') == 180\n            assert control(view, 'fontFamily').property('displayText') == 'Liberation Sans'\n            assert control(view, 'boldButton').property('checked') is True\n            click(view, 'styleHeading 1', qt_app)\n            assert document.paragraphs()[1].style == 'Heading 1'\n            assert model.selection['size'] == document.paragraphs()[1].size\n            assert control(view, 'styleHeading 1').property('checked') is True\n            evidence = os.environ.get('ZALDROS_OFFICE_EVIDENCE_DIR')\n            if evidence:\n                import hashlib\n                import json\n                destination = Path(evidence)\n                destination.mkdir(parents=True, exist_ok=True)\n                image = view.grabWindow()\n                screenshot = destination / 'writer-home.png'\n                assert image.save(str(screenshot))\n                receipt = {'scope': 'Real UNO paragraph-formatting interaction, owned two-paragraph fixture',\n                           'viewport': [image.width(), image.height()],\n                           'device_pixel_ratio': image.devicePixelRatio(),\n                           'selected_paragraph': model.selectedParagraph,\n                           'paragraphs': model.paragraphs,\n                           'sha256': hashlib.sha256(screenshot.read_bytes()).hexdigest(),\n                           'source': os.environ.get('GITHUB_S",
+      "title": "Office test failure"
+    },
+    {
+      "message": "{\"python\": \"3.12.3\", \"libreoffice\": \"LibreOffice 24.2.7.2 420(Build:2)\", \"uno_module\": \"/usr/lib/python3/dist-packages/uno.py\", \"workflow_sha\": \"b0efad0baf35e805176c58d722a92a1bc205f45b\", \"run_id\": \"40556254699\"}",
+      "title": "Office runtime"
+    },
+    {
+      "message": "{\"base_prefix\": \"/usr\", \"executable\": \"/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python\", \"packages\": {\"PySide6-Essentials\": \"6.12.0\", \"pytest\": \"9.1.1\"}, \"prefix\": \"/home/runner/work/Zaldros/Zaldros/.venv-office\", \"profile\": \"office\", \"python\": \"3.12.3\", \"readiness\": \"dependencies-imported\", \"uno_module\": \"/usr/lib/python3/dist-packages/uno.py\", \"version_info\": [3, 12]}",
+      "title": "Development environment"
+    }
+  ],
+  "diagnostic_limit": "The failure annotation was truncated before its actual final exception; screenshot/metadata was emitted before the round-trip assertion and is not full acceptance."
+}
