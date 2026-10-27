@@ -1,7 +1,7 @@
 # Передача контекста
 
-Обновлено: 2026-10-26. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-Текущий цикл Office CI начинается с main `870c361` (PR #3 MERGED).
+Обновлено: 2026-10-27. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
+Текущий цикл ISO input coverage начинается с main `494a277` (PR #4 MERGED).
 
 ## Текущая задача и результат
 
@@ -414,6 +414,52 @@ formatting проверки. UI Writer больше не падает на чт�
 CI — merge в main. Затем оставшиеся P02 licensing/P03 coverage и bootstrap,
 P04 operation lifecycle/recovery. Office/ISO/hardware readiness сверх проверенного
 engine/offscreen scope не объявляется.
+
+### P03 — ISO input coverage
+
+База `494a2775e6ecd6e9d9b426ec1dff938907063bfd`; ветка `codex/iso-input-coverage`.
+Владелец поручил продолжить и объяснить четыре PR простыми словами. Зафиксировано:
+PR #1 аудит/план и доверенные build inputs, #2 branding/README, #3 строгий VM gate
+и screenshot/window evidence, #4 обязательный real-UNO CI и исправления Writer.
+
+Старый native push filter пропускал backend/apps/assets, provenance inventory и
+устанавливаемый tools/collect-logs.sh. Новые regressions берут реальные `$REPO`
+входы рецепта, inventory path/entries и дерево apps. На старой конфигурации:
+**3 failed / 6 passed**. После правки: tools **64 passed**, functional ISO gate
+**48 passed**. Включён system/** вместо только theme; docs и исторические Fedora
+Containerfiles не запускают тяжёлую ISO сборку. Референсный workflow синхронизирован.
+Новых pull_request events или расширения write-token scope нет.
+
+Runtime-код не изменялся. Code inspection подтвердил, что собственные Office
+frontends пока не копируются в ISO; apps filter не объявляет packaging выполненным.
+Далее: PR, normal CI и полный ISO rerun; сохранить точные source/results и merge.
+Оставшиеся P03 bootstrap/reproducibility, P02 licensing и P04 lifecycle остаются
+открытыми. Подробности: iteration `0015-iso-input-coverage.md`, BUILD.md.
+
+### ISO input coverage — удалённая приёмка
+
+Проверенный source `38ba1043251cc78912cdbb96539902e58c4b28f3`.
+[Normal CI 40459015507](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40459015507):
+**8/8 PASS**. [ISO 40458956429](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40458956429):
+native event **push**, **3/3 builds**, **9/9 boot jobs PASS**. Все девять свежих
+сырых отчётов перепроверены строгим report.py: exit 0, **99/99** обязательных
+UI PASS; снимки 1280×800 без ошибок, перемещение и minimize/restore одного UUID.
+Все сборки аутентифицировали одинаковый rootfs SHA256. Доказательства:
+`docs/state/evidence/iso-input-coverage/vm-acceptance.json`.
+
+Модель входов: 99 recipe paths / 32 пропуска прежде; 159 inventory/validation
+paths / 159 прежде; 36 planned app paths / 36 прежде. Теперь пропусков нет.
+Receipt/model hash: `input-coverage.json` в той же директории. Apps остаются
+planned integration inputs, не объявляются установленными. Guest JSON по-прежнему
+не встраивает source SHA/run ID — ограничение записано; commits и даты публикации
+сопоставлены с workflow. P17 source binding не считается завершённым.
+
+Финальное уточнение теста привязывает фильтр именно к push; чужой event не может
+дать ложное подтверждение. Tools после этого: **65 passed**, functional gate
+**48 passed**. Follow-up меняет только документы/доказательства и unshipped
+регрессию; ISO workflow, рецепт и runtime остаются проверенной версии 38ba104.
+PR #5 → CI follow-up → normal merge. Далее: оставшийся P03 dev bootstrap,
+P02 licensing и P04 async/recovery; полного alpha/installed/hardware claim нет.
 
 ## Шаблон следующей записи
 

@@ -1,0 +1,495 @@
+{
+  "source_commit": "38ba1043251cc78912cdbb96539902e58c4b28f3",
+  "workflow": {
+    "conclusion": "success",
+    "created_at": "2026-10-27T06:04:42Z",
+    "event": "push",
+    "head_sha": "38ba1043251cc78912cdbb96539902e58c4b28f3",
+    "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40458956429",
+    "id": 40458956429,
+    "status": "completed",
+    "updated_at": "2026-10-27T06:28:04Z"
+  },
+  "jobs": [
+    {
+      "name": "build (full)",
+      "conclusion": "success"
+    },
+    {
+      "name": "build (services)",
+      "conclusion": "success"
+    },
+    {
+      "name": "build (legacy)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (services, mid)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (services, modern)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (full, mid)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (legacy, modern)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (legacy, low)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (full, modern)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (full, low)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (legacy, mid)",
+      "conclusion": "success"
+    },
+    {
+      "name": "boot (services, low)",
+      "conclusion": "success"
+    }
+  ],
+  "normal_ci": {
+    "conclusion": "success",
+    "headSha": "38ba1043251cc78912cdbb96539902e58c4b28f3",
+    "jobs": [
+      {
+        "name": "benchmark harness (baseline on the runner)",
+        "conclusion": "success"
+      },
+      {
+        "name": "office (sheets, real UNO + Qt)",
+        "conclusion": "success"
+      },
+      {
+        "name": "compatibility registries (evidence gate)",
+        "conclusion": "success"
+      },
+      {
+        "name": "build OS images (requires podman)",
+        "conclusion": "success"
+      },
+      {
+        "name": "shell prototype (backend + visual render tests)",
+        "conclusion": "success"
+      },
+      {
+        "name": "office (writer, real UNO + Qt)",
+        "conclusion": "success"
+      },
+      {
+        "name": "zaldros-sysprobe (unit tests + live run)",
+        "conclusion": "success"
+      },
+      {
+        "name": "office (slides, real UNO + Qt)",
+        "conclusion": "success"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40459015507"
+  },
+  "builds": [
+    {
+      "variant": "full",
+      "report_commit": "bbad77bab09bcde6c08dc9ad82b314922755f46a",
+      "subject": "diagnostics: run 40458956429 full success",
+      "rootfs": {
+        "url": "https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz",
+        "sha256": "046fcabb7f16f45a80ae11824664f2a07e01386c6fb1ed9dc1e225a66a6553a2",
+        "trusted_primary_fingerprints": [
+          "843938DF228D22F7B3742BC0D94AA3F0EFE21092"
+        ],
+        "status": "verified-and-extracted"
+      }
+    },
+    {
+      "variant": "services",
+      "report_commit": "a1d4e5df7a4c4d3fdc5b3035b45620b246f6dee1",
+      "subject": "diagnostics: run 40458956429 services success",
+      "rootfs": {
+        "url": "https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz",
+        "sha256": "046fcabb7f16f45a80ae11824664f2a07e01386c6fb1ed9dc1e225a66a6553a2",
+        "trusted_primary_fingerprints": [
+          "843938DF228D22F7B3742BC0D94AA3F0EFE21092"
+        ],
+        "status": "verified-and-extracted"
+      }
+    },
+    {
+      "variant": "legacy",
+      "report_commit": "50274c023113333bbd6d006a93f2af8d28373483",
+      "subject": "diagnostics: run 40458956429 legacy success",
+      "rootfs": {
+        "url": "https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz",
+        "sha256": "046fcabb7f16f45a80ae11824664f2a07e01386c6fb1ed9dc1e225a66a6553a2",
+        "trusted_primary_fingerprints": [
+          "843938DF228D22F7B3742BC0D94AA3F0EFE21092"
+        ],
+        "status": "verified-and-extracted"
+      }
+    }
+  ],
+  "results": [
+    {
+      "variant": "full",
+      "profile": "low",
+      "report_commit": "b1ec8178bf2bdce3cf8bed92d3df3f6ee4434b9e",
+      "published_at": "2026-10-27T06:16:50Z",
+      "report_file": "zaldros-full-low.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{3a376469-c546-46ad-a04e-c9761a12be33}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307317,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "mid",
+      "report_commit": "71c2e3382385ec97dcd6023c8843fa534f503a78",
+      "published_at": "2026-10-27T06:16:23Z",
+      "report_file": "zaldros-full-mid.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{5c8c3633-8e0e-48d0-b649-ec5fb7c080a7}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307602,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "full",
+      "profile": "modern",
+      "report_commit": "9bd70ed2425b278f65fc0610120b8993084232a5",
+      "published_at": "2026-10-27T06:16:27Z",
+      "report_file": "zaldros-full-modern.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{1708d685-d1dc-479f-9c9b-27edab0203cf}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 307528,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "low",
+      "report_commit": "7e0cc10700aeb10630e807b951efe0bf1b680d0b",
+      "published_at": "2026-10-27T06:27:58Z",
+      "report_file": "zaldros-services-low.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{172934e4-ef67-4bef-ac12-1b28af09783a}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309590,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "mid",
+      "report_commit": "b40bc14721370a84d4130865c4971ffac3e2d334",
+      "published_at": "2026-10-27T06:20:04Z",
+      "report_file": "zaldros-services-mid.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{69a86e41-cdf0-42dd-8ad4-86b113673be1}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309642,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "services",
+      "profile": "modern",
+      "report_commit": "44a1032f42f756af423a171be032ef413332bcca",
+      "published_at": "2026-10-27T06:16:06Z",
+      "report_file": "zaldros-services-modern.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{331f8f4d-c401-4824-ad5c-b6d8820c88e1}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309559,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "low",
+      "report_commit": "6094218d55e1bd3fa86c412cebd2156ab1429228",
+      "published_at": "2026-10-27T06:16:24Z",
+      "report_file": "zaldros-legacy-low.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{8ab302cc-6dc0-4398-8b44-d05c1dd32166}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309462,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "mid",
+      "report_commit": "98baf2cf0cd136c8e26e108b28d13ac2f153c660",
+      "published_at": "2026-10-27T06:23:07Z",
+      "report_file": "zaldros-legacy-mid.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{319a5d1d-4083-4563-b25e-c6cce1b8aca4}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309561,
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "variant": "legacy",
+      "profile": "modern",
+      "report_commit": "b586e525883b03578e482fa26398d6504616e283",
+      "published_at": "2026-10-27T06:19:31Z",
+      "report_file": "zaldros-legacy-modern.json",
+      "boot": "PASS",
+      "ui": {
+        "desktop_ready": "PASS",
+        "start_open": "PASS",
+        "start_close": "PASS",
+        "app_launch_explorer": "PASS",
+        "window_move": "PASS",
+        "minimize": "PASS",
+        "restore": "PASS",
+        "alt_tab": "PASS",
+        "task_view": "PASS",
+        "taskbar_response": "PASS",
+        "screenshot": "PASS"
+      },
+      "window_id": "{b20c4232-6750-402f-87c9-149f93d283d9}",
+      "move_before": [
+        256,
+        115
+      ],
+      "move_after": [
+        376,
+        195
+      ],
+      "minimized": true,
+      "restored_minimized": false,
+      "screenshot": {
+        "tool": "spectacle",
+        "bytes": 309512,
+        "width": 1280,
+        "height": 800
+      }
+    }
+  ],
+  "acceptance": {
+    "boot_targets": 9,
+    "required_ui_passes": 99,
+    "strict_report_cli_exit": 0
+  },
+  "provenance_limit": "Guest JSON does not itself embed source SHA/run ID. Workflow source and exact diagnostic commits are pinned; publication dates were checked against this run. End-to-end guest/source binding remains P17 work.",
+  "scope": "ISO recipe/input coverage and existing boot/UI acceptance only. App-trigger coverage does not install Office frontends; installed-system, hardware and frame pacing remain unverified."
+}
