@@ -172,3 +172,55 @@ def test_paragraph_indexes_after_a_table_select_the_same_paragraph_for_formattin
         assert document.paragraphs()[0].style != "Heading 1"
     finally:
         document.close()
+
+
+@needs_engine
+def test_font_size_and_alignment_round_trip_and_invalid_input_is_unchanged(engine, tmp_path):
+    document = engine.new_document()
+    target = tmp_path / 'formatting.odt'
+    try:
+        document.append('Before')
+        document.insert_table(1, 1, [['cell']])
+        document.append_paragraph('After')
+        index = next(p.index for p in document.paragraphs() if p.text == 'After')
+        document.set_character_format(index, font='Liberation Sans', size=13.5)
+        document.set_alignment(index, 3)
+        for size in (0, 401, float('nan'), float('inf')):
+            with pytest.raises(EngineError):
+                document.set_character_format(index, size=size)
+        with pytest.raises(EngineError):
+            document.set_character_format(index, font=' ')
+        with pytest.raises(EngineError):
+            document.set_alignment(index, 99)
+        with pytest.raises(EngineError):
+            document.set_alignment(-1, 3)
+        document.save_as(target)
+    finally:
+        document.close()
+    reopened = engine.open(target)
+    try:
+        after = next(p for p in reopened.paragraphs() if p.text == 'After')
+        assert after.font == 'Liberation Sans'
+        assert after.size == 13.5
+        assert after.alignment == 3
+        assert reopened.paragraphs()[0].alignment == 0
+    finally:
+        reopened.close()
+
+
+@needs_engine
+def test_mixed_character_properties_can_be_read_and_replaced(engine):
+    document = engine.new_document()
+    try:
+        document.append('Mixed paragraph')
+        cursor = document._doc.Text.createTextCursor()
+        cursor.gotoStart(False)
+        cursor.goRight(5, True)
+        cursor.CharWeight = 150.0
+        cursor.CharHeight = 24.0
+        assert document.paragraphs()[0].text == 'Mixed paragraph'
+        document.set_character_format(0, bold=False, size=12)
+        paragraph = document.paragraphs()[0]
+        assert paragraph.bold is False and paragraph.size == 12
+    finally:
+        document.close()

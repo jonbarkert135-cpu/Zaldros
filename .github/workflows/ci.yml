@@ -43,6 +43,7 @@ jobs:
       - name: Test real engine round trips and Qt UI without skips
         env:
           QT_QPA_PLATFORM: offscreen
+          ZALDROS_OFFICE_EVIDENCE_DIR: ${{ github.workspace }}/office-results
         run: .venv-office/bin/python tools/ci/office.py ${{ matrix.app }} --junitxml office-results/tests.xml
       - name: Preserve Office test evidence
         if: always()

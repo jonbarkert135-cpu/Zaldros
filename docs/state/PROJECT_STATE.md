@@ -1,6 +1,7 @@
 # Project state — 2026-10-27
 
-The current development-bootstrap cycle starts from main `4a2612ccc426873223f502b2fed60c5be8c600ef`.
+The Writer Home cycle starts from main `c907842411cf80cae27f50ac99c9e8c5aea740b7`
+(development bootstrap PR #6 merged).
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
 Office engine/UI verified source: `d25e310cfce717f17484a4b9b22eaa46c4b2a453`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
@@ -30,6 +31,13 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+Writer Home (P19 partial): grouped font/size, character toggles, alignment and
+style controls now target a selected whole paragraph through the existing UNO
+engine. Local optional Writer: 11 passed / 11 skipped (UNO unavailable); tools:
+80 passed. Real-engine interaction/round-trip confirmation is pending. This is
+not an inline editor or full document-layout renderer. See iteration 0017 and
+[local scope/receipt](evidence/writer-home/local.json).
 
 Development bootstrap: direct pins shared by tools/shell/Office and the same
 preparation script used locally/CI. Actual fresh local venvs: **78 tools passed**,

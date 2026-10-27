@@ -1,46 +1,28 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Qt model for the Zaldros Writer UI.
-
-The model is a *view* of the engine, never a second source of truth. Without an engine it is an
-empty document that says why it is empty — the chrome renders, and nothing pretends to be a
-working word processor.
-"""
-
+"""Qt view of the real Writer document; formatting targets a whole paragraph."""
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
+from PySide6.QtGui import QFontDatabase
 
 from .engine import EngineError, WriterEngine, writer_available
 
-REFERENCE = Path(__file__).resolve().parents[3] / "system" / "theme" / "word-reference.json"
-
-# Word's Home tab, in Word's order. Buttons that we cannot yet ask the engine for are absent
-# rather than drawn dead — a ribbon full of decoration is what this project does not build.
-HOME_GROUPS = (
-    ("Буфер обмена", ("Вставить", "Вырезать", "Копировать")),
-    ("Шрифт", ("Полужирный", "Курсив", "Подчёркнутый", "Размер")),
-    ("Абзац", ("По левому краю", "По центру", "По правому краю", "По ширине")),
-    ("Стили", ("Обычный", "Заголовок 1", "Заголовок 2", "Цитата")),
-)
-
-RIBBON_TABS = ("Файл", "Главная", "Вставка", "Макет", "Ссылки", "Рецензирование", "Вид")
-
-STYLE_NAMES = {"Обычный": "Default Paragraph Style", "Заголовок 1": "Heading 1",
-               "Заголовок 2": "Heading 2", "Цитата": "Quotations"}
+REFERENCE = Path(__file__).resolve().parents[3] / 'system/theme/word-reference.json'
+RIBBON_TABS = ('Файл', 'Главная', 'Вставка', 'Макет', 'Ссылки', 'Рецензирование', 'Вид')
+STYLE_NAMES = {'Обычный': 'Default Paragraph Style', 'Заголовок 1': 'Heading 1',
+               'Заголовок 2': 'Heading 2', 'Цитата': 'Quotations'}
 
 
 def reference() -> dict:
-    """The measured Word geometry. A missing file is a bug, not a default to invent."""
-    with REFERENCE.open(encoding="utf-8") as handle:
+    """Derived geometry, explicitly not a measured Word screenshot baseline."""
+    with REFERENCE.open(encoding='utf-8') as handle:
         return json.load(handle)
 
 
 class DocumentModel(QObject):
-    """One document, as the ribbon and the page canvas see it."""
-
     changed = Signal()
 
     def __init__(self, document=None, engine: WriterEngine | None = None) -> None:
@@ -48,16 +30,16 @@ class DocumentModel(QObject):
         self._engine = engine
         self._document = document
         self._paragraphs: list[dict] = []
-        self._status = "" if document is not None else self._missing_reason()
-        self._path = ""
+        self._selected = 0
+        self._status = '' if document is not None else self._missing_reason()
+        self._path = ''
         if document is not None:
             self.refresh()
 
-    @staticmethod
-    def _missing_reason() -> str:
+    def _missing_reason(self) -> str:
         if not writer_available():
-            return "Движок Writer не установлен (пакет libreoffice-writer-nogui)"
-        return "Документ не открыт"
+            return self.tr('Движок Writer не установлен (пакет libreoffice-writer-nogui)')
+        return self.tr('Документ не открыт')
 
     @Slot()
     def refresh(self) -> None:
@@ -66,50 +48,62 @@ class DocumentModel(QObject):
             self.changed.emit()
             return
         try:
-            self._paragraphs = [
-                {"index": item.index, "text": item.text, "style": item.style,
-                 "bold": item.bold, "italic": item.italic, "underline": item.underline,
-                 "size": item.size, "alignment": item.alignment}
-                for item in self._document.paragraphs()]
-            self._status = ""
+            self._paragraphs = [vars(item).copy() for item in self._document.paragraphs()]
+            if not 0 <= self._selected < len(self._paragraphs):
+                self._selected = 0
+            self._status = ''
         except EngineError as error:
             self._paragraphs = []
             self._status = str(error)
         self.changed.emit()
 
-    # --- editing -----------------------------------------------------------------------------
-    @Slot(str, result=bool)
-    def appendParagraph(self, text: str) -> bool:  # noqa: N802
-        if self._document is None:
-            return False
-        self._document.append_paragraph(text)
-        self.refresh()
-        return True
-
-    @Slot(int, str, result=bool)
-    def applyStyle(self, index: int, name: str) -> bool:  # noqa: N802
-        """«Заголовок 1» is applied as the engine's own style, not as bold 16 pt."""
+    def _edit(self, action, *args, **kwargs) -> bool:
         if self._document is None:
             return False
         try:
-            self._document.set_paragraph_style(index, STYLE_NAMES.get(name, name))
+            getattr(self._document, action)(*args, **kwargs)
         except EngineError as error:
+            # Read back even after a partial engine failure; never leave stale pressed states.
+            self.refresh()
             self._status = str(error)
             self.changed.emit()
             return False
         self.refresh()
+        return not self._status
+
+    @Slot(int, result=bool)
+    def selectParagraph(self, index: int) -> bool:  # noqa: N802
+        if not 0 <= index < len(self._paragraphs):
+            return False
+        self._selected = index
+        self.changed.emit()
         return True
+
+    @Slot(str, result=bool)
+    def appendParagraph(self, text: str) -> bool:  # noqa: N802
+        return self._edit('append_paragraph', text)
+
+    @Slot(int, str, result=bool)
+    def applyStyle(self, index: int, name: str) -> bool:  # noqa: N802
+        return self._edit('set_paragraph_style', index, STYLE_NAMES.get(name, name))
 
     @Slot(int, str, bool, result=bool)
     def applyFormat(self, index: int, attribute: str, value: bool) -> bool:  # noqa: N802
-        if self._document is None:
+        if attribute not in ('bold', 'italic', 'underline'):
             return False
-        keyword = {"bold": "bold", "italic": "italic", "underline": "underline"}.get(attribute)
-        if keyword is None:
-            return False
-        self._document.set_character_format(index, **{keyword: value})
-        self.refresh()
-        return True
+        return self._edit('set_character_format', index, **{attribute: value})
+
+    @Slot(str, result=bool)
+    def applyFont(self, name: str) -> bool:  # noqa: N802
+        return self._edit('set_character_format', self._selected, font=name)
+
+    @Slot(float, result=bool)
+    def applyFontSize(self, size: float) -> bool:  # noqa: N802
+        return self._edit('set_character_format', self._selected, size=size)
+
+    @Slot(int, result=bool)
+    def applyAlignment(self, alignment: int) -> bool:  # noqa: N802
+        return self._edit('set_alignment', self._selected, alignment)
 
     @Slot(str, result=bool)
     def saveAs(self, path: str) -> bool:  # noqa: N802
@@ -121,25 +115,41 @@ class DocumentModel(QObject):
             self._status = str(error)
             self.changed.emit()
             return False
+        self._status = ''
         self.changed.emit()
         return True
 
     @Slot(str, result=bool)
     def exportPdf(self, path: str) -> bool:  # noqa: N802
-        return self.saveAs(str(Path(path).with_suffix(".pdf")))
+        return self.saveAs(str(Path(path).with_suffix('.pdf')))
 
-    # --- what QML draws ------------------------------------------------------------------------
-    @Property("QVariantList", notify=changed)
+    @Property('QVariantList', notify=changed)
     def paragraphs(self) -> list:
         return list(self._paragraphs)
 
-    @Property("QVariantList", constant=True)
+    @Property('QVariantList', constant=True)
     def tabs(self) -> list:
-        return list(RIBBON_TABS)
+        return [self.tr('Файл'), self.tr('Главная'), self.tr('Вставка'), self.tr('Макет'),
+                self.tr('Ссылки'), self.tr('Рецензирование'), self.tr('Вид')]
 
-    @Property("QVariantList", constant=True)
-    def groups(self) -> list:
-        return [{"title": title, "commands": list(commands)} for title, commands in HOME_GROUPS]
+    @Property(int, notify=changed)
+    def selectedParagraph(self) -> int:  # noqa: N802
+        return self._selected
+
+    @Property(bool, notify=changed)
+    def formatAvailable(self) -> bool:  # noqa: N802
+        return self.live and 0 <= self._selected < len(self._paragraphs)
+
+    @Property('QVariantMap', notify=changed)
+    def selection(self) -> dict:
+        return self._paragraphs[self._selected].copy() if self.formatAvailable else {}
+
+    @Property('QStringList', notify=changed)
+    def fontFamilies(self) -> list[str]:  # noqa: N802
+        families = set(QFontDatabase.families())
+        if self.formatAvailable and self.selection['font']:
+            families.add(self.selection['font'])
+        return sorted(families)
 
     @Property(str, notify=changed)
     def status(self) -> str:
@@ -151,11 +161,10 @@ class DocumentModel(QObject):
 
     @Property(int, notify=changed)
     def wordCount(self) -> int:  # noqa: N802
-        return sum(len(item["text"].split()) for item in self._paragraphs)
+        return sum(len(item['text'].split()) for item in self._paragraphs)
 
     @Property(int, notify=changed)
     def pageCount(self) -> int:  # noqa: N802
-        """The engine's pagination, or 0 — never a guess from character counts."""
         if self._document is None:
             return 0
         try:

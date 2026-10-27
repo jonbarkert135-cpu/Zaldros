@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Zaldros Writer — the window.
 //
 // Sizes come from ref.window, which is system/theme/word-reference.json. That file is DERIVED
@@ -19,7 +20,6 @@ Item {
     readonly property var win: ref.window
     readonly property string uiFont: uiFontFamily
     property int activeTab: 1
-    property int caretParagraph: 0
 
     Rectangle { anchors.fill: parent; color: "#f0f0f0" }
 
@@ -42,8 +42,8 @@ Item {
                        font.family: root.uiFont; font.pixelSize: 11; font.bold: true }
             }
             Text {
-                text: document.path === "" ? qsTr("Документ1 — Word")
-                                           : document.path + " — Word"
+                text: document.path === "" ? qsTr("Документ1 — Zaldros Writer")
+                                           : document.path + " — Zaldros Writer"
                 color: "#ffffff"
                 font.family: root.uiFont
                 font.pixelSize: 13
@@ -71,7 +71,7 @@ Item {
                         id: label
                         anchors.centerIn: parent
                         text: modelData
-                        color: index === root.activeTab ? "#185abd" : "#444444"
+                        color: index === root.activeTab ? "#185abd" : "#888888"
                         font.family: root.uiFont
                         font.pixelSize: 13
                     }
@@ -81,7 +81,9 @@ Item {
                         height: 2
                         color: "#185abd"
                     }
-                    MouseArea { anchors.fill: parent; onClicked: root.activeTab = index }
+                    HoverHandler { id: tabHover }
+                    ToolTip.visible: tabHover.hovered && index !== 1
+                    ToolTip.text: qsTr("Этот раздел пока недоступен")
                 }
             }
         }
@@ -96,63 +98,7 @@ Item {
         radius: win.ribbon_card_radius
         color: "#ffffff"
 
-        Row {
-            anchors { left: parent.left; leftMargin: 10; verticalCenter: parent.verticalCenter }
-            spacing: 20
-            Repeater {
-                model: document.groups
-                delegate: Column {
-                    spacing: 6
-                    Row {
-                        spacing: 6
-                        Repeater {
-                            model: modelData.commands
-                            delegate: Rectangle {
-                                width: Math.max(64, commandLabel.width + 16)
-                                height: 56
-                                radius: 4
-                                color: commandHover.containsMouse ? "#f3f3f3" : "transparent"
-                                Text {
-                                    id: commandLabel
-                                    anchors.centerIn: parent
-                                    text: modelData
-                                    color: "#333333"
-                                    font.family: root.uiFont
-                                    font.pixelSize: 12
-                                    font.bold: modelData === "Полужирный"
-                                    font.italic: modelData === "Курсив"
-                                    font.underline: modelData === "Подчёркнутый"
-                                }
-                                MouseArea {
-                                    id: commandHover
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onClicked: {
-                                        var name = modelData;
-                                        if (name === "Полужирный")
-                                            document.applyFormat(root.caretParagraph, "bold", true);
-                                        else if (name === "Курсив")
-                                            document.applyFormat(root.caretParagraph, "italic", true);
-                                        else if (name === "Подчёркнутый")
-                                            document.applyFormat(root.caretParagraph, "underline", true);
-                                        else if (name.indexOf("Заголовок") === 0 || name === "Обычный"
-                                                 || name === "Цитата")
-                                            document.applyStyle(root.caretParagraph, name);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Text {
-                        text: modelData.title
-                        color: "#767676"
-                        font.family: root.uiFont
-                        font.pixelSize: 11
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                }
-            }
-        }
+        HomeRibbon { anchors.fill: parent; model: document; uiFont: root.uiFont }
     }
 
     // ---------------------------------------------------------------- page
@@ -181,20 +127,29 @@ Item {
 
                 Repeater {
                     model: document.paragraphs
-                    delegate: Text {
+                    delegate: Rectangle {
+                        objectName: "paragraph" + modelData.index
                         width: text.width
+                        height: Math.max(24, paragraphText.implicitHeight)
+                        color: document.selectedParagraph === modelData.index ? "#edf4fc" : "transparent"
+                        Text {
+                        id: paragraphText
+                        width: parent.width
                         wrapMode: Text.WordWrap
                         text: modelData.text
                         color: "#1b1b1b"
-                        font.family: root.uiFont
-                        font.pixelSize: modelData.style.indexOf("Heading") === 0 ? 22
-                                        : (modelData.size > 0 ? modelData.size * 1.33 : 15)
-                        font.bold: modelData.bold || modelData.style.indexOf("Heading") === 0
-                        font.italic: modelData.italic
-                        font.underline: modelData.underline
+                        font.family: modelData.font || root.uiFont
+                        font.pointSize: modelData.size > 0 ? modelData.size : 11
+                        horizontalAlignment: modelData.alignment === 3 ? Text.AlignHCenter
+                                             : modelData.alignment === 1 ? Text.AlignRight
+                                             : modelData.alignment === 2 ? Text.AlignJustify : Text.AlignLeft
+                        font.bold: modelData.bold === true
+                        font.italic: modelData.italic === true
+                        font.underline: modelData.underline === true
+                        }
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: root.caretParagraph = modelData.index
+                            onClicked: document.selectParagraph(modelData.index)
                         }
                     }
                 }
@@ -219,12 +174,20 @@ Item {
 
         Text {
             anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
-            text: document.live
-                  ? qsTr("Страница %1    Слов: %2").arg(document.pageCount).arg(document.wordCount)
-                  : document.status
+            width: parent.width - selectionStatus.width - 36
+            elide: Text.ElideRight
+            text: document.status || (document.live
+                  ? qsTr("Страниц: %1    Слов: %2").arg(document.pageCount).arg(document.wordCount)
+                  : "")
             color: "#ffffff"
             font.family: root.uiFont
             font.pixelSize: 12
+        }
+        Text {
+            id: selectionStatus
+            anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
+            text: document.formatAvailable ? qsTr("Абзац %1 — форматирование всего абзаца").arg(document.selectedParagraph + 1) : ""
+            color: "#ffffff"; font.family: root.uiFont; font.pixelSize: 12
         }
     }
 }

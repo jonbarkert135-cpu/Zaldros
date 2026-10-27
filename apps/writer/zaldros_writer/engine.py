@@ -17,6 +17,8 @@ Two entry points, and the difference matters:
 from __future__ import annotations
 
 import os
+import math
+from gettext import gettext as _
 import shutil
 import socket
 import subprocess
@@ -49,11 +51,12 @@ class Paragraph:
     index: int
     text: str
     style: str
-    bold: bool = False
-    italic: bool = False
-    underline: bool = False
+    bold: bool | None = False
+    italic: bool | None = False
+    underline: bool | None = False
     size: float = 0.0
     alignment: int = 0
+    font: str = ""
 
 
 def soffice_path() -> str | None:
@@ -148,15 +151,20 @@ class Document:
             element = enumeration.nextElement()
             if not element.supportsService("com.sun.star.text.Paragraph"):
                 continue
+            weight = getattr(element, "CharWeight", None)
+            posture = getattr(element, "CharPosture", None)
+            underline = getattr(element, "CharUnderline", None)
+            alignment = getattr(element, "ParaAdjust", None)
             out.append(Paragraph(
                 index=index, text=element.getString(),
                 style=str(getattr(element, "ParaStyleName", "")),
-                bold=float(getattr(element, "CharWeight", 100)) > 100,
-                italic=getattr(getattr(element, "CharPosture", None), "value", "NONE") in
+                bold=None if weight is None else float(weight) > 100,
+                italic=None if posture is None else posture.value in
                        ("ITALIC", "OBLIQUE", "REVERSE_ITALIC", "REVERSE_OBLIQUE"),
-                underline=int(getattr(element, "CharUnderline", 0)) != 0,
-                size=float(getattr(element, "CharHeight", 0)),
-                alignment=int(getattr(element, "ParaAdjust", 0))))
+                underline=None if underline is None else int(underline) != 0,
+                size=float(getattr(element, "CharHeight", 0) or 0),
+                alignment=-1 if alignment is None else int(alignment),
+                font=str(getattr(element, "CharFontName", "") or "")))
             index += 1
         return out
 
@@ -187,8 +195,8 @@ class Document:
         if text:
             body.insertString(cursor, text, False)
 
-    def set_paragraph_style(self, index: int, style: str) -> None:
-        """Apply a real Writer style — «Heading 1», not our own idea of bold text."""
+    def _paragraph(self, index: int):
+        """Use the same top-level paragraph indexing as paragraphs(), skipping tables."""
         enumeration = self._doc.getText().createEnumeration()
         position = 0
         while enumeration.hasMoreElements():
@@ -196,37 +204,51 @@ class Document:
             if not element.supportsService("com.sun.star.text.Paragraph"):
                 continue
             if position == index:
-                try:
-                    element.ParaStyleName = style
-                except Exception as exc:
-                    raise EngineError(f"движок отказал в стиле {style!r}: {exc}") from exc
-                return
+                return element
             position += 1
-        raise EngineError(f"нет абзаца с номером {index}")
+        raise EngineError(_("Нет абзаца с номером {index}").format(index=index))
+
+    def _set_paragraph_properties(self, index: int, **properties) -> None:
+        try:
+            element = self._paragraph(index)
+            for name, value in properties.items():
+                setattr(element, name, value)
+        except EngineError:
+            raise
+        except Exception as exc:
+            raise EngineError(_("Writer не применил форматирование: {error}").format(error=exc)) from exc
+
+    def set_paragraph_style(self, index: int, style: str) -> None:
+        """Apply a real Writer paragraph style."""
+        self._set_paragraph_properties(index, ParaStyleName=style)
+
+    def set_alignment(self, index: int, alignment: int) -> None:
+        # com.sun.star.style.ParagraphAdjust: LEFT=0, RIGHT=1, BLOCK=2, CENTER=3.
+        if type(alignment) is not int or alignment not in (0, 1, 2, 3):
+            raise EngineError(_("Неизвестное выравнивание абзаца"))
+        self._set_paragraph_properties(index, ParaAdjust=alignment)
 
     def set_character_format(self, index: int, bold: bool | None = None,
                              italic: bool | None = None, underline: bool | None = None,
-                             size: float | None = None) -> None:
-        enumeration = self._doc.getText().createEnumeration()
-        position = 0
-        while enumeration.hasMoreElements():
-            element = enumeration.nextElement()
-            if not element.supportsService("com.sun.star.text.Paragraph"):
-                continue
-            if position == index:
-                if bold is not None:
-                    element.CharWeight = 150.0 if bold else 100.0
-                if italic is not None:
-                    import uno
-                    element.CharPosture = uno.Enum("com.sun.star.awt.FontSlant",
-                                                  "ITALIC" if italic else "NONE")
-                if underline is not None:
-                    element.CharUnderline = 1 if underline else 0
-                if size is not None:
-                    element.CharHeight = float(size)
-                return
-            position += 1
-        raise EngineError(f"нет абзаца с номером {index}")
+                             size: float | None = None, font: str | None = None) -> None:
+        if size is not None and (not math.isfinite(size) or not 1 <= size <= 400):
+            raise EngineError(_("Размер шрифта должен быть от 1 до 400 пунктов"))
+        if font is not None and (not font.strip() or len(font) > 256):
+            raise EngineError(_("Укажите название шрифта"))
+        properties = {}
+        if bold is not None:
+            properties["CharWeight"] = 150.0 if bold else 100.0
+        if italic is not None:
+            import uno
+            properties["CharPosture"] = uno.Enum("com.sun.star.awt.FontSlant",
+                                               "ITALIC" if italic else "NONE")
+        if underline is not None:
+            properties["CharUnderline"] = 1 if underline else 0
+        if size is not None:
+            properties["CharHeight"] = float(size)
+        if font is not None:
+            properties["CharFontName"] = font.strip()
+        self._set_paragraph_properties(index, **properties)
 
     def insert_table(self, rows: int, columns: int, values: list[list[str]] | None = None) -> None:
         table = self._doc.createInstance("com.sun.star.text.TextTable")

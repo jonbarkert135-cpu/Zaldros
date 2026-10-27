@@ -1,0 +1,33 @@
+{
+  "base_commit": "c907842411cf80cae27f50ac99c9e8c5aea740b7",
+  "source_state": "working tree before initial Writer Home commit; file hashes below",
+  "files": {
+    "apps/writer/qml/Writer.qml": "afa31c7042068d96b7464ef0a9582b20a774a34dae907fe26b694fbf0f4d9e4e",
+    "apps/writer/qml/HomeRibbon.qml": "0c89f9d6b5b3963138fe71660c86aa7639023056173e16468d926431cb22145c",
+    "apps/writer/zaldros_writer/model.py": "1e4032ba6cf946cae78cab7bed7408eb4a7f287fb68de04038b5b97fb1a7d04b",
+    "apps/writer/zaldros_writer/engine.py": "1b072cc8aff2f091fa1996b6ba101277c18c0da3e6eeb20f8a9c08d11e002a26",
+    "apps/writer/tests/test_ui.py": "fc9fcda6523dea32c28fe427ca6c8b278307c9e0b3b086c1c0323a23b35a7ade",
+    "apps/writer/tests/test_engine.py": "d1a8fbd6e815013774af75516f8eff067cb764c44de9fdfca9628ac7eaaf8548"
+  },
+  "local_optional_writer": {
+    "passed": 11,
+    "skipped": 11,
+    "reason": "Matching UNO is unavailable; this is not real-engine acceptance"
+  },
+  "tools": {
+    "passed": 80,
+    "skipped": 0
+  },
+  "image": {
+    "path": "no-engine.png",
+    "sha256": "4b89d454135ebc3293f1d150547f27c64cd124e1bb3eed8a1a066c52f38e6b50",
+    "size": [
+      1280,
+      800
+    ],
+    "document_open": false,
+    "uno_available": false,
+    "scope": "Own chrome/no-document disabled-controls baseline, no Office editing/parity claim"
+  },
+  "observed_initial_test_failure": "QObject child lookup missed QML Repeater delegates. Corrected test helper to walk the visual tree; unload QML before releasing model to avoid teardown warnings."
+}
