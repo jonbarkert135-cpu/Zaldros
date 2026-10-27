@@ -55,3 +55,20 @@ deleted`). The separate Qt selection-input test-double probe reproduces it local
 Keep named strong references through layout inspection; the probe then passes.
 No engine, range, selection, painted-format or round-trip assertion is removed.
 Original notices and HTML hash: `initial-ci-failure.json`. Remote rerun is required.
+
+**FINAL REMOTE ACCEPTANCE** — Source `c625c8f93ac67969e943dd352c933da4e9f71b0f`,
+CI `40575214293`: **all eight job types PASS**. Writer **40** (22 engine / 18 UI),
+Sheets **15**, Slides **15** = **70 passed / zero failures/skips**, Python 3.12.3 /
+LibreOffice 24.2.7.2. Both painted-run assertions and DOCX/ODT saves/reopens pass after
+retaining Qt wrapper references. Previous failures remain separately archived.
+Exact source/code hashes, public run/job HTML hashes and JSON notices are preserved
+in `acceptance.json` / `final-source.json`. The archived image remains explicitly
+a local test-double layout fixture, not a relabelled live-engine screenshot.
+
+**STATUS / HANDOFF** — Selected-range/basic-run display slice verified; P19 PARTIAL.
+Final follow-up records evidence only. PR creation still returns CONNECT 403, so
+normal Git merge/push is the authorized fallback under server branch rules.
+Next primary iteration returns to **P04 measured GUI/service responsiveness and
+recovery**, using real fault injection and pinned baselines. Cross-paragraph
+selection, richer rendering/paste/history and ISO frontend integration remain
+open P19 work; no installed-system/hardware acceptance is added.
