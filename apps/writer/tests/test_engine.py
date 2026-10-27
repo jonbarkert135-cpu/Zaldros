@@ -175,9 +175,10 @@ def test_paragraph_indexes_after_a_table_select_the_same_paragraph_for_formattin
 
 
 @needs_engine
-def test_font_size_and_alignment_round_trip_and_invalid_input_is_unchanged(engine, tmp_path):
+@pytest.mark.parametrize('suffix', ['.odt', '.docx'])
+def test_font_size_and_alignment_round_trip_and_invalid_input_is_unchanged(engine, tmp_path, suffix):
     document = engine.new_document()
-    target = tmp_path / 'formatting.odt'
+    target = tmp_path / ('formatting' + suffix)
     try:
         document.append('Before')
         document.insert_table(1, 1, [['cell']])

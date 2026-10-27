@@ -129,7 +129,7 @@ Flickable {
                 spacing: 4
                 Repeater {
                     model: [
-                        {key: "Default Paragraph Style", label: qsTr("Обычный"), sample: qsTr("Обычный текст"), size: 15},
+                        {key: "Standard", label: qsTr("Обычный"), sample: qsTr("Обычный текст"), size: 15},
                         {key: "Heading 1", label: qsTr("Заголовок 1"), sample: qsTr("Заголовок"), size: 20},
                         {key: "Heading 2", label: qsTr("Заголовок 2"), sample: qsTr("Подзаголовок"), size: 17},
                         {key: "Quotations", label: qsTr("Цитата"), sample: qsTr("Цитата"), size: 15}

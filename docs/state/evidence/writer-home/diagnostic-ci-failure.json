@@ -1,0 +1,25 @@
+{
+  "source_commit": "cecf3d443cf170af550ef3b9002345c89d57f37f",
+  "run_id": 40556731365,
+  "job_id": 122374662678,
+  "result": "21 passed, 1 failed, zero skips; not accepted",
+  "annotations": [
+    {
+      "message": "{\"scope\": \"Real UNO paragraph-formatting interaction, owned two-paragraph fixture\", \"viewport\": [1280, 800], \"device_pixel_ratio\": 1.0, \"selected_paragraph\": 1, \"paragraphs\": [{\"index\": 0, \"text\": \"\\u041f\\u0435\\u0440\\u0432\\u044b\\u0439 \\u0430\\u0431\\u0437\\u0430\\u0446\", \"style\": \"Standard\", \"bold\": false, \"italic\": false, \"underline\": false, \"size\": 13.0, \"alignment\": 0, \"font\": \"Monospace\"}, {\"index\": 1, \"text\": \"\\u0412\\u0442\\u043e\\u0440\\u043e\\u0439 \\u0430\\u0431\\u0437\\u0430\\u0446\", \"style\": \"Heading 1\", \"bold\": true, \"italic\": false, \"underline\": false, \"size\": 18.0, \"alignment\": 0, \"font\": \"Liberation Sans\"}], \"sha256\": \"b941bd053d20ffa0827d2da27c001c59b5595d13fd4693a6a44ac5f5eb3fd7f2\", \"source\": \"cecf3d443cf170af550ef3b9002345c89d57f37f\"}",
+      "title": "Writer UI evidence"
+    },
+    {
+      "message": "{\"collected\": 22, \"passed\": {\"test_engine.py\": 14, \"test_ui.py\": 7}, \"failed\": 1, \"skipped\": 0, \"exitstatus\": 1}",
+      "title": "Office test summary"
+    },
+    {
+      "message": "AssertionError: assert 'Liberation Serif' == 'Monospace'\n  \n  - Monospace\n  + Liberation Serif\napps/writer/tests/test_ui.py::test_home_controls_edit_real_paragraph_and_saved_docx",
+      "title": "Office test failure"
+    },
+    {
+      "message": "{\"python\": \"3.12.3\", \"libreoffice\": \"LibreOffice 24.2.7.2 420(Build:2)\", \"uno_module\": \"/usr/lib/python3/dist-packages/uno.py\", \"workflow_sha\": \"cecf3d443cf170af550ef3b9002345c89d57f37f\", \"run_id\": \"40556731365\"}",
+      "title": "Office runtime"
+    }
+  ],
+  "observed_failure": "Selected generic Qt alias Monospace is read back during the session but reopens as Liberation Serif in DOCX. No font equality assertion is weakened."
+}

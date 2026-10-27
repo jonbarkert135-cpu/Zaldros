@@ -6,13 +6,13 @@ import json
 from pathlib import Path
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
-from PySide6.QtGui import QFontDatabase
+from PySide6.QtGui import QFont, QFontDatabase, QFontInfo
 
 from .engine import EngineError, WriterEngine, writer_available
 
 REFERENCE = Path(__file__).resolve().parents[3] / 'system/theme/word-reference.json'
 RIBBON_TABS = ('Файл', 'Главная', 'Вставка', 'Макет', 'Ссылки', 'Рецензирование', 'Вид')
-STYLE_NAMES = {'Обычный': 'Default Paragraph Style', 'Заголовок 1': 'Heading 1',
+STYLE_NAMES = {'Обычный': 'Standard', 'Заголовок 1': 'Heading 1',
                'Заголовок 2': 'Heading 2', 'Цитата': 'Quotations'}
 
 
@@ -95,7 +95,12 @@ class DocumentModel(QObject):
 
     @Slot(str, result=bool)
     def applyFont(self, name: str) -> bool:  # noqa: N802
-        return self._edit('set_character_format', self._selected, font=name)
+        if not name.strip():
+            return False
+        # Qt lists generic aliases such as Monospace. Writer's DOCX exporter
+        # does not preserve those reliably; submit the concrete matched family.
+        family = QFontInfo(QFont(name)).family()
+        return self._edit('set_character_format', self._selected, font=family)
 
     @Slot(float, result=bool)
     def applyFontSize(self, size: float) -> bool:  # noqa: N802

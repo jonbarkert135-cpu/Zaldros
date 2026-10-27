@@ -165,6 +165,7 @@ def test_home_controls_edit_real_paragraph_and_saved_docx(qt_app, live_writer, t
         qt_app.processEvents()
         assert control(view, 'fontFamily').property('displayText') == 'Liberation Serif'
         assert control(view, 'fontSize').property('value') == 120
+        assert control(view, 'styleStandard').property('checked') is True
         for name, attribute in [('boldButton', 'bold'), ('italicButton', 'italic'),
                                 ('underlineButton', 'underline')]:
             click(view, name, qt_app)
@@ -200,6 +201,10 @@ def test_home_controls_edit_real_paragraph_and_saved_docx(qt_app, live_writer, t
         assert document.paragraphs()[1].style == 'Heading 1'
         assert model.selection['size'] == document.paragraphs()[1].size
         assert control(view, 'styleHeading 1').property('checked') is True
+        click(view, 'styleStandard', qt_app)
+        assert document.paragraphs()[1].style == 'Standard'
+        assert control(view, 'styleStandard').property('checked') is True
+        click(view, 'styleHeading 1', qt_app)
         evidence = os.environ.get('ZALDROS_OFFICE_EVIDENCE_DIR')
         if evidence:
             import hashlib

@@ -53,3 +53,13 @@ Job-log download returned no log in this environment. Emit the actual pytest cra
 message first, bounded in UTF-8 bytes, and use short terminal tracebacks. A real
 pytest regression with a long Unicode source ensures the exception survives.
 No document assertion has been removed; rerun is required to diagnose the cause.
+
+**DIAGNOSIS / FIX CANDIDATE** — Improved diagnostics on `cecf3d4`, push run
+`40556731365`, Writer job `122374662678`: the same 21 passed / 1 failed. Exact
+assertion: reopened font `Liberation Serif` differs from selected generic Qt alias
+`Monospace`. Preserve `diagnostic-ci-failure.json` and the unchanged equality check.
+Resolve the selected Qt family through QFontInfo before submitting a concrete
+family to UNO. Add DOCX alongside ODT to the concrete-font/fractional-size engine
+round trip. Remote confirmation must establish whether this fixes the cause.
+The actual engine receipt also shows the default style ID is `Standard`, so the
+Normal card now uses that UNO ID and the real UI test checks Normal/Heading switching.
