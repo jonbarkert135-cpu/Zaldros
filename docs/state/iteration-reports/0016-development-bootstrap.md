@@ -51,7 +51,17 @@ earlier fresh-shell receipt is retained with its original code hash. A fresh rem
 run is required for this refinement. Actual receipts: destination-isolation.json
 and local-final-checks.json; UI/engine/recipe sources remain unchanged.
 
-**NEXT** — Publish PR, verify all three profiles in normal CI and required real-UNO
-suites, inspect any ISO triggered by the shell README update, and merge normally.
+**FINAL REMOTE ACCEPTANCE** — Source `d25e310`, push run `40471227890` and PR run
+`40471232810`: all eight distinct job types succeed across the two runs. The PR
+checkout `20a4d06` and source have the identical Git tree
+`fa62b607557136c42e16dd95888f71b765d6ba59`. The five selected profile jobs confirm
+the correct packages/interpreters; real UNO suites total 47 passed / zero skips.
+Each run also has a cancelled duplicate Office dependency-setup job and its failed
+artifact upload, preserved in `ci-acceptance-final.json`. Neither entire final
+workflow is represented as green. Initial all-green CI/ISO receipts remain separate.
+
+**STATUS / NEXT** — Shared bootstrap slice verified; PR #6 is ready for normal
+merge, subject to repository branch rules. No admin override or check weakening.
 Then proceed to the measured P04 operation/recovery slice; P02 licensing and remaining
-reproducibility/permission hardening stay open.
+reproducibility/permission hardening stay open. The Office reference brief and
+current chrome captures retain the owner's UI requirements for subsequent P19 work.

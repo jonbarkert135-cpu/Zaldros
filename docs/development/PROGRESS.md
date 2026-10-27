@@ -517,6 +517,20 @@ fresh tools setup с PIP_TARGET/PREFIX/USER/LOG/config + подложным pyte
 Далее: CI hardened source → normal merge → измеряемый P04 slice. P02 licensing,
 полная lock/snapshot воспроизводимость и permission hardening остаются открытыми.
 
+### Bootstrap — итоговая проверка hardened source
+
+`d25e310`: push CI `40471227890` и PR CI `40471232810` вместе подтверждают все
+восемь различных типов заданий. Проверено равенство Git tree исходника и реального
+PR checkout `20a4d06`: `fa62b607557136c42e16dd95888f71b765d6ba59`.
+Пять выбранных profile jobs подтверждают нужные Python/dependency versions;
+Writer 17 + Sheets 15 + Slides 15 = **47 PASS / 0 skipped** с реальным UNO.
+В каждом прогоне отменён один дублирующий Office setup до запуска тестов; upload
+артефакта затем завершился ошибкой из-за отсутствия результатов. Все статусы
+сохранены в `ci-acceptance-final.json`. Полностью зелёными эти два workflow не
+объявляются; начальные успешные CI/ISO остаются отдельными доказательствами.
+Далее: обычное объединение PR #6 по правилам репозитория. P03 slice подготовки
+среды проверен; полный lock/snapshot и остальные открытые этапы не закрываются.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);
