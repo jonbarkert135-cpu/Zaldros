@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
-from PySide6.QtGui import QFont, QFontDatabase, QFontInfo
+from PySide6.QtGui import QFontDatabase
 
 from .engine import EngineError, WriterEngine, writer_available
 
@@ -95,12 +95,7 @@ class DocumentModel(QObject):
 
     @Slot(str, result=bool)
     def applyFont(self, name: str) -> bool:  # noqa: N802
-        if not name.strip():
-            return False
-        # Qt lists generic aliases such as Monospace. Writer's DOCX exporter
-        # does not preserve those reliably; submit the concrete matched family.
-        family = QFontInfo(QFont(name)).family()
-        return self._edit('set_character_format', self._selected, font=family)
+        return self._edit('set_character_format', self._selected, font=name)
 
     @Slot(float, result=bool)
     def applyFontSize(self, size: float) -> bool:  # noqa: N802

@@ -151,9 +151,10 @@ class Document:
             element = enumeration.nextElement()
             if not element.supportsService("com.sun.star.text.Paragraph"):
                 continue
-            weight = getattr(element, "CharWeight", None)
-            posture = getattr(element, "CharPosture", None)
-            underline = getattr(element, "CharUnderline", None)
+            characters = self._paragraph_cursor(element)
+            weight = getattr(characters, "CharWeight", None)
+            posture = getattr(characters, "CharPosture", None)
+            underline = getattr(characters, "CharUnderline", None)
             alignment = getattr(element, "ParaAdjust", None)
             out.append(Paragraph(
                 index=index, text=element.getString(),
@@ -162,9 +163,9 @@ class Document:
                 italic=None if posture is None else posture.value in
                        ("ITALIC", "OBLIQUE", "REVERSE_ITALIC", "REVERSE_OBLIQUE"),
                 underline=None if underline is None else int(underline) != 0,
-                size=float(getattr(element, "CharHeight", 0) or 0),
+                size=float(getattr(characters, "CharHeight", 0) or 0),
                 alignment=-1 if alignment is None else int(alignment),
-                font=str(getattr(element, "CharFontName", "") or "")))
+                font=str(getattr(characters, "CharFontName", "") or "")))
             index += 1
         return out
 
@@ -208,9 +209,18 @@ class Document:
             position += 1
         raise EngineError(_("Нет абзаца с номером {index}").format(index=index))
 
-    def _set_paragraph_properties(self, index: int, **properties) -> None:
+    @staticmethod
+    def _paragraph_cursor(element):
+        """Select actual character runs, not the paragraph's character defaults."""
+        cursor = element.getText().createTextCursorByRange(element.getStart())
+        cursor.gotoRange(element.getEnd(), True)
+        return cursor
+
+    def _set_paragraph_properties(self, index: int, *, characters=False, **properties) -> None:
         try:
             element = self._paragraph(index)
+            if characters:
+                element = self._paragraph_cursor(element)
             for name, value in properties.items():
                 setattr(element, name, value)
         except EngineError:
@@ -248,7 +258,7 @@ class Document:
             properties["CharHeight"] = float(size)
         if font is not None:
             properties["CharFontName"] = font.strip()
-        self._set_paragraph_properties(index, **properties)
+        self._set_paragraph_properties(index, characters=True, **properties)
 
     def insert_table(self, rows: int, columns: int, values: list[list[str]] | None = None) -> None:
         table = self._doc.createInstance("com.sun.star.text.TextTable")

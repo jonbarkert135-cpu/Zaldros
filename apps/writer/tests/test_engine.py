@@ -184,7 +184,8 @@ def test_font_size_and_alignment_round_trip_and_invalid_input_is_unchanged(engin
         document.insert_table(1, 1, [['cell']])
         document.append_paragraph('After')
         index = next(p.index for p in document.paragraphs() if p.text == 'After')
-        document.set_character_format(index, font='Liberation Sans', size=13.5)
+        document.set_character_format(index, font='Liberation Sans', size=13.5,
+                                      bold=True, italic=True, underline=True)
         document.set_alignment(index, 3)
         for size in (0, 401, float('nan'), float('inf')):
             with pytest.raises(EngineError):
@@ -203,6 +204,7 @@ def test_font_size_and_alignment_round_trip_and_invalid_input_is_unchanged(engin
         after = next(p for p in reopened.paragraphs() if p.text == 'After')
         assert after.font == 'Liberation Sans'
         assert after.size == 13.5
+        assert after.bold is True and after.italic is True and after.underline is True
         assert after.alignment == 3
         assert reopened.paragraphs()[0].alignment == 0
     finally:

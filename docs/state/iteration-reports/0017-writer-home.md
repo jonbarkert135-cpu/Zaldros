@@ -63,3 +63,12 @@ family to UNO. Add DOCX alongside ODT to the concrete-font/fractional-size engin
 round trip. Remote confirmation must establish whether this fixes the cause.
 The actual engine receipt also shows the default style ID is `Standard`, so the
 Normal card now uses that UNO ID and the real UI test checks Normal/Heading switching.
+
+**CONCRETE-FONT RERUN** — `c5180ad`, PR run `40557228996`, Writer job
+`122376422575`: 21 passed / 2 failed / zero skips. DOCX also loses concrete
+`Liberation Sans`; resolving a generic alias is insufficient. Preserve
+`concrete-font-ci-failure.json`. Remove that provisional alias mapping and target
+an actual text cursor spanning paragraph start/end for character read/write,
+instead of the paragraph's character defaults. Paragraph style/alignment still
+use the paragraph object. Keep strict font equality and strengthen both ODT/DOCX
+round trips to require bold/italic/underline ON after reopening too.

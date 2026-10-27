@@ -1,0 +1,29 @@
+{
+  "source_commit": "c5180ad79b5b7c69f908811fa44fdb4a1d7819da",
+  "run_id": 40557228996,
+  "job_id": 122376422575,
+  "result": "21 passed, 2 failed, zero skips; not accepted",
+  "annotations": [
+    {
+      "message": "{\"scope\": \"Real UNO paragraph-formatting interaction, owned two-paragraph fixture\", \"viewport\": [1280, 800], \"device_pixel_ratio\": 1.0, \"selected_paragraph\": 1, \"paragraphs\": [{\"index\": 0, \"text\": \"\\u041f\\u0435\\u0440\\u0432\\u044b\\u0439 \\u0430\\u0431\\u0437\\u0430\\u0446\", \"style\": \"Standard\", \"bold\": false, \"italic\": false, \"underline\": false, \"size\": 13.0, \"alignment\": 0, \"font\": \"DejaVu Sans Mono\"}, {\"index\": 1, \"text\": \"\\u0412\\u0442\\u043e\\u0440\\u043e\\u0439 \\u0430\\u0431\\u0437\\u0430\\u0446\", \"style\": \"Heading 1\", \"bold\": true, \"italic\": false, \"underline\": false, \"size\": 18.0, \"alignment\": 0, \"font\": \"Liberation Sans\"}], \"sha256\": \"b941bd053d20ffa0827d2da27c001c59b5595d13fd4693a6a44ac5f5eb3fd7f2\", \"source\": \"61ea7f44ef7071976e0b2052cfbdd4c9286bf4fb\"}",
+      "title": "Writer UI evidence"
+    },
+    {
+      "message": "{\"collected\": 23, \"passed\": {\"test_engine.py\": 14, \"test_ui.py\": 7}, \"failed\": 2, \"skipped\": 0, \"exitstatus\": 1}",
+      "title": "Office test summary"
+    },
+    {
+      "message": "AssertionError: assert 'Liberation Serif' == 'DejaVu Sans Mono'\n  \n  - DejaVu Sans Mono\n  + Liberation Serif\napps/writer/tests/test_ui.py::test_home_controls_edit_real_paragraph_and_saved_docx",
+      "title": "Office test failure"
+    },
+    {
+      "message": "AssertionError: assert 'Liberation Serif' == 'Liberation Sans'\n  \n  - Liberation Sans\n  ?             ^^^\n  + Liberation Serif\n  ?             ^^^^\napps/writer/tests/test_engine.py::test_font_size_and_alignment_round_trip_and_invalid_input_is_unchanged[.docx]",
+      "title": "Office test failure"
+    },
+    {
+      "message": "{\"python\": \"3.12.3\", \"libreoffice\": \"LibreOffice 24.2.7.2 420(Build:2)\", \"uno_module\": \"/usr/lib/python3/dist-packages/uno.py\", \"workflow_sha\": \"61ea7f44ef7071976e0b2052cfbdd4c9286bf4fb\", \"run_id\": \"40557228996\"}",
+      "title": "Office runtime"
+    }
+  ],
+  "finding": "Both generic and concrete families fail DOCX equality; alias-only hypothesis is insufficient. Replace paragraph character-default read/write with the actual selected text range. Keep all equality checks."
+}
