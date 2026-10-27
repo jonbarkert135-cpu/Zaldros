@@ -1,0 +1,90 @@
+{
+  "source_commit": "747cb015a8d78bba1bb917b7c1db8d287ab99d59",
+  "workflow": {
+    "run_id": 40565144511,
+    "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40565144511",
+    "status": "Success",
+    "successful_job_types": 8,
+    "html_sha256": "3ae8ea773b336cedc5fb2b768d97d2fd437fb12e5be4a3d2b70961358198e445"
+  },
+  "office": [
+    {
+      "job_id": 122404320030,
+      "name": "office (sheets, real UNO + Qt)",
+      "tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 9,
+          "test_ui.py": 6
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "747cb015a8d78bba1bb917b7c1db8d287ab99d59",
+        "run_id": "40565144511"
+      },
+      "html_sha256": "6cf5a71653d61af76de5e363838bdf0eff6da511c57220e152eb47d919a65004"
+    },
+    {
+      "job_id": 122404320309,
+      "name": "office (slides, real UNO + Qt)",
+      "tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 11,
+          "test_ui.py": 4
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "747cb015a8d78bba1bb917b7c1db8d287ab99d59",
+        "run_id": "40565144511"
+      },
+      "html_sha256": "54ddd39df8dfabf9ceb21d39bad9f345276556607157e47a9af615dc813f4bfd"
+    },
+    {
+      "job_id": 122404320523,
+      "name": "office (writer, real UNO + Qt)",
+      "tests": {
+        "collected": 32,
+        "passed": {
+          "test_engine.py": 19,
+          "test_ui.py": 13
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "747cb015a8d78bba1bb917b7c1db8d287ab99d59",
+        "run_id": "40565144511"
+      },
+      "html_sha256": "1a43c62a042fa6739a757c399a8a7cffb1579848ba88a322ecd3bd12c38e40ac"
+    }
+  ],
+  "office_passed": 62,
+  "writer_passed": 32,
+  "skipped": 0,
+  "local_optional_writer": {
+    "passed": 14,
+    "skipped": 18,
+    "reason": "Missing matching local UNO; explicit Qt test doubles are not engine acceptance"
+  },
+  "local_tools_passed": 81,
+  "evidence_transport": "Public GitHub run/job HTML (HTTP 200), exact JSON notices. API/PR creation still fails with CONNECT 403; no PR creation or API merge is claimed.",
+  "scope": "Inline body-paragraph text, unchanged formatted runs, Unicode cursor validation, guarded split/join, actual Qt input/caret and repeated Ctrl+S DOCX/ODT saves. Not complete Word compatibility, rich page/run rendering, cross-paragraph selection, rich paste, native file-dialog/hardware or ISO-frontend acceptance.",
+  "iso": "40565144514 still in progress at capture; conservative apps filter, no shipped ISO recipe/runtime change and frontend installation still open."
+}

@@ -581,3 +581,17 @@ Enter делит абзац, Backspace/Delete объединяют соседн�
 Локально: optional Writer 14 PASS / 18 SKIP без UNO; tools 81 PASS. Реальный движок
 должен подтвердить новые round-trip/UI сценарии. Подробности и ограничения — 0018.
 P19 PARTIAL; P04 и установка Office frontends в ISO остаются открытыми.
+
+### Writer editing — удалённая приёмка
+
+`747cb01`, CI `40565144511`: **8/8 типов заданий PASS**, Writer **32**, Sheets **15**,
+Slides **15** — **62 PASS / 0 SKIP** на реальном UNO/LibreOffice 24.2.7.2. Начальная
+версия e7a88fc тоже прошла 8/8; предупреждения диалога/shortcuts исправлены отдельно.
+Реальные тесты проверяют сохранение нетронутых mixed-format runs, Unicode-границы,
+запрет удаления таблицы через merge, ввод/caret/Enter/Backspace и два Ctrl+S с
+открытием DOCX/ODT. Локальные 14 PASS / 18 SKIP не смешиваются с engine acceptance.
+Точные метаданные/источники: `docs/state/evidence/writer-editing/acceptance.json`.
+API GitHub блокирует создание PR (CONNECT 403); Git и публичные страницы CI доступны.
+Итоговая интеграция — обычный Git merge/push, без выдуманного PR и обхода branch rules.
+ISO ещё выполняется; его успешная приёмка и установка frontend в образ не заявляются.
+P19 остаётся PARTIAL, ограничения 0018 и остальные открытые Pxx сохраняются.

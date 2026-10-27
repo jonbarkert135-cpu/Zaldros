@@ -46,3 +46,24 @@ explicit width and bind all platform Save/Save As sequences; rerun rendering/tes
 GitHub API still rejects PR creation (CONNECT 403), while Git and public Actions
 pages work. Do not claim a PR was created; retain the concrete body locally and
 use normal Git integration after verified CI if the API remains unavailable.
+
+**FINAL REMOTE ACCEPTANCE** — Initial `e7a88fc`, CI `40564986957`: all eight job
+ types PASS, Writer 32 / zero skips. Final source `747cb015a8d78bba1bb917b7c1db8d287ab99d59`,
+CI `40565144511`: **all eight job types PASS**. Writer **32** (19 engine / 13 UI),
+Sheets **15**, Slides **15** = **62 passed / zero failures/skips** on Python 3.12.3 /
+LibreOffice 24.2.7.2. Local optional checks remain 14 passed / 18 skips, separate
+from real-UNO evidence. Source hashes, public run/job HTML hashes and exact JSON
+notices are in `acceptance.json` / `final-source.json`.
+
+The Qt test-double view was inspected locally with text/caret/Save control, explicitly
+as layout evidence, not a live UNO screenshot. The archived image is the initial
+no-engine render, with its own source hash. Native file-dialog interaction is not
+claimed tested; the real engine UI test uses an existing local target for Ctrl+S.
+ISO `40565144514` is in progress; recipe/runtime/frontend installation are unchanged.
+
+**STATUS / NEXT** — Inline-edit/save slice verified, P19 PARTIAL. Final follow-up
+records evidence only. API PR creation remains unavailable (CONNECT 403); no PR
+number is invented. Perform an ordinary Git merge/push to main under server rules.
+Next work remains cross-paragraph selection/range formatting, rich/multiline paste,
+file lifecycle/undo and P04 measured GUI/service recovery; ISO frontend installation,
+installed-system and hardware acceptance remain open.
