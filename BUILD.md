@@ -1,10 +1,12 @@
 # Building Zaldros OS
 
-Latest recorded build-input validation: [P02 evidence](docs/state/evidence/p02-rootfs/README.md),
-source `6168e9b`, workflow `40333303076`: three ISO builds and nine boot jobs succeeded.
-The guest screenshot step reports FAIL for legacy variants, despite green jobs;
-see the retained per-step summary. This is not a completed desktop acceptance gate.
-The dated CI account below remains historical context.
+Latest boot/UI validation: [ISO input-coverage evidence](docs/state/evidence/iso-input-coverage/vm-acceptance.json),
+source `38ba104`, workflow `40458956429`: three ISO builds, nine boot jobs and all
+99 required UI steps passed. All raw reports were rechecked with the strict CLI.
+Earlier [P02 evidence](docs/state/evidence/p02-rootfs/README.md) on `6168e9b` includes
+real screenshot failures that green jobs formerly hid; those failures remain
+historical records. Installed-system, hardware and full-alpha gates remain open.
+The dated CI account below is historical context.
 
 The [current functional gate](docs/state/decisions/ADR-0026-functional-ci-acceptance.md)
 requires boot facts and all eleven host/guest UI checks to pass. Failed or missing
@@ -57,9 +59,9 @@ in QEMU on a GitHub runner" until a machine says otherwise.
 
 Repository branch pushes trigger the ISO workflow for changes in `backend/`,
 `apps/`, `assets/`, `system/`, `shell/`, `build/iso/`, `build/provenance/`, the
-shipped `tools/collect-logs.sh`, or the active ISO workflow itself. Documentation
-and the historical Fedora Containerfiles retain ordinary CI without rebuilding
-the Ubuntu ISO. Manual workflow dispatch remains available.
+shipped `tools/collect-logs.sh`, or the active ISO workflow itself. Changes confined
+to `docs/`, the root README or the historical Fedora Containerfiles retain ordinary
+CI without rebuilding the Ubuntu ISO. Manual workflow dispatch remains available.
 
 The tools regression checks the push filter against actual `$REPO` recipe inputs,
 the asset inventory and all app sources. It rejects filters that miss an input,

@@ -436,6 +436,31 @@ frontends пока не копируются в ISO; apps filter не объяв
 Оставшиеся P03 bootstrap/reproducibility, P02 licensing и P04 lifecycle остаются
 открытыми. Подробности: iteration `0015-iso-input-coverage.md`, BUILD.md.
 
+### ISO input coverage — удалённая приёмка
+
+Проверенный source `38ba1043251cc78912cdbb96539902e58c4b28f3`.
+[Normal CI 40459015507](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40459015507):
+**8/8 PASS**. [ISO 40458956429](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40458956429):
+native event **push**, **3/3 builds**, **9/9 boot jobs PASS**. Все девять свежих
+сырых отчётов перепроверены строгим report.py: exit 0, **99/99** обязательных
+UI PASS; снимки 1280×800 без ошибок, перемещение и minimize/restore одного UUID.
+Все сборки аутентифицировали одинаковый rootfs SHA256. Доказательства:
+`docs/state/evidence/iso-input-coverage/vm-acceptance.json`.
+
+Модель входов: 99 recipe paths / 32 пропуска прежде; 159 inventory/validation
+paths / 159 прежде; 36 planned app paths / 36 прежде. Теперь пропусков нет.
+Receipt/model hash: `input-coverage.json` в той же директории. Apps остаются
+planned integration inputs, не объявляются установленными. Guest JSON по-прежнему
+не встраивает source SHA/run ID — ограничение записано; commits и даты публикации
+сопоставлены с workflow. P17 source binding не считается завершённым.
+
+Финальное уточнение теста привязывает фильтр именно к push; чужой event не может
+дать ложное подтверждение. Tools после этого: **65 passed**, functional gate
+**48 passed**. Follow-up меняет только документы/доказательства и unshipped
+регрессию; ISO workflow, рецепт и runtime остаются проверенной версии 38ba104.
+PR #5 → CI follow-up → normal merge. Далее: оставшийся P03 dev bootstrap,
+P02 licensing и P04 async/recovery; полного alpha/installed/hardware claim нет.
+
 ## Шаблон следующей записи
 
 Для каждого этапа добавлять: Pxx/подэтап; исходный и конечный SHA (либо uncommitted);

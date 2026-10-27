@@ -1,0 +1,65 @@
+{
+  "base_commit": "494a2775e6ecd6e9d9b426ec1dff938907063bfd",
+  "workflow_source_commit": "38ba1043251cc78912cdbb96539902e58c4b28f3",
+  "old_push_patterns": [
+    "build/iso/**",
+    "shell/**",
+    "system/theme/**",
+    ".github/workflows/iso.yml"
+  ],
+  "new_push_patterns": [
+    "build/iso/**",
+    "build/provenance/**",
+    "shell/**",
+    "backend/**",
+    "apps/**",
+    "assets/**",
+    "system/**",
+    "tools/collect-logs.sh",
+    ".github/workflows/iso.yml"
+  ],
+  "groups": {
+    "recipe": {
+      "checked_paths": 99,
+      "uncovered_before": 32,
+      "examples_before": [
+        "backend/zaldros_backend/__init__.py",
+        "backend/zaldros_backend/accounts.py",
+        "backend/zaldros_backend/audio.py",
+        "backend/zaldros_backend/auth.py",
+        "backend/zaldros_backend/bluetooth.py"
+      ],
+      "uncovered_after": 0,
+      "kind": "consumed recipe/validation inputs"
+    },
+    "assets": {
+      "checked_paths": 159,
+      "uncovered_before": 159,
+      "examples_before": [
+        "assets/fonts/pt-sans/LICENSE.txt",
+        "assets/fonts/pt-sans/PTSans-Bold.ttf",
+        "assets/fonts/pt-sans/PTSans-Regular.ttf",
+        "assets/icons/apps/AUTHORS",
+        "assets/icons/apps/COPYING"
+      ],
+      "uncovered_after": 0,
+      "kind": "consumed recipe/validation inputs"
+    },
+    "apps": {
+      "checked_paths": 36,
+      "uncovered_before": 36,
+      "examples_before": [
+        "apps/sheets/README.md",
+        "apps/sheets/qml/CaptionButtons.qml",
+        "apps/sheets/qml/ComboLike.qml",
+        "apps/sheets/qml/LetterButton.qml",
+        "apps/sheets/qml/MenuLike.qml"
+      ],
+      "uncovered_after": 0,
+      "kind": "planned integration inputs, not installed by recipe"
+    }
+  },
+  "matcher_scope": "literal paths and literal-directory /** only, matching the workflow filters; this is not a general GitHub glob or YAML parser",
+  "local_tools_after_event_guard": 65,
+  "coverage_model_sha256": "bec0c4872c38b917aa0b18f983cbbe90bbf5092fb44d8150d3c9f134e9ef6c1d"
+}

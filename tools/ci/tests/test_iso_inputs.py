@@ -11,10 +11,12 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW = ROOT / ".github/workflows/iso.yml"
 
 
-def push_patterns():
+def push_patterns(workflow=WORKFLOW):
     # The workflow uses a JSON-compatible flow list for this data. Keep stdlib
     # parsing and simple literal-directory /** filters; do not emulate YAML/globs.
-    match = re.search(r"(?m)^    paths: (\[.*\])$", WORKFLOW.read_text())
+    push = re.search(r"(?m)^  push:\n((?:    .*\n)+)", workflow.read_text())
+    assert push, "ISO push event is missing"
+    match = re.search(r"(?m)^    paths: (\[.*\])$", push[1])
     assert match, "keep the ISO push paths as a JSON-compatible flow list"
     patterns = json.loads(match[1])
     assert patterns and all(isinstance(p, str) for p in patterns)
@@ -26,6 +28,13 @@ def push_patterns():
 def selected(path):
     return any(path.startswith(p[:-2]) if p.endswith("/**") else path == p
                for p in push_patterns())
+
+
+def test_another_events_filter_cannot_stand_in_for_push(tmp_path):
+    workflow = tmp_path / "workflow.yml"
+    workflow.write_text('on:\n  pull_request:\n    paths: ["backend/**"]\n')
+    with pytest.raises(AssertionError, match="push event is missing"):
+        push_patterns(workflow)
 
 
 def files_under(path):
