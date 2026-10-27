@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Qt view of the real Writer document; formatting targets a whole paragraph."""
+"""Qt view of Writer text, paragraph operations and selected character ranges."""
 from __future__ import annotations
 
 import json
@@ -7,7 +7,7 @@ from pathlib import Path
 
 from PySide6.QtCore import (QAbstractListModel, QModelIndex, Property, QObject,
                             QTimer, Qt, QUrl, Signal, Slot)
-from PySide6.QtGui import QFontDatabase
+from PySide6.QtGui import QFont, QFontDatabase, QSyntaxHighlighter, QTextCharFormat
 
 from .engine import EngineError, WriterEngine, writer_available
 
@@ -52,6 +52,34 @@ class ParagraphRows(QAbstractListModel):
                     self.dataChanged.emit(position, position, [Qt.ItemDataRole.UserRole])
 
 
+class RunHighlighter(QSyntaxHighlighter):
+    """Paint engine character runs without rewriting text, selection or undo history."""
+    def __init__(self, document):
+        super().__init__(document)
+        self.runs = []
+
+    def highlightBlock(self, text):
+        block_start = self.currentBlock().position()
+        block_end = block_start + len(text.encode('utf-16-le')) // 2
+        for run in self.runs:
+            start = max(block_start, run['start'])
+            end = min(block_end, run['start'] + run['length'])
+            if start >= end:
+                continue
+            fmt = QTextCharFormat()
+            if run['font']:
+                fmt.setFontFamilies([run['font']])
+            if run['size'] > 0:
+                fmt.setFontPointSize(run['size'])
+            if run['bold'] is not None:
+                fmt.setFontWeight(QFont.Weight.Bold if run['bold'] else QFont.Weight.Normal)
+            if run['italic'] is not None:
+                fmt.setFontItalic(run['italic'])
+            if run['underline'] is not None:
+                fmt.setFontUnderline(run['underline'])
+            self.setFormat(start - block_start, end - start, fmt)
+
+
 class DocumentModel(QObject):
     changed = Signal()
     focusRequested = Signal(int, int)
@@ -66,6 +94,13 @@ class DocumentModel(QObject):
         self._path = str(Path(path).resolve()) if document is not None and path else ''
         self._modified = False
         self._drafts = {}
+        self._text_selection = (0, 0)
+        self._range_format = {}
+        self._highlighters = {}
+        self._selection_timer = QTimer(self)
+        self._selection_timer.setSingleShot(True)
+        self._selection_timer.setInterval(75)
+        self._selection_timer.timeout.connect(self._read_selection)
         self._rows = ParagraphRows(self)
         self._flush_timer = QTimer(self)
         self._flush_timer.setSingleShot(True)
@@ -95,16 +130,67 @@ class DocumentModel(QObject):
             # Keep the last readback and any unsent draft if the engine is unavailable.
             self._status = str(error)
         self._sync_rows()
+        if self.hasTextSelection:
+            self._range_format = {}
+            self._selection_timer.start()
         self.changed.emit()
 
     def _sync_rows(self):
         self._rows.sync([{**item, 'editorText': self._drafts.get(item['index'], item['text'])}
                          for item in self._paragraphs])
+        for index, highlighter in list(self._highlighters.items()):
+            try:
+                highlighter.runs = (self._paragraphs[index].get('runs', [])
+                                    if index not in self._drafts else [])
+                highlighter.rehighlight()
+            except (RuntimeError, IndexError):
+                self._highlighters.pop(index, None)  # editor destroyed by a structural reset
+
+    @Slot(int, QObject)
+    def attachEditor(self, index, quick_document):  # noqa: N802
+        self._highlighters[index] = RunHighlighter(quick_document.textDocument())
+        self._sync_rows()
+
+    def _clear_selection(self):
+        self._selection_timer.stop()
+        self._text_selection = (0, 0)
+        self._range_format = {}
+
+    @Slot(int, int, int)
+    def setTextSelection(self, index, start, end):  # noqa: N802
+        if index != self._selected or not self.formatAvailable:
+            return
+        pair = (min(start, end), max(start, end))
+        if pair == self._text_selection:
+            return
+        self._text_selection = pair
+        self._range_format = {}
+        self._selection_timer.start()
+        self.changed.emit()
+
+    def _read_selection(self):
+        self._selection_timer.stop()
+        if not self.hasTextSelection:
+            return True
+        if not self.flushEdits():
+            return False
+        self._selection_timer.stop()
+        try:
+            self._range_format = self._document.character_format(self._selected, *self._text_selection)
+        except EngineError as error:
+            self._range_format = {}
+            self._status = str(error)
+            self.changed.emit()
+            return False
+        self._status = ''
+        self.changed.emit()
+        return True
 
     @Slot(int, str, result=bool)
     def queueText(self, index: int, text: str) -> bool:  # noqa: N802
         if not self.live or not 0 <= index < len(self._paragraphs):
             return False
+        self._clear_selection()
         if text == self._paragraphs[index]['text']:
             self._drafts.pop(index, None)
         else:
@@ -135,6 +221,7 @@ class DocumentModel(QObject):
 
     @Slot(int, int, result=bool)
     def splitParagraph(self, index: int, position: int) -> bool:  # noqa: N802
+        self._clear_selection()
         if not self._edit('split_paragraph', index, position):
             return False
         self._selected = index + 1
@@ -144,6 +231,7 @@ class DocumentModel(QObject):
 
     @Slot(int, result=bool)
     def mergeParagraph(self, index: int) -> bool:  # noqa: N802
+        self._clear_selection()
         if not 0 < index < len(self._paragraphs) or not self.flushEdits():
             return False
         position = len(self._paragraphs[index - 1]['text'].encode('utf-16-le')) // 2
@@ -179,6 +267,7 @@ class DocumentModel(QObject):
             self.focusRequested.emit(self._selected, 0)
             return False
         self._selected = index
+        self._clear_selection()
         self.changed.emit()
         return True
 
@@ -194,15 +283,24 @@ class DocumentModel(QObject):
     def applyFormat(self, index: int, attribute: str, value: bool) -> bool:  # noqa: N802
         if attribute not in ('bold', 'italic', 'underline'):
             return False
-        return self._edit('set_character_format', index, **{attribute: value})
+        return self._apply_character_format(index, **{attribute: value})
+
+    def _apply_character_format(self, index, **properties):
+        if index == self._selected and self.hasTextSelection:
+            if not self._read_selection():
+                return False
+            properties.update(zip(('start', 'end'), self._text_selection))
+        if not self._edit('set_character_format', index, **properties):
+            return False
+        return self._read_selection()
 
     @Slot(str, result=bool)
     def applyFont(self, name: str) -> bool:  # noqa: N802
-        return self._edit('set_character_format', self._selected, font=name)
+        return self._apply_character_format(self._selected, font=name)
 
     @Slot(float, result=bool)
     def applyFontSize(self, size: float) -> bool:  # noqa: N802
-        return self._edit('set_character_format', self._selected, size=size)
+        return self._apply_character_format(self._selected, size=size)
 
     @Slot(int, result=bool)
     def applyAlignment(self, alignment: int) -> bool:  # noqa: N802
@@ -272,7 +370,25 @@ class DocumentModel(QObject):
 
     @Property('QVariantMap', notify=changed)
     def selection(self) -> dict:
-        return self._paragraphs[self._selected].copy() if self.formatAvailable else {}
+        if not self.formatAvailable:
+            return {}
+        base = self._paragraphs[self._selected].copy()
+        if self.hasTextSelection:
+            unknown = dict(font='', size=0, bold=None, italic=None, underline=None)
+            return {**base, **(self._range_format or unknown)}
+        return base
+
+    @Property(bool, notify=changed)
+    def hasTextSelection(self) -> bool:  # noqa: N802
+        return self._text_selection[1] > self._text_selection[0]
+
+    @Property(int, notify=changed)
+    def selectionLength(self) -> int:  # noqa: N802
+        return self._text_selection[1] - self._text_selection[0]
+
+    @Property(bool, notify=changed)
+    def characterFormatAvailable(self) -> bool:  # noqa: N802
+        return self.formatAvailable and (not self.hasTextSelection or bool(self._range_format))
 
     @Property('QStringList', notify=changed)
     def fontFamilies(self) -> list[str]:  # noqa: N802

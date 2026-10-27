@@ -1,9 +1,9 @@
 # Project state — 2026-10-27
 
-The Writer editing cycle starts from main `4514ba65742a8072731e1d8a5d808f25eb43aa35`
-(Writer Home PR #7 merged).
+The Writer selection-formatting cycle starts from main `1ac61346e7372deb6a22509904d3d21e18925090`
+(inline editing/save integrated through ordinary Git merge).
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
-Office engine/UI verified source: `747cb015a8d78bba1bb917b7c1db8d287ab99d59`.
+Office engine/UI verified source: `c625c8f93ac67969e943dd352c933da4e9f71b0f`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
 old current-status summary; it does not retrospectively reclassify historical runs.
 
@@ -31,6 +31,17 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+Selection-formatting follow-up: local optional Writer **17 passed / 23 skipped**
+(no matching UNO); tools **81 passed**. Character commands target a selection within
+one paragraph, and Qt paints basic mixed runs reported by Writer. Long-text wrapping
+is corrected with a regression. Source `c625c8f`, CI `40575214293`: **all eight job
+types PASS**; Writer **40**, Sheets **15**, Slides **15**, zero failures/skips on
+real UNO. Tests retain selection during ribbon use, inspect painted ranges and
+reopen DOCX/ODT with unchanged neighbors. Iteration 0019 and
+[acceptance](evidence/writer-selection/acceptance.json) record scope and limits.
+Next primary iteration returns to P04 measured GUI/service responsiveness and
+recovery; remaining P19 features stay open. Earlier accepted stages follow.
 
 Writer editing follow-up: local optional suite **14 passed / 18 skipped** because
 this interpreter lacks UNO; tools **81 passed**. Stable inline editors, guarded

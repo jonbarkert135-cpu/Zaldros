@@ -23,7 +23,7 @@ Flickable {
                     id: fontFamily
                     objectName: "fontFamily"
                     width: 196; height: 30
-                    enabled: ribbon.ready
+                    enabled: ribbon.model.characterFormatAvailable
                     font.family: ribbon.uiFont
                     model: ribbon.model.fontFamilies
                     currentIndex: ribbon.ready ? find(ribbon.selection.font) : -1
@@ -35,7 +35,7 @@ Flickable {
                     id: fontSize
                     objectName: "fontSize"
                     width: 88; height: 30
-                    enabled: ribbon.ready
+                    enabled: ribbon.model.characterFormatAvailable
                     font.family: ribbon.uiFont
                     editable: true
                     from: 10; to: 4000; stepSize: 10
@@ -62,7 +62,7 @@ Flickable {
                         required property var modelData
                         objectName: modelData.key + "Button"
                         width: 34; height: 30
-                        enabled: ribbon.ready
+                        enabled: ribbon.model.characterFormatAvailable
                         text: modelData.label
                         checked: ribbon.ready && ribbon.selection[modelData.key] === true
                         highlighted: checked

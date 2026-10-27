@@ -1,7 +1,7 @@
 # Передача контекста
 
 Обновлено: 2026-10-27. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-Текущий цикл редактирования Writer начинается с main `4514ba6` (PR #7 MERGED).
+Текущий цикл форматирования выделения Writer начинается с main `1ac6134`.
 
 ## Текущая задача и результат
 
@@ -595,3 +595,30 @@ API GitHub блокирует создание PR (CONNECT 403); Git и публ
 Итоговая интеграция — обычный Git merge/push, без выдуманного PR и обхода branch rules.
 ISO ещё выполняется; его успешная приёмка и установка frontend в образ не заявляются.
 P19 остаётся PARTIAL, ограничения 0018 и остальные открытые Pxx сохраняются.
+
+### P19 — форматирование выделения Writer
+
+База `1ac6134`. Font/size/bold/italic/underline применяются к выделению внутри
+абзаца; без выделения сохраняется явно подписанное форматирование всего абзаца.
+Стили/выравнивание остаются абзацными. Basic mixed runs из UNO отображаются через
+QSyntaxHighlighter без переписывания текста/undo. Ошибка чтения выделения блокирует
+character commands, не превращая их в whole-paragraph запись. Исправлен перенос
+длинного текста: ширина TextArea теперь равна колонке страницы; добавлен regression.
+Локально optional Writer **17 PASS / 23 SKIP** без UNO; tools **81 PASS**. Реальные
+range/Qt/DOCX/ODT сценарии требуют CI. Подробности и ограничения — iteration 0019.
+
+### Writer selection — итоговая приёмка и возврат к P04
+
+`c625c8f`, CI `40575214293`: **8/8 типов заданий PASS**, Writer **40** (engine 22 /
+UI 18), Sheets **15**, Slides **15** = **70 PASS / 0 SKIP** на LibreOffice 24.2.7.2.
+Первый прогон c3dad87 дал Writer 38 PASS / 2 FAIL: при инспекции Qt layout временная
+Python-обёртка QTextDocument освобождалась раньше времени. Отдельный локальный Qt
+probe воспроизвёл проблему; сохранены сильные ссылки, все assertions оставлены.
+После исправления реальные Qt range/painted-run/DOCX/ODT сценарии проходят целиком.
+Локальные 17 PASS / 23 SKIP без UNO и synthetic layout PNG не объявляются engine
+acceptance. Подробные receipts и начальные падения: `writer-selection/` в evidence.
+Финальный follow-up меняет только документы. PR API всё ещё отвечает CONNECT 403;
+интеграция — обычный Git merge/push без обхода branch rules.
+Следующий основной этап: **P04 — измеряемая отзывчивость GUI/service операций и
+восстановление после ошибок**. P19 PARTIAL; cross-paragraph/rich rendering/paste,
+история, ISO frontend installation и остальные открытые этапы сохраняются.

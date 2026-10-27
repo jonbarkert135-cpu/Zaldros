@@ -82,3 +82,14 @@ tests with real UNO, zero skips, including Qt input and DOCX/ODT persistence.
 The local no-engine capture is not a document editing receipt.
 This improves group structure/behavior; it is not a new measured Word geometry or
 complete visual/functional parity claim.
+
+## Selected text and mixed runs (iteration 0019)
+
+Writer character controls now target the selection within one paragraph; without
+selection they retain whole-paragraph behavior. Styles/alignment stay paragraph
+operations, stated in the status bar. Basic engine font/size/character runs paint
+inside the editor without replacing its text. Real-UNO acceptance is 40 Writer
+tests without skips, including actual Qt selection/ribbon/painted-format checks
+and DOCX/ODT persistence. The archived layout test-double image is separate from
+that evidence. Complete page/field/object fidelity and cross-paragraph selection
+remain open; no new measured Word geometry or full visual parity is claimed.
