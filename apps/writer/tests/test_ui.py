@@ -410,3 +410,137 @@ def test_draft_survives_successful_write_followed_by_failed_readback(qt_app):
     assert model.flushEdits()
     assert not model.pendingEdits
     assert model.paragraphs[0]['text'] == 'retained after read failure'
+
+
+def test_engine_runs_highlight_without_changing_plain_text_or_undo(qt_app):
+    from PySide6.QtGui import QFont, QTextDocument
+    from zaldros_writer.model import RunHighlighter
+    document = QTextDocument()
+    document.setPlainText('a😀BCz')
+    document.clearUndoRedoStacks()
+    highlighter = RunHighlighter(document)
+    base = dict(font='PT Sans', size=12, bold=False, italic=False, underline=False)
+    highlighter.runs = [dict(base, start=0, length=3),
+                        dict(base, start=3, length=2, bold=True, italic=True, size=19),
+                        dict(base, start=5, length=1)]
+    highlighter.rehighlight()
+    ranges = document.begin().layout().formats()
+    bold = next(r for r in ranges if r.start == 3)
+    assert bold.length == 2
+    assert bold.format.fontWeight() == QFont.Weight.Bold
+    assert bold.format.fontItalic() is True and bold.format.fontPointSize() == 19
+    assert document.toPlainText() == 'a😀BCz'
+    assert not document.isUndoAvailable()
+
+
+def test_failed_selection_read_disables_character_commands_without_writing(qt_app):
+    from zaldros_writer.engine import EngineError, Paragraph
+
+    class UnreadableSelection:
+        written = False
+        def paragraphs(self):
+            return [Paragraph(0, 'hello', 'Standard', size=12, font='PT Sans')]
+        def character_format(self, *args):
+            raise EngineError('selection unavailable')
+        def set_character_format(self, *args, **kwargs):
+            self.written = True
+
+    document = UnreadableSelection()
+    model = DocumentModel(document)
+    model.setTextSelection(0, 1, 4)
+    assert not model._read_selection()
+    assert model.formatAvailable and not model.characterFormatAvailable
+    assert model.selection['bold'] is None and model.selection['font'] == ''
+    assert not model.applyFormat(0, 'bold', True)
+    assert not document.written and not model.modified
+
+
+@needs_writer
+@pytest.mark.parametrize('suffix', ['.docx', '.odt'])
+def test_keyboard_selection_ribbon_and_painted_runs_round_trip(qt_app, live_writer, tmp_path, suffix):
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QFont
+    from PySide6.QtTest import QTest
+    document = live_writer.new_document()
+    target = tmp_path / ('selected-ui' + suffix)
+    view = None
+    try:
+        document.append('left target right')
+        document.set_character_format(0, font='Liberation Serif', size=12,
+                                      bold=False, italic=False, underline=False)
+        document.save_as(target)
+        model = DocumentModel(document, path=str(target))
+        view = writer_view(model)
+        click(view, 'paragraph0', qt_app)
+        editor = control(view, 'paragraph0')
+        QTest.keyClick(view, Qt.Key.Key_Home)
+        for _ in range(5): QTest.keyClick(view, Qt.Key.Key_Right)
+        for _ in range(6): QTest.keyClick(view, Qt.Key.Key_Right, Qt.KeyboardModifier.ShiftModifier)
+        QTest.qWait(120)
+        assert model.hasTextSelection and model.selectionLength == 6
+        assert model.characterFormatAvailable
+        click(view, 'boldButton', qt_app)
+        assert document.character_format(0, 5, 11)['bold'] is True
+        assert document.character_format(0, 0, 5)['bold'] is False
+        assert editor.property('selectionStart') == 5 and editor.property('selectionEnd') == 11
+        assert control(view, 'boldButton').property('checked') is True
+        click(view, 'boldButton', qt_app)
+        assert document.character_format(0, 5, 11)['bold'] is False
+        click(view, 'boldButton', qt_app)
+        click(view, 'italicButton', qt_app)
+        click(view, 'underlineButton', qt_app)
+        size = control(view, 'fontSize')
+        size.forceActiveFocus()
+        QTest.keyClick(view, Qt.Key.Key_Up)
+        qt_app.processEvents()
+        assert document.character_format(0, 5, 11)['size'] == 13
+        family = control(view, 'fontFamily')
+        family.forceActiveFocus()
+        QTest.keyClick(view, Qt.Key.Key_Down)
+        qt_app.processEvents()
+        selected = document.character_format(0, 5, 11)
+        assert selected['font'] != 'Liberation Serif'
+        assert document.character_format(0, 0, 5)['font'] == 'Liberation Serif'
+        assert document.character_format(0, 11, 17)['size'] == 12
+        painted = editor.property('textDocument').textDocument().begin().layout().formats()
+        fmt = next(r.format for r in painted if r.start <= 5 < r.start + r.length)
+        assert fmt.fontWeight() == QFont.Weight.Bold and fmt.fontPointSize() == 13
+        assert fmt.fontItalic() is True and fmt.fontUnderline() is True
+        assert not model.pendingEdits
+        QTest.keyClick(view, Qt.Key.Key_S, Qt.KeyboardModifier.ControlModifier)
+        qt_app.processEvents()
+        assert not model.modified
+    finally:
+        if view is not None:
+            view.rootObject().setProperty('closeApproved', True)
+            close_view(view, qt_app)
+        document.close()
+    reopened = live_writer.open(target)
+    try:
+        assert reopened.character_format(0, 5, 11) == selected
+        assert reopened.character_format(0, 0, 5)['bold'] is False
+        assert reopened.character_format(0, 11, 17)['font'] == 'Liberation Serif'
+    finally:
+        reopened.close()
+
+
+def test_inline_editor_wraps_long_text_inside_page_column(qt_app):
+    from PySide6.QtTest import QTest
+    from zaldros_writer.engine import Paragraph
+
+    class LongDocument:
+        def paragraphs(self):
+            return [Paragraph(0, 'Long paragraph with wrapping. ' * 60, 'Standard',
+                              size=12, font='PT Sans')]
+        def page_count(self): return 1
+
+    model = DocumentModel(LongDocument())
+    view = writer_view(model)
+    try:
+        QTest.qWait(20)
+        editor = control(view, 'paragraph0')
+        assert editor.width() == editor.parentItem().width() == 642
+        assert editor.property('contentHeight') > 100
+        assert editor.height() >= editor.property('contentHeight')
+    finally:
+        close_view(view, qt_app)

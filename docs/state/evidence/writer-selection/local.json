@@ -1,0 +1,33 @@
+{
+  "base_commit": "1ac61346e7372deb6a22509904d3d21e18925090",
+  "source_state": "working tree before first selection commit; hashes below",
+  "files": {
+    "apps/writer/qml/Writer.qml": "416ae372d231a558865789e9b9d325148d55e3d68e965290c2d6ffd95387efd3",
+    "apps/writer/qml/HomeRibbon.qml": "0f65300c556e1e624b91748679e05dcd9a8f78baadd90f002b17f459f02dc26d",
+    "apps/writer/zaldros_writer/model.py": "f23724e3bd600b10c6d4b88d8aae5cd1654cd5513ac312da9543a97a5e8e7faf",
+    "apps/writer/zaldros_writer/engine.py": "08ee3cece99736b4271a9f623e2475d8f5edeedd4b5ac163923342c3f2b4781e",
+    "apps/writer/tests/test_engine.py": "caac4d5c063a45e4d1c399c0b6c256516f70d5e115624ebbdc1a39ce8db84cfd",
+    "apps/writer/tests/test_ui.py": "332aa9a4433a1fabc1719b7c9bad987ecfebaf30898fda96ac40233f58ba26c2"
+  },
+  "optional_writer": {
+    "passed": 17,
+    "skipped": 23,
+    "reason": "No matching local UNO; explicit test doubles/highlighter checks are not live-engine acceptance"
+  },
+  "tools_passed": 81,
+  "image": {
+    "file": "layout-test-double.png",
+    "sha256": "7afd4ad5fdf8e88e3c571987dd2a016de572370a82bccaef3a36128f867504d6",
+    "scope": "Explicit Qt test-double mixed-run layout, not UNO; owned fixture text and PT Sans",
+    "viewport": [
+      1280,
+      800
+    ]
+  },
+  "wrapping_regression": {
+    "before_editor_width": 421.28125,
+    "parent_width": 642,
+    "after_editor_width": 642,
+    "scope": "Fixed page-column layout, not frame pacing or performance acceptance"
+  }
+}

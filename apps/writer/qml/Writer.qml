@@ -202,7 +202,7 @@ Item {
                         id: editor
                         required property var paragraph
                         objectName: "paragraph" + paragraph.index
-                        width: text.width
+                        width: parent.width
                         height: Math.max(28, contentHeight + topPadding + bottomPadding)
                         wrapMode: TextEdit.Wrap
                         textFormat: TextEdit.PlainText
@@ -221,7 +221,13 @@ Item {
                         font.italic: paragraph.italic === true
                         font.underline: paragraph.underline === true
                         Accessible.name: qsTr("Абзац %1").arg(paragraph.index + 1)
-                        onActiveFocusChanged: if (activeFocus) document.selectParagraph(paragraph.index)
+                        function reportSelection() {
+                            if (activeFocus) document.setTextSelection(paragraph.index, selectionStart, selectionEnd);
+                        }
+                        Component.onCompleted: document.attachEditor(paragraph.index, textDocument)
+                        onActiveFocusChanged: if (activeFocus && document.selectParagraph(paragraph.index)) reportSelection()
+                        onSelectionStartChanged: reportSelection()
+                        onSelectionEndChanged: reportSelection()
                         onTextChanged: if (activeFocus && text !== paragraph.editorText) document.queueText(paragraph.index, text)
                         Keys.onReturnPressed: function(event) {
                             if (selectionStart !== selectionEnd) remove(selectionStart, selectionEnd);
@@ -278,7 +284,7 @@ Item {
         Text {
             id: selectionStatus
             anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
-            text: document.formatAvailable ? (document.pendingEdits ? qsTr("Текст ожидает записи — ") : "") + qsTr("Абзац %1 — форматирование всего абзаца").arg(document.selectedParagraph + 1) : ""
+            text: document.formatAvailable ? (document.pendingEdits ? qsTr("Текст ожидает записи — ") : "") + (document.hasTextSelection ? qsTr("Шрифт — к выделению; стиль — к абзацу") : qsTr("Абзац %1 — форматирование всего абзаца").arg(document.selectedParagraph + 1)) : ""
             color: "#ffffff"; font.family: root.uiFont; font.pixelSize: 12
         }
     }

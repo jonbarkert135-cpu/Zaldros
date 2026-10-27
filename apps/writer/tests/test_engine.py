@@ -311,3 +311,53 @@ def test_merge_cannot_remove_a_table(engine):
         assert 'protected' in document.text and 'Before' in document.text and 'After' in document.text
     finally:
         document.close()
+
+
+@needs_engine
+@pytest.mark.parametrize('suffix', ['.docx', '.odt'])
+def test_selected_character_format_preserves_neighbors_and_round_trips(engine, tmp_path, suffix):
+    document = engine.new_document()
+    target = tmp_path / ('selection' + suffix)
+    try:
+        document.append('left 😀 target right')
+        document.set_character_format(0, font='Liberation Serif', size=12,
+                                      bold=False, italic=False, underline=False)
+        document.set_character_format(0, font='Liberation Sans', size=19.5,
+                                      bold=True, italic=True, underline=True, start=8, end=14)
+        selected = document.character_format(0, 8, 14)
+        assert selected == dict(font='Liberation Sans', size=19.5, bold=True, italic=True, underline=True)
+        assert document.character_format(0, 0, 8) == dict(
+            font='Liberation Serif', size=12, bold=False, italic=False, underline=False)
+        assert document.character_format(0, 14, 20)['bold'] is False
+        runs = document.paragraphs()[0].runs
+        assert sum(r['length'] for r in runs) == 20
+        assert any(r['start'] == 8 and r['length'] == 6 and r['bold'] for r in runs)
+        document.save_as(target)
+    finally:
+        document.close()
+    reopened = engine.open(target)
+    try:
+        assert reopened.paragraphs()[0].text == 'left 😀 target right'
+        assert reopened.character_format(0, 8, 14) == selected
+        assert reopened.character_format(0, 0, 8)['font'] == 'Liberation Serif'
+        assert reopened.character_format(0, 14, 20)['size'] == 12
+        reopened.set_character_format(0, bold=False, start=8, end=14)
+        assert reopened.character_format(0, 8, 14)['bold'] is False
+        assert reopened.character_format(0, 8, 14)['italic'] is True
+    finally:
+        reopened.close()
+
+
+@needs_engine
+def test_invalid_selected_range_cannot_fall_back_to_whole_paragraph(engine):
+    document = engine.new_document()
+    try:
+        document.append('a😀z')
+        document.set_character_format(0, bold=False)
+        for start, end in [(-1, 1), (0, 0), (0, 99), (None, 2), (1, None), (1, 2), (2, 3)]:
+            with pytest.raises(EngineError):
+                document.set_character_format(0, bold=True, start=start, end=end)
+            assert document.paragraphs()[0].bold is False
+        assert document.paragraphs()[0].text == 'a😀z'
+    finally:
+        document.close()

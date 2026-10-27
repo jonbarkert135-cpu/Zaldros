@@ -24,7 +24,7 @@ import socket
 import subprocess
 import tempfile
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 #: The engine's own filter names. Not invented here — these strings come from LibreOffice.
@@ -57,6 +57,7 @@ class Paragraph:
     size: float = 0.0
     alignment: int = 0
     font: str = ""
+    runs: list[dict] = field(default_factory=list)
 
 
 def soffice_path() -> str | None:
@@ -160,22 +161,67 @@ class Document:
             if not element.supportsService("com.sun.star.text.Paragraph"):
                 continue
             characters = self._paragraph_cursor(element)
-            weight = getattr(characters, "CharWeight", None)
-            posture = getattr(characters, "CharPosture", None)
-            underline = getattr(characters, "CharUnderline", None)
             alignment = getattr(element, "ParaAdjust", None)
             out.append(Paragraph(
                 index=index, text=element.getString(),
                 style=str(getattr(element, "ParaStyleName", "")),
-                bold=None if weight is None else float(weight) > 100,
-                italic=None if posture is None else posture.value in
-                       ("ITALIC", "OBLIQUE", "REVERSE_ITALIC", "REVERSE_OBLIQUE"),
-                underline=None if underline is None else int(underline) != 0,
-                size=float(getattr(characters, "CharHeight", 0) or 0),
                 alignment=-1 if alignment is None else int(alignment),
-                font=str(getattr(characters, "CharFontName", "") or "")))
+                runs=self._text_runs(element), **self._character_values(characters)))
             index += 1
         return out
+
+    @staticmethod
+    def _character_values(cursor) -> dict:
+        weight = getattr(cursor, "CharWeight", None)
+        posture = getattr(cursor, "CharPosture", None)
+        underline = getattr(cursor, "CharUnderline", None)
+        return {
+            'bold': None if weight is None else float(weight) > 100,
+            'italic': None if posture is None else posture.value in
+                      ('ITALIC', 'OBLIQUE', 'REVERSE_ITALIC', 'REVERSE_OBLIQUE'),
+            'underline': None if underline is None else int(underline) != 0,
+            'size': float(getattr(cursor, 'CharHeight', 0) or 0),
+            'font': str(getattr(cursor, 'CharFontName', '') or '')}
+
+    def _text_runs(self, paragraph) -> list[dict]:
+        portions = paragraph.createEnumeration()
+        chunks = []
+        offset = 0
+        runs = []
+        while portions.hasMoreElements():
+            portion = portions.nextElement()
+            value = portion.getString()
+            if not value:
+                continue
+            if portion.TextPortionType != 'Text':
+                return []  # fields/objects need their own renderer; do not invent offsets
+            length = self._units(value)
+            runs.append({'start': offset, 'length': length,
+                         **self._character_values(portion)})
+            chunks.append(value)
+            offset += length
+        return runs if ''.join(chunks) == paragraph.getString() else []
+
+    def _character_cursor(self, index: int, start: int | None = None, end: int | None = None):
+        paragraph = self._paragraph(index)
+        if start is None and end is None:
+            return self._paragraph_cursor(paragraph)
+        encoded = paragraph.getString().encode('utf-16-le')
+        if (type(start) is not int or type(end) is not int
+                or not 0 <= start < end <= len(encoded) // 2):
+            raise EngineError(_("Некорректное выделение текста"))
+        cursor = self._cursor_after(paragraph, encoded[:start * 2].decode('utf-16-le'))
+        limit = self._cursor_after(paragraph, encoded[:end * 2].decode('utf-16-le'))
+        cursor.gotoRange(limit, True)
+        return cursor
+
+    def character_format(self, index: int, start: int, end: int) -> dict:
+        try:
+            return self._character_values(self._character_cursor(index, start, end))
+        except EngineError:
+            raise
+        except Exception as exc:
+            raise EngineError(_("Writer не прочитал выделение: {error}").format(error=exc)) from exc
 
     def page_count(self) -> int:
         """The engine's own pagination — the number in Word's status bar."""
@@ -320,11 +366,12 @@ class Document:
         cursor.gotoRange(element.getEnd(), True)
         return cursor
 
-    def _set_paragraph_properties(self, index: int, *, characters=False, **properties) -> None:
+    def _set_paragraph_properties(self, index: int, *, characters=False,
+                                  start=None, end=None, **properties) -> None:
         try:
             element = self._paragraph(index)
             if characters:
-                element = self._paragraph_cursor(element)
+                element = self._character_cursor(index, start, end)
             for name, value in properties.items():
                 setattr(element, name, value)
         except EngineError:
@@ -344,7 +391,8 @@ class Document:
 
     def set_character_format(self, index: int, bold: bool | None = None,
                              italic: bool | None = None, underline: bool | None = None,
-                             size: float | None = None, font: str | None = None) -> None:
+                             size: float | None = None, font: str | None = None,
+                             *, start: int | None = None, end: int | None = None) -> None:
         if size is not None and (not math.isfinite(size) or not 1 <= size <= 400):
             raise EngineError(_("Размер шрифта должен быть от 1 до 400 пунктов"))
         if font is not None and (not font.strip() or len(font) > 256):
@@ -362,7 +410,7 @@ class Document:
             properties["CharHeight"] = float(size)
         if font is not None:
             properties["CharFontName"] = font.strip()
-        self._set_paragraph_properties(index, characters=True, **properties)
+        self._set_paragraph_properties(index, characters=True, start=start, end=end, **properties)
 
     def insert_table(self, rows: int, columns: int, values: list[list[str]] | None = None) -> None:
         table = self._doc.createInstance("com.sun.star.text.TextTable")
