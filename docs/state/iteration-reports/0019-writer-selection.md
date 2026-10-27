@@ -45,3 +45,13 @@ has no new performance or completion claim.
 source/results, then normal main integration. API GitHub still returns CONNECT 403;
 use public CI pages for readback and ordinary Git merge/push if PR creation remains
 unavailable. No admin bypass or invented PR number.
+
+**INITIAL CI FAILURE / REPRODUCTION** — Source `c3dad87`, CI `40574578143`:
+Writer **38 passed / 2 failed / zero skips** (engine 22 pass, UI 16 pass).
+Both DOCX/ODT UI cases fail while inspecting painted QTextLayout formats through
+a chained QQuickTextDocument/QTextDocument/QTextBlock expression: the temporary Qt
+wrapper is released too early (`Internal C++ object ... QTextDocument already
+deleted`). The separate Qt selection-input test-double probe reproduces it locally.
+Keep named strong references through layout inspection; the probe then passes.
+No engine, range, selection, painted-format or round-trip assertion is removed.
+Original notices and HTML hash: `initial-ci-failure.json`. Remote rerun is required.

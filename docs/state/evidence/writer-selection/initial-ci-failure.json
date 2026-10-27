@@ -1,0 +1,41 @@
+{
+  "source_commit": "c3dad87723d3887b632b5b0d68c80f1ac8f37940",
+  "run_id": 40574578143,
+  "writer_result": "38 passed / 2 failed / zero skips; not accepted",
+  "html_sha256": "8fc9d8764bd6aa63ccc9963834da31fb0051d511fdd6f90567e770c177b32a0b",
+  "notices": [
+    {
+      "title": "Office test failure",
+      "message": "RuntimeError: libshiboken: Internal C++ object (PySide6.QtGui.QTextDocument) already deleted.\napps/writer/tests/test_ui.py::test_keyboard_selection_ribbon_and_painted_runs_round_trip[.odt]"
+    },
+    {
+      "title": "Office test failure",
+      "message": "RuntimeError: libshiboken: Internal C++ object (PySide6.QtGui.QTextDocument) already deleted.\napps/writer/tests/test_ui.py::test_keyboard_selection_ribbon_and_painted_runs_round_trip[.docx]"
+    },
+    {
+      "title": "Office test summary",
+      "message": "{\"collected\": 15, \"passed\": {\"test_engine.py\": 11, \"test_ui.py\": 4}, \"failed\": 0, \"skipped\": 0, \"exitstatus\": 0}"
+    },
+    {
+      "title": "Office runtime",
+      "message": "{\"python\": \"3.12.3\", \"libreoffice\": \"LibreOffice 24.2.7.2 420(Build:2)\", \"uno_module\": \"/usr/lib/python3/dist-packages/uno.py\", \"workflow_sha\": \"c3dad87723d3887b632b5b0d68c80f1ac8f37940\", \"run_id\": \"40574578143\"}"
+    },
+    {
+      "title": "Office test summary",
+      "message": "{\"collected\": 40, \"passed\": {\"test_engine.py\": 22, \"test_ui.py\": 16}, \"failed\": 2, \"skipped\": 0, \"exitstatus\": 1}"
+    },
+    {
+      "title": "Office runtime",
+      "message": "{\"python\": \"3.12.3\", \"libreoffice\": \"LibreOffice 24.2.7.2 420(Build:2)\", \"uno_module\": \"/usr/lib/python3/dist-packages/uno.py\", \"workflow_sha\": \"c3dad87723d3887b632b5b0d68c80f1ac8f37940\", \"run_id\": \"40574578143\"}"
+    },
+    {
+      "title": "Office test summary",
+      "message": "{\"collected\": 15, \"passed\": {\"test_engine.py\": 9, \"test_ui.py\": 6}, \"failed\": 0, \"skipped\": 0, \"exitstatus\": 0}"
+    },
+    {
+      "title": "Office runtime",
+      "message": "{\"python\": \"3.12.3\", \"libreoffice\": \"LibreOffice 24.2.7.2 420(Build:2)\", \"uno_module\": \"/usr/lib/python3/dist-packages/uno.py\", \"workflow_sha\": \"c3dad87723d3887b632b5b0d68c80f1ac8f37940\", \"run_id\": \"40574578143\"}"
+    }
+  ],
+  "local_reproduction": "Temporary Qt input/layout test-double probe fails with the same deleted QTextDocument wrapper error at the chained inspection. Named strong references make the probe pass without removing painted-format assertions."
+}

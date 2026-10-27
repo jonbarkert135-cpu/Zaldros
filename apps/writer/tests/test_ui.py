@@ -502,7 +502,12 @@ def test_keyboard_selection_ribbon_and_painted_runs_round_trip(qt_app, live_writ
         assert selected['font'] != 'Liberation Serif'
         assert document.character_format(0, 0, 5)['font'] == 'Liberation Serif'
         assert document.character_format(0, 11, 17)['size'] == 12
-        painted = editor.property('textDocument').textDocument().begin().layout().formats()
+        # Keep Qt wrappers alive while traversing their non-owning layout pointers.
+        quick_document = editor.property('textDocument')
+        text_document = quick_document.textDocument()
+        block = text_document.begin()
+        layout = block.layout()
+        painted = layout.formats()
         fmt = next(r.format for r in painted if r.start <= 5 < r.start + r.length)
         assert fmt.fontWeight() == QFont.Weight.Bold and fmt.fontPointSize() == 13
         assert fmt.fontItalic() is True and fmt.fontUnderline() is True
