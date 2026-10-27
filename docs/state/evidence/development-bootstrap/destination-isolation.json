@@ -1,0 +1,31 @@
+{
+  "bootstrap_sha256": "2446329558d8c4e4ec9f9e97ff1303bbbaca442e6aeb0f564889a18f832a4736",
+  "exitstatus": 0,
+  "external_destinations_created": false,
+  "ambient_module_used": false,
+  "overrides_tested": [
+    "PIP_TARGET",
+    "PIP_PREFIX",
+    "PIP_USER",
+    "PIP_LOG",
+    "PIP_CONFIG_FILE",
+    "PYTHONPATH"
+  ],
+  "environment": {
+    "base_prefix": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python",
+    "executable": "/tmp/zaldros-bootstrap-isolation-guzidwhb/venv/bin/python",
+    "packages": {
+      "pytest": "9.1.1"
+    },
+    "prefix": "/tmp/zaldros-bootstrap-isolation-guzidwhb/venv",
+    "profile": "tools",
+    "python": "3.12.14",
+    "readiness": "dependencies-imported",
+    "uno_module": null,
+    "version_info": [
+      3,
+      12
+    ]
+  },
+  "scope": "Actual fresh tools setup with deliberately conflicting destination/config/module overrides; only the explicitly requested venv was populated."
+}

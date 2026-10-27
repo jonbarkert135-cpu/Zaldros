@@ -1,0 +1,891 @@
+{
+  "source_commit": "d25e310cfce717f17484a4b9b22eaa46c4b2a453",
+  "pr_checkout_commit": "20a4d06bf544cc9e498cf08ac39081997f2f7d6b",
+  "identical_git_tree": "fa62b607557136c42e16dd95888f71b765d6ba59",
+  "acceptance": "All eight distinct job types succeeded across two runs of identical Git trees; neither whole workflow is marked successful.",
+  "workflows": [
+    {
+      "run_id": 40471227890,
+      "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40471227890",
+      "event": "push",
+      "head_sha": "d25e310cfce717f17484a4b9b22eaa46c4b2a453",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_id": 122078547558,
+          "name": "shell prototype (backend + visual render tests)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install Qt runtime dependencies",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run shell tests and render evidence screenshots",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078547757,
+          "name": "office (writer, real UNO + Qt)",
+          "conclusion": "cancelled",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install the matching system Python and Office engine",
+              "conclusion": "cancelled"
+            },
+            {
+              "name": "Record interpreter and engine versions",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Test real engine round trips and Qt UI without skips",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Preserve Office test evidence",
+              "conclusion": "failure"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078547758,
+          "name": "zaldros-sysprobe (unit tests + live run)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Prepare the tools environment",
+              "conclusion": "success"
+            },
+            {
+              "name": "Unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Live probe on the runner (real systemd system)",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Live hardware inventory on the runner",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078547765,
+          "name": "compatibility registries (evidence gate)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "No compatibility claim without evidence (spec PART 4 \u00a725)",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078547856,
+          "name": "benchmark harness (baseline on the runner)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Collect a baseline sample (real systemd host)",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078547912,
+          "name": "build OS images (requires podman)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build zaldros-base",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build zaldros-desktop",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078547952,
+          "name": "office (slides, real UNO + Qt)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install the matching system Python and Office engine",
+              "conclusion": "success"
+            },
+            {
+              "name": "Record interpreter and engine versions",
+              "conclusion": "success"
+            },
+            {
+              "name": "Test real engine round trips and Qt UI without skips",
+              "conclusion": "success"
+            },
+            {
+              "name": "Preserve Office test evidence",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078548021,
+          "name": "office (sheets, real UNO + Qt)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install the matching system Python and Office engine",
+              "conclusion": "success"
+            },
+            {
+              "name": "Record interpreter and engine versions",
+              "conclusion": "success"
+            },
+            {
+              "name": "Test real engine round trips and Qt UI without skips",
+              "conclusion": "success"
+            },
+            {
+              "name": "Preserve Office test evidence",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 40471232810,
+      "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40471232810",
+      "event": "pull_request",
+      "head_sha": "d25e310cfce717f17484a4b9b22eaa46c4b2a453",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_id": 122078562319,
+          "name": "benchmark harness (baseline on the runner)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Collect a baseline sample (real systemd host)",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078562464,
+          "name": "zaldros-sysprobe (unit tests + live run)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Prepare the tools environment",
+              "conclusion": "success"
+            },
+            {
+              "name": "Unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Live probe on the runner (real systemd system)",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Live hardware inventory on the runner",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078562572,
+          "name": "build OS images (requires podman)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build zaldros-base",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build zaldros-desktop",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078562583,
+          "name": "shell prototype (backend + visual render tests)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install Qt runtime dependencies",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run shell tests and render evidence screenshots",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078562585,
+          "name": "office (slides, real UNO + Qt)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install the matching system Python and Office engine",
+              "conclusion": "success"
+            },
+            {
+              "name": "Record interpreter and engine versions",
+              "conclusion": "success"
+            },
+            {
+              "name": "Test real engine round trips and Qt UI without skips",
+              "conclusion": "success"
+            },
+            {
+              "name": "Preserve Office test evidence",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078562608,
+          "name": "compatibility registries (evidence gate)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "No compatibility claim without evidence (spec PART 4 \u00a725)",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078562706,
+          "name": "office (sheets, real UNO + Qt)",
+          "conclusion": "cancelled",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install the matching system Python and Office engine",
+              "conclusion": "cancelled"
+            },
+            {
+              "name": "Record interpreter and engine versions",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Test real engine round trips and Qt UI without skips",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Preserve Office test evidence",
+              "conclusion": "failure"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "job_id": 122078562722,
+          "name": "office (writer, real UNO + Qt)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install the matching system Python and Office engine",
+              "conclusion": "success"
+            },
+            {
+              "name": "Record interpreter and engine versions",
+              "conclusion": "success"
+            },
+            {
+              "name": "Test real engine round trips and Qt UI without skips",
+              "conclusion": "success"
+            },
+            {
+              "name": "Preserve Office test evidence",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "selected_successful_jobs": [
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547558,
+      "name": "shell prototype (backend + visual render tests)",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547758,
+      "name": "zaldros-sysprobe (unit tests + live run)",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547765,
+      "name": "compatibility registries (evidence gate)",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547856,
+      "name": "benchmark harness (baseline on the runner)",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547912,
+      "name": "build OS images (requires podman)",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547952,
+      "name": "office (slides, real UNO + Qt)",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078548021,
+      "name": "office (sheets, real UNO + Qt)",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40471232810,
+      "job_id": 122078562722,
+      "name": "office (writer, real UNO + Qt)",
+      "conclusion": "success"
+    }
+  ],
+  "profiles": [
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547558,
+      "name": "shell prototype (backend + visual render tests)",
+      "conclusion": "success",
+      "environment": {
+        "base_prefix": "/opt/hostedtoolcache/Python/3.12.15/x64",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-shell/bin/python",
+        "packages": {
+          "Pillow": "13.0.0",
+          "PySide6-Essentials": "6.12.0",
+          "numpy": "2.5.4",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-shell",
+        "profile": "shell",
+        "python": "3.12.15",
+        "readiness": "dependencies-imported",
+        "uno_module": null,
+        "version_info": [
+          3,
+          12
+        ]
+      }
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547758,
+      "name": "zaldros-sysprobe (unit tests + live run)",
+      "conclusion": "success",
+      "environment": {
+        "base_prefix": "/opt/hostedtoolcache/Python/3.12.15/x64",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-tools/bin/python",
+        "packages": {
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-tools",
+        "profile": "tools",
+        "python": "3.12.15",
+        "readiness": "dependencies-imported",
+        "uno_module": null,
+        "version_info": [
+          3,
+          12
+        ]
+      }
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078547952,
+      "name": "office (slides, real UNO + Qt)",
+      "conclusion": "success",
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "office_tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 11,
+          "test_ui.py": 4
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "office_runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "d25e310cfce717f17484a4b9b22eaa46c4b2a453",
+        "run_id": "40471227890"
+      }
+    },
+    {
+      "run_id": 40471227890,
+      "job_id": 122078548021,
+      "name": "office (sheets, real UNO + Qt)",
+      "conclusion": "success",
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "office_tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 9,
+          "test_ui.py": 6
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "office_runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "d25e310cfce717f17484a4b9b22eaa46c4b2a453",
+        "run_id": "40471227890"
+      }
+    },
+    {
+      "run_id": 40471232810,
+      "job_id": 122078562722,
+      "name": "office (writer, real UNO + Qt)",
+      "conclusion": "success",
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "office_tests": {
+        "collected": 17,
+        "passed": {
+          "test_engine.py": 12,
+          "test_ui.py": 5
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "office_runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "20a4d06bf544cc9e498cf08ac39081997f2f7d6b",
+        "run_id": "40471232810"
+      }
+    }
+  ],
+  "office_passed": 47,
+  "office_skipped": 0,
+  "cancelled_scope": "One duplicate Office setup in each run was cancelled before tests; upload then failed because no test artifact existed. Full step outcomes above are preserved. No cancelled job is counted as passing.",
+  "limits": "No full-green final workflow claim. Earlier full-green source and ISO receipts are retained separately. Office Qt chrome references do not certify full editing/parity or installed ISO integration."
+}

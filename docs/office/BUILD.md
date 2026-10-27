@@ -20,8 +20,7 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends python3-uno python3-venv \
   libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui \
   libgl1 libegl1 libxkbcommon0 libdbus-1-3 fonts-liberation fonts-dejavu-core
-/usr/bin/python3 -m venv --system-site-packages .venv-office
-.venv-office/bin/python -m pip install -r tools/ci/office-requirements.txt
+/usr/bin/python3 tools/dev/setup.py office
 QT_QPA_PLATFORM=offscreen .venv-office/bin/python tools/ci/office.py writer --junitxml office-results/writer.xml
 QT_QPA_PLATFORM=offscreen .venv-office/bin/python tools/ci/office.py sheets --junitxml office-results/sheets.xml
 QT_QPA_PLATFORM=offscreen .venv-office/bin/python tools/ci/office.py slides --junitxml office-results/slides.xml
@@ -52,3 +51,9 @@ annotations, so diagnosis does not depend solely on artifact download access.
 LibreOffice/UNO come from the runner's signed apt repositories. Qt and pytest are
 pinned in `tools/ci/office-requirements.txt`; apt package versions are recorded,
 not claimed to be an immutable distribution snapshot.
+
+Office requirements reference the shared exact pins in `tools/dev/constraints.txt`.
+Local and CI preparation use the same script. Read-only checks and reuse safeguards:
+[development setup](../development/SETUP.md). The owner's Windows Office visual
+references and unchanged-engine requirement are recorded in
+[REFERENCE_BRIEF.md](REFERENCE_BRIEF.md).

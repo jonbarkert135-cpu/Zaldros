@@ -1,8 +1,8 @@
 # Project state — 2026-10-27
 
-The current ISO-input cycle starts from main `494a2775e6ecd6e9d9b426ec1dff938907063bfd`.
-Runtime-verified source: `38ba1043251cc78912cdbb96539902e58c4b28f3`.
-Office engine/UI verified source: `50555cedb2cba41d70d0f1533e0ade1525eed92c`.
+The current development-bootstrap cycle starts from main `4a2612ccc426873223f502b2fed60c5be8c600ef`.
+Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
+Office engine/UI verified source: `d25e310cfce717f17484a4b9b22eaa46c4b2a453`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
 old current-status summary; it does not retrospectively reclassify historical runs.
 
@@ -25,11 +25,29 @@ OS, installed system, or fully working backend is **not established**.
 | Base | Ubuntu 26.04 live ISO is the active implementation candidate; ADR-0009 remains PROPOSED until accepted by its gate |
 | Desktop | KWin 6/Wayland + own Qt/QML shell; internal QML windows and real compositor windows must be verified separately |
 | Variant | full/services/legacy comparison still open; full is the first smoke-test control, not an accepted winner |
-| Current implementation evidence | Local tests plus source 38ba104 boot/UI validation: all three variants × three VM profiles; installed-system and hardware evidence remain open |
+| Current implementation evidence | Local tests plus source 85cec38 boot/UI validation: all three variants × three VM profiles; installed-system and hardware evidence remain open |
 | Updates/recovery | Query/refresh implemented; complete update/install/recovery lifecycle not delivered; apt has no inherited bootc atomicity |
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+Development bootstrap: direct pins shared by tools/shell/Office and the same
+preparation script used locally/CI. Actual fresh local venvs: **78 tools passed**,
+**613 shell passed / zero skips**, 62 existing forkpty warnings, 148.98s. Read-only
+inspection preserves venv file sizes/mtimes; repeated setup succeeds. Actual default
+Office interpreter lacks UNO and fails before target creation. Remote bootstrap/UNO
+confirmation is recorded for initial source 85cec38: eight CI jobs and all 47
+Office tests pass. The final pip-destination isolation fix on d25e310 has **80 local
+tools tests**, actual hostile-config verification, and all eight CI job types
+passing across two runs of identical Git trees. The final runs each contain a
+cancelled duplicate Office setup; neither whole workflow is called successful.
+The selected real-UNO suites pass all **47 tests without skips**.
+Receipts: [local setup](evidence/development-bootstrap/local-setup.json),
+[initial CI](evidence/development-bootstrap/ci-acceptance.json),
+[final CI and cancelled-job outcomes](evidence/development-bootstrap/ci-acceptance-final.json),
+[destination isolation](evidence/development-bootstrap/destination-isolation.json).
+The new Office UI instruction preserves Calc/Writer/Impress engines; its screenshot
+reference brief is linked in P19. No UI refresh is claimed by the bootstrap.
 
 ISO input-coverage cycle: tools **65 passed** locally after adding a push-event
 guard; existing functional gate **48 passed**. Source `38ba104`: normal CI run
@@ -119,8 +137,9 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
 5. **P1 / P03:** ISO push coverage now includes backend/apps/assets, provenance,
    system configuration and the shipped log helper. Input-derived regressions:
    tools 65 passed; source 38ba104 passes all nine VM targets. Office CI remains
-   verified at 47 tests without skips on 50555ce. Other P03 bootstrap/reproducibility
-   stays open.
+   verified at 47 tests without skips on d25e310. The shared rootless dev bootstrap
+   and destination hardening are locally and remotely verified in iteration 0016.
+   Complete transitive/apt locking and other P03 reproducibility work stay open.
 6. **P1 / P03/P17:** report.py previously gated only on `boot`, so a guest UI step
    could report FAIL while the workflow was green. **D03 fixed and VM-verified**
    on 4c35535: boot facts and eleven UI steps gate all nine targets. The missing

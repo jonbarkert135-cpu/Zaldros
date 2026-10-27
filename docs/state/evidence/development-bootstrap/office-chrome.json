@@ -1,0 +1,33 @@
+{
+  "source_commit": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+  "profile": "fresh shell venv, Qt offscreen",
+  "uno_available": false,
+  "document_loaded": false,
+  "scope": "Optional chrome render baseline only; no real-engine, editing or visual parity acceptance. No supplied Microsoft screenshot pixels are embedded.",
+  "images": [
+    {
+      "app": "writer",
+      "file": "writer-chrome.png",
+      "sha256": "55ee6dd8bfb926b2229fe0f605874d99f255803191d90ebd6447a1c9da552122",
+      "width": 1280,
+      "height": 800,
+      "command": "cd apps/writer && QT_QPA_PLATFORM=offscreen ../../.venv/bin/python -m zaldros_writer render --out <output.png>"
+    },
+    {
+      "app": "sheets",
+      "file": "sheets-chrome.png",
+      "sha256": "d1cc16b4cdd788d64b725f725e2c607d34be103efdb8116c8747effa3af8d47c",
+      "width": 1280,
+      "height": 800,
+      "command": "cd apps/sheets && QT_QPA_PLATFORM=offscreen ../../.venv/bin/python -m zaldros_sheets render --out <output.png>"
+    },
+    {
+      "app": "slides",
+      "file": "slides-chrome.png",
+      "sha256": "9222e8cf2fae41bcedebd1a516bae99f856b2471c0cb056e58faeba1f75b6a39",
+      "width": 1280,
+      "height": 800,
+      "command": "cd apps/slides && QT_QPA_PLATFORM=offscreen ../../.venv/bin/python -m zaldros_slides render --out <output.png>"
+    }
+  ]
+}

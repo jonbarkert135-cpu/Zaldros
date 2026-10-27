@@ -1,0 +1,214 @@
+{
+  "source_commit": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+  "workflow": {
+    "conclusion": "success",
+    "headSha": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+    "jobs": [
+      {
+        "job_id": 122067349915,
+        "name": "zaldros-sysprobe (unit tests + live run)",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122067350176,
+        "name": "benchmark harness (baseline on the runner)",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122067350181,
+        "name": "office (sheets, real UNO + Qt)",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122067350191,
+        "name": "compatibility registries (evidence gate)",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122067350277,
+        "name": "shell prototype (backend + visual render tests)",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122067350304,
+        "name": "build OS images (requires podman)",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122067350370,
+        "name": "office (writer, real UNO + Qt)",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122067350441,
+        "name": "office (slides, real UNO + Qt)",
+        "conclusion": "success"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40467806652"
+  },
+  "profiles": [
+    {
+      "job": "zaldros-sysprobe (unit tests + live run)",
+      "job_id": 122067349915,
+      "environment": {
+        "base_prefix": "/opt/hostedtoolcache/Python/3.12.15/x64",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-tools/bin/python",
+        "packages": {
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-tools",
+        "profile": "tools",
+        "python": "3.12.15",
+        "readiness": "dependencies-imported",
+        "uno_module": null,
+        "version_info": [
+          3,
+          12
+        ]
+      }
+    },
+    {
+      "job": "office (sheets, real UNO + Qt)",
+      "job_id": 122067350181,
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "office_tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 9,
+          "test_ui.py": 6
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "office_runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+        "run_id": "40467806652"
+      }
+    },
+    {
+      "job": "shell prototype (backend + visual render tests)",
+      "job_id": 122067350277,
+      "environment": {
+        "base_prefix": "/opt/hostedtoolcache/Python/3.12.15/x64",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-shell/bin/python",
+        "packages": {
+          "Pillow": "13.0.0",
+          "PySide6-Essentials": "6.12.0",
+          "numpy": "2.5.4",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-shell",
+        "profile": "shell",
+        "python": "3.12.15",
+        "readiness": "dependencies-imported",
+        "uno_module": null,
+        "version_info": [
+          3,
+          12
+        ]
+      }
+    },
+    {
+      "job": "office (writer, real UNO + Qt)",
+      "job_id": 122067350370,
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "office_tests": {
+        "collected": 17,
+        "passed": {
+          "test_engine.py": 12,
+          "test_ui.py": 5
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "office_runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+        "run_id": "40467806652"
+      }
+    },
+    {
+      "job": "office (slides, real UNO + Qt)",
+      "job_id": 122067350441,
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "office_tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 11,
+          "test_ui.py": 4
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "office_runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "85cec3877d44373b29f32efa13e6e18712ab50b8",
+        "run_id": "40467806652"
+      }
+    }
+  ],
+  "office_passed": 47,
+  "office_skipped": 0,
+  "runtime_scope": "Bootstrap/CI/dependency verification; Linux runtime and Office engines/UI code are unchanged from base 4a2612c. Optional chrome renders do not certify editing/parity.",
+  "limits": "Direct pins are not a full transitive/apt lock; no local UNO, hardware or installed-system certification."
+}

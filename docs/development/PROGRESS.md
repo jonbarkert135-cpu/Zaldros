@@ -1,7 +1,7 @@
 # Передача контекста
 
 Обновлено: 2026-10-27. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-Текущий цикл ISO input coverage начинается с main `494a277` (PR #4 MERGED).
+Текущий цикл dev bootstrap начинается с main `4a2612c` (PR #5 MERGED).
 
 ## Текущая задача и результат
 
@@ -460,6 +460,76 @@ planned integration inputs, не объявляются установленны
 регрессию; ISO workflow, рецепт и runtime остаются проверенной версии 38ba104.
 PR #5 → CI follow-up → normal merge. Далее: оставшийся P03 dev bootstrap,
 P02 licensing и P04 async/recovery; полного alpha/installed/hardware claim нет.
+
+### P03 — единая подготовка среды разработки
+
+База: `4a2612ccc426873223f502b2fed60c5be8c600ef`; ветка `codex/development-bootstrap`.
+Добавлен `tools/dev/setup.py` с профилями tools/shell/office, default venv targets,
+выбором Python и read-only --check. Точные direct pins теперь в одном constraints
+файле; CI и локальный setup используют один код. Профили tools/shell изолированы,
+Office сохраняет system-site-packages для совместимого UNO. Никаких apt/system-pip
+установок из bootstrap. Неподходящие папки/симлинки/интерпретаторы/версии отклоняются.
+
+Проверено на реально созданных чистых .venv-tools и .venv: **78 tools passed**,
+**613 shell passed / 0 skipped**, 62 прежних forkpty warnings, 148.98s. Повторная
+подготовка tools успешна; --check не изменил размеры/mtime файлов venv. Настоящий
+Office preflight текущего системного Python без UNO: exit 1 до создания venv.
+Локальный Office engine pass не заявляется. Код/constraints hashes и реальные
+метаданные: `docs/state/evidence/development-bootstrap/local-setup.json`.
+
+Владелец прислал реальные Windows Excel/Word/PowerPoint screenshots и потребовал
+сохранить нынешние движки. Контракт сохранён в `docs/office/REFERENCE_BRIEF.md` и
+P19 prompt: Calc/Writer/Impress остаются; UI-команды связываются с движком, Word
+не объявляется измеренным по Excel. UI/engines в этой итерации не переписываются.
+
+Далее: normal CI должен подтвердить этот bootstrap для трёх профилей, включая
+настоящий Office UNO. Shell README уточнён; консервативный shell/** filter поэтому
+также запустит ISO, хотя runtime/рецепт не меняются. После проверки — PR/merge.
+P03 hardening и P02 licensing остаются отдельными задачами; P04 async/recovery
+переходит к измеряемому прототипу после подготовки этой воспроизводимой базы.
+
+### Bootstrap — первая удалённая приёмка и изоляция pip destination
+
+Source `85cec3877d44373b29f32efa13e6e18712ab50b8`:
+normal CI `40467806652` — **8/8 PASS**, реальные Checks annotations подтверждают
+вызов нового bootstrap для tools/shell/office. Tools/shell Python 3.12.15,
+Office Python 3.12.3 + системный UNO + LibreOffice 24.2.7.2. **47 Office tests PASS,
+0 skipped**. Receipt: `docs/state/evidence/development-bootstrap/ci-acceptance.json`.
+ISO `40467806594`: **3/3 builds, 9/9 boots, 99/99 required UI PASS**;
+строгий replay exit 0. Exact commits/ограничения: `iso-acceptance.json` там же.
+
+Локальные own-app chrome captures из новой shell venv сохранены для сравнения с
+присланными Windows Office примерами: три PNG + `office-chrome.json`. Это baseline
+без UNO/открытого документа, не функциональная или pixel-parity приёмка. В brief
+перечислены реальные пробелы Writer/Slides ribbon, own-brand captions и локализации.
+
+Во время review обнаружен конкретный выход за target через ambient pip config:
+проверка старого child_environment — **1 failed / 1 passed**. Child-процессы теперь
+игнорируют destination/extra-requirement overrides, user/system pip config и
+PYTHONPATH/PYTHONHOME, сохраняя network/TLS/hash-policy env options. На настоящем
+fresh tools setup с PIP_TARGET/PREFIX/USER/LOG/config + подложным pytest в PYTHONPATH
+сторонние destinations не созданы, импортирован правильный pytest. Доказательство:
+`destination-isolation.json`; финальные checks/hash/80 tools: `local-final-checks.json`.
+Исходный local-setup.json сохранён с прежним hash и 613 shell pass, без перелэйбливания.
+
+Эта правка bootstrap требует нового normal CI. ISO recipe/runtime/engine код не
+меняются; повторный тяжёлый ISO не нужен для финальных tools/docs-only изменений.
+Далее: CI hardened source → normal merge → измеряемый P04 slice. P02 licensing,
+полная lock/snapshot воспроизводимость и permission hardening остаются открытыми.
+
+### Bootstrap — итоговая проверка hardened source
+
+`d25e310`: push CI `40471227890` и PR CI `40471232810` вместе подтверждают все
+восемь различных типов заданий. Проверено равенство Git tree исходника и реального
+PR checkout `20a4d06`: `fa62b607557136c42e16dd95888f71b765d6ba59`.
+Пять выбранных profile jobs подтверждают нужные Python/dependency versions;
+Writer 17 + Sheets 15 + Slides 15 = **47 PASS / 0 skipped** с реальным UNO.
+В каждом прогоне отменён один дублирующий Office setup до запуска тестов; upload
+артефакта затем завершился ошибкой из-за отсутствия результатов. Все статусы
+сохранены в `ci-acceptance-final.json`. Полностью зелёными эти два workflow не
+объявляются; начальные успешные CI/ISO остаются отдельными доказательствами.
+Далее: обычное объединение PR #6 по правилам репозитория. P03 slice подготовки
+среды проверен; полный lock/snapshot и остальные открытые этапы не закрываются.
 
 ## Шаблон следующей записи
 
