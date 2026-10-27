@@ -1,0 +1,24 @@
+{
+  "base_commit": "4514ba65742a8072731e1d8a5d808f25eb43aa35",
+  "source": "working tree before initial editing commit; hashes below",
+  "files": {
+    "apps/writer/qml/Writer.qml": "255ba1481fbeb8039ab8e7ef671a3db83e7dfc888397f284b0e5760c8f59e533",
+    "apps/writer/zaldros_writer/model.py": "670e92f8d90fc1f35d82d9d9b15c2e87ae61a5a349bfa11f722582c58276f2e6",
+    "apps/writer/zaldros_writer/engine.py": "531f282433deec79983418e1ac6384e4241415c37a4e33964f70cb9b04babe95",
+    "apps/writer/zaldros_writer/app.py": "0885ce2d963e98709d657c632845cefaba92ac7922bd2124f23bf2e7c3ba2a0a",
+    "apps/writer/tests/test_engine.py": "f13e6a95e4fea0a37ef4460bf97652350db78104bcd14dd6943847b766654e7e",
+    "apps/writer/tests/test_ui.py": "541ba3af691d71c833a64c8bfcb705a6d9feaae2dd4e4f430023e6dad332238f"
+  },
+  "optional_writer": {
+    "passed": 14,
+    "skipped": 18,
+    "reason": "No local matching UNO; local UI fault/caret tests use explicit test doubles"
+  },
+  "tools_passed": 81,
+  "image": {
+    "file": "no-engine.png",
+    "sha256": "050f31f96641112e1f47d8f4fc298e241653cbcc9b82947de6879cead79313a4",
+    "scope": "Own chrome, no document or UNO; not real editing acceptance"
+  },
+  "initial_failure": "QML Keys.onBackspacePressed is unsupported: 2 failed, 5 passed, 1 skipped. Use generic key handling; all tests retained."
+}

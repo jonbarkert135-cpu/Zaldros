@@ -49,9 +49,9 @@ def _open(path: str | None):
     return engine, document
 
 
-def _build(view: QQuickView, document) -> DocumentModel:
+def _build(view: QQuickView, document, path: str | None = None) -> DocumentModel:
     family = load_font()
-    model = DocumentModel(document)
+    model = DocumentModel(document, path=path or "")
     context = view.rootContext()
     context.setContextProperty("ref", reference())
     context.setContextProperty("document", model)
@@ -65,7 +65,7 @@ def render(out: str, *, open_path: str | None = None, width: int = 1280,
     app = QGuiApplication.instance() or QGuiApplication(sys.argv[:1])
     engine, document = _open(open_path)
     view = QQuickView()
-    _KEEP.append(_build(view, document))
+    _KEEP.append(_build(view, document, open_path))
     view.setSource(QUrl.fromLocalFile(str(QML_DIR / "Writer.qml")))
     if view.status() == QQuickView.Status.Error:
         for error in view.errors():
@@ -90,7 +90,7 @@ def run(open_path: str | None = None) -> int:
     app = QGuiApplication.instance() or QGuiApplication(sys.argv)
     engine, document = _open(open_path)
     view = QQuickView()
-    _KEEP.append(_build(view, document))
+    _KEEP.append(_build(view, document, open_path))
     view.setSource(QUrl.fromLocalFile(str(QML_DIR / "Writer.qml")))
     view.setResizeMode(QQuickView.ResizeMode.SizeRootObjectToView)
     view.resize(1280, 800)

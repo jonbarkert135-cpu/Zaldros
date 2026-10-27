@@ -227,3 +227,87 @@ def test_mixed_character_properties_can_be_read_and_replaced(engine):
         assert paragraph.bold is False and paragraph.size == 12
     finally:
         document.close()
+
+
+@needs_engine
+@pytest.mark.parametrize('suffix', ['.odt', '.docx'])
+def test_text_edit_preserves_untouched_formatted_runs_and_round_trips(engine, tmp_path, suffix):
+    document = engine.new_document()
+    target = tmp_path / ('edited' + suffix)
+    try:
+        document.append('Start BOLD 😀 tail')
+        cursor = document._doc.Text.createTextCursor()
+        cursor.gotoStart(False)
+        cursor.goRight(6, False)
+        cursor.goRight(4, True)
+        cursor.CharWeight = 150.0
+        cursor.CharHeight = 16.0
+        document.append_paragraph('Untouched')
+        document.replace_paragraph_text(0, 'Start BOLD 😀 tail', 'Start BOLD 😀 new tail')
+        document.replace_paragraph_text(0, 'Start BOLD 😀 new tail', 'Начало BOLD 😀 new tail')
+        document.save_as(target)
+        document.replace_paragraph_text(0, 'Начало BOLD 😀 new tail', 'Начало BOLD 😀 saved twice')
+        document.save_as(target, overwrite=True)
+    finally:
+        document.close()
+    reopened = engine.open(target)
+    try:
+        assert [p.text for p in reopened.paragraphs()] == ['Начало BOLD 😀 saved twice', 'Untouched']
+        first = reopened._paragraph(0)
+        start = reopened._cursor_after(first, 'Начало ')
+        end = reopened._cursor_after(first, 'Начало BOLD')
+        start.gotoRange(end, True)
+        assert start.getString() == 'BOLD'
+        assert start.CharWeight == 150.0 and start.CharHeight == 16.0
+    finally:
+        reopened.close()
+
+
+@needs_engine
+def test_unicode_split_merge_and_stale_text_refusal(engine):
+    document = engine.new_document()
+    try:
+        document.append('a😀bc')
+        document.replace_paragraph_text(0, 'a😀bc', 'a😀βbc')
+        with pytest.raises(EngineError):
+            document.replace_paragraph_text(0, 'stale', 'wrong')
+        with pytest.raises(EngineError):
+            document.replace_paragraph_text(0, 'a😀βbc', 'two\nparagraphs')
+        with pytest.raises(EngineError):
+            document.split_paragraph(0, 2)  # middle of the UTF-16 surrogate pair
+        assert document.paragraphs()[0].text == 'a😀βbc'
+        document.split_paragraph(0, 3)
+        assert [p.text for p in document.paragraphs()] == ['a😀', 'βbc']
+        document.merge_paragraph(1)
+        assert [p.text for p in document.paragraphs()] == ['a😀βbc']
+    finally:
+        document.close()
+
+
+@needs_engine
+def test_merge_cannot_remove_a_table(engine):
+    document = engine.new_document()
+    try:
+        document.append('Before')
+        document.insert_table(1, 1, [['protected']])
+        document.append_paragraph('After')
+        # Find the paragraph directly following the table, including an empty one.
+        elements = document._doc.Text.createEnumeration()
+        previous_is_table = False
+        paragraph_index = 0
+        while elements.hasMoreElements():
+            item = elements.nextElement()
+            is_paragraph = item.supportsService('com.sun.star.text.Paragraph')
+            if is_paragraph and previous_is_table:
+                with pytest.raises(EngineError):
+                    document.merge_paragraph(paragraph_index)
+                break
+            if is_paragraph:
+                paragraph_index += 1
+            previous_is_table = item.supportsService('com.sun.star.text.TextTable')
+        else:
+            pytest.fail('fixture has no paragraph after table')
+        assert document._doc.TextTables.Count == 1
+        assert 'protected' in document.text and 'Before' in document.text and 'After' in document.text
+    finally:
+        document.close()

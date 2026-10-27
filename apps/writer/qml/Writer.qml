@@ -11,6 +11,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 Item {
     id: root
@@ -42,13 +43,81 @@ Item {
                        font.family: root.uiFont; font.pixelSize: 11; font.bold: true }
             }
             Text {
-                text: document.path === "" ? qsTr("Документ1 — Zaldros Writer")
-                                           : document.path + " — Zaldros Writer"
+                text: (document.modified ? "* " : "") + (document.path === "" ? qsTr("Документ1 — Zaldros Writer")
+                                           : document.path + " — Zaldros Writer")
+                width: titleBar.width - 240
+                elide: Text.ElideMiddle
                 color: "#ffffff"
                 font.family: root.uiFont
                 font.pixelSize: 13
                 anchors.verticalCenter: parent.verticalCenter
             }
+        }
+    }
+
+    property bool closeApproved: false
+    property bool closeAfterSave: false
+
+    function saved(ok) {
+        if (ok && closeAfterSave) {
+            closeApproved = true;
+            root.Window.window.close();
+        }
+        closeAfterSave = false;
+    }
+    function saveDocument() {
+        if (!document.live) return;
+        if (document.path === "") saveDialog.open();
+        else saved(document.saveAs(document.path));
+    }
+    Button {
+        objectName: "saveButton"
+        anchors { right: parent.right; rightMargin: 12; top: parent.top; topMargin: 10 }
+        text: qsTr("Сохранить")
+        enabled: document.live
+        onClicked: root.saveDocument()
+    }
+    Shortcut { sequence: StandardKey.Save; onActivated: root.saveDocument() }
+    Shortcut { sequence: StandardKey.SaveAs; onActivated: if (document.live) saveDialog.open() }
+    FileDialog {
+        id: saveDialog
+        title: qsTr("Сохранить документ")
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: selectedNameFilter.index === 1 ? "odt" : "docx"
+        nameFilters: [qsTr("Документ Word (*.docx)"), qsTr("Текст OpenDocument (*.odt)")]
+        onAccepted: root.saved(document.saveAsUrl(selectedFile))
+        onRejected: root.closeAfterSave = false
+    }
+    Connections {
+        target: root.Window.window
+        function onClosing(event) {
+            if (!root.closeApproved && document.modified) {
+                event.accepted = false;
+                closeDialog.open();
+            }
+        }
+    }
+    Dialog {
+        id: closeDialog
+        objectName: "unsavedDialog"
+        anchors.centerIn: parent
+        modal: true
+        title: qsTr("Сохранить изменения?")
+        contentItem: Label { text: qsTr("Документ содержит несохранённые изменения.") }
+        footer: Row {
+            spacing: 8; padding: 12
+            Button { text: qsTr("Сохранить"); onClicked: { closeDialog.close(); root.closeAfterSave = true; root.saveDocument(); } }
+            Button { text: qsTr("Не сохранять"); onClicked: { root.closeApproved = true; closeDialog.close(); root.Window.window.close(); } }
+            Button { objectName: "cancelClose"; text: qsTr("Отмена"); onClicked: closeDialog.close() }
+        }
+    }
+    Connections {
+        target: document
+        function onFocusRequested(index, position) {
+            Qt.callLater(function() {
+                var editor = paragraphRepeater.itemAt(index);
+                if (editor) { editor.forceActiveFocus(); editor.cursorPosition = position; }
+            });
         }
     }
 
@@ -111,7 +180,7 @@ Item {
 
         Rectangle {
             id: page
-            width: 794                       // A4 at 96 dpi — the engine's own default page
+            width: 794                       // Approximate preview frame, not engine page geometry
             height: Math.max(1123, text.height + 160)
             anchors.horizontalCenter: parent.horizontalCenter
             y: 8
@@ -121,36 +190,58 @@ Item {
 
             Column {
                 id: text
-                x: 76; y: 76                  // 20 mm margins
+                x: 76; y: 76                  // Fixed preview padding
                 width: page.width - 152
                 spacing: 8
 
                 Repeater {
-                    model: document.paragraphs
-                    delegate: Rectangle {
-                        objectName: "paragraph" + modelData.index
+                    id: paragraphRepeater
+                    model: document.paragraphModel
+                    delegate: TextArea {
+                        id: editor
+                        required property var paragraph
+                        objectName: "paragraph" + paragraph.index
                         width: text.width
-                        height: Math.max(24, paragraphText.implicitHeight)
-                        color: document.selectedParagraph === modelData.index ? "#edf4fc" : "transparent"
-                        Text {
-                        id: paragraphText
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        text: modelData.text
+                        height: Math.max(28, contentHeight + topPadding + bottomPadding)
+                        wrapMode: TextEdit.Wrap
+                        textFormat: TextEdit.PlainText
+                        selectByMouse: true
+                        persistentSelection: true
+                        leftPadding: 0; rightPadding: 0; topPadding: 2; bottomPadding: 2
+                        text: paragraph.editorText
                         color: "#1b1b1b"
-                        font.family: modelData.font || root.uiFont
-                        font.pointSize: modelData.size > 0 ? modelData.size : 11
-                        horizontalAlignment: modelData.alignment === 3 ? Text.AlignHCenter
-                                             : modelData.alignment === 1 ? Text.AlignRight
-                                             : modelData.alignment === 2 ? Text.AlignJustify : Text.AlignLeft
-                        font.bold: modelData.bold === true
-                        font.italic: modelData.italic === true
-                        font.underline: modelData.underline === true
+                        background: Rectangle { color: document.selectedParagraph === editor.paragraph.index ? "#edf4fc" : "transparent" }
+                        font.family: paragraph.font || root.uiFont
+                        font.pointSize: paragraph.size > 0 ? paragraph.size : 11
+                        horizontalAlignment: paragraph.alignment === 3 ? Text.AlignHCenter
+                                             : paragraph.alignment === 1 ? Text.AlignRight
+                                             : paragraph.alignment === 2 ? Text.AlignJustify : Text.AlignLeft
+                        font.bold: paragraph.bold === true
+                        font.italic: paragraph.italic === true
+                        font.underline: paragraph.underline === true
+                        Accessible.name: qsTr("Абзац %1").arg(paragraph.index + 1)
+                        onActiveFocusChanged: if (activeFocus) document.selectParagraph(paragraph.index)
+                        onTextChanged: if (activeFocus && text !== paragraph.editorText) document.queueText(paragraph.index, text)
+                        Keys.onReturnPressed: function(event) {
+                            if (selectionStart !== selectionEnd) remove(selectionStart, selectionEnd);
+                            document.splitParagraph(paragraph.index, cursorPosition);
+                            event.accepted = true;
                         }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: document.selectParagraph(modelData.index)
+                        Keys.onEnterPressed: function(event) {
+                            if (selectionStart !== selectionEnd) remove(selectionStart, selectionEnd);
+                            document.splitParagraph(paragraph.index, cursorPosition);
+                            event.accepted = true;
                         }
+                        Keys.onPressed: function(event) {
+                            if (event.key === Qt.Key_Backspace && cursorPosition === 0
+                                    && selectionStart === selectionEnd && paragraph.index > 0) {
+                                document.mergeParagraph(paragraph.index); event.accepted = true;
+                            } else if (event.key === Qt.Key_Delete && cursorPosition === length
+                                    && selectionStart === selectionEnd && paragraph.index + 1 < document.paragraphs.length) {
+                                document.mergeParagraph(paragraph.index + 1); event.accepted = true;
+                            } else event.accepted = false;
+                        }
+
                     }
                 }
 
@@ -186,7 +277,7 @@ Item {
         Text {
             id: selectionStatus
             anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
-            text: document.formatAvailable ? qsTr("Абзац %1 — форматирование всего абзаца").arg(document.selectedParagraph + 1) : ""
+            text: document.formatAvailable ? (document.pendingEdits ? qsTr("Текст ожидает записи — ") : "") + qsTr("Абзац %1 — форматирование всего абзаца").arg(document.selectedParagraph + 1) : ""
             color: "#ffffff"; font.family: root.uiFont; font.pixelSize: 12
         }
     }

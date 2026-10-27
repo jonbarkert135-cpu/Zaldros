@@ -241,3 +241,172 @@ def test_home_controls_edit_real_paragraph_and_saved_docx(qt_app, live_writer, t
         assert actual[1].style == 'Heading 1'
     finally:
         reopened.close()
+
+
+def test_failed_text_write_retains_draft_and_blocks_save(tmp_path, qt_app):
+    from dataclasses import replace
+    from zaldros_writer.engine import EngineError, Paragraph
+
+    class EditingDocument:
+        fail = True
+        item = Paragraph(0, 'original', 'Standard', size=12, font='PT Sans')
+
+        def paragraphs(self):
+            return [self.item]
+
+        def replace_paragraph_text(self, index, before, after):
+            if self.fail:
+                raise EngineError('engine unavailable')
+            assert self.item.text == before
+            self.item = replace(self.item, text=after)
+
+        def save_as(self, path, *, overwrite):
+            assert overwrite
+            Path(path).write_text(self.item.text)
+            return Path(path)
+
+    document = EditingDocument()
+    model = DocumentModel(document)
+    assert model.queueText(0, 'retained draft')
+    assert not model.flushEdits()
+    assert model.pendingEdits and model.modified
+    assert model.paragraphModel.rows[0]['editorText'] == 'retained draft'
+    target = tmp_path / 'not-yet-saved.txt'
+    assert not model.saveAs(str(target)) and not target.exists()
+    document.fail = False
+    assert model.flushEdits() and not model.pendingEdits
+    assert document.item.text == 'retained draft'
+    assert model.saveAs(str(target)) and not model.modified
+    assert target.read_text() == 'retained draft'
+
+
+def test_editor_keeps_caret_on_readback_and_guards_unsaved_close(qt_app):
+    from dataclasses import replace
+    from PySide6.QtCore import QObject, Qt
+    from PySide6.QtTest import QTest
+    from PySide6.QtGui import QGuiApplication
+    from zaldros_writer.engine import Paragraph
+
+    class EditingDocument:
+        item = Paragraph(0, 'original', 'Standard', size=12, font='PT Sans')
+
+        def paragraphs(self): return [self.item]
+        def page_count(self): return 1
+        def replace_paragraph_text(self, index, before, after):
+            assert before == self.item.text
+            self.item = replace(self.item, text=after)
+
+    doc = EditingDocument()
+    model = DocumentModel(doc)
+    view = writer_view(model)
+    try:
+        click(view, 'paragraph0', qt_app)
+        editor = control(view, 'paragraph0')
+        QTest.keyClick(view, Qt.Key.Key_A, Qt.KeyboardModifier.ControlModifier)
+        QGuiApplication.clipboard().setText('новый 😀 текст')
+        QTest.keyClick(view, Qt.Key.Key_V, Qt.KeyboardModifier.ControlModifier)
+        position = editor.property('cursorPosition')
+        assert model.pendingEdits and model.modified
+        assert model.flushEdits()
+        assert control(view, 'paragraph0') is editor
+        assert editor.property('cursorPosition') == position
+        assert doc.item.text == 'новый 😀 текст'
+        assert not view.close()
+        qt_app.processEvents()
+        dialog = view.rootObject().findChild(QObject, 'unsavedDialog')
+        assert dialog.property('visible') is True
+        dialog.close()
+    finally:
+        view.rootObject().setProperty('closeApproved', True)
+        close_view(view, qt_app)
+
+
+@needs_writer
+@pytest.mark.parametrize('suffix', ['.docx', '.odt'])
+def test_inline_typing_enter_backspace_and_ctrl_s_round_trip(qt_app, live_writer, tmp_path, suffix):
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QGuiApplication
+    from PySide6.QtTest import QTest
+    document = live_writer.new_document()
+    target = tmp_path / ('typed' + suffix)
+    view = None
+    try:
+        document.append('original')
+        document.save_as(target)
+        model = DocumentModel(document, path=str(target))
+        view = writer_view(model)
+        click(view, 'paragraph0', qt_app)
+        editor = control(view, 'paragraph0')
+        QTest.keyClick(view, Qt.Key.Key_A, Qt.KeyboardModifier.ControlModifier)
+        QGuiApplication.clipboard().setText('hello😀')
+        QTest.keyClick(view, Qt.Key.Key_V, Qt.KeyboardModifier.ControlModifier)
+        assert model.pendingEdits and model.modified
+        QTest.qWait(240)
+        assert document.paragraphs()[0].text == 'hello😀'
+        assert control(view, 'paragraph0') is editor
+        assert editor.property('cursorPosition') == 7
+        QTest.keyClick(view, Qt.Key.Key_Return)
+        QTest.qWait(30)
+        assert [p.text for p in document.paragraphs()] == ['hello😀', '']
+        assert model.selectedParagraph == 1
+        for key in (Qt.Key.Key_N, Qt.Key.Key_E, Qt.Key.Key_X, Qt.Key.Key_T):
+            QTest.keyClick(view, key)
+        QTest.qWait(240)
+        assert document.paragraphs()[1].text == 'next'
+        QTest.keyClick(view, Qt.Key.Key_Home)
+        QTest.keyClick(view, Qt.Key.Key_Backspace)
+        QTest.qWait(30)
+        assert [p.text for p in document.paragraphs()] == ['hello😀next']
+        assert control(view, 'paragraph0').property('cursorPosition') == 7
+        QTest.keyClick(view, Qt.Key.Key_S, Qt.KeyboardModifier.ControlModifier)
+        qt_app.processEvents()
+        assert not model.modified and not model.pendingEdits
+        QGuiApplication.clipboard().setText('!')
+        QTest.keyClick(view, Qt.Key.Key_V, Qt.KeyboardModifier.ControlModifier)
+        assert model.modified
+        QTest.keyClick(view, Qt.Key.Key_S, Qt.KeyboardModifier.ControlModifier)
+        qt_app.processEvents()
+        assert not model.modified and not model.pendingEdits
+    finally:
+        if view is not None:
+            view.rootObject().setProperty('closeApproved', True)
+            close_view(view, qt_app)
+        document.close()
+    reopened = live_writer.open(target)
+    try:
+        assert [p.text for p in reopened.paragraphs()] == ['hello😀!next']
+    finally:
+        reopened.close()
+
+
+def test_draft_survives_successful_write_followed_by_failed_readback(qt_app):
+    from dataclasses import replace
+    from zaldros_writer.engine import EngineError, Paragraph
+
+    class UncertainDocument:
+        item = Paragraph(0, 'original', 'Standard')
+        fail_read = False
+
+        def paragraphs(self):
+            if self.fail_read:
+                self.fail_read = False
+                raise EngineError('readback interrupted')
+            return [self.item]
+
+        def replace_paragraph_text(self, index, before, after):
+            # Same idempotent contract as the real bridge after a lost readback.
+            if self.item.text == after:
+                return
+            assert self.item.text == before
+            self.item = replace(self.item, text=after)
+
+    doc = UncertainDocument()
+    model = DocumentModel(doc)
+    model.queueText(0, 'retained after read failure')
+    doc.fail_read = True
+    assert not model.flushEdits()
+    assert model.pendingEdits and model.modified
+    assert model.paragraphModel.rows[0]['editorText'] == 'retained after read failure'
+    assert model.flushEdits()
+    assert not model.pendingEdits
+    assert model.paragraphs[0]['text'] == 'retained after read failure'

@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from PySide6.QtCore import Property, QObject, Signal, Slot
+from PySide6.QtCore import (QAbstractListModel, QModelIndex, Property, QObject,
+                            QTimer, Qt, QUrl, Signal, Slot)
 from PySide6.QtGui import QFontDatabase
 
 from .engine import EngineError, WriterEngine, writer_available
@@ -22,17 +23,54 @@ def reference() -> dict:
         return json.load(handle)
 
 
+class ParagraphRows(QAbstractListModel):
+    """Keep editor delegates/carets alive during ordinary text/format updates."""
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.rows = []
+
+    def roleNames(self):
+        return {Qt.ItemDataRole.UserRole: b'paragraph'}
+
+    def rowCount(self, parent=QModelIndex()):
+        return 0 if parent.isValid() else len(self.rows)
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if index.isValid() and role == Qt.ItemDataRole.UserRole:
+            return self.rows[index.row()]
+
+    def sync(self, rows):
+        if len(rows) != len(self.rows):
+            self.beginResetModel()
+            self.rows = rows
+            self.endResetModel()
+        else:
+            for index, row in enumerate(rows):
+                if row != self.rows[index]:
+                    self.rows[index] = row
+                    position = self.index(index)
+                    self.dataChanged.emit(position, position, [Qt.ItemDataRole.UserRole])
+
+
 class DocumentModel(QObject):
     changed = Signal()
+    focusRequested = Signal(int, int)
 
-    def __init__(self, document=None, engine: WriterEngine | None = None) -> None:
+    def __init__(self, document=None, engine: WriterEngine | None = None, path: str = '') -> None:
         super().__init__()
         self._engine = engine
         self._document = document
         self._paragraphs: list[dict] = []
         self._selected = 0
         self._status = '' if document is not None else self._missing_reason()
-        self._path = ''
+        self._path = str(Path(path).resolve()) if document is not None and path else ''
+        self._modified = False
+        self._drafts = {}
+        self._rows = ParagraphRows(self)
+        self._flush_timer = QTimer(self)
+        self._flush_timer.setSingleShot(True)
+        self._flush_timer.setInterval(180)
+        self._flush_timer.timeout.connect(self.flushEdits)
         if document is not None:
             self.refresh()
 
@@ -45,6 +83,7 @@ class DocumentModel(QObject):
     def refresh(self) -> None:
         if self._document is None:
             self._paragraphs = []
+            self._sync_rows()
             self.changed.emit()
             return
         try:
@@ -53,13 +92,72 @@ class DocumentModel(QObject):
                 self._selected = 0
             self._status = ''
         except EngineError as error:
-            self._paragraphs = []
+            # Keep the last readback and any unsent draft if the engine is unavailable.
             self._status = str(error)
+        self._sync_rows()
         self.changed.emit()
 
-    def _edit(self, action, *args, **kwargs) -> bool:
-        if self._document is None:
+    def _sync_rows(self):
+        self._rows.sync([{**item, 'editorText': self._drafts.get(item['index'], item['text'])}
+                         for item in self._paragraphs])
+
+    @Slot(int, str, result=bool)
+    def queueText(self, index: int, text: str) -> bool:  # noqa: N802
+        if not self.live or not 0 <= index < len(self._paragraphs):
             return False
+        if text == self._paragraphs[index]['text']:
+            self._drafts.pop(index, None)
+        else:
+            self._drafts[index] = text
+            self._modified = True
+        self._sync_rows()
+        self.changed.emit()
+        self._flush_timer.start()
+        return True
+
+    @Slot(result=bool)
+    def flushEdits(self) -> bool:  # noqa: N802
+        self._flush_timer.stop()
+        for index, text in list(self._drafts.items()):
+            try:
+                self._document.replace_paragraph_text(index, self._paragraphs[index]['text'], text)
+            except EngineError as error:
+                self._status = str(error)
+                self.changed.emit()
+                return False
+            self.refresh()
+            if self._status:
+                return False
+            self._drafts.pop(index)
+            self._sync_rows()
+            self.changed.emit()
+        return True
+
+    @Slot(int, int, result=bool)
+    def splitParagraph(self, index: int, position: int) -> bool:  # noqa: N802
+        if not self._edit('split_paragraph', index, position):
+            return False
+        self._selected = index + 1
+        self.changed.emit()
+        self.focusRequested.emit(self._selected, 0)
+        return True
+
+    @Slot(int, result=bool)
+    def mergeParagraph(self, index: int) -> bool:  # noqa: N802
+        if not 0 < index < len(self._paragraphs) or not self.flushEdits():
+            return False
+        position = len(self._paragraphs[index - 1]['text'].encode('utf-16-le')) // 2
+        if not self._edit('merge_paragraph', index):
+            return False
+        self._selected = index - 1
+        self.changed.emit()
+        self.focusRequested.emit(self._selected, position)
+        return True
+
+    def _edit(self, action, *args, **kwargs) -> bool:
+        if self._document is None or not self.flushEdits():
+            return False
+        self._modified = True
         try:
             getattr(self._document, action)(*args, **kwargs)
         except EngineError as error:
@@ -74,6 +172,11 @@ class DocumentModel(QObject):
     @Slot(int, result=bool)
     def selectParagraph(self, index: int) -> bool:  # noqa: N802
         if not 0 <= index < len(self._paragraphs):
+            return False
+        if index == self._selected:
+            return True
+        if not self.flushEdits():
+            self.focusRequested.emit(self._selected, 0)
             return False
         self._selected = index
         self.changed.emit()
@@ -107,10 +210,25 @@ class DocumentModel(QObject):
 
     @Slot(str, result=bool)
     def saveAs(self, path: str) -> bool:  # noqa: N802
-        if self._document is None:
+        if self._document is None or not self.flushEdits():
             return False
         try:
-            self._path = str(self._document.save_as(path))
+            self._path = str(self._document.save_as(path, overwrite=True))
+        except EngineError as error:
+            self._status = str(error)
+            self.changed.emit()
+            return False
+        self._status = ''
+        self._modified = False
+        self.changed.emit()
+        return True
+
+    @Slot(str, result=bool)
+    def exportPdf(self, path: str) -> bool:  # noqa: N802
+        if self._document is None or not self.flushEdits():
+            return False
+        try:
+            self._document.export_pdf(path)
         except EngineError as error:
             self._status = str(error)
             self.changed.emit()
@@ -119,13 +237,25 @@ class DocumentModel(QObject):
         self.changed.emit()
         return True
 
-    @Slot(str, result=bool)
-    def exportPdf(self, path: str) -> bool:  # noqa: N802
-        return self.saveAs(str(Path(path).with_suffix('.pdf')))
+    @Slot(QUrl, result=bool)
+    def saveAsUrl(self, url: QUrl) -> bool:  # noqa: N802
+        return self.saveAs(url.toLocalFile()) if url.isLocalFile() else False
 
     @Property('QVariantList', notify=changed)
     def paragraphs(self) -> list:
         return list(self._paragraphs)
+
+    @Property(QObject, constant=True)
+    def paragraphModel(self):  # noqa: N802
+        return self._rows
+
+    @Property(bool, notify=changed)
+    def modified(self) -> bool:
+        return self._modified
+
+    @Property(bool, notify=changed)
+    def pendingEdits(self) -> bool:  # noqa: N802
+        return bool(self._drafts)
 
     @Property('QVariantList', constant=True)
     def tabs(self) -> list:
