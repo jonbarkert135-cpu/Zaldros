@@ -70,3 +70,15 @@ Observed gaps to address in P19:
 These images verify that the chrome renders in the new environment. Their empty
 or unavailable-document state is explicit; they do not demonstrate working Office
 editing or parity with the owner's reference screenshots.
+
+## Writer Home slice (iteration 0017)
+
+The first implementation slice replaces the flat Writer commands with font/size,
+character toggles, paragraph alignment and style-gallery controls. They target a
+whole selected top-level paragraph, read back Writer state and disable without a
+document. Clipboard and other unimplemented commands are not presented as working.
+The source engine remains LibreOffice Writer. Iteration 0017 confirms 23 Writer
+tests with real UNO, zero skips, including Qt input and DOCX/ODT persistence.
+The local no-engine capture is not a document editing receipt.
+This improves group structure/behavior; it is not a new measured Word geometry or
+complete visual/functional parity claim.

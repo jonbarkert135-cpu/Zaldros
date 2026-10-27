@@ -1,0 +1,13 @@
+{
+  "source_commit": "babdfe8c287872b219b930eef0b72d0c7277b65a",
+  "files": {
+    "apps/writer/qml/Writer.qml": "afa31c7042068d96b7464ef0a9582b20a774a34dae907fe26b694fbf0f4d9e4e",
+    "apps/writer/qml/HomeRibbon.qml": "4f4931a464fe31f21889de060554096d05d031bde0c8b85397a9a6833d7e6875",
+    "apps/writer/zaldros_writer/model.py": "6e2ae5738a77193347afa38cc26ddb10ac57830f39f9ba8001a9f05a66c47720",
+    "apps/writer/zaldros_writer/engine.py": "9cfaa4accf91fa65fa852cebb0af86190d74ca1977eb2fad9075310728f9c00f",
+    "apps/writer/tests/test_engine.py": "475159f8c11cd6f9ca105679119175a953d71b6e5272f1c0215f561b931d0315",
+    "apps/writer/tests/test_ui.py": "9a5d68fa19262dc9bddf1b38e6b5534e39c86014c10b88a1f7d0f5110ef5cdb8",
+    "tools/ci/office.py": "cebf9e1734faffa2dd392724bbf76ae0c1fa785352ff52c9160f1f2eb5d258f6",
+    "tools/ci/tests/test_office.py": "36caaa003d2452b4e7c162719b5be652d5f6f03eb56c0633c7df4d5fc7663af2"
+  }
+}
