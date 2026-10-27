@@ -5,13 +5,22 @@ window decorations. Qt 6 / QML with a Python backend.
 
 ## Run
 
-    QT_QPA_PLATFORM=offscreen python -m zaldros_shell render --out desktop.png
-    python -m zaldros_shell render --start | --quick | --context | --light | --locale en
-    python -m zaldros_shell run            # needs a display
+From the repository root: `python3 tools/dev/setup.py shell`.
+Then, from `shell/zaldros-shell`:
+
+    QT_QPA_PLATFORM=offscreen ../../.venv/bin/python -m zaldros_shell render --out desktop.png
+    ../../.venv/bin/python -m zaldros_shell run            # needs a display
+
+The renderer also accepts `--start`, `--quick`, `--context`, `--light` and `--locale en`.
+Profiles, host prerequisites and read-only environment checks:
+[development setup](../../docs/development/SETUP.md).
 
 ## Tests
 
-    python -m pytest tests -q     # 32 tests: backends, .desktop parsing, system readouts, renders
+    QT_QPA_PLATFORM=offscreen ../../.venv/bin/python -m pytest tests -q
+
+Current counts and exact evidence are in [project state](../../docs/state/PROJECT_STATE.md).
+Local/private-bus/offscreen tests and real VM/system/hardware checks have distinct scopes.
 
 ## Layout
 
@@ -33,5 +42,8 @@ window decorations. Qt 6 / QML with a Python backend.
 
 ## Known limitations
 
-Runs as a window, not a Wayland layer-shell panel. No window tracking, no search index, quick-setting
-toggles are read-only, icons are placeholder strokes until Fluent (MIT) is vendored.
+The standalone entry point uses a QQuickView; internal QML app windows and external
+KWin windows must be verified separately. Linux service adapters and writable controls
+exist, but the synchronous GUI path, reconnect recovery, installed-system integration
+and hardware acceptance remain incomplete. See the capability register rather than
+inferring completeness from a render. Asset provenance/licensing gaps remain tracked.

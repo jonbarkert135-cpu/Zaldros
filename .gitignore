@@ -5,6 +5,9 @@ __pycache__/
 dist/
 *.egg-info/
 .venv-office/
+.venv/
+.venv-tools/
+.venv-shell/
 office-results/
 service-map.md
 service-map.json

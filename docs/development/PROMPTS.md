@@ -267,6 +267,12 @@ high contrast и reduced motion. Готово: core workflow проходит б
 
 ## P19 — Полезный Office и доказанная совместимость
 
+Соблюдай указание владельца от 2026-10-27: использовать присланные примеры реальных
+Windows Excel/Word/PowerPoint для интерфейсов Sheets/Writer/Slides и сохранить
+текущие движки LibreOffice Calc/Writer/Impress. Ориентиры и границы измерений:
+`docs/office/REFERENCE_BRIEF.md`. Word сверять с Word, а не выдавать производную
+геометрию Excel за измеренный Word. Команды должны работать через движок.
+
 Примени общий контракт. Запускай Writer/Sheets/Slides с реальным LibreOffice и UNO
 совместимого интерпретатора. Выбери ограниченный набор DOCX/XLSX/PPTX/ODF/PDF fixtures
 с разрешённой лицензией; проверь текст, формулы, структуры и round-trip, не только

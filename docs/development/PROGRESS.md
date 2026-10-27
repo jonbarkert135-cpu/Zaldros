@@ -1,7 +1,7 @@
 # Передача контекста
 
 Обновлено: 2026-10-27. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-Текущий цикл ISO input coverage начинается с main `494a277` (PR #4 MERGED).
+Текущий цикл dev bootstrap начинается с main `4a2612c` (PR #5 MERGED).
 
 ## Текущая задача и результат
 
@@ -460,6 +460,33 @@ planned integration inputs, не объявляются установленны
 регрессию; ISO workflow, рецепт и runtime остаются проверенной версии 38ba104.
 PR #5 → CI follow-up → normal merge. Далее: оставшийся P03 dev bootstrap,
 P02 licensing и P04 async/recovery; полного alpha/installed/hardware claim нет.
+
+### P03 — единая подготовка среды разработки
+
+База: `4a2612ccc426873223f502b2fed60c5be8c600ef`; ветка `codex/development-bootstrap`.
+Добавлен `tools/dev/setup.py` с профилями tools/shell/office, default venv targets,
+выбором Python и read-only --check. Точные direct pins теперь в одном constraints
+файле; CI и локальный setup используют один код. Профили tools/shell изолированы,
+Office сохраняет system-site-packages для совместимого UNO. Никаких apt/system-pip
+установок из bootstrap. Неподходящие папки/симлинки/интерпретаторы/версии отклоняются.
+
+Проверено на реально созданных чистых .venv-tools и .venv: **78 tools passed**,
+**613 shell passed / 0 skipped**, 62 прежних forkpty warnings, 148.98s. Повторная
+подготовка tools успешна; --check не изменил размеры/mtime файлов venv. Настоящий
+Office preflight текущего системного Python без UNO: exit 1 до создания venv.
+Локальный Office engine pass не заявляется. Код/constraints hashes и реальные
+метаданные: `docs/state/evidence/development-bootstrap/local-setup.json`.
+
+Владелец прислал реальные Windows Excel/Word/PowerPoint screenshots и потребовал
+сохранить нынешние движки. Контракт сохранён в `docs/office/REFERENCE_BRIEF.md` и
+P19 prompt: Calc/Writer/Impress остаются; UI-команды связываются с движком, Word
+не объявляется измеренным по Excel. UI/engines в этой итерации не переписываются.
+
+Далее: normal CI должен подтвердить этот bootstrap для трёх профилей, включая
+настоящий Office UNO. Shell README уточнён; консервативный shell/** filter поэтому
+также запустит ISO, хотя runtime/рецепт не меняются. После проверки — PR/merge.
+P03 hardening и P02 licensing остаются отдельными задачами; P04 async/recovery
+переходит к измеряемому прототипу после подготовки этой воспроизводимой базы.
 
 ## Шаблон следующей записи
 

@@ -1,6 +1,6 @@
 # Project state — 2026-10-27
 
-The current ISO-input cycle starts from main `494a2775e6ecd6e9d9b426ec1dff938907063bfd`.
+The current development-bootstrap cycle starts from main `4a2612ccc426873223f502b2fed60c5be8c600ef`.
 Runtime-verified source: `38ba1043251cc78912cdbb96539902e58c4b28f3`.
 Office engine/UI verified source: `50555cedb2cba41d70d0f1533e0ade1525eed92c`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
@@ -30,6 +30,15 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+Development bootstrap: direct pins shared by tools/shell/Office and the same
+preparation script used locally/CI. Actual fresh local venvs: **78 tools passed**,
+**613 shell passed / zero skips**, 62 existing forkpty warnings, 148.98s. Read-only
+inspection preserves venv file sizes/mtimes; repeated setup succeeds. Actual default
+Office interpreter lacks UNO and fails before target creation. Remote bootstrap/UNO
+confirmation is pending. Receipt: [local setup](evidence/development-bootstrap/local-setup.json).
+The new Office UI instruction preserves Calc/Writer/Impress engines; its screenshot
+reference brief is linked in P19. No UI refresh is claimed by the bootstrap.
 
 ISO input-coverage cycle: tools **65 passed** locally after adding a push-event
 guard; existing functional gate **48 passed**. Source `38ba104`: normal CI run
@@ -120,7 +129,8 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
    system configuration and the shipped log helper. Input-derived regressions:
    tools 65 passed; source 38ba104 passes all nine VM targets. Office CI remains
    verified at 47 tests without skips on 50555ce. Other P03 bootstrap/reproducibility
-   stays open.
+   stays open. A shared rootless dev bootstrap is locally verified; its CI confirmation
+   is pending in iteration 0016.
 6. **P1 / P03/P17:** report.py previously gated only on `boot`, so a guest UI step
    could report FAIL while the workflow was green. **D03 fixed and VM-verified**
    on 4c35535: boot facts and eleven UI steps gate all nine targets. The missing

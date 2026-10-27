@@ -1,0 +1,62 @@
+{
+  "base_commit": "4a2612ccc426873223f502b2fed60c5be8c600ef",
+  "bootstrap_sha256": "4a4d61446424a06232e58a92ec052778572cb41c652eface5d74d780c7e2dc5f",
+  "constraints_sha256": "676f50bbf980e411fa748d61a88372b067cd59f9a71bb0567673b9e145baf986",
+  "shell": {
+    "base_prefix": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python",
+    "executable": "/workspace/Zaldros/.venv/bin/python",
+    "packages": {
+      "Pillow": "13.0.0",
+      "PySide6-Essentials": "6.12.0",
+      "numpy": "2.5.4",
+      "pytest": "9.1.1"
+    },
+    "prefix": "/workspace/Zaldros/.venv",
+    "profile": "shell",
+    "python": "3.12.14",
+    "readiness": "dependencies-imported",
+    "uno_module": null,
+    "version_info": [
+      3,
+      12
+    ]
+  },
+  "tools": {
+    "base_prefix": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python",
+    "executable": "/workspace/Zaldros/.venv-tools/bin/python",
+    "packages": {
+      "pytest": "9.1.1"
+    },
+    "prefix": "/workspace/Zaldros/.venv-tools",
+    "profile": "tools",
+    "python": "3.12.14",
+    "readiness": "dependencies-imported",
+    "uno_module": null,
+    "version_info": [
+      3,
+      12
+    ]
+  },
+  "fresh_tools_tests": {
+    "passed": 78,
+    "skipped": 0
+  },
+  "fresh_shell_tests": {
+    "passed": 613,
+    "skipped": 0,
+    "warnings": 62,
+    "seconds": 148.98
+  },
+  "tools_repeated_setup": "success, same dependency versions",
+  "readonly_check": {
+    "exitstatus": 0,
+    "venv_file_sizes_mtimes_unchanged": true
+  },
+  "office_negative": {
+    "returncode": 1,
+    "venv_created": false,
+    "stderr": "Development setup FAIL: interpreter probe failed: Traceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n    loaded = {name: importlib.import_module(name) for name in modules}\n                    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/usr/lib/python3.13/importlib/__init__.py\", line 88, in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen importlib._bootstrap>\", line 1387, in _gcd_import\n  File \"<frozen importlib._bootstrap>\", line 1360, in _find_and_load\n  File \"<frozen importlib._bootstrap>\", line 1324, in _find_and_load_unlocked\nModuleNotFoundError: No module named 'uno'\nUse the system Python matching python3-uno; see docs/office/BUILD.md.\n",
+    "scope": "Actual default system interpreter lacks UNO; setup must fail before creating a venv."
+  },
+  "scope": "Local fresh venv setup, imports and tests. Office engine/UNO success must be verified on the matching remote system interpreter."
+}
