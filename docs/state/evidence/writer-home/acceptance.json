@@ -1,0 +1,148 @@
+{
+  "source_commit": "babdfe8c287872b219b930eef0b72d0c7277b65a",
+  "pr_checkout": "8138815510b460bcc08b3c49d2e227e638a0d22d",
+  "identical_tree": "f6e30467c26be686b11fd6ea6a206a95b5eb4a35",
+  "workflow": {
+    "run_id": 40557896014,
+    "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40557896014",
+    "conclusion": "success",
+    "html_sha256": "e4ba638d00cdaeea12d127315edee9075994a488d1358f584faab52c10e5bd8a",
+    "observed_duration": "6m 30s",
+    "successful_job_types": 8
+  },
+  "office": [
+    {
+      "app": "writer",
+      "job_id": 122378760179,
+      "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40557896014/job/122378760179",
+      "tests": {
+        "collected": 23,
+        "passed": {
+          "test_engine.py": 15,
+          "test_ui.py": 8
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "8138815510b460bcc08b3c49d2e227e638a0d22d",
+        "run_id": "40557896014"
+      },
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "html_sha256": "efa38438bd5330f04a2386fd564aea8fea349f98152eceaaab8f6eea0b6d05b7"
+    },
+    {
+      "app": "sheets",
+      "job_id": 122378760622,
+      "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40557896014/job/122378760622",
+      "tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 9,
+          "test_ui.py": 6
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "8138815510b460bcc08b3c49d2e227e638a0d22d",
+        "run_id": "40557896014"
+      },
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "html_sha256": "e10056d73a8b09e431420a5ea4bb8279716dbc2bf3f26e61f872eff3b656c202"
+    },
+    {
+      "app": "slides",
+      "job_id": 122378760430,
+      "url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40557896014/job/122378760430",
+      "tests": {
+        "collected": 15,
+        "passed": {
+          "test_engine.py": 11,
+          "test_ui.py": 4
+        },
+        "failed": 0,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      "runtime": {
+        "python": "3.12.3",
+        "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "workflow_sha": "8138815510b460bcc08b3c49d2e227e638a0d22d",
+        "run_id": "40557896014"
+      },
+      "environment": {
+        "base_prefix": "/usr",
+        "executable": "/home/runner/work/Zaldros/Zaldros/.venv-office/bin/python",
+        "packages": {
+          "PySide6-Essentials": "6.12.0",
+          "pytest": "9.1.1"
+        },
+        "prefix": "/home/runner/work/Zaldros/Zaldros/.venv-office",
+        "profile": "office",
+        "python": "3.12.3",
+        "readiness": "dependencies-imported",
+        "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+        "version_info": [
+          3,
+          12
+        ]
+      },
+      "html_sha256": "367cd7f5ab33beb4fbcf9940872619250aaf69ed2ea2f3c15e0542f5bd1f95a3"
+    }
+  ],
+  "office_passed": 53,
+  "writer_passed": 23,
+  "office_skipped": 0,
+  "local_optional_writer": {
+    "passed": 11,
+    "skipped": 12,
+    "reason": "No matching local UNO; no local engine acceptance"
+  },
+  "local_tools_passed": 81,
+  "evidence_transport": "Checks API initially supplied failed/current Writer annotations; subsequent api.github.com CONNECT requests returned envoy 403. Public GitHub run/job HTML returned HTTP 200 and supplied final status and exact JSON notice contents. No failure is promoted or bypassed.",
+  "artifact_scope": "Writer test archives an owned-fixture PNG/JSON and JUnit/runtime versions. Artifact download is unavailable here, so its live PNG is not claimed locally inspected. Earlier failed-run captures are not relabelled.",
+  "scope": "Whole top-level paragraph formatting, actual Qt input, engine readback and DOCX/ODT persistence on LibreOffice 24.2.7.2. Not an inline editor, faithful page-layout renderer, visual parity or installed-ISO/hardware acceptance.",
+  "iso_status": "Conservatively triggered apps-path ISO workflow 40557888747 is still in progress at capture. Shipped ISO recipe/runtime are unchanged; Office frontend installation is still open."
+}

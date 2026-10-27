@@ -1,0 +1,230 @@
+[
+  {
+    "run_id": 40556228759,
+    "source": "600043adb400bf04300bf434930c75492488049b",
+    "status_before_cancel": "in_progress",
+    "conclusion_before_cancel": null,
+    "reason": "Superseded by font fix c5180ad; known Writer failures retained separately. Cancel pending duplicate work to release runner capacity; no cancelled check counted as pass.",
+    "jobs_before_cancel": [
+      {
+        "job_id": 122372898948,
+        "name": "zaldros-sysprobe (unit tests + live run)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372899353,
+        "name": "compatibility registries (evidence gate)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372899385,
+        "name": "benchmark harness (baseline on the runner)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372899455,
+        "name": "shell prototype (backend + visual render tests)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372899480,
+        "name": "office (sheets, real UNO + Qt)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372899495,
+        "name": "build OS images (requires podman)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372899651,
+        "name": "office (writer, real UNO + Qt)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "job_id": 122372899796,
+        "name": "office (slides, real UNO + Qt)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "run_id": 40556254699,
+    "source": "600043adb400bf04300bf434930c75492488049b",
+    "status_before_cancel": "in_progress",
+    "conclusion_before_cancel": null,
+    "reason": "Superseded by font fix c5180ad; known Writer failures retained separately. Cancel pending duplicate work to release runner capacity; no cancelled check counted as pass.",
+    "jobs_before_cancel": [
+      {
+        "job_id": 122372994768,
+        "name": "build OS images (requires podman)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372995094,
+        "name": "benchmark harness (baseline on the runner)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372995181,
+        "name": "office (writer, real UNO + Qt)",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "job_id": 122372995182,
+        "name": "zaldros-sysprobe (unit tests + live run)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372995270,
+        "name": "office (slides, real UNO + Qt)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372995356,
+        "name": "office (sheets, real UNO + Qt)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "job_id": 122372995429,
+        "name": "shell prototype (backend + visual render tests)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122372995450,
+        "name": "compatibility registries (evidence gate)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "run_id": 40556731365,
+    "source": "cecf3d443cf170af550ef3b9002345c89d57f37f",
+    "status_before_cancel": "queued",
+    "conclusion_before_cancel": null,
+    "reason": "Superseded by font fix c5180ad; known Writer failures retained separately. Cancel pending duplicate work to release runner capacity; no cancelled check counted as pass.",
+    "jobs_before_cancel": [
+      {
+        "job_id": 122374662322,
+        "name": "benchmark harness (baseline on the runner)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122374662659,
+        "name": "office (sheets, real UNO + Qt)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122374662678,
+        "name": "office (writer, real UNO + Qt)",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "job_id": 122374662686,
+        "name": "compatibility registries (evidence gate)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122374663112,
+        "name": "zaldros-sysprobe (unit tests + live run)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374663130,
+        "name": "shell prototype (backend + visual render tests)",
+        "status": "queued",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374663137,
+        "name": "build OS images (requires podman)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374663140,
+        "name": "office (slides, real UNO + Qt)",
+        "status": "in_progress",
+        "conclusion": null
+      }
+    ]
+  },
+  {
+    "run_id": 40556740067,
+    "source": "cecf3d443cf170af550ef3b9002345c89d57f37f",
+    "status_before_cancel": "queued",
+    "conclusion_before_cancel": null,
+    "reason": "Superseded by font fix c5180ad; known Writer failures retained separately. Cancel pending duplicate work to release runner capacity; no cancelled check counted as pass.",
+    "jobs_before_cancel": [
+      {
+        "job_id": 122374692315,
+        "name": "build OS images (requires podman)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374692718,
+        "name": "office (slides, real UNO + Qt)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "job_id": 122374692782,
+        "name": "compatibility registries (evidence gate)",
+        "status": "queued",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374692906,
+        "name": "office (sheets, real UNO + Qt)",
+        "status": "queued",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374692969,
+        "name": "benchmark harness (baseline on the runner)",
+        "status": "queued",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374692999,
+        "name": "office (writer, real UNO + Qt)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374693036,
+        "name": "zaldros-sysprobe (unit tests + live run)",
+        "status": "queued",
+        "conclusion": null
+      },
+      {
+        "job_id": 122374693037,
+        "name": "shell prototype (backend + visual render tests)",
+        "status": "queued",
+        "conclusion": null
+      }
+    ]
+  }
+]

@@ -10,7 +10,7 @@ Bold/italic/underline always wrote true, so clicking again could not remove form
 The selected paragraph's engine formatting was not shown in the ribbon. The canvas
 forced a guessed heading size/bold state instead of using engine values.
 
-**FIX** — Grouped Home controls for installed font family, 1–400 pt size (tenths),
+**FIX** — Grouped Home controls for Qt font family, 1–400 pt size (tenths),
 on/off character formats, four paragraph alignments and four real Writer styles.
 A model-owned paragraph selection supplies all control readbacks. Canvas uses the
 engine's reported font/size/alignment and highlights the selected paragraph.
@@ -72,3 +72,28 @@ an actual text cursor spanning paragraph start/end for character read/write,
 instead of the paragraph's character defaults. Paragraph style/alignment still
 use the paragraph object. Keep strict font equality and strengthen both ODT/DOCX
 round trips to require bold/italic/underline ON after reopening too.
+
+**FINAL ACCEPTANCE** — `babdfe8c287872b219b930eef0b72d0c7277b65a`, PR CI
+`40557896014`: all eight job types PASS. Writer **23** (15 engine / 8 UI),
+Sheets **15**, Slides **15**: **53 passed, zero failures/skips**, Python 3.12.3 /
+LibreOffice 24.2.7.2. Real PR checkout `8138815510b460bcc08b3c49d2e227e638a0d22d`
+has the identical tree `f6e30467c26be686b11fd6ea6a206a95b5eb4a35`. Both generic and
+concrete-font assertions pass after targeting actual text ranges. The provisional
+alias mapping was removed; it was not the cause. Bold/italic/underline ON persist
+through ODT/DOCX and the UI checks on/off plus selection/style readback.
+
+API access subsequently returned CONNECT 403; public GitHub run/job HTML remained
+HTTP 200 and supplied final status and exact JSON annotations. Parsed acceptance,
+HTML hashes and final code hashes are in `acceptance.json` / `final-source.json`.
+Earlier failed runs and superseded cancellation metadata remain separate.
+Writer artifact download is unavailable; its live PNG is not claimed inspected.
+The inspected local no-engine image and temporary explicit test-double UI probe
+are only layout/input evidence. No failed-run image is promoted to final acceptance.
+ISO `40557888747` is still running; shipped recipe/runtime have not changed and
+this does not install the Office frontend. Existing runtime evidence remains separate.
+
+**STATUS / NEXT** — Writer Home formatting slice verified; P19 remains PARTIAL.
+Final follow-up records evidence only. Normal merge to main is authorized; use
+ordinary Git merge/push if the GitHub API remains unavailable, preserving server
+branch rules. Next Office work is real text editing/selection and file lifecycle;
+P04 service operation/recovery, P02 licensing and ISO frontend installation stay open.

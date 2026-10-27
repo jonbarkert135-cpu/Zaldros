@@ -77,7 +77,8 @@ The first implementation slice replaces the flat Writer commands with font/size,
 character toggles, paragraph alignment and style-gallery controls. They target a
 whole selected top-level paragraph, read back Writer state and disable without a
 document. Clipboard and other unimplemented commands are not presented as working.
-The source engine remains LibreOffice Writer. See iteration 0017 for live-engine
-acceptance status; the local no-engine capture is not a document editing receipt.
+The source engine remains LibreOffice Writer. Iteration 0017 confirms 23 Writer
+tests with real UNO, zero skips, including Qt input and DOCX/ODT persistence.
+The local no-engine capture is not a document editing receipt.
 This improves group structure/behavior; it is not a new measured Word geometry or
 complete visual/functional parity claim.

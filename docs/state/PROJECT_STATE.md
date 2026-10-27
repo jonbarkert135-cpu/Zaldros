@@ -3,7 +3,7 @@
 The Writer Home cycle starts from main `c907842411cf80cae27f50ac99c9e8c5aea740b7`
 (development bootstrap PR #6 merged).
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
-Office engine/UI verified source: `d25e310cfce717f17484a4b9b22eaa46c4b2a453`.
+Office engine/UI verified source: `babdfe8c287872b219b930eef0b72d0c7277b65a`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
 old current-status summary; it does not retrospectively reclassify historical runs.
 
@@ -34,10 +34,14 @@ OS, installed system, or fully working backend is **not established**.
 
 Writer Home (P19 partial): grouped font/size, character toggles, alignment and
 style controls now target a selected whole paragraph through the existing UNO
-engine. Local optional Writer: 11 passed / 11 skipped (UNO unavailable); tools:
-80 passed. Real-engine interaction/round-trip confirmation is pending. This is
-not an inline editor or full document-layout renderer. See iteration 0017 and
-[local scope/receipt](evidence/writer-home/local.json).
+engine. Final local optional Writer: 11 passed / 12 skipped (UNO unavailable);
+tools: **81 passed**. Real-UNO CI `40557896014` passes all eight jobs on source
+`babdfe8`: Writer **23**, Sheets **15**, Slides **15**, zero failures/skips.
+Character read/write now targets the actual paragraph text range; DOCX/ODT
+persistence regressions caught and fixed the previous paragraph-defaults bug.
+This is not an inline editor or full document-layout renderer. See iteration 0017,
+[initial local receipt](evidence/writer-home/local.json) and
+[final acceptance](evidence/writer-home/acceptance.json).
 
 Development bootstrap: direct pins shared by tools/shell/Office and the same
 preparation script used locally/CI. Actual fresh local venvs: **78 tools passed**,
@@ -54,8 +58,9 @@ Receipts: [local setup](evidence/development-bootstrap/local-setup.json),
 [initial CI](evidence/development-bootstrap/ci-acceptance.json),
 [final CI and cancelled-job outcomes](evidence/development-bootstrap/ci-acceptance-final.json),
 [destination isolation](evidence/development-bootstrap/destination-isolation.json).
-The new Office UI instruction preserves Calc/Writer/Impress engines; its screenshot
-reference brief is linked in P19. No UI refresh is claimed by the bootstrap.
+The Office UI instruction preserves Calc/Writer/Impress engines; its screenshot
+reference brief is linked in P19. The bootstrap itself did not refresh the UI;
+the subsequent Writer Home slice is verified separately above.
 
 ISO input-coverage cycle: tools **65 passed** locally after adding a push-event
 guard; existing functional gate **48 passed**. Source `38ba104`: normal CI run
