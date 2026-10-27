@@ -5,7 +5,8 @@ name: iso
 on:
   workflow_dispatch:
   push:
-    paths: ["build/iso/**", "shell/**", "system/theme/**", ".github/workflows/iso.yml"]
+    # Keep a JSON-compatible flow list: the tools gate checks it against recipe inputs.
+    paths: ["build/iso/**", "build/provenance/**", "shell/**", "backend/**", "apps/**", "assets/**", "system/**", "tools/collect-logs.sh", ".github/workflows/iso.yml"]
 
 permissions:
   contents: write        # the build publishes its diagnostics to a ci-logs-* branch (see below)

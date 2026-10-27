@@ -1,6 +1,6 @@
-# Project state — 2026-10-26
+# Project state — 2026-10-27
 
-The current Office-CI cycle starts from main `870c3610661507899cd0c5425629761062c54f3e`.
+The current ISO-input cycle starts from main `494a2775e6ecd6e9d9b426ec1dff938907063bfd`.
 Runtime-verified source: `4c35535a33466c0b4c6bd28139e12b75c56f4a44`.
 Office engine/UI verified source: `50555cedb2cba41d70d0f1533e0ade1525eed92c`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
@@ -103,14 +103,19 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
 3. **P1 / P05:** taskbar and internal window model do not prove external-window behavior.
 4. **P1 / P16:** Settings fonts says Selawik while the shell preference is PT Sans.
    Sixteen toggle rows have no backend control; static status must not imply measurement.
-5. **P1 / P03:** ISO path filters still omit backend/apps/assets. Required Office
-   CI is now real-UNO/Qt verified: 47 tests, no skips, source 50555ce. Other P03
-   bootstrap/coverage/reproducibility work remains open.
+5. **P1 / P03:** ISO push coverage now includes backend/apps/assets, provenance,
+   system configuration and the shipped log helper. Input-derived regressions:
+   tools 64 passed; new remote ISO confirmation pending. Office CI remains verified
+   at 47 tests without skips on 50555ce. Other P03 bootstrap/reproducibility stays open.
 6. **P1 / P03/P17:** report.py previously gated only on `boot`, so a guest UI step
    could report FAIL while the workflow was green. **D03 fixed and VM-verified**
    on 4c35535: boot facts and eleven UI steps gate all nine targets. The missing
    screenshot runtime and geometry producer are corrected. Other P03/P17 work
    remains open. See ADR-0026 and iteration 0013.
+
+7. **P19 / integration:** the ISO recipe does not yet install our Office frontends.
+   Their real-engine/offscreen tests and apps path coverage do not establish
+   installed-ISO integration.
 
 See F01–F12 and D01/D02 in the capability register for scope and confidence.
 No functional application code was changed by P01. P02 changes build authentication,

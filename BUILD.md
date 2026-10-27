@@ -53,6 +53,27 @@ means the build fails, an unreadable report means `UNVERIFIED` — never a pass.
 virtio, no Wi-Fi or Bluetooth radio, no installer. Every "works" in this repository means "works
 in QEMU on a GitHub runner" until a machine says otherwise.
 
+## Automatic ISO input coverage
+
+Repository branch pushes trigger the ISO workflow for changes in `backend/`,
+`apps/`, `assets/`, `system/`, `shell/`, `build/iso/`, `build/provenance/`, the
+shipped `tools/collect-logs.sh`, or the active ISO workflow itself. Documentation
+and the historical Fedora Containerfiles retain ordinary CI without rebuilding
+the Ubuntu ISO. Manual workflow dispatch remains available.
+
+The tools regression checks the push filter against actual `$REPO` recipe inputs,
+the asset inventory and all app sources. It rejects filters that miss an input,
+checks the reference workflow copy, and supports the filter's intentionally simple
+literal-path/directory-`/**` syntax. The workflow keeps its path list JSON-compatible
+so this check needs no new parser dependency.
+
+This extends the existing repository-push/manual workflow; it does not introduce
+pull-request-event execution with diagnostic-branch write credentials. Branch
+pushes in this repository run before their PR is merged. Native GitHub path-filter
+behavior still applies. Selecting `apps/**` does not install the Office frontends
+in the ISO: their packaging/integration remains separate work, and their current
+real-engine CI runs on Ubuntu 24.04.
+
 ## Requirements for the ISO build
 
 P02 authenticates the Ubuntu rootfs checksum manifest and archive before extraction;

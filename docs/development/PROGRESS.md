@@ -1,7 +1,7 @@
 # Передача контекста
 
-Обновлено: 2026-10-26. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-Текущий цикл Office CI начинается с main `870c361` (PR #3 MERGED).
+Обновлено: 2026-10-27. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
+Текущий цикл ISO input coverage начинается с main `494a277` (PR #4 MERGED).
 
 ## Текущая задача и результат
 
@@ -414,6 +414,27 @@ formatting проверки. UI Writer больше не падает на чт�
 CI — merge в main. Затем оставшиеся P02 licensing/P03 coverage и bootstrap,
 P04 operation lifecycle/recovery. Office/ISO/hardware readiness сверх проверенного
 engine/offscreen scope не объявляется.
+
+### P03 — ISO input coverage
+
+База `494a2775e6ecd6e9d9b426ec1dff938907063bfd`; ветка `codex/iso-input-coverage`.
+Владелец поручил продолжить и объяснить четыре PR простыми словами. Зафиксировано:
+PR #1 аудит/план и доверенные build inputs, #2 branding/README, #3 строгий VM gate
+и screenshot/window evidence, #4 обязательный real-UNO CI и исправления Writer.
+
+Старый native push filter пропускал backend/apps/assets, provenance inventory и
+устанавливаемый tools/collect-logs.sh. Новые regressions берут реальные `$REPO`
+входы рецепта, inventory path/entries и дерево apps. На старой конфигурации:
+**3 failed / 6 passed**. После правки: tools **64 passed**, functional ISO gate
+**48 passed**. Включён system/** вместо только theme; docs и исторические Fedora
+Containerfiles не запускают тяжёлую ISO сборку. Референсный workflow синхронизирован.
+Новых pull_request events или расширения write-token scope нет.
+
+Runtime-код не изменялся. Code inspection подтвердил, что собственные Office
+frontends пока не копируются в ISO; apps filter не объявляет packaging выполненным.
+Далее: PR, normal CI и полный ISO rerun; сохранить точные source/results и merge.
+Оставшиеся P03 bootstrap/reproducibility, P02 licensing и P04 lifecycle остаются
+открытыми. Подробности: iteration `0015-iso-input-coverage.md`, BUILD.md.
 
 ## Шаблон следующей записи
 
