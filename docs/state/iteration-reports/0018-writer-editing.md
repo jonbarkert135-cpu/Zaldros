@@ -39,3 +39,10 @@ synchronous during flush/readback; P04 responsiveness/recovery is not declared s
 exact source/results, then normal main merge. GitHub API currently returns CONNECT
 403; public run/job web pages and Git remain available. Prefer a PR if API recovers;
 otherwise ordinary Git merge/push must respect server branch rules. No bypass.
+
+**RENDER FOLLOW-UP** — The own no-engine render exposed a dialog implicit-width
+binding loop and standard-shortcut ambiguity warnings. Give the unsaved dialog an
+explicit width and bind all platform Save/Save As sequences; rerun rendering/tests.
+GitHub API still rejects PR creation (CONNECT 403), while Git and public Actions
+pages work. Do not claim a PR was created; retain the concrete body locally and
+use normal Git integration after verified CI if the API remains unavailable.

@@ -77,8 +77,8 @@ Item {
         enabled: document.live
         onClicked: root.saveDocument()
     }
-    Shortcut { sequence: StandardKey.Save; onActivated: root.saveDocument() }
-    Shortcut { sequence: StandardKey.SaveAs; onActivated: if (document.live) saveDialog.open() }
+    Shortcut { sequences: [StandardKey.Save]; onActivated: root.saveDocument() }
+    Shortcut { sequences: [StandardKey.SaveAs]; onActivated: if (document.live) saveDialog.open() }
     FileDialog {
         id: saveDialog
         title: qsTr("Сохранить документ")
@@ -100,6 +100,7 @@ Item {
     Dialog {
         id: closeDialog
         objectName: "unsavedDialog"
+        width: 440
         anchors.centerIn: parent
         modal: true
         title: qsTr("Сохранить изменения?")
