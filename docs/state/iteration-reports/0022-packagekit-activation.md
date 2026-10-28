@@ -49,3 +49,14 @@ Existing finite authentication/match-rule setup and teardown timeouts still appl
 on the private worker. Next: measured initial Settings reads/transport recovery;
 verify real PackageKit integration and the observed server-routing gap separately.
 Final CI/ISO results are recorded on this iteration's PR after verification.
+
+**REMOTE ACCEPTANCE** — Source `a053e144534968d5eb69533c77d865acd139862a`,
+PR [#10](https://github.com/jonbarkert135-cpu/Zaldros/pull/10), CI
+[40772567142](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40772567142):
+all eight jobs PASS. Real UNO Office: Writer 40, Sheets 15, Slides 15, zero
+failures/skips. Actual PR checkout and source share Git tree
+`f25a3e6f5bedd8716ba70e115534810642a330af`.
+[CI receipt](../evidence/update-activation/ci-acceptance.json) records run/jobs and
+structured Checks notices; no unread remote shell count is asserted. The follow-up
+changes documentation/evidence only. Final follow-up checks, ISO `40772442351`
+and merge state are recorded on PR #10 without promoting unfinished workflows.

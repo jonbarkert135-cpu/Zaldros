@@ -39,6 +39,9 @@ Pinned base reproduces 5 failures/2 passes; final focused 35 PASS, full shell 64
 PASS and tools 81 PASS, zero skips. Real private daemon/service-file child tests
 are not real PackageKit/systemd integration. New observed generic server-side
 METHOD_CALL parking/routing gap remains open. See iteration 0022 and its receipts.
+Source `a053e14`, PR #10 CI `40772567142`: all eight jobs PASS, real UNO Office
+40/15/15 with zero failures/skips. Follow-up/ISO/merge outcomes are recorded on
+PR #10; source receipts remain pinned to the implementation they actually tested.
 PR #9 final CI/ISO/replay passed; its PR body records 3 builds/9 boots and 99 UI PASS.
 
 P04 next vertical slice: Settings update check runs on one worker with its own bus,

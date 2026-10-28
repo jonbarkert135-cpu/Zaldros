@@ -23,6 +23,11 @@ reply_sender сохраняет unique имя реального создате�
 открытым gate, а не скрыто исправленной функцией. Реальный PackageKit/systemd,
 начальные синхронные Settings reads, transport reconnect и FD gate ещё открыты.
 Настройки среды/зависимости не менялись; Publish для этого PR не требуется.
+PR [#10](https://github.com/jonbarkert135-cpu/Zaldros/pull/10), source `a053e14`:
+CI `40772567142` — все восемь jobs PASS, реальный Office 40/15/15 без skips.
+Pinned-source CI receipt сохранён в evidence/update-activation/. Финальные
+follow-up/ISO/merge статусы записаны на PR #10; этот checkpoint не заявляет,
+что ещё выполнявшийся ISO workflow уже прошёл.
 
 ## P04 — неблокирующая проверка обновлений
 
