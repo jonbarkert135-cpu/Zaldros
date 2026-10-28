@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-28",
+  "level": "BUS / offscreen Qt notification integration",
+  "base_commit": "05af5bc5b135897a0a156e2a9df4879d8899f956",
+  "python": "3.12.14",
+  "baseline": {
+    "backend_sha256": {
+      "backend/zaldros_backend/connection.py": "882263c757e216db428980445cfdf85369d1048bb89e0061fc38e3381db3fce4",
+      "backend/zaldros_backend/bus.py": "892f8805679e4491440bfb99e3add043e8d3da494bc82dd02b7193d9fae6bbfd"
+    },
+    "command": "PYTHONPATH=/tmp/zaldros-p04-baseline/backend .venv/bin/python -m pytest /tmp/zaldros-p04-baseline/test_owner_recovery.py -k \"not bluez and not failed_subscription\" -q --junitxml=/tmp/zaldros-p04-baseline/results.xml",
+    "exit_code": 1,
+    "passed": 1,
+    "failed": 5,
+    "deselected": 2,
+    "tests": [
+      {
+        "name": "test_repeated_service_restart_recovers_existing_subscription_without_duplicates",
+        "status": "FAIL",
+        "failure": "AssertionError: assert ['initial'] == ['initial', '..., 'restart-2']\n  \n  Right contains 3 more items, first extra item: 'restart-0'\n  Use -v to get more diff"
+      },
+      {
+        "name": "test_missing_service_never_accepts_other_sender_then_recovers_on_start",
+        "status": "FAIL",
+        "failure": "AssertionError: assert ['other'] == []\n  \n  Left contains one more item: 'other'\n  Use -v to get more diff"
+      },
+      {
+        "name": "test_unique_sender_subscription_is_not_a_wildcard",
+        "status": "FAIL",
+        "failure": "AssertionError: assert ['unrelated', 'expected'] == ['expected']\n  \n  At index 0 diff: 'unrelated' != 'expected'\n  Left contains one more item: 'expected'\n  Use -v to get more diff"
+      },
+      {
+        "name": "test_forged_name_owner_signal_does_not_rebind_subscription",
+        "status": "PASS"
+      },
+      {
+        "name": "test_owner_changes_invalidate_service_presence_cache_after_dispatch",
+        "status": "FAIL",
+        "failure": "AssertionError: assert not True\n +  where True = has_service('org.zaldros.TestRecovery', max_age=3600)\n +    where has_service = <zaldros_backend.bus.Bus object at 0x7f96bd7a97f0>.has_service"
+      },
+      {
+        "name": "test_shared_rule_is_removed_after_last_cancel_and_can_be_resubscribed",
+        "status": "FAIL",
+        "failure": "AssertionError: assert not [Message(type=4, flags=0, serial=5, path='/org/zaldros/TestRecovery', interface='org.zaldros.TestRecovery', member='Changed', error_name=None, reply_serial=None, destination=None, sender=':1.1', signature='s', body=['no-listeners'])]"
+      }
+    ],
+    "log_sha256": "3672515e5c9c539d32b045ffe940a2e476d1a6f18f9f17d35643c6572fe7866e"
+  },
+  "candidate": {
+    "file_sha256": {
+      "backend/zaldros_backend/connection.py": "9dc75aba24ec9c84302173f7b212bac7520a6d467d22686307ffc5e612b7bdd8",
+      "backend/zaldros_backend/bus.py": "fbe8561a2954ac959ae18b39d04795e4ecc7c05134da52b73152d117fd07a709",
+      "shell/zaldros-shell/tests/test_backend_owner_recovery.py": "ef7b829c793e2be421acc7fccc34cee20708af65827a47f97176fbfd2dafa726"
+    },
+    "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests/test_backend_owner_recovery.py -q --junitxml=/tmp/zaldros-p04-owner-candidate.xml",
+    "exit_code": 0,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "tests": [
+      {
+        "name": "test_repeated_service_restart_recovers_existing_subscription_without_duplicates",
+        "status": "PASS"
+      },
+      {
+        "name": "test_missing_service_never_accepts_other_sender_then_recovers_on_start",
+        "status": "PASS"
+      },
+      {
+        "name": "test_unique_sender_subscription_is_not_a_wildcard",
+        "status": "PASS"
+      },
+      {
+        "name": "test_forged_name_owner_signal_does_not_rebind_subscription",
+        "status": "PASS"
+      },
+      {
+        "name": "test_owner_changes_invalidate_service_presence_cache_after_dispatch",
+        "status": "PASS"
+      },
+      {
+        "name": "test_shared_rule_is_removed_after_last_cancel_and_can_be_resubscribed",
+        "status": "PASS"
+      },
+      {
+        "name": "test_failed_subscription_removes_its_owner_watch",
+        "status": "PASS"
+      },
+      {
+        "name": "test_bluez_restart_reaches_existing_facade_and_qt_bridge",
+        "status": "PASS"
+      }
+    ]
+  },
+  "other_checks": [
+    {
+      "command": "QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest shell/zaldros-shell/tests/test_backend*.py -q -rs",
+      "passed": 160,
+      "skipped": 0,
+      "exit_code": 0,
+      "scope": "six initial recovery regressions; before adding Qt/failed-subscription cases"
+    },
+    {
+      "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests -q -rs",
+      "passed": 620,
+      "skipped": 0,
+      "warnings": 62,
+      "seconds": 170.65,
+      "exit_code": 0,
+      "scope": "final backend code; collection included seven recovery tests before eighth cleanup test was added; final eight-case focused run recorded above",
+      "log_sha256": "5dca162c5c73aa5ee6a08c4cc338bbcf46bbd00d1486567a28ad41da0f5b5c37"
+    },
+    {
+      "command": ".venv-tools/bin/python -m pytest tools -q",
+      "passed": 81,
+      "skipped": 0,
+      "seconds": 3.89,
+      "exit_code": 0
+    }
+  ],
+  "limits": [
+    "Test services on a real private dbus-daemon, not real system BlueZ/UDisks.",
+    "No bus transport reconnect, initial snapshot recovery or operation lifecycle acceptance.",
+    "No CPU/RAM/GUI-latency improvement claimed.",
+    "62 existing forkpty deprecation warnings remain in full shell suite."
+  ]
+}

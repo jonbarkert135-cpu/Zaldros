@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """The one place in Zaldros that talks D-Bus.
 
 `Bus` is deliberately boring: nothing it does raises. Every call returns a `Result` that either
@@ -63,6 +64,7 @@ class Bus:
         self._failure = ""
         self._next_attempt = 0.0
         self._name_cache: dict[str, tuple[float, bool]] = {}
+        self._name_cache_epoch: tuple[Connection, int] | None = None
 
     # -- connection --------------------------------------------------------------------------
     @property
@@ -118,13 +120,17 @@ class Bus:
         Cached briefly: a quick-settings panel asks about five services at once and none of them
         appears or disappears within a few seconds without also sending NameOwnerChanged.
         """
+        connection = self.connection
+        if connection is None:
+            return False
+        epoch = (connection, connection.owner_generation)
+        if epoch != self._name_cache_epoch:
+            self._name_cache.clear()
+            self._name_cache_epoch = epoch
         cached = self._name_cache.get(name)
         now = time.monotonic()
         if cached and now - cached[0] < max_age:
             return cached[1]
-        connection = self.connection
-        if connection is None:
-            return False
         try:
             owned = connection.name_has_owner(name)
         except DBusError:

@@ -1,7 +1,7 @@
-# Project state — 2026-10-27
+# Project state — 2026-10-28
 
-The Writer selection-formatting cycle starts from main `1ac61346e7372deb6a22509904d3d21e18925090`
-(inline editing/save integrated through ordinary Git merge).
+The P04 service-owner recovery cycle starts from main
+`05af5bc5b135897a0a156e2a9df4879d8899f956`.
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
 Office engine/UI verified source: `c625c8f93ac67969e943dd352c933da4e9f71b0f`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
@@ -31,6 +31,17 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+P04 first slice: well-known subscriptions follow daemon-authenticated owner changes
+on the same bus, absent/unique senders are strictly filtered, presence caches follow
+dispatched owner changes, and duplicate match rules have balanced cancellation.
+Real private-bus fault tests include repeated service restart and facade/Qt event
+delivery. System-service/hardware verification and bus transport reconnection remain
+open; synchronous GUI calls and the async transport decision remain the next P04 slice.
+Exact local/CI outcomes: [iteration 0020](iteration-reports/0020-service-owner-recovery.md).
+GitHub API access is restored after environment publication. Delivery must use actual
+PRs and normal GitHub merges; earlier historical direct-main fallback instructions
+are superseded by the owner's correction.
 
 Selection-formatting follow-up: local optional Writer **17 passed / 23 skipped**
 (no matching UNO); tools **81 passed**. Character commands target a selection within
@@ -162,8 +173,9 @@ confirmed running systemd/KWin desktop or QEMU/KVM workflow.
    before extraction, with tamper tests. The live Ubuntu endpoint/signing-key check
    subsequently passed; evidence is in evidence/p02-rootfs/. Fallback icon provenance
    is unresolved.
-2. **P1 / P04:** synchronous GUI-to-service path and reconnect/subscription recovery
-   need fault-injection evidence and an operation lifecycle.
+2. **P1 / P04:** synchronous GUI-to-service path and bus transport reconnect still
+   need an operation lifecycle and fault-injection evidence. Same-bus service-owner
+   subscription recovery is addressed in iteration 0020, within its stated test scope.
 3. **P1 / P05:** taskbar and internal window model do not prove external-window behavior.
 4. **P1 / P16:** Settings fonts says Selawik while the shell preference is PT Sans.
    Sixteen toggle rows have no backend control; static status must not imply measurement.
