@@ -90,6 +90,7 @@ def build_view(locale: str = "ru", tick: bool = True) -> tuple[QQuickView, list]
     host_info = HostInfo()
     weather_state = WeatherState(fetch=tick)
     settings_controls = SettingsControls()
+    QGuiApplication.instance().aboutToQuit.connect(settings_controls.cancelUpdates)
     settings_tree = SettingsTree(controls=settings_controls)
     user_prefs = Prefs()
     clipboard_model = ClipboardModel()

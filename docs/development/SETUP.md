@@ -94,3 +94,10 @@ Direct versions live once in `tools/dev/constraints.txt`. The tools, shell and
 Office requirement files reference those pins. This fixes direct dependencies;
 transitive packages, interpreter builds and apt repositories are not an immutable
 lockfile/snapshot. CI uses this same preparation script for tools, shell and Office.
+## Environment publication and GitHub delivery
+
+Publishing the cloud environment applies its saved setup/network configuration and
+snapshot. It is needed after changing that configuration, not for every coding
+session or PR. A normal project change uses branch → PR → checks → GitHub merge.
+Publishing an OS release or ISO for users is a separate action; environment Publish
+does not release Zaldros or replace the GitHub PR workflow.

@@ -216,16 +216,21 @@ class Connection:
             raise DBusError(f"sending {message.member} failed: {exc.strerror or exc}") from exc
         return message.serial
 
-    def call(self, message: Message, timeout: float = DEFAULT_TIMEOUT) -> Message:
+    def call(self, message: Message, timeout: float = DEFAULT_TIMEOUT,
+             cancelled: Callable[[], bool] | None = None) -> Message:
         """Send and wait for the matching reply. Raises DBusError on an error reply or a timeout."""
         message.type = METHOD_CALL
+        if cancelled and cancelled():
+            raise DBusError("call cancelled before sending")
         serial = self.send(message)
         deadline = time.monotonic() + timeout
         while True:
+            if cancelled and cancelled():
+                raise DBusError("stopped waiting for the call; remote work may continue")
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 raise DBusError(f"{message.interface}.{message.member} did not answer in {timeout}s")
-            reply = self._read_message(remaining)
+            reply = self._read_message(min(remaining, 0.05) if cancelled else remaining)
             if reply is None:
                 continue
             if reply.reply_serial == serial:

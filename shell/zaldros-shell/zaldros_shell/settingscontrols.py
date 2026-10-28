@@ -95,9 +95,10 @@ def _percent_choices(values=(0, 20, 40, 60, 80, 100)) -> list[dict]:
 class Registry:
     """All controls, built against one backend. Rebuilt cheaply; holds no state of its own."""
 
-    def __init__(self, backend=None, home: Path | None = None) -> None:
+    def __init__(self, backend=None, home: Path | None = None, state_provider=None) -> None:
         self._backend = backend if backend is not None else system.backend()
         self._home = home
+        self._state_provider = state_provider
         self._controls: dict[str, Control] = {}
         self._build()
 
@@ -112,6 +113,10 @@ class Registry:
         return sorted(self._controls)
 
     def state(self, control_id: str) -> State:
+        if self._state_provider is not None:
+            state = self._state_provider(control_id)
+            if state is not None:
+                return state
         control = self._controls.get(control_id)
         if control is None:
             return State(INFO, False, None, "", False, "нет такого параметра")

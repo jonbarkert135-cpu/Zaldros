@@ -721,22 +721,29 @@ class SettingsControls(QObject):
     """
 
     changed = Signal()
+    updatesChanged = Signal()
 
-    def __init__(self, registry=None, home: Path | None = None) -> None:
+    def __init__(self, registry=None, home: Path | None = None, update_check=None) -> None:
         super().__init__()
         self._home = home
         self._registry = registry
+        from .updatecheck import UpdateCheck
+        self._updates = update_check if update_check is not None else (UpdateCheck() if registry is None else None)
+        if self._updates is not None:
+            self._updates.changed.connect(self.updatesChanged)
 
     @property
     def registry(self):
         if self._registry is None:
-            self._registry = settingscontrols.Registry(home=self._home)
+            self._registry = settingscontrols.Registry(home=self._home,
+                state_provider=self._updates.control_state if self._updates is not None else None)
         return self._registry
 
     @Slot()
     def refresh(self) -> None:
         """Rebuild: monitors, drives and user accounts appear and disappear."""
-        self._registry = settingscontrols.Registry(home=self._home)
+        self._registry = None
+        self.registry
         self.changed.emit()
 
     @Slot(str, result="QVariantMap")
@@ -746,6 +753,9 @@ class SettingsControls(QObject):
     @Slot(str, result="QVariantMap")
     def activate(self, control_id: str) -> dict:
         """Click on a row: a switch flips, an action runs, anything else is only read back."""
+        if control_id == "updates.check" and self._updates is not None:
+            self._updates.start()
+            return self._updates.control_state(control_id).as_variant()
         registry = self.registry
         state = registry.state(control_id)
         if state.kind == settingscontrols.SWITCH:
@@ -757,6 +767,8 @@ class SettingsControls(QObject):
 
     @Slot(str, "QVariant", result="QVariantMap")
     def set(self, control_id: str, value) -> dict:
+        if control_id == "updates.check" and self._updates is not None:
+            return self.activate(control_id)
         state = self.registry.set(control_id, value)
         self.changed.emit()
         return state.as_variant()
@@ -764,6 +776,23 @@ class SettingsControls(QObject):
     @Slot(str, result="QVariantList")
     def choices(self, control_id: str) -> list:
         return list(self.registry.state(control_id).choices)
+
+    @Property(bool, notify=updatesChanged)
+    def updatesBusy(self):
+        return self._updates is not None and self._updates.busy
+
+    @Property(str, notify=updatesChanged)
+    def updatesStatus(self):
+        return self._updates.message if self._updates is not None else ""
+
+    @Property(bool, notify=updatesChanged)
+    def updatesCancellable(self):
+        return self._updates is not None and self._updates.status == "running"
+
+    @Slot()
+    def cancelUpdates(self):
+        if self._updates is not None:
+            self._updates.cancel()
 
 
 class SettingsTree(QObject):
@@ -776,6 +805,20 @@ class SettingsTree(QObject):
         self._controls = controls
         self._pages = (pages if pages is not None
                        else settingspages.to_variant(settingspages.build(controls=self._registry())))
+        if controls is not None:
+            controls.updatesChanged.connect(self._refresh_updates)
+
+    @Slot()
+    def _refresh_updates(self):
+        # Update only cached update rows. Rebuilding all pages would synchronously
+        # query unrelated services and reintroduce stalls after an async result.
+        for page in self._pages.values():
+            for entry in page["entries"]:
+                if entry.get("control") in ("updates.check", "updates.available"):
+                    state = self._registry().state(entry["control"])
+                    entry.update(value=state.detail if state.available else state.reason,
+                                 writable=state.writable, reason=state.reason)
+        self.changed.emit()
 
     def _registry(self):
         return self._controls.registry if self._controls is not None else None

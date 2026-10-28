@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-28",
+  "base_commit": "b86f4a95c49ae6676a2c41cf46a53d1199becb07",
+  "level": "real private D-Bus / offscreen Qt, PackageKit-shaped test service",
+  "file_sha256": {
+    "backend/zaldros_backend/bus.py": "6983868a1de72c7184e7954fb2e4780b6197a43a8613fbd8fc08a21489ff0cdb",
+    "backend/zaldros_backend/connection.py": "bc6d7d78739e9af9b3b051c864b3dd0a845fe19fed4d518aefb8f66d75ff9d41",
+    "backend/zaldros_backend/updates.py": "0f9e20cc8270c396527b55edb28e555130055c8d745f06c406bd47dbdd679824",
+    "shell/zaldros-shell/zaldros_shell/updatecheck.py": "ef6308d745eb1f53ab3549ea69c3646f1b1183f3fb5f8e3e1f1e2b762fe94e4e",
+    "shell/zaldros-shell/zaldros_shell/settingscontrols.py": "a1085ca14ce675075570643e0c13b07b90e3981d9c64fb22f86fedce7adfff20",
+    "shell/zaldros-shell/zaldros_shell/model.py": "543f0774bb1e3b662cdf4b5d8a42eb19860f065845bb6cf7b7546950aace210e",
+    "shell/zaldros-shell/zaldros_shell/app.py": "cfc50efa946eaa93db3759344d14035d25748de273cb26c8d34d79291046a468",
+    "shell/zaldros-shell/qml/apps/Settings.qml": "175a19be45525e68bace8cea4963dd410a5a3b74186024251d6dd9d5f68aa9ee",
+    "shell/zaldros-shell/tests/test_update_check.py": "0327a8bbde5be73deb13c929d21cc9a226370904afb30f756602d2ed9bf28765",
+    "tools/zaldros-bench/update_check_latency.py": "d8b885bc6602129df027b5039694f12a9620d39a92ce48fdcdca2f09e731a2ef"
+  },
+  "checks": [
+    {
+      "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests/test_update_check.py -q --junitxml=/tmp/zaldros-update-focused-final.xml",
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0
+    },
+    {
+      "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests -q -rs",
+      "passed": 639,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 62,
+      "seconds": 148.65,
+      "exit_code": 0,
+      "log_sha256": "1b3cd1b9125501859efb7924ab732442e4b982f75985631b996d4b23a2304705"
+    },
+    {
+      "command": ".venv-tools/bin/python -m pytest tools -q",
+      "passed": 81,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 2.88,
+      "exit_code": 0
+    }
+  ],
+  "baseline_regression": {
+    "source": "b86f4a95c49ae6676a2c41cf46a53d1199becb07",
+    "selected": "test_backend_uses_one_deadline_for_create_start_and_finished",
+    "failed": 1,
+    "deselected": 17,
+    "exit_code": 1,
+    "observation": "120ms total budget was reset after CreateTransaction; old code returned success after sequential 80ms+80ms phases",
+    "log_sha256": "bee071962b1c6072d7390c12023a9a5d1d84fa775ca065fbd72f9a5c7c4091e0"
+  },
+  "initial_full_failure": {
+    "passed": 637,
+    "failed": 1,
+    "warnings": 62,
+    "seconds": 147.32,
+    "source": "uncommitted checkpoint before QML helper/exposure fix, not final-source hashes above",
+    "failure": "real QML test used QObject descendant lookup for visual delegates and no window-exposure wait",
+    "log_sha256": "629fa5c3f89f026f800a2ee7437795fd9138a2e032a52fac45437975b78376d4"
+  },
+  "benchmark": {
+    "baseline_file": "baseline.json",
+    "candidate_file": "candidate.json",
+    "comparison_file": "comparison.md",
+    "scope": "Only ui_latency_ms in the injected slow-service case; no overall OS/performance acceptance"
+  },
+  "qtdbus_probe": {
+    "result": "qtdbus.json",
+    "source": "qtdbus-probe.py",
+    "unix_fd_bus_roundtrip": "UNRUN"
+  },
+  "limits": [
+    "P04 remains partial; other GUI reads and initial Settings tree remain synchronous.",
+    "Stopping observation does not roll back a remote metadata refresh.",
+    "No package install/upgrade or real system PackageKit/polkit/hardware acceptance."
+  ]
+}

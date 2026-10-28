@@ -1,7 +1,7 @@
 # Project state — 2026-10-28
 
-The P04 service-owner recovery cycle starts from main
-`05af5bc5b135897a0a156e2a9df4879d8899f956`.
+The P04 update-check cycle starts from main
+`b86f4a95c49ae6676a2c41cf46a53d1199becb07` (PR #8 merged normally through GitHub).
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
 Office engine/UI verified source: `c625c8f93ac67969e943dd352c933da4e9f71b0f`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
@@ -31,6 +31,15 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+P04 next vertical slice: Settings update check runs on one worker with its own bus,
+one deadline, stop-waiting semantics and confirmed readback. Cached update rows
+avoid synchronous rereads when a result arrives. Local targeted: 18 PASS; measured
+private-bus fault case: 257.294 → 5.297 ms maximum Qt heartbeat gap. QtDBus comparison
+and FD/license limits: ADR-0027; [iteration 0021](iteration-reports/0021-async-update-check.md).
+This does not complete P04 or establish real PackageKit/hardware acceptance.
+PR #8 final ISO results are in its PR body: 3 builds/9 boots and 99 strict UI PASS;
+pending notes below refer to the earlier evidence checkpoint. Its follow-up CI passed.
 
 P04 first slice: well-known subscriptions follow daemon-authenticated owner changes
 on the same bus, absent/unique senders are strictly filtered, presence caches follow
