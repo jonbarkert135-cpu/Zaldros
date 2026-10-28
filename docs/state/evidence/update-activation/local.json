@@ -1,0 +1,238 @@
+{
+  "date": "2026-10-28",
+  "base_commit": "32512e27b136917bc8144d9490e90d155e7a29a5",
+  "python": "3.12.14",
+  "scope": "private real dbus-daemon service-file activation / test child / Qt update-check controller",
+  "file_sha256": {
+    "backend/zaldros_backend/bus.py": "d76fa97dca8db78492facb5d5f7c71c7547a2e7f8ab009797ccfb96d1c8c4552",
+    "backend/zaldros_backend/updates.py": "147095d97ca74dd154703f66d71f863edf68a2402e8cef0daacd232d14b5b120",
+    "backend/zaldros_backend/testing.py": "ccbefe8d89f887a16588574408a9a8a3727c29ed0fc1a4b7786dd541e9951029",
+    "shell/zaldros-shell/tests/test_update_activation.py": "37499fbc190cf2005261cc195a0fa1917f7e5700e9ad3dd4aa48cc6089d42bd6",
+    "shell/zaldros-shell/tests/helpers/packagekit_activation.py": "46258eb15f3fe84c9e0a3a2ede7cdb074018b1b3ed25b6b50d57a59d3017bad6"
+  },
+  "baseline": {
+    "production_source_sha256": {
+      "backend/zaldros_backend/bus.py": "6983868a1de72c7184e7954fb2e4780b6197a43a8613fbd8fc08a21489ff0cdb",
+      "backend/zaldros_backend/updates.py": "0f9e20cc8270c396527b55edb28e555130055c8d745f06c406bd47dbdd679824"
+    },
+    "test_harness_override": "Only testing.py from final harness, to supply the private activation service directory. Frozen bus.py/updates.py match base byte-for-byte.",
+    "command": "QT_QPA_PLATFORM=offscreen PYTHONPATH=/tmp/zaldros-activation-base/backend:/workspace/Zaldros/shell/zaldros-shell .venv/bin/python -m pytest /tmp/zaldros-activation-base/test_update_activation.py -q",
+    "passed": 2,
+    "failed": 5,
+    "skipped": 0,
+    "exit_code": 1,
+    "cases": [
+      {
+        "name": "test_inactive_installed_service_is_activated_and_read_back",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_missing_or_failed_activation_reports_failure_not_zero[None]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_missing_or_failed_activation_reports_failure_not_zero[fail-start]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_activation_keeps_deadline_or_cancellation_and_can_retry[deadline]",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_activation_keeps_deadline_or_cancellation_and_can_retry[cancel]",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_service_exit_then_new_check_activates_a_new_process",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_owner_replacement_before_create_reply_never_reports_success",
+        "status": "FAIL"
+      }
+    ],
+    "log_sha256": "dc394b72dbb6a8ea6d9a6f21fa94e27ddaa836960554517ae504daf7317eed7d"
+  },
+  "focused": {
+    "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests/test_update_activation.py shell/zaldros-shell/tests/test_update_check.py shell/zaldros-shell/tests/test_backend_bus.py -q",
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 5.89,
+    "exit_code": 0,
+    "cases": [
+      {
+        "name": "test_inactive_installed_service_is_activated_and_read_back",
+        "status": "PASS"
+      },
+      {
+        "name": "test_missing_or_failed_activation_reports_failure_not_zero[None]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_missing_or_failed_activation_reports_failure_not_zero[fail-start]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_activation_keeps_deadline_or_cancellation_and_can_retry[deadline]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_activation_keeps_deadline_or_cancellation_and_can_retry[cancel]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_service_exit_then_new_check_activates_a_new_process",
+        "status": "PASS"
+      },
+      {
+        "name": "test_owner_replacement_before_create_reply_never_reports_success",
+        "status": "PASS"
+      },
+      {
+        "name": "test_actual_model_action_runs_in_worker_and_reads_packages_after_finished",
+        "status": "PASS"
+      },
+      {
+        "name": "test_failure_timeout_or_daemon_loss_never_becomes_zero_updates[denied-failed]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_failure_timeout_or_daemon_loss_never_becomes_zero_updates[vanish-failed]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_failure_timeout_or_daemon_loss_never_becomes_zero_updates[silent-timed_out]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_failure_timeout_or_daemon_loss_never_becomes_zero_updates[hang-timed_out]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_stop_waiting_does_not_claim_remote_rollback_and_late_result_cannot_win",
+        "status": "PASS"
+      },
+      {
+        "name": "test_foreign_finished_signal_cannot_complete_the_transaction",
+        "status": "PASS"
+      },
+      {
+        "name": "test_update_notifications_refresh_only_cached_rows_not_other_services",
+        "status": "PASS"
+      },
+      {
+        "name": "test_state_reads_and_registry_build_do_not_create_a_worker_or_touch_update_service",
+        "status": "PASS"
+      },
+      {
+        "name": "test_gui_heartbeat_continues_during_a_slow_service_reply",
+        "status": "PASS"
+      },
+      {
+        "name": "test_backend_uses_one_deadline_for_create_start_and_finished",
+        "status": "PASS"
+      },
+      {
+        "name": "test_real_qml_click_starts_check_and_keyboard_can_stop_waiting",
+        "status": "PASS"
+      },
+      {
+        "name": "test_invalid_deadline_does_not_start_worker[0]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_invalid_deadline_does_not_start_worker[-1]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_invalid_deadline_does_not_start_worker[nan]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_invalid_deadline_does_not_start_worker[inf]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_invalid_deadline_does_not_start_worker[1e+20]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_worker_start_failure_is_reported_without_a_stuck_busy_state",
+        "status": "PASS"
+      },
+      {
+        "name": "test_a_connection_authenticates_and_gets_a_unique_name",
+        "status": "PASS"
+      },
+      {
+        "name": "test_an_unknown_method_comes_back_as_an_error_not_a_hang",
+        "status": "PASS"
+      },
+      {
+        "name": "test_an_unreachable_bus_is_a_reason_not_an_exception",
+        "status": "PASS"
+      },
+      {
+        "name": "test_property_dictionaries_decode_over_the_real_wire",
+        "status": "PASS"
+      },
+      {
+        "name": "test_managed_objects_returns_the_whole_tree_in_one_call",
+        "status": "PASS"
+      },
+      {
+        "name": "test_setting_a_property_reaches_the_service",
+        "status": "PASS"
+      },
+      {
+        "name": "test_a_property_change_wakes_only_the_domain_it_belongs_to",
+        "status": "PASS"
+      },
+      {
+        "name": "test_a_burst_of_signals_becomes_one_notification",
+        "status": "PASS"
+      },
+      {
+        "name": "test_nothing_is_delivered_to_a_domain_nobody_subscribed_to",
+        "status": "PASS"
+      },
+      {
+        "name": "test_the_backend_reports_what_it_is_connected_to",
+        "status": "PASS"
+      }
+    ]
+  },
+  "full_shell": {
+    "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests -q -rs",
+    "passed": 646,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 62,
+    "seconds": 149.6,
+    "exit_code": 0,
+    "log_sha256": "da5c1d210d5afe3b1436a6857e3757239d6488e5ecb30afc07861fee4a4de129"
+  },
+  "tools": {
+    "command": ".venv-tools/bin/python -m pytest tools -q",
+    "passed": 81,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 6.43,
+    "exit_code": 0
+  },
+  "initial_helper_failure": {
+    "passed": 33,
+    "failed": 2,
+    "cause": "Synchronous RequestName on the test server received and dropped queued CreateTransaction through Connection._park. Temporary trace observed METHOD_CALL type 1.",
+    "fix": "Export test objects before a no-reply RequestName; ObjectServer.process then receives queued activation calls.",
+    "remaining_gate": "Generic server-side method routing during synchronous client calls not fixed.",
+    "diagnostic_log_sha256": "57c7785334e1d066b449c9147f83f3eec4049d043053d5433563427a0258624f",
+    "initial_run_log_sha256": "404e17e493e3f237e039f35eadaebf456cf0910debb1700863e021cc1753be4a"
+  },
+  "limits": [
+    "No new performance claim; PR9 benchmark is historical.",
+    "Test service, not real PackageKit/systemd/polkit/network or package upgrade acceptance.",
+    "Bus transport reconnect, other synchronous GUI reads and FD support remain open."
+  ]
+}

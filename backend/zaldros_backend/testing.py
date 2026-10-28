@@ -16,6 +16,7 @@ Not shipped to a user's machine by accident — it is only imported by tests and
 from __future__ import annotations
 
 import os
+from html import escape
 import shutil
 import subprocess
 import tempfile
@@ -34,12 +35,16 @@ class SessionDaemon:
     Used instead of `dbus-run-session` so a test can hold the address and open several
     connections to it — the mock services on one, the backend under test on another, which is how
     the real system is arranged.
+
+    Optional service_directory loads activation files for child-process tests. It
+    belongs to this private daemon; no host service directory is used by default.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, service_directory: str | None = None) -> None:
         self.address = ""
         self._process: subprocess.Popen | None = None
         self._directory = ""
+        self._service_directory = service_directory
 
     @staticmethod
     def available() -> bool:
@@ -59,6 +64,7 @@ class SessionDaemon:
   <type>session</type>
   <listen>unix:path={socket_path}</listen>
   <auth>EXTERNAL</auth>
+  {f'<servicedir>{escape(self._service_directory)}</servicedir>' if self._service_directory else ''}
   <policy context="default">
     <allow send_destination="*" eavesdrop="true"/>
     <allow eavesdrop="true"/>

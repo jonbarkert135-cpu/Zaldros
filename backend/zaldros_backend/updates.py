@@ -83,16 +83,17 @@ class UpdatesFacet:
             return call(service, path, interface, method, signature, values,
                         timeout=max(0.001, deadline - time.monotonic()), cancelled=stopped)
 
-        # Pin the transaction to one unique owner: a replacement daemon must never
-        # complete an old transaction, even if it reuses the same object path.
-        owner = ask("org.freedesktop.DBus", "/org/freedesktop/DBus",
-                    "org.freedesktop.DBus", "GetNameOwner", "s", [PackageKit.SERVICE], one=True)
-        if not owner.ok:
-            return Result.bad(owner.error or NO_DAEMON, PackageKit.SERVICE)
-        connection = self._bus.connection
-        created = ask(owner.value, PackageKit.PATH, PackageKit.IFACE, "CreateTransaction", one=True)
+        # A well-known destination lets the daemon activate an installed service.
+        # The reply's sender identifies the process that actually created this
+        # transaction, rather than a possibly stale GetNameOwner snapshot.
+        created = ask(PackageKit.SERVICE, PackageKit.PATH, PackageKit.IFACE,
+                      "CreateTransaction", one=True)
         if not created.ok:
             return Result.bad(created.error or NO_DAEMON, PackageKit.SERVICE)
+        owner = created.reply_sender
+        if not owner.startswith(":"):
+            return Result.bad(NO_DAEMON, PackageKit.SERVICE)
+        connection = self._bus.connection
         path = str(created.value)
         finished: dict[str, Any] = {}
 
@@ -111,23 +112,29 @@ class UpdatesFacet:
             finished["error"] = str(values[1]) if len(values) > 1 else "error"
 
         def on_owner(message) -> None:
-            if len(message.body) == 3 and message.body[1] == owner.value:
+            if len(message.body) == 3 and message.body[1] == owner:
                 finished["error"] = NO_DAEMON
 
         subscriptions = [
             self._bus.on_signal(on_package, path=path, interface=PackageKit.TRANSACTION,
-                                member="Package", sender=owner.value),
+                                member="Package", sender=owner),
             self._bus.on_signal(on_finished, path=path, interface=PackageKit.TRANSACTION,
-                                member="Finished", sender=owner.value),
+                                member="Finished", sender=owner),
             self._bus.on_signal(on_error, path=path, interface=PackageKit.TRANSACTION,
-                                member="ErrorCode", sender=owner.value),
+                                member="ErrorCode", sender=owner),
             self._bus.on_signal(on_owner, sender="org.freedesktop.DBus",
                                 path="/org/freedesktop/DBus", interface="org.freedesktop.DBus",
                                 member="NameOwnerChanged", arg0=PackageKit.SERVICE)]
         try:
             if any(subscription is None for subscription in subscriptions):
                 return Result.bad("could not subscribe to update transaction", path)
-            call = ask(owner.value, path, PackageKit.TRANSACTION, member, signature, body)
+            # Subscribe first, then verify ownership: a loss between the create
+            # reply and installing NameOwnerChanged must not be silently missed.
+            current = ask("org.freedesktop.DBus", "/org/freedesktop/DBus",
+                          "org.freedesktop.DBus", "GetNameOwner", "s", [PackageKit.SERVICE], one=True)
+            if not current.ok or current.value != owner:
+                return Result.bad(NO_DAEMON, path)
+            call = ask(owner, path, PackageKit.TRANSACTION, member, signature, body)
             if not call.ok:
                 return Result.bad(call.error, path)
             while "exit" not in finished and "error" not in finished:
