@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """A D-Bus connection: socket, SASL handshake, calls, and signal delivery.
 
 No polling. A connection exposes `fileno()`, so the shell watches the socket with a
@@ -30,6 +31,8 @@ OBJECT_MANAGER = "org.freedesktop.DBus.ObjectManager"
 
 SYSTEM_BUS_FALLBACK = "unix:path=/var/run/dbus/system_bus_socket"
 DEFAULT_TIMEOUT = 5.0
+OWNER_CHANGED_RULE = (f"type='signal',sender='{BUS_NAME}',path='{BUS_PATH}',"
+                      f"interface='{BUS_INTERFACE}',member='NameOwnerChanged'")
 
 
 class DBusError(RuntimeError):
@@ -110,6 +113,9 @@ class Connection:
         self._handlers: list[tuple[str, dict[str, str], Callable[[Message], None]]] = []
         self._parked: list[Message] = []
         self._closed = False
+        self._match_users: dict[str, int] = {}
+        self._watching_owners = False
+        self.owner_generation = 0
 
     # -- lifecycle ---------------------------------------------------------------------------
     @classmethod
@@ -295,6 +301,17 @@ class Connection:
         return delivered
 
     def _deliver(self, message: Message) -> int:
+        # Only the daemon may rebind a well-known sender. A service can emit the same
+        # interface/member/path, so checking only those fields would allow spoofing.
+        if (message.sender == BUS_NAME and message.path == BUS_PATH
+                and message.interface == BUS_INTERFACE and message.member == "NameOwnerChanged"
+                and message.signature == "sss" and len(message.body) == 3):
+            name, _old, new = message.body
+            if not name.startswith(":"):
+                self.owner_generation += 1
+                for _rule, criteria, _handler in self._handlers:
+                    if criteria.get("sender") == name:
+                        criteria["sender_unique"] = new
         count = 0
         for _rule, criteria, handler in list(self._handlers):
             if _matches(criteria, message):
@@ -325,10 +342,22 @@ class Connection:
         # who wanted it. It cannot compare senders as written: a signal's `sender` field is the
         # unique name (":1.7"), never the well-known one. Without resolving it here, a udisks2
         # InterfacesAdded also woke the BlueZ handler — measured, then fixed.
-        if sender and not sender.startswith(":"):
-            criteria["sender_unique"] = self._owner_of(sender)
-        self.call(Message(destination=BUS_NAME, path=BUS_PATH, interface=BUS_INTERFACE,
-                          member="AddMatch", signature="s", body=[rule]))
+        well_known = sender and not sender.startswith(":") and sender != BUS_NAME
+        started_owner_watch = False
+        if well_known and not self._watching_owners:
+            # Install before querying the owner: a restart between GetNameOwner and
+            # AddMatch must not be missed. Delivery updates bindings in wire order.
+            self._acquire_match(OWNER_CHANGED_RULE)
+            self._watching_owners = started_owner_watch = True
+        if sender:
+            criteria["sender_unique"] = self._owner_of(sender) if well_known else sender
+        try:
+            self._acquire_match(rule)
+        except DBusError:
+            if started_owner_watch:
+                self._release_match(OWNER_CHANGED_RULE)
+                self._watching_owners = False
+            raise
         self._handlers.append((rule, criteria, handler))
         return Subscription(rule, handler, self)
 
@@ -339,13 +368,32 @@ class Connection:
                                   and entry[2] is subscription.handler)]
         if len(self._handlers) == before:
             return
-        if any(entry[0] == subscription.rule for entry in self._handlers):
-            return  # another subscriber still wants this rule
+        for _ in range(before - len(self._handlers)):
+            self._release_match(subscription.rule)
+        if self._watching_owners and not any(
+                criteria.get("sender") not in (None, BUS_NAME)
+                and not criteria["sender"].startswith(":")
+                for _rule, criteria, _handler in self._handlers):
+            self._release_match(OWNER_CHANGED_RULE)
+            self._watching_owners = False
+
+    def _acquire_match(self, rule: str) -> None:
+        if not self._match_users.get(rule):
+            self.call(Message(destination=BUS_NAME, path=BUS_PATH, interface=BUS_INTERFACE,
+                              member="AddMatch", signature="s", body=[rule]))
+        self._match_users[rule] = self._match_users.get(rule, 0) + 1
+
+    def _release_match(self, rule: str) -> None:
+        remaining = self._match_users[rule] - 1
+        if remaining:
+            self._match_users[rule] = remaining
+            return
+        del self._match_users[rule]
         if self._closed:
             return
         try:
             self.call(Message(destination=BUS_NAME, path=BUS_PATH, interface=BUS_INTERFACE,
-                              member="RemoveMatch", signature="s", body=[subscription.rule]))
+                              member="RemoveMatch", signature="s", body=[rule]))
         except DBusError:
             pass  # the bus is going away; the rule dies with the connection
 
@@ -376,8 +424,9 @@ class Connection:
 
 
 def _matches(criteria: dict[str, str], message: Message) -> bool:
-    unique = criteria.get("sender_unique")
-    if unique and message.sender and message.sender != unique:
+    # An unresolved owner is unavailable, never a wildcard over the shared socket.
+    if "sender_unique" in criteria and (not criteria["sender_unique"]
+                                        or message.sender != criteria["sender_unique"]):
         return False
     if criteria.get("interface") and message.interface != criteria["interface"]:
         return False

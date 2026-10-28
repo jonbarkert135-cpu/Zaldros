@@ -92,8 +92,20 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests -q
   pass over property dictionaries.
 * `test_backend_bus.py` — a private `dbus-daemon`, real connections, signal routing and
   coalescing.
+* `test_backend_owner_recovery.py` — service loss/start/repeated restart, sender isolation,
+  presence-cache invalidation, shared-rule cancellation and delivery through the Qt bridge.
+  These use test services, not real BlueZ or UDisks hardware.
 * `test_backend_facets.py` — each facet against a mock of its own service, with the real property
   names and the real D-Bus types.
 * `test_backend_overhead.py` — the guard that keeps the polling gone.
 
 Measurement: `tools/zaldros-bench/backend_overhead.py --seconds 60`.
+
+Well-known sender subscriptions track the daemon's `NameOwnerChanged` events on the
+existing connection. One internal match per connection is active while named-service
+subscriptions exist; identical match rules share one daemon registration. An absent
+owner matches no sender. Dispatched owner changes invalidate `Bus.has_service`'s cache;
+without an owner watch, its existing TTL still applies. This adds no polling timer.
+It restores events after a service restart on the same bus. Transport/bus-daemon
+reconnection, initial snapshot refresh after owner changes and nonblocking calls remain
+P04 work; this change does not establish them.
