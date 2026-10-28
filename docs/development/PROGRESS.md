@@ -21,6 +21,10 @@ P04 остаётся PARTIAL: блокирующие вызовы, Operation lif
 полный reconnect после перезапуска dbus-daemon и initial snapshot refresh ещё открыты.
 Сравнение async транспорта с библиотекой и соответствующий ADR — следующий подэтап,
 до миграции долгих действий. Изменение не заявляет улучшения latency/RAM/CPU.
+PR [#8](https://github.com/jonbarkert135-cpu/Zaldros/pull/8) создан. На source `1bb28ca`
+PR CI `40756838384`: все восемь jobs PASS; настоящий Office — 40/15/15, без skips.
+Локально: shell 620/0 (включены семь новых регрессий), финальный targeted 8/0,
+tools 81/0; группы пересекаются. ISO и документационный follow-up ещё проверяются.
 Точные проверки и источники: [итерация 0020](../state/iteration-reports/0020-service-owner-recovery.md).
 Предыдущие результаты ниже сохранены как история.
 

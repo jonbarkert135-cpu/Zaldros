@@ -36,7 +36,18 @@ the run. The final focused suite passes all **8**, zero skips, on the same final
 backend implementation. Earlier backend-only run: **160 passed** (six initial
 recovery regressions). Exact commands, baseline failures and final code hashes:
 [local.json](../evidence/service-owner-recovery/local.json). These overlapping
-counts are not added together. Remote CI is pending.
+counts are not added together.
+
+**REMOTE ACCEPTANCE** — Source `1bb28ca6df6c5eedfae1438656dafe6d70f48a11`,
+PR #8 run [40756838384](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40756838384):
+all **eight CI jobs succeeded**. Real UNO/offscreen Office: Writer **40**, Sheets
+**15**, Slides **15**, zero failures/skips. The actual PR checkout `e41f9c9` and
+source have the identical Git tree `57b8986b2c5778e2be76ba9147c9e65153506fa3`.
+Run/jobs and structured Checks receipts: [ci-acceptance.json](../evidence/service-owner-recovery/ci-acceptance.json).
+Artifact downloads remain blocked by CONNECT 403 to a separate Azure storage host;
+no independently inspected remote shell test count or downloaded-artifact claim.
+ISO workflow `40756796822` and final documentation follow-up checks are tracked
+separately; this paragraph does not promote an in-progress workflow to PASS.
 
 **LIMITS / STATUS** — P04 PARTIAL. This fixes service-owner routing on a live bus,
 not reconnect after dbus-daemon/transport loss. No automatic initial snapshot on

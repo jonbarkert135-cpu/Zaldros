@@ -38,6 +38,10 @@ dispatched owner changes, and duplicate match rules have balanced cancellation.
 Real private-bus fault tests include repeated service restart and facade/Qt event
 delivery. System-service/hardware verification and bus transport reconnection remain
 open; synchronous GUI calls and the async transport decision remain the next P04 slice.
+Local full shell 620 pass / zero skips (seven new cases collected), final targeted
+8 pass / zero skips, tools 81 pass. PR #8 CI `40756838384` on `1bb28ca`: all eight
+jobs succeed; real Office remains 40/15/15 with zero failures/skips. ISO and final
+documentation follow-up checks are separate pending runs.
 Exact local/CI outcomes: [iteration 0020](iteration-reports/0020-service-owner-recovery.md).
 GitHub API access is restored after environment publication. Delivery must use actual
 PRs and normal GitHub merges; earlier historical direct-main fallback instructions
