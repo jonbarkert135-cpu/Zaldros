@@ -1,0 +1,155 @@
+{
+  "source_commit": "2056a7c72416340190e3a69602e7452a7046eadc",
+  "source_tree": "db3585fdb6bba31d0e963db8d4b6438b4c0bf58b",
+  "pr": 9,
+  "url": "https://github.com/jonbarkert135-cpu/Zaldros/pull/9",
+  "run": {
+    "id": 40767182098,
+    "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098",
+    "event": "pull_request",
+    "head_sha": "2056a7c72416340190e3a69602e7452a7046eadc",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-10-28T20:52:54Z",
+    "updated_at": "2026-10-28T20:55:59Z"
+  },
+  "jobs": [
+    {
+      "id": 123094355990,
+      "name": "zaldros-sysprobe (unit tests + live run)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094355990"
+    },
+    {
+      "id": 123094356431,
+      "name": "office (sheets, real UNO + Qt)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094356431"
+    },
+    {
+      "id": 123094356444,
+      "name": "benchmark harness (baseline on the runner)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094356444"
+    },
+    {
+      "id": 123094356470,
+      "name": "build OS images (requires podman)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094356470"
+    },
+    {
+      "id": 123094356491,
+      "name": "office (writer, real UNO + Qt)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094356491"
+    },
+    {
+      "id": 123094356504,
+      "name": "office (slides, real UNO + Qt)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094356504"
+    },
+    {
+      "id": 123094356564,
+      "name": "compatibility registries (evidence gate)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094356564"
+    },
+    {
+      "id": 123094356661,
+      "name": "shell prototype (backend + visual render tests)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098/job/123094356661"
+    }
+  ],
+  "office": [
+    {
+      "name": "office (sheets, real UNO + Qt)",
+      "job_id": 123094356431,
+      "notices": {
+        "Office test summary": {
+          "collected": 15,
+          "passed": {
+            "test_engine.py": 9,
+            "test_ui.py": 6
+          },
+          "failed": 0,
+          "skipped": 0,
+          "exitstatus": 0
+        },
+        "Office runtime": {
+          "python": "3.12.3",
+          "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+          "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+          "workflow_sha": "7788dabf5eb4fecbb978b7438168affaa9f5b0a4",
+          "run_id": "40767182098"
+        }
+      }
+    },
+    {
+      "name": "office (writer, real UNO + Qt)",
+      "job_id": 123094356491,
+      "notices": {
+        "Office test summary": {
+          "collected": 40,
+          "passed": {
+            "test_engine.py": 22,
+            "test_ui.py": 18
+          },
+          "failed": 0,
+          "skipped": 0,
+          "exitstatus": 0
+        },
+        "Office runtime": {
+          "python": "3.12.3",
+          "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+          "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+          "workflow_sha": "7788dabf5eb4fecbb978b7438168affaa9f5b0a4",
+          "run_id": "40767182098"
+        }
+      }
+    },
+    {
+      "name": "office (slides, real UNO + Qt)",
+      "job_id": 123094356504,
+      "notices": {
+        "Office test summary": {
+          "collected": 15,
+          "passed": {
+            "test_engine.py": 11,
+            "test_ui.py": 4
+          },
+          "failed": 0,
+          "skipped": 0,
+          "exitstatus": 0
+        },
+        "Office runtime": {
+          "python": "3.12.3",
+          "libreoffice": "LibreOffice 24.2.7.2 420(Build:2)",
+          "uno_module": "/usr/lib/python3/dist-packages/uno.py",
+          "workflow_sha": "7788dabf5eb4fecbb978b7438168affaa9f5b0a4",
+          "run_id": "40767182098"
+        }
+      }
+    }
+  ],
+  "code_sha256": {
+    "backend/zaldros_backend/updates.py": "0f9e20cc8270c396527b55edb28e555130055c8d745f06c406bd47dbdd679824",
+    "shell/zaldros-shell/zaldros_shell/updatecheck.py": "ef6308d745eb1f53ab3549ea69c3646f1b1183f3fb5f8e3e1f1e2b762fe94e4e",
+    "shell/zaldros-shell/tests/test_update_check.py": "0327a8bbde5be73deb13c929d21cc9a226370904afb30f756602d2ed9bf28765"
+  },
+  "limits": [
+    "Shell remote job success recorded; no independently downloaded shell pytest counts.",
+    "Office counts come from structured Checks notices and real UNO/offscreen Qt.",
+    "ISO outcomes tracked separately on PR9; no installed-system/hardware acceptance."
+  ]
+}

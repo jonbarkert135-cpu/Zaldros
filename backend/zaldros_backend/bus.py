@@ -140,7 +140,8 @@ class Bus:
 
     def call(self, service: str, path: str, interface: str, member: str,
              signature: str = "", body: Iterable[Any] = (),
-             timeout: float | None = None) -> Result:
+             timeout: float | None = None,
+             cancelled: Callable[[], bool] | None = None) -> Result:
         connection = self.connection
         source = f"{service}{path} {interface}.{member}"
         if connection is None:
@@ -148,7 +149,8 @@ class Bus:
         message = Message(destination=service, path=path, interface=interface, member=member,
                           signature=signature, body=list(body))
         try:
-            reply = connection.call(message, timeout if timeout is not None else self.timeout)
+            reply = connection.call(message, timeout if timeout is not None else self.timeout,
+                                    cancelled=cancelled)
         except DBusError as exc:
             return Result.bad(str(exc), source)
         return Result.good(reply.body, source)

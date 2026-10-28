@@ -1,0 +1,17 @@
+{
+  "mode": "synchronous",
+  "backend_root": "/tmp/zaldros-async-baseline/backend",
+  "call_ok": false,
+  "ui_latency_ms": 257.294,
+  "ticks": 93,
+  "heartbeat_ms": 5,
+  "service_delay_ms": 450,
+  "deadline_ms": 250,
+  "operation_status": "idle",
+  "scope": "private real D-Bus / Qt; test service; one update-check path",
+  "metrics": {
+    "ui_latency_ms": 257.294
+  },
+  "loaded_updates_module": "/tmp/zaldros-async-baseline/backend/zaldros_backend/updates.py",
+  "loaded_updates_sha256": "386bd1e65cd358b11a717d9f3b0454cc3dfa11b9626e946e23be8f2b5370e983"
+}

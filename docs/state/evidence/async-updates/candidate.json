@@ -1,0 +1,16 @@
+{
+  "mode": "worker",
+  "backend_root": "/workspace/Zaldros/backend",
+  "ui_latency_ms": 5.297,
+  "ticks": 147,
+  "heartbeat_ms": 5,
+  "service_delay_ms": 450,
+  "deadline_ms": 250,
+  "operation_status": "timed_out",
+  "scope": "private real D-Bus / Qt; test service; one update-check path",
+  "metrics": {
+    "ui_latency_ms": 5.297
+  },
+  "loaded_updates_module": "/workspace/Zaldros/backend/zaldros_backend/updates.py",
+  "loaded_updates_sha256": "0f9e20cc8270c396527b55edb28e555130055c8d745f06c406bd47dbdd679824"
+}

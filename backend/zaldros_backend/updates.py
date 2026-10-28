@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """System updates — PackageKit.
 
 PackageKit is the one API that answers "what would be updated" without knowing whether the machine
@@ -13,7 +14,7 @@ not finish — never an empty list, which would read as "you are up to date".
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Callable
 
 from .bus import Bus, Result
 from .catalog import PackageKit
@@ -44,7 +45,8 @@ class UpdatesFacet:
                                 locked=bool(data.get("Locked", False)))
 
     # -- queries -----------------------------------------------------------------------------
-    def updates(self, timeout: float = 60.0) -> Reading:
+    def updates(self, timeout: float = 60.0,
+                cancelled: Callable[[], bool] | None = None) -> Reading:
         """The packages that would be installed, counted and named.
 
         `value` is the number of updates, so the Settings row can show a number; `packages` holds
@@ -53,24 +55,42 @@ class UpdatesFacet:
         """
         collected: list[dict[str, str]] = []
         outcome = self._transaction("GetUpdates", "t", [PackageKit.FILTER_NONE], collected,
-                                    timeout)
+                                    timeout, cancelled)
         if not outcome.ok:
             return Reading.missing(outcome.error or NO_SERVICE, PackageKit.SERVICE)
         security = sum(1 for package in collected if package["info"] == "security")
         return Reading.measured(len(collected), _summary(len(collected), security),
                                 PackageKit.SERVICE, packages=collected, security=security)
 
-    def refresh(self, timeout: float = 180.0) -> Result:
+    def refresh(self, timeout: float = 180.0,
+                cancelled: Callable[[], bool] | None = None) -> Result:
         """Re-read the repositories, the way "Проверить обновления" does in Windows."""
-        return self._transaction("RefreshCache", "b", [False], [], timeout)
+        return self._transaction("RefreshCache", "b", [False], [], timeout, cancelled)
 
     # -- the transaction dance -----------------------------------------------------------------
     def _transaction(self, member: str, signature: str, body: list[Any],
-                     collected: list[dict[str, str]], timeout: float) -> Result:
-        if not self.available():
-            return Result.bad(NO_DAEMON, PackageKit.SERVICE)
-        created = self._bus.call_one(PackageKit.SERVICE, PackageKit.PATH, PackageKit.IFACE,
-                                     "CreateTransaction")
+                     collected: list[dict[str, str]], timeout: float,
+                     cancelled: Callable[[], bool] | None = None) -> Result:
+        deadline = time.monotonic() + timeout
+
+        def stopped() -> bool:
+            return time.monotonic() >= deadline or bool(cancelled and cancelled())
+
+        def ask(service, path, interface, method, signature="", values=(), one=False):
+            if stopped():
+                return Result.bad(TIMED_OUT, path)
+            call = self._bus.call_one if one else self._bus.call
+            return call(service, path, interface, method, signature, values,
+                        timeout=max(0.001, deadline - time.monotonic()), cancelled=stopped)
+
+        # Pin the transaction to one unique owner: a replacement daemon must never
+        # complete an old transaction, even if it reuses the same object path.
+        owner = ask("org.freedesktop.DBus", "/org/freedesktop/DBus",
+                    "org.freedesktop.DBus", "GetNameOwner", "s", [PackageKit.SERVICE], one=True)
+        if not owner.ok:
+            return Result.bad(owner.error or NO_DAEMON, PackageKit.SERVICE)
+        connection = self._bus.connection
+        created = ask(owner.value, PackageKit.PATH, PackageKit.IFACE, "CreateTransaction", one=True)
         if not created.ok:
             return Result.bad(created.error or NO_DAEMON, PackageKit.SERVICE)
         path = str(created.value)
@@ -90,22 +110,31 @@ class UpdatesFacet:
             values = list(message.body)
             finished["error"] = str(values[1]) if len(values) > 1 else "error"
 
+        def on_owner(message) -> None:
+            if len(message.body) == 3 and message.body[1] == owner.value:
+                finished["error"] = NO_DAEMON
+
         subscriptions = [
             self._bus.on_signal(on_package, path=path, interface=PackageKit.TRANSACTION,
-                                member="Package"),
+                                member="Package", sender=owner.value),
             self._bus.on_signal(on_finished, path=path, interface=PackageKit.TRANSACTION,
-                                member="Finished"),
+                                member="Finished", sender=owner.value),
             self._bus.on_signal(on_error, path=path, interface=PackageKit.TRANSACTION,
-                                member="ErrorCode")]
+                                member="ErrorCode", sender=owner.value),
+            self._bus.on_signal(on_owner, sender="org.freedesktop.DBus",
+                                path="/org/freedesktop/DBus", interface="org.freedesktop.DBus",
+                                member="NameOwnerChanged", arg0=PackageKit.SERVICE)]
         try:
-            call = self._bus.call(PackageKit.SERVICE, path, PackageKit.TRANSACTION, member,
-                                  signature, body, timeout=timeout)
+            if any(subscription is None for subscription in subscriptions):
+                return Result.bad("could not subscribe to update transaction", path)
+            call = ask(owner.value, path, PackageKit.TRANSACTION, member, signature, body)
             if not call.ok:
                 return Result.bad(call.error, path)
-            deadline = time.monotonic() + timeout
             while "exit" not in finished and "error" not in finished:
-                if time.monotonic() > deadline:
+                if stopped():
                     return Result.bad(TIMED_OUT, path)
+                if connection is None or connection.closed:
+                    return Result.bad(NO_DAEMON, path)
                 self._bus.dispatch(0.05)
         finally:
             for subscription in subscriptions:

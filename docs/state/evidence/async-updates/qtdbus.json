@@ -1,0 +1,30 @@
+{
+  "0": {
+    "signature": "a{sv}",
+    "error": "",
+    "argument_types": [
+      "QDBusArgument"
+    ],
+    "converted_types": [
+      "QDBusArgument"
+    ],
+    "native_dictionary": false
+  },
+  "1": {
+    "signature": "s",
+    "error": "Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.",
+    "argument_types": [
+      "str"
+    ],
+    "converted_types": [
+      "str"
+    ],
+    "native_dictionary": false
+  },
+  "pyside": "6.12.0",
+  "license_metadata": "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only",
+  "unix_fd_wrapper_valid": true,
+  "unix_fd_bus_roundtrip": "UNRUN",
+  "ui_latency_ms": 6.252,
+  "scope": "bundled QtDBus probe; automatic GetAll conversion and one async timeout only"
+}

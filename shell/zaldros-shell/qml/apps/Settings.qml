@@ -36,6 +36,11 @@ Item {
     function goBack() { var next = stack.slice(); next.pop(); stack = next }
     function selectRail(index) { page = index; stack = [] }
 
+    Connections {
+        target: settings.tree
+        function onChanged() { settings.treeRevision += 1 }
+    }
+
 
     function reading(key) {
         var value = settings.host ? settings.host.value(key) : "";
@@ -254,6 +259,28 @@ Item {
                 }
             }
 
+            Row {
+                visible: settings.currentId === "update" && typeof settingsControls !== "undefined" && settingsControls
+                width: parent.width
+                spacing: 12
+                Text {
+                    width: Math.max(0, parent.width - stopUpdateButton.width - 12)
+                    wrapMode: Text.Wrap
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: typeof settingsControls !== "undefined" && settingsControls ? settingsControls.updatesStatus : ""
+                    color: Theme.textSecondary
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontCaption
+                }
+                Button {
+                    id: stopUpdateButton
+                    objectName: "stopUpdateCheck"
+                    text: qsTr("Stop waiting")
+                    enabled: typeof settingsControls !== "undefined" && settingsControls && settingsControls.updatesCancellable
+                    onClicked: settingsControls.cancelUpdates()
+                }
+            }
+
             // page cards
             Repeater {
                 model: settings.current.entries
@@ -271,6 +298,7 @@ Item {
                         topPadding: index === 0 ? 0 : 12
                     }
                     SettingsCard {
+                    objectName: modelData.control
                     width: parent.width
                     glyph: modelData.glyph
                     title: modelData.title
@@ -292,6 +320,10 @@ Item {
                         // A row backed by settingscontrols.py asks the system to change and then
                         // redraws from what the system answered — never from what was clicked.
                         else if (modelData.control !== "" && typeof settingsControls !== "undefined") {
+                            if (modelData.control === "updates.check") {
+                                settingsControls.activate(modelData.control);
+                                return;
+                            }
                             if (modelData.kind === "option") {
                                 settingsControls.set(modelData.control, modelData.option);
                                 settings.goBack();
