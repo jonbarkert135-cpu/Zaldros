@@ -1,7 +1,7 @@
 # Project state — 2026-10-28
 
-The P04 update-check cycle starts from main
-`b86f4a95c49ae6676a2c41cf46a53d1199becb07` (PR #8 merged normally through GitHub).
+The P04 activation cycle starts from main
+`32512e27b136917bc8144d9490e90d155e7a29a5` (PR #9 merged normally through GitHub).
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
 Office engine/UI verified source: `c625c8f93ac67969e943dd352c933da4e9f71b0f`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
@@ -31,6 +31,15 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+P04 activation slice: well-known CreateTransaction activates an installed service;
+method reply sender metadata pins the creator, with ownership verified after the
+loss subscription. A replacement owner cannot silently complete the old operation.
+Pinned base reproduces 5 failures/2 passes; final focused 35 PASS, full shell 646
+PASS and tools 81 PASS, zero skips. Real private daemon/service-file child tests
+are not real PackageKit/systemd integration. New observed generic server-side
+METHOD_CALL parking/routing gap remains open. See iteration 0022 and its receipts.
+PR #9 final CI/ISO/replay passed; its PR body records 3 builds/9 boots and 99 UI PASS.
 
 P04 next vertical slice: Settings update check runs on one worker with its own bus,
 one deadline, stop-waiting semantics and confirmed readback. Cached update rows

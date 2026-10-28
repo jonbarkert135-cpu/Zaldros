@@ -1,7 +1,28 @@
 # Передача контекста
 
 Обновлено: 2026-10-28. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-Текущий P04 update-check начинается с main `b86f4a95c49ae6676a2c41cf46a53d1199becb07`.
+Текущий P04 activation начинается с main `32512e27b136917bc8144d9490e90d155e7a29a5`.
+
+## P04 — запуск службы и идентичность создателя транзакции
+
+PR #9 MERGED через GitHub; main `32512e2`. Его финальные CI/ISO проверки прошли:
+3 builds/9 boots и replay 99 обязательных UI PASS. Предыдущие разделы — checkpoint
+истории, а не утверждение о незавершённом PR #9.
+
+Новые проверки воспроизвели пять ошибок на базовом production Bus/Updates. Первый
+CreateTransaction теперь идёт на well-known имя для штатной D-Bus активации;
+reply_sender сохраняет unique имя реального создателя. После подписок проверяем,
+что владелец не заменён: старый процесс не может дать ложный успешный refresh.
+Проверены delayed activation → timeout/cancel → retry и новый процесс после выхода.
+Локально: focused 35 PASS, shell 646 PASS, tools 81 PASS; без skips. P04 PARTIAL.
+Подробности: [итерация 0022](../state/iteration-reports/0022-packagekit-activation.md).
+
+При создании child fixture отдельно обнаружен Connection.call/_park, теряющий
+входящий METHOD_CALL во время синхронного RequestName. Helper публикуется без
+ожидания ответа; общий server-side routing / Notification startup остаётся отдельным
+открытым gate, а не скрыто исправленной функцией. Реальный PackageKit/systemd,
+начальные синхронные Settings reads, transport reconnect и FD gate ещё открыты.
+Настройки среды/зависимости не менялись; Publish для этого PR не требуется.
 
 ## P04 — неблокирующая проверка обновлений
 

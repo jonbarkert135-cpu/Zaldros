@@ -81,6 +81,14 @@ dependencies: the standard library and the specification.
 
 ## Tests
 
+Successful `Bus.call` and `call_one` results also expose `reply_sender`, the sender
+reported by the bus for that method return. It is empty for local/non-bus results.
+PackageKit creates a transaction at its well-known destination so D-Bus can activate
+an installed inactive service. Subsequent calls/signals use the actual creator's
+unique connection name. After subscribing to owner loss, the facet verifies that
+the creator still owns the service name before starting the transaction action.
+It never substitutes a replacement owner for an already created transaction.
+
 They live with the shell's, so CI runs them:
 
 ```
@@ -95,6 +103,9 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests -q
 * `test_backend_owner_recovery.py` — service loss/start/repeated restart, sender isolation,
   presence-cache invalidation, shared-rule cancellation and delivery through the Qt bridge.
   These use test services, not real BlueZ or UDisks hardware.
+* `test_update_activation.py` — real service-file activation of a test child,
+  failed startup, cancellation/deadline and retry, process restart, and owner
+  replacement before the CreateTransaction reply. Requires no host PackageKit.
 * `test_backend_facets.py` — each facet against a mock of its own service, with the real property
   names and the real D-Bus types.
 * `test_backend_overhead.py` — the guard that keeps the polling gone.

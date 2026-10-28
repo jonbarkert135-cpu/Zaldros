@@ -35,13 +35,14 @@ class Result:
     value: Any = None
     error: str = ""
     source: str = ""
+    reply_sender: str = ""  # daemon-stamped sender of a successful method return
 
     def __bool__(self) -> bool:
         return self.ok
 
     @classmethod
-    def good(cls, value: Any, source: str = "") -> "Result":
-        return cls(True, value, "", source)
+    def good(cls, value: Any, source: str = "", reply_sender: str = "") -> "Result":
+        return cls(True, value, "", source, reply_sender)
 
     @classmethod
     def bad(cls, error: str, source: str = "") -> "Result":
@@ -153,7 +154,7 @@ class Bus:
                                     cancelled=cancelled)
         except DBusError as exc:
             return Result.bad(str(exc), source)
-        return Result.good(reply.body, source)
+        return Result.good(reply.body, source, reply.sender or "")
 
     def call_one(self, *args: Any, **kwargs: Any) -> Result:
         """`call` for the common case of a single return value."""
@@ -163,7 +164,7 @@ class Bus:
         values = result.value or []
         if len(values) != 1:
             return Result.bad(f"expected one value, got {len(values)}", result.source)
-        return Result.good(values[0], result.source)
+        return Result.good(values[0], result.source, result.reply_sender)
 
     # -- properties --------------------------------------------------------------------------
     def get(self, service: str, path: str, interface: str, name: str) -> Result:
