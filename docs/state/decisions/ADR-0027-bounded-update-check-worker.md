@@ -52,6 +52,11 @@ overwrite terminal/newer states. Retry is enabled after worker cleanup; repeated
 clicks do not grow a queue. Application quit requests cancellation without joining
 on the GUI thread.
 
+Connection authentication and match-rule setup/teardown retain their existing
+finite transport timeouts in the worker. They can delay cleanup and re-enabling
+retry after the GUI has already shown its deadline/cancelled state. The 50 ms
+check applies to cancellable method reply waits, not every transport phase.
+
 Pin transactions to the unique service owner, verify Finished/ErrorCode, observe
 owner loss, and reject foreign/replacement-owner signals. A successful method
 return or missing service never becomes a zero-update count. Publish only the

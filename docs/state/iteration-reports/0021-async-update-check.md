@@ -40,6 +40,19 @@ fails as expected: two 80 ms phases incorrectly succeed under a 120 ms budget.
 It passes with the shared deadline. Exact commands, failures and source hashes:
 [local.json](../evidence/async-updates/local.json). Remote outcomes follow CI.
 
+**REMOTE ACCEPTANCE** — Source `2056a7c72416340190e3a69602e7452a7046eadc`,
+PR [#9](https://github.com/jonbarkert135-cpu/Zaldros/pull/9), CI
+[40767182098](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40767182098):
+all eight jobs PASS. Real UNO: Writer 40, Sheets 15, Slides 15, zero failures/skips.
+Actual PR checkout and source have identical Git tree
+`db3585fdb6bba31d0e963db8d4b6438b4c0bf58b`.
+[CI receipt](../evidence/async-updates/ci-acceptance.json) records jobs/Checks notices;
+no uninspected remote shell pytest count is invented. This follow-up changes
+documentation/evidence only. Final follow-up checks, ISO `40767127413` and merge
+state are recorded on PR #9; this source receipt does not assert an unfinished
+workflow passed. Transport setup/teardown can delay worker cleanup/retry after
+the GUI deadline; 50 ms cancellation polling does not cover those control phases.
+
 **FAILURES RETAINED** — Initial focused test used repeated QTest.qWait calls that
 starved Python workers; the normal Qt event loop passed. Use a test QEventLoop
 instead; production has no nested event loop. QML delegates require a visual-item

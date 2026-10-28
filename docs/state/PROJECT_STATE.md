@@ -38,6 +38,11 @@ avoid synchronous rereads when a result arrives. Local targeted: 18 PASS; measur
 private-bus fault case: 257.294 → 5.297 ms maximum Qt heartbeat gap. QtDBus comparison
 and FD/license limits: ADR-0027; [iteration 0021](iteration-reports/0021-async-update-check.md).
 This does not complete P04 or establish real PackageKit/hardware acceptance.
+Source `2056a7c`, PR #9 CI `40767182098`: all eight jobs PASS, real Office 40/15/15
+without skips; local full shell 639 PASS and tools 81 PASS. Pinned receipts are in
+evidence/async-updates/. PR #9 records final follow-up/ISO checks and merge state.
+Worker transport setup/teardown retains finite control timeouts, so cleanup/retry
+may lag the GUI's terminal deadline/cancel state.
 PR #8 final ISO results are in its PR body: 3 builds/9 boots and 99 strict UI PASS;
 pending notes below refer to the earlier evidence checkpoint. Its follow-up CI passed.
 
