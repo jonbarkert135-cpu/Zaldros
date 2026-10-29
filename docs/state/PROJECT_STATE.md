@@ -1,7 +1,7 @@
-# Project state — 2026-10-28
+# Project state — 2026-10-29
 
-The P04 activation cycle starts from main
-`32512e27b136917bc8144d9490e90d155e7a29a5` (PR #9 merged normally through GitHub).
+The P04 incoming-method routing cycle starts from main
+`ea60e7323101d6647c16f13528e7f15c066efdf3` (PR #10 merged normally through GitHub).
 Runtime-verified source: `85cec3877d44373b29f32efa13e6e18712ab50b8`.
 Office engine/UI verified source: `c625c8f93ac67969e943dd352c933da4e9f71b0f`.
 P01 and P02 deliveries are already committed and merged. This page supersedes the
@@ -31,6 +31,22 @@ OS, installed system, or fully working backend is **not established**.
 | Current work | P01 DONE; P02 PARTIAL: signature/hash gate, asset staging and live Ubuntu authentication verified; licensing reviews remain open |
 
 ## Verification
+
+The observed server-side incoming-method loss is addressed by retaining methods
+alongside signals and sharing dispatch with ObjectServer.process. Outgoing RPCs
+do not execute service callbacks reentrantly; client-only dispatch defers them.
+FIFO survives callback failure, signals reach subscribers while the server runs,
+NO_REPLY_EXPECTED is preserved, and closing a connection inside a handler is a
+normal transport error. The activation child no longer needs its no-reply name
+acquisition workaround. Frozen-base regressions: 10 FAIL / 1 PASS. Final focused
+36 PASS, full shell/backend 657 PASS (62 existing warnings), tools 81 PASS, zero
+skips/failures: iteration 0023 and evidence/incoming-method-routing/local.json.
+Remote acceptance and merge will be recorded on the corresponding actual PR.
+No notification-shell integration or automatic Qt drain scheduling is established;
+owners still need to call process after RPCs even when the socket is no longer
+readable. Real services, reconnect, remaining GUI reads and FD support remain open.
+PR #10's final CI/ISO/replay passed (3 builds/9 boots, 99 required UI PASS), and
+its actual PR body records the pinned receipts. Earlier pending notes are checkpoints.
 
 P04 activation slice: well-known CreateTransaction activates an installed service;
 method reply sender metadata pins the creator, with ownership verified after the

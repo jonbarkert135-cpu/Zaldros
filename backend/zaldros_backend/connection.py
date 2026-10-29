@@ -16,6 +16,7 @@ import errno
 import os
 import socket
 import time
+from collections import deque
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -101,8 +102,8 @@ class Connection:
     """One connection to one bus.
 
     Thread model: single-threaded, like the shell. Calls block on the socket with a timeout and
-    park any signal that arrives in the meantime, so a signal is never lost just because it landed
-    between a request and its reply.
+    park signals and incoming method calls until dispatch, without running service callbacks
+    inside a synchronous outgoing call. A connection belongs to one thread at a time.
     """
 
     def __init__(self, sock: socket.socket) -> None:
@@ -111,7 +112,7 @@ class Connection:
         self._serial = 0
         self._unique_name = ""
         self._handlers: list[tuple[str, dict[str, str], Callable[[Message], None]]] = []
-        self._parked: list[Message] = []
+        self._parked: deque[Message] = deque()
         self._closed = False
         self._match_users: dict[str, int] = {}
         self._watching_owners = False
@@ -251,8 +252,8 @@ class Connection:
         message = self._take_buffered()
         if message is not None:
             return message
-        self._socket.settimeout(max(0.0, timeout))
         try:
+            self._socket.settimeout(max(0.0, timeout))
             chunk = self._socket.recv(65536)
         except socket.timeout:
             return None
@@ -279,30 +280,43 @@ class Connection:
         return message
 
     def _park(self, message: Message) -> None:
-        if message.type == SIGNAL:
+        if message.type in (SIGNAL, METHOD_CALL):
             self._parked.append(message)
         # Stray method returns and errors for calls nobody is waiting on are dropped: the caller
         # that would have cared has already timed out and reported it.
 
-    def dispatch(self, timeout: float = 0.0) -> int:
+    def dispatch(self, timeout: float = 0.0, *,
+                 method_handler: Callable[[Message], None] | None = None) -> int:
         """Deliver everything that has arrived. Returns how many signals were delivered.
 
         Called from the socket notifier, so `timeout=0`: read what is there, deliver, return.
+        ObjectServer supplies method_handler; client-only dispatch retains incoming calls for
+        that server's next process(). Replies to abandoned RPCs are dropped. Neither path
+        executes method handlers reentrantly inside call().
         """
         delivered = 0
-        for message in self._parked:
-            delivered += self._deliver(message)
-        self._parked = []
+        deferred: deque[Message] = deque()
         deadline = time.monotonic() + timeout
-        while True:
-            message = self._read_message(max(0.0, deadline - time.monotonic()))
-            if message is None:
-                break
-            if message.type == SIGNAL:
-                delivered += self._deliver(message)
-            if timeout <= 0 and not self._buffer:
-                # One recv per dispatch when we are not waiting: the notifier will fire again.
-                break
+        try:
+            while True:
+                # RPCs inside callbacks may park more messages. Consume that FIFO before
+                # reading newer socket data, without revisiting client-only deferred calls.
+                message = (self._parked.popleft() if self._parked else
+                           self._read_message(max(0.0, deadline - time.monotonic())))
+                if message is None:
+                    break
+                if message.type == SIGNAL:
+                    delivered += self._deliver(message)
+                elif message.type == METHOD_CALL:
+                    if method_handler is None:
+                        deferred.append(message)
+                    else:
+                        method_handler(message)
+        finally:
+            # Preserve earlier deferred calls ahead of the unprocessed tail, including
+            # when a consumer raises. No message is replayed after its handler ran.
+            deferred.extend(self._parked)
+            self._parked = deferred
         return delivered
 
     def _deliver(self, message: Message) -> int:

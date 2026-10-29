@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from .connection import Connection, DBusError
-from .wire import (ERROR, METHOD_CALL, METHOD_RETURN, NO_REPLY_EXPECTED, SIGNAL, Message,
+from .wire import (ERROR, METHOD_RETURN, NO_REPLY_EXPECTED, SIGNAL, Message,
                    Variant)
 
 PROPERTIES = "org.freedesktop.DBus.Properties"
@@ -149,19 +149,17 @@ class ObjectServer:
     def process(self, timeout: float = 0.0) -> int:
         """Answer whatever has arrived. Returns how many calls were handled."""
         handled = 0
-        while True:
-            try:
-                message = self.connection._read_message(timeout)     # noqa: SLF001 - same package
-            except DBusError:
-                return handled
-            if message is None:
-                return handled
-            if message.type == METHOD_CALL:
-                reply = self.handle(message)
-                if reply is not None and not message.flags & NO_REPLY_EXPECTED:
-                    self.connection.send(reply)
-                handled += 1
-            timeout = 0.0
+        def receive(message: Message) -> None:
+            nonlocal handled
+            reply = self.handle(message)
+            if reply is not None and not message.flags & NO_REPLY_EXPECTED:
+                self.connection.send(reply)
+            handled += 1
+        try:
+            self.connection.dispatch(timeout, method_handler=receive)
+        except DBusError:
+            pass  # Preserve the number served before the transport closed.
+        return handled
 
     def handle(self, message: Message) -> Message | None:
         try:

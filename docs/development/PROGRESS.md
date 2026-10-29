@@ -1,7 +1,30 @@
 # Передача контекста
 
-Обновлено: 2026-10-28. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
-Текущий P04 activation начинается с main `32512e27b136917bc8144d9490e90d155e7a29a5`.
+Обновлено: 2026-10-29. Исходный аудит: `12afe1f572193fa105e0b2cd27a77b0715b4d605`.
+Текущий P04 routing начинается с main `ea60e7323101d6647c16f13528e7f15c066efdf3`.
+
+## P04 — входящие запросы во время исходящего RPC
+
+PR #10 MERGED через GitHub; его финальные проверки прошли: весь CI,
+3 ISO builds/9 boots и replay 99 обязательных UI PASS. Ниже сохранены checkpoint
+предыдущей итерации и её ограничения, актуальные на момент записи.
+
+Следующий срез исправляет отдельно обнаруженную потерю METHOD_CALL. Connection
+сохраняет входящие команды, ObjectServer обслуживает ту же FIFO-очередь вместе
+с signals; client-only dispatch оставляет команды для сервера. Обработчик команды
+не вызывается внутри синхронного call(). При ошибке callback порядок оставшихся
+команд сохраняется. Закрытие сокета внутри команды даёт штатный DBusError.
+Activation helper теперь использует обычный синхронный RequestName без обхода.
+
+На frozen backend базового main: 10 FAIL / 1 PASS. Финальные локальные результаты:
+focused 36 PASS, shell/backend 657 PASS, tools 81 PASS, без skips/ошибок;
+62 прежних forkpty warnings. Команды: [receipt](../state/evidence/incoming-method-routing/local.json).
+История выявленных ошибок и границы: [итерация 0023](../state/iteration-reports/0023-incoming-method-routing.md).
+CI/ISO/финальный merge будут зафиксированы на настоящем PR после завершения.
+P04/P12 PARTIAL: automatic process scheduling после RPC и подключение внешнего
+NotificationServer к оболочке ещё не выполнены. Transport reconnect, остальные
+GUI reads/actions, real PackageKit/systemd/polkit и FD gate остаются открытыми.
+Настройки среды и зависимости не менялись; повторный Publish не нужен.
 
 ## P04 — запуск службы и идентичность создателя транзакции
 
