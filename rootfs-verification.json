@@ -1,0 +1,8 @@
+{
+  "url": "https://cdimage.ubuntu.com/ubuntu-base/releases/resolute/release/ubuntu-base-26.04-base-amd64.tar.gz",
+  "sha256": "046fcabb7f16f45a80ae11824664f2a07e01386c6fb1ed9dc1e225a66a6553a2",
+  "trusted_primary_fingerprints": [
+    "843938DF228D22F7B3742BC0D94AA3F0EFE21092"
+  ],
+  "status": "verified-and-extracted"
+}
