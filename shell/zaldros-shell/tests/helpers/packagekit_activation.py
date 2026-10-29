@@ -22,9 +22,8 @@ address = os.environ["DBUS_STARTER_ADDRESS"]
 mock = MockSystem(address)
 replacement = None
 try:
-    # Export first, then announce without a blocking client RPC. Connection.call
-    # parks signals, not incoming method calls; queued activation requests must
-    # go straight to ObjectServer.process instead of getting dropped in RequestName.
+    # Export first, then synchronously acquire the name. Requests queued by activation
+    # may arrive during RequestName: production Connection must retain them for process().
     connection = Connection.connect(address)
     mock.servers["org.freedesktop.PackageKit"] = ObjectServer(connection)
     mock._connections.append(connection)
@@ -50,9 +49,7 @@ try:
             replacement.add_packagekit(updates=99)
         return original_create()
     manager.methods["CreateTransaction"].handler = create
-    connection.send_no_reply(Message(destination="org.freedesktop.DBus",
-        path="/org/freedesktop/DBus", interface="org.freedesktop.DBus", member="RequestName",
-        signature="su", body=["org.freedesktop.PackageKit", 4]))
+    assert server.request_name("org.freedesktop.PackageKit")
     (directory / "ready").write_text(server.connection.unique_name)
     while not server.connection.closed:
         mock.process(0.005)

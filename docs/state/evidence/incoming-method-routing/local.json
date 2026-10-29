@@ -1,0 +1,281 @@
+{
+  "date": "2026-10-29",
+  "base_commit": "ea60e7323101d6647c16f13528e7f15c066efdf3",
+  "python": "3.12.14",
+  "scope": "Real private dbus-daemon protocol tests; no real system services or hardware",
+  "file_sha256": {
+    "backend/zaldros_backend/connection.py": "a710ddce0a8ae25396e0b8ea454a28030a9b68d4f0e39db9c35034ebb0e30e3c",
+    "backend/zaldros_backend/service.py": "c79fd1665c050e974d19358161112b632edb1824ffb973ee3258e7fc3e2b24e8",
+    "shell/zaldros-shell/tests/test_incoming_methods.py": "64dc105f61251c3caa40afb191d77a605d35803c6cbabbe4df61de4a14ff7827",
+    "shell/zaldros-shell/tests/helpers/packagekit_activation.py": "85503460d7eba3d4305df9d975dbe065976d06c73d69f1174e2eeb8f912664e7"
+  },
+  "baseline": {
+    "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros /workspace/Zaldros/.venv/bin/python -m pytest /tmp/zaldros-routing-base/shell/zaldros-shell/tests/test_incoming_methods.py -q",
+    "tests": 11,
+    "failures": 10,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 1,
+    "seconds": 0.321,
+    "exit_code": 1,
+    "cases": [
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[success]",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[error]",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[timeout]",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[cancel]",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_client_dispatch_preserves_methods_for_the_object_server",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_service_handler_rpc_retains_the_next_call_without_reentrant_execution",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_object_server_delivers_signals_while_receiving_methods",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_callback_rpc_does_not_erase_newly_parked_messages",
+        "status": "PASS"
+      },
+      {
+        "name": "test_no_reply_calls_execute_once_and_do_not_send_a_reply",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_signal_callback_failure_retains_unhandled_calls_in_order",
+        "status": "FAIL"
+      },
+      {
+        "name": "test_service_connection_closed_during_handler_ends_processing_cleanly",
+        "status": "FAIL"
+      }
+    ],
+    "log_sha256": "0288a6ebe07a06ff56b5c4c54b6bf945cebbdd856123da2bb757fc924c9daff4",
+    "junit_sha256": "a732e16caee12d5add848957661eccaac3abce0418cbe8edbad50666c0a665a4"
+  },
+  "baseline_production_sha256": {
+    "backend/zaldros_backend/connection.py": "bc6d7d78739e9af9b3b051c864b3dd0a845fe19fed4d518aefb8f66d75ff9d41",
+    "backend/zaldros_backend/service.py": "8147241e287eb8ef40e347879e17c6dd98daac52cfd5cce458937cbda68c57e7"
+  },
+  "baseline_method": "git archive base backend and shell test conftest into a separate root; copy only final new test. Production files unmodified, verified byte-for-byte.",
+  "focused": {
+    "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests/test_incoming_methods.py shell/zaldros-shell/tests/test_update_activation.py shell/zaldros-shell/tests/test_backend_bus.py shell/zaldros-shell/tests/test_backend_owner_recovery.py -q",
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 36,
+    "seconds": 3.959,
+    "exit_code": 0,
+    "cases": [
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[success]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[error]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[timeout]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_incoming_calls_survive_outgoing_call_without_reentrant_execution[cancel]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_client_dispatch_preserves_methods_for_the_object_server",
+        "status": "PASS"
+      },
+      {
+        "name": "test_service_handler_rpc_retains_the_next_call_without_reentrant_execution",
+        "status": "PASS"
+      },
+      {
+        "name": "test_object_server_delivers_signals_while_receiving_methods",
+        "status": "PASS"
+      },
+      {
+        "name": "test_callback_rpc_does_not_erase_newly_parked_messages",
+        "status": "PASS"
+      },
+      {
+        "name": "test_no_reply_calls_execute_once_and_do_not_send_a_reply",
+        "status": "PASS"
+      },
+      {
+        "name": "test_signal_callback_failure_retains_unhandled_calls_in_order",
+        "status": "PASS"
+      },
+      {
+        "name": "test_service_connection_closed_during_handler_ends_processing_cleanly",
+        "status": "PASS"
+      },
+      {
+        "name": "test_inactive_installed_service_is_activated_and_read_back",
+        "status": "PASS"
+      },
+      {
+        "name": "test_missing_or_failed_activation_reports_failure_not_zero[None]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_missing_or_failed_activation_reports_failure_not_zero[fail-start]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_activation_keeps_deadline_or_cancellation_and_can_retry[deadline]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_activation_keeps_deadline_or_cancellation_and_can_retry[cancel]",
+        "status": "PASS"
+      },
+      {
+        "name": "test_service_exit_then_new_check_activates_a_new_process",
+        "status": "PASS"
+      },
+      {
+        "name": "test_owner_replacement_before_create_reply_never_reports_success",
+        "status": "PASS"
+      },
+      {
+        "name": "test_a_connection_authenticates_and_gets_a_unique_name",
+        "status": "PASS"
+      },
+      {
+        "name": "test_an_unknown_method_comes_back_as_an_error_not_a_hang",
+        "status": "PASS"
+      },
+      {
+        "name": "test_an_unreachable_bus_is_a_reason_not_an_exception",
+        "status": "PASS"
+      },
+      {
+        "name": "test_property_dictionaries_decode_over_the_real_wire",
+        "status": "PASS"
+      },
+      {
+        "name": "test_managed_objects_returns_the_whole_tree_in_one_call",
+        "status": "PASS"
+      },
+      {
+        "name": "test_setting_a_property_reaches_the_service",
+        "status": "PASS"
+      },
+      {
+        "name": "test_a_property_change_wakes_only_the_domain_it_belongs_to",
+        "status": "PASS"
+      },
+      {
+        "name": "test_a_burst_of_signals_becomes_one_notification",
+        "status": "PASS"
+      },
+      {
+        "name": "test_nothing_is_delivered_to_a_domain_nobody_subscribed_to",
+        "status": "PASS"
+      },
+      {
+        "name": "test_the_backend_reports_what_it_is_connected_to",
+        "status": "PASS"
+      },
+      {
+        "name": "test_repeated_service_restart_recovers_existing_subscription_without_duplicates",
+        "status": "PASS"
+      },
+      {
+        "name": "test_missing_service_never_accepts_other_sender_then_recovers_on_start",
+        "status": "PASS"
+      },
+      {
+        "name": "test_unique_sender_subscription_is_not_a_wildcard",
+        "status": "PASS"
+      },
+      {
+        "name": "test_forged_name_owner_signal_does_not_rebind_subscription",
+        "status": "PASS"
+      },
+      {
+        "name": "test_owner_changes_invalidate_service_presence_cache_after_dispatch",
+        "status": "PASS"
+      },
+      {
+        "name": "test_shared_rule_is_removed_after_last_cancel_and_can_be_resubscribed",
+        "status": "PASS"
+      },
+      {
+        "name": "test_failed_subscription_removes_its_owner_watch",
+        "status": "PASS"
+      },
+      {
+        "name": "test_bluez_restart_reaches_existing_facade_and_qt_bridge",
+        "status": "PASS"
+      }
+    ],
+    "log_sha256": "ac0f8ab8d47f6a057ef36bad06453ebda89ad2bf5b825b8a8925f4a8dba2e7d9",
+    "junit_sha256": "52e34f936a8352bf5c5d6bfc6b870e248ce0c7f3cda761385ffada1ff69f2b98"
+  },
+  "shell": {
+    "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests -q",
+    "tests": 657,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 657,
+    "seconds": 85.77,
+    "exit_code": 0,
+    "log_sha256": "30c806660179d310fdea243c595f8d306600c45f488bfea0baefe45c8774ae8a",
+    "junit_sha256": "90c24eec30ff61cfef1a21fb6f06dedaa0407545cd6b82886e107003f11c811a"
+  },
+  "tools": {
+    "command": ".venv-tools/bin/python -m pytest tools -q",
+    "tests": 81,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 81,
+    "seconds": 2.831,
+    "exit_code": 0,
+    "log_sha256": "0b7e297e97d3894462836bb681d9d975fb4a3c30fd67c7dc2b72bccf3d234ea0",
+    "junit_sha256": "dc4464f647dd42d10d5c5e721915c79cbdbb60d5b531a402719ffd5aa644cc83"
+  },
+  "intermediate_full": {
+    "command": "QT_QPA_PLATFORM=offscreen XDG_CACHE_HOME=/workspace/.cache/zaldros .venv/bin/python -m pytest shell/zaldros-shell/tests -q",
+    "tests": 655,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 655,
+    "seconds": 89.298,
+    "exit_code": 0,
+    "log_sha256": "155706f0db97b71e89480a82aeb507036f35fc729124abbf7ced464c6feacfe4",
+    "junit_sha256": "1a708df451d6c519d2e1f0ba0c03efe34d2d11484bbc078b07b9eb601f7cb769"
+  },
+  "development_failures": [
+    "Initial new eight-case reproduction: 7 failed/1 passed.",
+    "Incorrect test_service_owner_recovery.py filename: no tests collected; corrected to test_backend_owner_recovery.py.",
+    "First deque FIFO attempt: 1 failed/33 passed; callback failure reversed deferred calls. Assertion retained; deferral restored in finally.",
+    "Interim full collected nine new tests before final two regressions: 655 passed/63 warnings. One unhandled-thread warning from socket.settimeout on a closed socket; fixed error normalization and added test. Final run has only the 62 existing forkpty warnings."
+  ],
+  "limits": [
+    "No performance improvement claim or global transport migration.",
+    "Owner still schedules process() after synchronous RPC; parked user-space messages alone need not wake Qt socket notifier.",
+    "Shell external-notification integration, bus transport reconnect, initial Settings reads, other GUI actions, real PackageKit/systemd/polkit/hardware and Unix-FD support remain open.",
+    "Remote acceptance recorded separately after checks complete. No environment/dependency change."
+  ]
+}

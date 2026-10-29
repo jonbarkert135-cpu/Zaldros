@@ -64,8 +64,8 @@ coalesces the burst, and the UI is told once. What cannot signal is named:
 | file | what it is |
 | --- | --- |
 | `wire.py` | the D-Bus wire format: marshalling, alignment, messages |
-| `connection.py` | socket, SASL handshake, calls, match rules, signal delivery |
-| `service.py` | the server side — publishing objects, used by the notification server and by the mocks |
+| `connection.py` | socket, SASL handshake, calls, match rules, deferred signals and incoming calls |
+| `service.py` | publishing objects and serving calls, also used by the mocks; shell notification integration remains open |
 | `bus.py` | the non-raising API every facet uses (`Result`) |
 | `catalog.py` | every service name, path, interface and enumeration, each with its source |
 | `reading.py` | the honesty contract |
@@ -103,6 +103,9 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests -q
 * `test_backend_owner_recovery.py` — service loss/start/repeated restart, sender isolation,
   presence-cache invalidation, shared-rule cancellation and delivery through the Qt bridge.
   These use test services, not real BlueZ or UDisks hardware.
+* `test_incoming_methods.py` — incoming calls survive outgoing success/error/timeout/cancel,
+  client dispatch and callback RPCs; FIFO order, no duplicate execution, no-reply semantics
+  and signal delivery through ObjectServer are checked on a real private bus.
 * `test_update_activation.py` — real service-file activation of a test child,
   failed startup, cancellation/deadline and retry, process restart, and owner
   replacement before the CreateTransaction reply. Requires no host PackageKit.
@@ -120,3 +123,13 @@ without an owner watch, its existing TTL still applies. This adds no polling tim
 It restores events after a service restart on the same bus. Transport/bus-daemon
 reconnection, initial snapshot refresh after owner changes and nonblocking calls remain
 P04 work; this change does not establish them.
+
+Connections that also export objects retain incoming method calls while waiting for
+an outgoing RPC. `ObjectServer.process()` uses the same dispatcher as signal delivery
+and serves those calls afterwards; handlers never run inside `Connection.call()`.
+Client-only `dispatch()` retains methods until the object server processes them.
+`dispatch()` still counts signal handler deliveries; `process()` counts methods.
+The owner of an exported connection must schedule `process()` after synchronous RPCs
+as well as on socket readiness: parked user-space messages need not make the socket
+readable again. This transport fix does not wire the shell's notification server or
+add automatic Qt scheduling/reconnection.
