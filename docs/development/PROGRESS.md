@@ -20,7 +20,11 @@ Activation helper теперь использует обычный синхро�
 focused 36 PASS, shell/backend 657 PASS, tools 81 PASS, без skips/ошибок;
 62 прежних forkpty warnings. Команды: [receipt](../state/evidence/incoming-method-routing/local.json).
 История выявленных ошибок и границы: [итерация 0023](../state/iteration-reports/0023-incoming-method-routing.md).
-CI/ISO/финальный merge будут зафиксированы на настоящем PR после завершения.
+PR [#11](https://github.com/jonbarkert135-cpu/Zaldros/pull/11), source `e811227`:
+PR CI `40841250040` и push CI `40841200879` — по восемь jobs PASS; настоящий
+Office: Writer 40, Sheets 15, Slides 15, без skips/ошибок. Receipt фиксирует
+проверенный source/tree. Финальные follow-up/ISO/replay/merge статусы будут на PR
+после завершения; незавершённые проверки не считаются пройденными.
 P04/P12 PARTIAL: automatic process scheduling после RPC и подключение внешнего
 NotificationServer к оболочке ещё не выполнены. Transport reconnect, остальные
 GUI reads/actions, real PackageKit/systemd/polkit и FD gate остаются открытыми.

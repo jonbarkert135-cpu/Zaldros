@@ -51,3 +51,16 @@ parked user-space messages alone need not trigger another QSocketNotifier event.
 Shell notification-server wiring, bus-daemon reconnect, initial synchronous Settings
 reads, other GUI actions, and actual Unix-FD transfer remain open. Keep progressing
 through measured bounded slices and normal PR delivery.
+
+**REMOTE ACCEPTANCE** — Source `e811227a5fb64f48ac03f49985e88b2f8c184446`,
+PR [#11](https://github.com/jonbarkert135-cpu/Zaldros/pull/11), PR CI
+[40841250040](https://github.com/jonbarkert135-cpu/Zaldros/actions/runs/40841250040):
+all eight jobs PASS. Push CI `40841200879` also passed all eight. Structured real
+UNO Checks notices confirm Writer 40, Sheets 15, Slides 15: **70 PASS**, zero
+failures/skips. Actual PR checkout `9b622673c4c1de783f6a3ad45413d9e6c96166a5`
+and source share tree `e0d3706a304b2acb4776225019abae198fd8f9b0`.
+[CI receipt](../evidence/incoming-method-routing/ci-acceptance.json) pins run/jobs,
+runtime and source hashes. No unread remote shell count is asserted. The follow-up
+changes documentation/evidence only; final follow-up CI, ISO `40841200888`, strict
+VM replay and merge status will be recorded on PR #11 after completion. This
+checkpoint does not classify a still-running ISO workflow as passed.

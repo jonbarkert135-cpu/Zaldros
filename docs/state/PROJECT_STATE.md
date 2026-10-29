@@ -41,7 +41,10 @@ normal transport error. The activation child no longer needs its no-reply name
 acquisition workaround. Frozen-base regressions: 10 FAIL / 1 PASS. Final focused
 36 PASS, full shell/backend 657 PASS (62 existing warnings), tools 81 PASS, zero
 skips/failures: iteration 0023 and evidence/incoming-method-routing/local.json.
-Remote acceptance and merge will be recorded on the corresponding actual PR.
+PR #11 source `e811227`, PR CI `40841250040` and push CI `40841200879`: all eight
+jobs PASS each; real Office 40/15/15, zero failures/skips. Pinned CI receipt checks
+source/runtime tree equality. Follow-up CI, ISO/replay and merge outcomes will be
+recorded on the actual PR after completion; pending checks are not acceptance.
 No notification-shell integration or automatic Qt drain scheduling is established;
 owners still need to call process after RPCs even when the socket is no longer
 readable. Real services, reconnect, remaining GUI reads and FD support remain open.
